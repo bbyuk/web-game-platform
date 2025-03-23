@@ -3,6 +3,6 @@
     width: 1000px;
     background-color: white;
     border-radius: 50px;
-    /*box-shadow: var(--box-shadow);*/
+    border: solid 2px black;
     margin: 0 30px;
 }
