@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.canvas;
+package com.bb.webcanvasservice.domain.canvas.dto;
 
 public record Point(int x, int y) {
     public static Point of(int x, int y) {

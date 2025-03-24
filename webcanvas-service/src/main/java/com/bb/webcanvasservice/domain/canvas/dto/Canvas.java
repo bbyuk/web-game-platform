@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.canvas;
+package com.bb.webcanvasservice.domain.canvas.dto;
 
 import java.util.List;
 
