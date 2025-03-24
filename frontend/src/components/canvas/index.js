@@ -1,5 +1,4 @@
 import "index.css";
-import {createCanvas} from "canvas";
 import {useEffect, useRef, useState} from "react";
 
 export default function Canvas() {
@@ -18,22 +17,53 @@ export default function Canvas() {
         setPainting(false);
     }
     const onMouseMove = (event) => {
-        const rect = event.currentTarget.getBoundingClientRect();
+        const rect = canvasRef.current.getBoundingClientRect();
         const offsetX = event.clientX - rect.left;
         const offsetY = event.clientY - rect.top;
 
         if (painting) {
             canvasContext.lineTo(offsetX, offsetY);
             canvasContext.stroke();
-            setCurrentStroke((prevItems) => [...prevItems, {x: offsetX, y: offsetY}] );
-        }
-        else {
+            setCurrentStroke((prevItems) => [...prevItems, {x: offsetX, y: offsetY}]);
+        } else {
             canvasContext.beginPath();
             canvasContext.moveTo(offsetX, offsetY);
-            setStrokes((prevItems) => [...prevItems, currentStroke]);
+            if (currentStroke.length > 0) {
+                setStrokes((prevItems) => [...prevItems, currentStroke]);
+                setCurrentStroke([]);
+            }
         }
     }
 
+    const clear = () => {
+        canvasContext.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    }
+
+    const recover = () => {
+        if (strokes.length === 0) {
+            alert("이전에 그려진 데이터가 없습니다.");
+            return;
+        }
+
+        const rect = canvasRef.current.getBoundingClientRect();
+        console.log(rect);
+
+        strokes.forEach(stroke => {
+            if (stroke.length === 0) {
+                return;
+            }
+            stroke.forEach((point, index) => {
+                if (index > 0) {
+                    canvasContext.lineTo(point.x, point.y);
+                    canvasContext.stroke();
+                }
+
+                canvasContext.beginPath();
+                canvasContext.moveTo(point.x, point.y);
+            });
+        });
+
+    }
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -57,5 +87,16 @@ export default function Canvas() {
             onMouseUp={stopPainting}
             onMouseLeave={stopPainting}
         />
+
+        <div>
+            <br/>
+            <br/>
+            <button onClick={e => console.log(strokes)}>현재까지의 데이터 로그 찍기</button>
+            <button onClick={clear}>전체 지우기</button>
+            <button onClick={recover}>저장된 데이터로 그림 다시 그리기</button>
+            <br/>
+            <br/>
+            <br/>
+        </div>
     </>;
 }
