@@ -7,7 +7,7 @@ import java.util.List;
 @Builder
 public record Stroke(
         // 어떤 방에서 그려진 데이터인지
-        Long gameId,
+        Long gameRoomId,
 
         // 그림을 그린 유저 ID
         Long userId,

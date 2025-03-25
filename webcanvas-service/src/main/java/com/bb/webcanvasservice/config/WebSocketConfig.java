@@ -15,7 +15,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // 메시지 브로커 활성화: "/topic"과 "/queue"로 시작하는 경로에 대해 브로커를 활성화
-        registry.enableSimpleBroker("/topic", "/queue");
+        registry.enableSimpleBroker("/topic", "/sample");
 
         // 클라이언트로 메시지를 보낼 때 사용할 prefix 설정 (필요시)
         registry.setApplicationDestinationPrefixes("/app");
@@ -24,8 +24,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     // WebSocket 엔드포인트 설정
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // "/ws/canvas"와 "/ws/chat" 엔드포인트 설정
-        registry.addEndpoint("/ws/canvas").withSockJS();
-        registry.addEndpoint("/ws/chat").withSockJS();
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*");
+//                .withSockJS();
     }
 }

@@ -4,3 +4,11 @@ server:
 spring:
   application:
     name: webcanvas-service
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          socket: debug
+        messaging: debug

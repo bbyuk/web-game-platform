@@ -1,50 +1,71 @@
 package com.bb.webcanvasservice.domain.common;
 
-import static org.mockito.Mockito.*;
-
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompFrameHandler;
+import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
-import org.springframework.messaging.simp.stomp.StompSessionHandler;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.web.socket.WebSocketHttpHeaders;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.lang.reflect.Type;
+import java.util.concurrent.*;
 
-@ExtendWith(MockitoExtension.class)  // MockitoExtension을 사용하여 mock 객체 초기화
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class WebSocketControllerTest {
 
-    @Mock
-    private SimpMessagingTemplate simpMessagingTemplate;  // 메시지 전송을 위한 템플릿
+    @LocalServerPort
+    private int port;
+    private String WEBSOCKET_URL;
+    private final String SUBSCRIBE_TOPIC = "/topic";
+    private final String SEND_DESTINATION = "/app/draw";
 
-
-    private WebSocketController websocketController;
+    private WebSocketStompClient stompClient;
 
     @BeforeEach
-    public void setUp() {
-        websocketController = new WebSocketController(simpMessagingTemplate);
+    void setup() {
+        WEBSOCKET_URL = String.format("ws://localhost:%s/ws", port);
+        stompClient = new WebSocketStompClient(new StandardWebSocketClient());
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
     }
 
     @Test
-    public void testSendMessage() {
-        // 메세지
-        String message = "Hello message";
+    void testWebSocketDrawMessage() throws Exception {
+        // WebSocket 연결 설정
+        StompSession session = stompClient.connectAsync(
+                WEBSOCKET_URL,
+                new WebSocketHttpHeaders(),
+                new StompSessionHandlerAdapter() {}
+        ).get(3, TimeUnit.SECONDS);
+
+        // /topic/canvas 구독
+        CompletableFuture<String> subscribeFuture = new CompletableFuture<>();
+        session.subscribe(SUBSCRIBE_TOPIC, new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return String.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                subscribeFuture.complete(payload.toString());
+            }
+        });
+
+        // WebSocket 메세지 전송
+        String testMessage = "{\"x\":100, \"y\": 200}";
+        session.send(SEND_DESTINATION, testMessage);
 
 
-        // 웹소켓 세션에서 메시지 전송 메서드 호출 확인
-        String result = websocketController.handleDrawMessage(message);
+//        // 결과 검증
+        String receivedMessage = subscribeFuture.get(60, TimeUnit.SECONDS);
+        Assertions.assertThat(receivedMessage).isEqualTo(testMessage);
 
-        // mockito를 통해 메시지가 전송된 것을 확인
-        Mockito.verify(simpMessagingTemplate, times(1))
-                .convertAndSend(eq("/topic/messages"), eq(message));
-
-        // 결과 검증 (메시지가 그대로 반환되어야 함)
-        assertEquals(message, result);
     }
-
 }
