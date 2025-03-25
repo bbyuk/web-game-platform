@@ -37,5 +37,8 @@ public class GameRoomEntrance {
      */
     private User user;
 
-
+    public GameRoomEntrance(GameRoom gameRoom, User user) {
+        this.gameRoom = gameRoom;
+        this.user = user;
+    }
 }

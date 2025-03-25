@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.domain.game;
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.domain.game.exception.JoinCodeNotGeneratedException;
+import com.bb.webcanvasservice.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,16 @@ public class GameService {
 
     private final int JOIN_CODE_LENGTH = 10;
 
+    /**
+     * 서비스
+     */
+    private final UserService userService;
+
+    /**
+     * 레포지토리
+     */
     private final GameRoomRepository gameRoomRepository;
+    private final GameRoomEntranceRepository gameRoomEntranceRepository;
 
     /**
      * 유저 토큰으로 요청자를 식별해, 요청자가 입장한 게임 방을 리턴한다.
@@ -34,7 +44,7 @@ public class GameService {
      * 유저 토큰으로 요청자를 식별해, 요청자를 호스트로 하는 방을 새로 생성해 게임 방을 리턴한다.
      */
     @Transactional
-    public GameRoom createGameRoom(String hostUserToken) {
+    public Long createGameRoom(String hostUserToken) {
 
         /**
          * join code 생성
@@ -66,14 +76,14 @@ public class GameService {
         /**
          * GameRoom 생성
          */
-        GameRoom newGameRoom = new GameRoom(GameRoomStatus.WAITING, joinCode);
-        gameRoomRepository.save(newGameRoom);
+        GameRoom newGameRoom = gameRoomRepository.save(new GameRoom(GameRoomStatus.WAITING, joinCode));
 
         /**
          * TODO 게임 방 입장 Entity 생성 및 저장
          */
-        new GameRoomEntrance();
+        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(newGameRoom, userService.findUserByUserToken(hostUserToken));
+        gameRoomEntranceRepository.save(gameRoomEntrance);
 
-        return null;
+        return newGameRoom.getId();
     }
 }
