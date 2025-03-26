@@ -42,7 +42,7 @@ class GameServiceUnitTest {
                 .thenReturn(testUser);
 
         String joinCode = RandomCodeGenerator.generate(10);
-        GameRoom testGameRoom = new GameRoom(GameRoomStatus.WAITING, joinCode);
+        GameRoom testGameRoom = new GameRoom(GameRoomState.WAITING, joinCode);
         setId(testGameRoom, 1L);
 
         Mockito.when(gameRoomRepository.findById(any(Long.class)))

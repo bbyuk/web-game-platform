@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.domain.game;
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomNotFoundException;
-import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStatusException;
+import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
 import com.bb.webcanvasservice.domain.game.exception.JoinCodeNotGeneratedException;
 import com.bb.webcanvasservice.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class GameService {
      */
     @Transactional
     public GameRoom findGameRoomByUserToken(String userToken) {
-        return gameRoomRepository.findByGameRoomStatusNotMatchedAndUserToken(GameRoomStatus.CLOSED, userToken)
+        return gameRoomRepository.findByGameRoomStateNotMatchedAndUserToken(GameRoomState.CLOSED, userToken)
                 .orElseThrow(() -> new GameRoomNotFoundException("현재 입장한 방을 찾읈 수 없습니다."));
     }
 
@@ -69,7 +69,7 @@ public class GameService {
 
         while(collide) {
             String randomCode = RandomCodeGenerator.generate(JOIN_CODE_LENGTH);
-            collide = gameRoomRepository.findByGameRoomStatusNotMatchedAndJoinCode(GameRoomStatus.CLOSED, randomCode)
+            collide = gameRoomRepository.findByGameRoomStateNotMatchedAndJoinCode(GameRoomState.CLOSED, randomCode)
                     .isPresent();
 
             if (!collide) {
@@ -84,7 +84,7 @@ public class GameService {
         /**
          * GameRoom 생성
          */
-        GameRoom newGameRoom = gameRoomRepository.save(new GameRoom(GameRoomStatus.WAITING, joinCode));
+        GameRoom newGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, joinCode));
 
         /**
          * GameRoom 입장
@@ -112,12 +112,12 @@ public class GameService {
         }
 
         GameRoom targetGameRoom = gameRoomRepository.findByIdWithEntrances(gameRoomId).orElseThrow(() -> new GameRoomNotFoundException("게임 방을 찾을 수 없습니다."));
-        if (!targetGameRoom.getStatus().equals(GameRoomStatus.WAITING)) {
-            throw new IllegalGameRoomStatusException("방이 현재 입장할 수 없는 상태입니다.");
+        if (!targetGameRoom.getState().equals(GameRoomState.WAITING)) {
+            throw new IllegalGameRoomStateException("방이 현재 입장할 수 없는 상태입니다.");
         }
 
         if (targetGameRoom.getEntrances().size() >= GAME_ROOM_MAX_CAPACITY) {
-            throw new IllegalGameRoomStatusException("방의 정원이 모두 찼습니다.");
+            throw new IllegalGameRoomStateException("방의 정원이 모두 찼습니다.");
         }
 
 

@@ -21,20 +21,20 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
             from        GameRoomEntrance gre
             join fetch GameRoom gr
             on          gre.gameRoom = gr
-            where       gr.status != :gameRoomStatus
+            where       gr.state != :gameRoomState
             and         gre.user.userToken = :userToken
             """)
-    Optional<GameRoom> findByGameRoomStatusNotMatchedAndUserToken(@Param("gameRoomStatus") GameRoomStatus gameRoomStatus, @Param("userToken") String userToken);
+    Optional<GameRoom> findByGameRoomStateNotMatchedAndUserToken(@Param("gameRoomState") GameRoomState gameRoomState, @Param("userToken") String userToken);
 
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
             select  gr
             from    GameRoom gr
-            where   gr.status != :gameRoomStatus
+            where   gr.state != :gameRoomState
             and     gr.joinCode = :joinCode
             """)
-    Optional<GameRoom> findByGameRoomStatusNotMatchedAndJoinCode(@Param("gameRoomStatus") GameRoomStatus gameRoomStatus, @Param("joinCode") String joinCode);
+    Optional<GameRoom> findByGameRoomStateNotMatchedAndJoinCode(@Param("gameRoomState") GameRoomState gameRoomState, @Param("joinCode") String joinCode);
 
     @Query("""
            select gr

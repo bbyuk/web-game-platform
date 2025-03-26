@@ -27,11 +27,11 @@ public class GameRoom {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "state")
     /**
      * 게임 방 상태
      */
-    private GameRoomStatus status;
+    private GameRoomState state;
 
     @Column(name = "join_code", length = 12)
     /**
@@ -45,8 +45,8 @@ public class GameRoom {
      */
     private List<GameRoomEntrance> entrances = new ArrayList<>();
 
-    public GameRoom(GameRoomStatus status, String joinCode) {
-        this.status = status;
+    public GameRoom(GameRoomState state, String joinCode) {
+        this.state = state;
         this.joinCode = joinCode;
     }
 

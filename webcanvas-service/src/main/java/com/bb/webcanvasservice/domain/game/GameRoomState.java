@@ -4,7 +4,7 @@ package com.bb.webcanvasservice.domain.game;
 /**
  * 게임 방의 상태를 나타내는 상태 코드 enum
  */
-public enum GameRoomStatus {
+public enum GameRoomState {
     /**
      * 방이 닫힌 상태
      * 더 이상 사용되지 않음
