@@ -10,8 +10,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @WebMvcTest(CanvasController.class)
 class CanvasControllerMvcTest {
 
@@ -22,7 +20,6 @@ class CanvasControllerMvcTest {
     @DisplayName("클라이언트에서 발생한 Stroke 이벤트를 같은 방에 접속해 있는 유저들에게 브로드캐스팅한다.")
     void broadcastingWhenStrokeEventOccur() throws Exception {
         Stroke stroke = Stroke.builder()
-                .gameId(2L)
                 .userId(23L)
                 .color("black")
                 .lineWidth(5)
