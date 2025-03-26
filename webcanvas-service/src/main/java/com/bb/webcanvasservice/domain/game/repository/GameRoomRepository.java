@@ -1,5 +1,7 @@
-package com.bb.webcanvasservice.domain.game;
+package com.bb.webcanvasservice.domain.game.repository;
 
+import com.bb.webcanvasservice.domain.game.GameRoom;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -21,20 +23,22 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
             from        GameRoomEntrance gre
             join fetch GameRoom gr
             on          gre.gameRoom = gr
-            where       gr.state != :gameRoomState
+            where       gr.state != 'CLOSED'
             and         gre.user.userToken = :userToken
             """)
-    Optional<GameRoom> findByGameRoomStateNotMatchedAndUserToken(@Param("gameRoomState") GameRoomState gameRoomState, @Param("userToken") String userToken);
+    Optional<GameRoom> findNotClosedGameRoomByUserToken(@Param("userToken") String userToken);
 
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
-            select  gr
-            from    GameRoom gr
-            where   gr.state != :gameRoomState
-            and     gr.joinCode = :joinCode
+            select exists (
+                select 1
+                from GameRoom gr
+                where gr.state != 'CLOSED'
+                and gr.joinCode = :joinCode
+            )
             """)
-    Optional<GameRoom> findByGameRoomStateNotMatchedAndJoinCode(@Param("gameRoomState") GameRoomState gameRoomState, @Param("joinCode") String joinCode);
+    boolean existsJoinCodeConflictOnActiveGameRoom(@Param("joinCode") String joinCode);
 
     @Query("""
            select gr

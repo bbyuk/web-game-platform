@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.domain.game;
 
+import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -1,18 +1,23 @@
 package com.bb.webcanvasservice.domain.game;
 
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
 import com.bb.webcanvasservice.domain.game.exception.JoinCodeNotGeneratedException;
+import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
+import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 게임 방과 게임 세션 등 게임과 관련된 비즈니스 로직을 처리하는 서비스 클래스
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GameService {
@@ -21,6 +26,7 @@ public class GameService {
      * 게임 방의 입장 코드 길이
      */
     private final int JOIN_CODE_LENGTH = 10;
+    private final int JOIN_CODE_MAX_CONFLICT_COUNT = 10;
     private final int GAME_ROOM_MAX_CAPACITY = 8;
 
     /**
@@ -42,7 +48,7 @@ public class GameService {
      */
     @Transactional
     public GameRoom findGameRoomByUserToken(String userToken) {
-        return gameRoomRepository.findByGameRoomStateNotMatchedAndUserToken(GameRoomState.CLOSED, userToken)
+        return gameRoomRepository.findNotClosedGameRoomByUserToken(userToken)
                 .orElseThrow(() -> new GameRoomNotFoundException("현재 입장한 방을 찾읈 수 없습니다."));
     }
 
@@ -62,19 +68,20 @@ public class GameService {
          *      2.1. 현재 방의 상태가 closed가 아닌 게임 방 중 생성된 랜덤코드와 동일한 joinCode를 가진 게임 방이 있는지 조회
          *      2.2. 충돌 시 1번 로직으로 이동
          *      2.3. 통과시 해당 랜덤코드를 새로 생성할 방의 joinCode로 채택
+         *
+         * conflict가 10번 초과하여 발생할 시 joinCode 생성 중 문제가 발생했다는 문구와 함께 잠시후 재시도 해달라는 문구 출력 필요
          */
 
-        boolean collide = true;
-        String joinCode = "";
+        String joinCode = RandomCodeGenerator.generate(JOIN_CODE_LENGTH);
+        int conflictCount = 0;
 
-        while(collide) {
-            String randomCode = RandomCodeGenerator.generate(JOIN_CODE_LENGTH);
-            collide = gameRoomRepository.findByGameRoomStateNotMatchedAndJoinCode(GameRoomState.CLOSED, randomCode)
-                    .isPresent();
-
-            if (!collide) {
-                joinCode = randomCode;
+        while(gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(joinCode)) {
+            if (conflictCount == JOIN_CODE_MAX_CONFLICT_COUNT) {
+                log.error("join code 생성 중 충돌이 최대 횟수인 {}회 발생했습니다.", JOIN_CODE_MAX_CONFLICT_COUNT);
+                throw new JoinCodeNotGeneratedException("join code 생성 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
             }
+            conflictCount++;
+            joinCode = RandomCodeGenerator.generate(JOIN_CODE_LENGTH);
         }
 
         if (joinCode.isEmpty()) {
@@ -120,7 +127,6 @@ public class GameService {
         if (targetGameRoom.getEntrances().size() >= GAME_ROOM_MAX_CAPACITY) {
             throw new IllegalGameRoomStateException("방의 정원이 모두 찼습니다.");
         }
-
 
         GameRoomEntrance gameRoomEntrance =
                 new GameRoomEntrance(

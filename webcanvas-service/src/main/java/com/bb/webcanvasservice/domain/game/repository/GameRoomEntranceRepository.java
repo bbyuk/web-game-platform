@@ -1,5 +1,6 @@
-package com.bb.webcanvasservice.domain.game;
+package com.bb.webcanvasservice.domain.game.repository;
 
+import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +16,7 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             select exists(
                 select 1
                 from GameRoomEntrance gre
-                join fetch User u
+                join User u
                 on gre.user = u
                 where gre.user.id = :userId
             )
