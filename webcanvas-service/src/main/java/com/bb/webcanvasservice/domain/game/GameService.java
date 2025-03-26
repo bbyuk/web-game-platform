@@ -1,7 +1,9 @@
 package com.bb.webcanvasservice.domain.game;
 
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
+import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomNotFoundException;
+import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStatusException;
 import com.bb.webcanvasservice.domain.game.exception.JoinCodeNotGeneratedException;
 import com.bb.webcanvasservice.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ public class GameService {
      * 게임 방의 입장 코드 길이
      */
     private final int JOIN_CODE_LENGTH = 10;
-
+    private final int GAME_ROOM_MAX_CAPACITY = 8;
 
     /**
      * 서비스 주입
@@ -96,8 +98,7 @@ public class GameService {
     /**
      * 게임 방에 유저를 입장시킨다.
      *
-     * TODO 요구사항 구현
-     * - 입장시키려는 유저가 현재 아무 방에도 접속하지 않은 상태여야 한다.
+     * - 입장시키려는 유저가 현재 아무 방에도 접속하지 않은 상태여야 한다. -> 방에서 나갈 시 삭제 처리
      * - 입장하려는 방의 상태가 WAITING이어야 한다.
      * - 입장하려는 방에 접속한 유저 세션의 수(entrances)는 최대 8이다.
      * @param gameRoomId
@@ -106,11 +107,28 @@ public class GameService {
      */
     @Transactional
     public Long enterGameRoom(Long gameRoomId, Long userId) {
+        if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
+            throw new AlreadyEnteredRoomException("이미 입장한 방이 있습니다.");
+        }
+
+        GameRoom targetGameRoom = gameRoomRepository.findByIdWithEntrances(gameRoomId).orElseThrow(() -> new GameRoomNotFoundException("게임 방을 찾을 수 없습니다."));
+        if (!targetGameRoom.getStatus().equals(GameRoomStatus.WAITING)) {
+            throw new IllegalGameRoomStatusException("방이 현재 입장할 수 없는 상태입니다.");
+        }
+
+        if (targetGameRoom.getEntrances().size() >= GAME_ROOM_MAX_CAPACITY) {
+            throw new IllegalGameRoomStatusException("방의 정원이 모두 찼습니다.");
+        }
+
+
         GameRoomEntrance gameRoomEntrance =
                 new GameRoomEntrance(
-                        gameRoomRepository.findById(gameRoomId).orElseThrow(() -> new GameRoomNotFoundException("게임 방을 찾을 수 없습니다."))
+                        targetGameRoom
                         , userService.findUserByUserId(userId));
+
         GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
+
+
 
         return newGameRoomEntrance.getId();
     }

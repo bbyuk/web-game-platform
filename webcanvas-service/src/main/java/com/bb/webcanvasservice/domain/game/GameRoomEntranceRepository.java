@@ -1,6 +1,8 @@
 package com.bb.webcanvasservice.domain.game;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -8,4 +10,15 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntrance, Long> {
+
+    @Query("""
+            select exists(
+                select 1
+                from GameRoomEntrance gre
+                join fetch User u
+                on gre.user = u
+                where gre.user.id = :userId
+            )
+            """)
+    boolean existsGameRoomEntranceByUserId(@Param("userId") Long userId);
 }

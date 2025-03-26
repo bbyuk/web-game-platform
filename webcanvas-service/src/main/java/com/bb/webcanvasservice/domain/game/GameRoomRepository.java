@@ -35,4 +35,13 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
             and     gr.joinCode = :joinCode
             """)
     Optional<GameRoom> findByGameRoomStatusNotMatchedAndJoinCode(@Param("gameRoomStatus") GameRoomStatus gameRoomStatus, @Param("joinCode") String joinCode);
+
+    @Query("""
+           select gr
+           from GameRoom gr
+           join fetch GameRoomEntrance gre
+           on gre.gameRoom = gr
+           where gr.id = :id
+            """)
+    Optional<GameRoom> findByIdWithEntrances(@Param("id") Long id);
 }
