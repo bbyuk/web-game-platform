@@ -1,6 +1,9 @@
-package com.bb.webcanvasservice.domain.game;
+package com.bb.webcanvasservice.unit.domain.game;
 
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
+import com.bb.webcanvasservice.domain.game.GameRoom;
+import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.GameService;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
@@ -131,14 +134,14 @@ class GameServiceUnitTest {
         when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
                 .thenReturn(Boolean.FALSE);
         GameRoom testGameRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10));
-        testGameRoom.addEntrance(new GameRoomEntrance());
-        testGameRoom.addEntrance(new GameRoomEntrance());
-        testGameRoom.addEntrance(new GameRoomEntrance());
-        testGameRoom.addEntrance(new GameRoomEntrance());
-        testGameRoom.addEntrance(new GameRoomEntrance());
-        testGameRoom.addEntrance(new GameRoomEntrance());
-        testGameRoom.addEntrance(new GameRoomEntrance());
-        testGameRoom.addEntrance(new GameRoomEntrance());
+        testGameRoom.addEntrance(new GameRoomEntrance(null, null));
+        testGameRoom.addEntrance(new GameRoomEntrance(null, null));
+        testGameRoom.addEntrance(new GameRoomEntrance(null, null));
+        testGameRoom.addEntrance(new GameRoomEntrance(null, null));
+        testGameRoom.addEntrance(new GameRoomEntrance(null, null));
+        testGameRoom.addEntrance(new GameRoomEntrance(null, null));
+        testGameRoom.addEntrance(new GameRoomEntrance(null, null));
+        testGameRoom.addEntrance(new GameRoomEntrance(null, null));
 
         when(gameRoomRepository.findByIdWithEntrances(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));

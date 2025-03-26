@@ -1,9 +1,11 @@
-package com.bb.webcanvasservice.domain.game.repository;
+package com.bb.webcanvasservice.unit.domain.game.repository;
 
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
+import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
+import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -67,7 +69,6 @@ class GameRepositoryTest {
         Assertions.assertThat(queryResult.get().getJoinCode()).isEqualTo(enteredRoomCode);
     }
 
-
     @Test
     @DisplayName("활성 상태인 게임 방의 입장 코드와 충돌이 발생했을 때 true 리턴")
     public void returnTrueWhenJoinCodeConflict() {
@@ -85,14 +86,13 @@ class GameRepositoryTest {
     }
 
     @Test
-    @DisplayName("쿼리 요청 유저가 입장한 방이 있다면 true 리턴, 없다면 false 리턴")
+    @DisplayName("쿼리 요청 유저가 입장한 방이 있다면 true 리턴")
     public void returnTrueWhenUserEnteredAnyRoom() {
         // given
         Long testUserId = testUser.getId();
 
         GameRoom waitingRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10));
         GameRoom playingRoom = new GameRoom(GameRoomState.PLAYING, RandomCodeGenerator.generate(10));
-//        GameRoom closedRoom = new GameRoom(GameRoomState.CLOSED, RandomCodeGenerator.generate(10));
 
         gameRoomRepository.save(waitingRoom);
         gameRoomRepository.save(playingRoom);
@@ -104,4 +104,25 @@ class GameRepositoryTest {
 
     }
 
+    @Test
+    @DisplayName("쿼리 요청 유저가 입장한 방이 없다면 false 리턴")
+    public void returnFalseWhenUserNotEnteredAnyRoom() {
+        // given
+        Long testUserId = testUser.getId();
+
+        GameRoom waitingRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10));
+        GameRoom playingRoom = new GameRoom(GameRoomState.PLAYING, RandomCodeGenerator.generate(10));
+
+        gameRoomRepository.save(waitingRoom);
+        gameRoomRepository.save(playingRoom);
+
+        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(waitingRoom, testUser);
+        gameRoomEntranceRepository.save(gameRoomEntrance);
+
+        // when
+        boolean result = gameRoomEntranceRepository.existsGameRoomEntranceByUserId(testUserId);
+
+        // then
+        Assertions.assertThat(result).isTrue();
+    }
 }

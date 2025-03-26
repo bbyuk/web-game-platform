@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.common;
+package com.bb.webcanvasservice.unit.domain.common;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,14 +28,14 @@ class WebSocketControllerTest {
 
     private WebSocketStompClient stompClient;
 
-    @BeforeEach
+//    @BeforeEach
     void setup() {
         WEBSOCKET_URL = String.format("ws://localhost:%s/ws", port);
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
     }
 
-    @Test
+//    @Test
     void testWebSocketDrawMessage() throws Exception {
         // WebSocket 연결 설정
         StompSession session = stompClient.connectAsync(

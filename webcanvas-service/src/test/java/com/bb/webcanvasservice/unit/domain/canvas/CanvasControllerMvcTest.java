@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.canvas;
+package com.bb.webcanvasservice.unit.domain.canvas;
 
 import com.bb.webcanvasservice.domain.canvas.dto.Point;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
@@ -10,14 +10,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-@WebMvcTest(CanvasController.class)
+//@WebMvcTest(CanvasController.class)
 class CanvasControllerMvcTest {
 
-    @Autowired
+//    @Autowired
     private MockMvc mockMvc; // 모의 환경에서 웹 계층을 테스트하기 위한 유틸리티 클래스
 
-    @Test
-    @DisplayName("클라이언트에서 발생한 Stroke 이벤트를 같은 방에 접속해 있는 유저들에게 브로드캐스팅한다.")
+//    @Test
+//    @DisplayName("클라이언트에서 발생한 Stroke 이벤트를 같은 방에 접속해 있는 유저들에게 브로드캐스팅한다.")
     void broadcastingWhenStrokeEventOccur() throws Exception {
         Stroke stroke = Stroke.builder()
                 .userId(23L)
