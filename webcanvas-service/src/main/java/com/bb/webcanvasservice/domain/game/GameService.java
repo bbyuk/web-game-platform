@@ -95,6 +95,11 @@ public class GameService {
 
     /**
      * 게임 방에 유저를 입장시킨다.
+     *
+     * TODO 요구사항 구현
+     * - 입장시키려는 유저가 현재 아무 방에도 접속하지 않은 상태여야 한다.
+     * - 입장하려는 방의 상태가 WAITING이어야 한다.
+     * - 입장하려는 방에 접속한 유저 세션의 수(entrances)는 최대 8이다.
      * @param gameRoomId
      * @param userId
      * @return gameRoomEntranceId
