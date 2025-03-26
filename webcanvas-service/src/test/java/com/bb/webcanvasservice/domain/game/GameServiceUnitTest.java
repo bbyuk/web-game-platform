@@ -1,6 +1,8 @@
 package com.bb.webcanvasservice.domain.game;
 
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
+import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
+import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
 import org.assertj.core.api.Assertions;
@@ -9,14 +11,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GameServiceUnitTest {
@@ -30,35 +34,124 @@ class GameServiceUnitTest {
     @InjectMocks
     private GameService gameService;
 
-    private final String testUserToken = UUID.randomUUID().toString();
+    private final Random random = new Random();
 
     @Test
-    @DisplayName("GameRoom에 입장시킨다.")
-    public void enterGameRoom() throws Exception {
+    @DisplayName("GameRoom 입장 - 유저가 현재 입장한 방이 없고, 방의 상태가 입장 가능한 상태이면 성공적으로 입장")
+    public void enterGameRoomSuccess() throws Exception {
         // given
+        String testUserToken = UUID.randomUUID().toString();
+
+        User alreadyEnteredUser1 = new User(UUID.randomUUID().toString());
+        User alreadyEnteredUser2 = new User(UUID.randomUUID().toString());
+
+
+        // 테스트 유저
         User testUser = new User(testUserToken);
-        setId(testUser, 1L);
-        Mockito.when(userService.findUserByUserId(any(Long.class)))
+        long testUserId = random.nextLong();
+        setId(testUser, testUserId);
+
+        when(userService.findUserByUserId(any(Long.class)))
                 .thenReturn(testUser);
 
+        // 테스트 게임 방
         String joinCode = RandomCodeGenerator.generate(10);
         GameRoom testGameRoom = new GameRoom(GameRoomState.WAITING, joinCode);
-        setId(testGameRoom, 1L);
+        long testGameRoomId = random.nextLong();
+        setId(testGameRoom, testGameRoomId);
 
-        Mockito.when(gameRoomRepository.findById(any(Long.class)))
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser1));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser2));
+
+        when(gameRoomRepository.findByIdWithEntrances(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
 
+        // 테스트 게임 방 입장
         GameRoomEntrance testGameRoomEntrance = new GameRoomEntrance(testGameRoom, testUser);
-        setId(testGameRoomEntrance, 1L);
+        long testGameRoomEntranceId = random.nextLong();
+        setId(testGameRoomEntrance, testGameRoomEntranceId);
 
-        Mockito.when(gameRoomEntranceRepository.save(any(GameRoomEntrance.class)))
+        when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
+                .thenReturn(Boolean.FALSE);
+        when(gameRoomEntranceRepository.save(any(GameRoomEntrance.class)))
                 .thenReturn(testGameRoomEntrance);
 
+
         // when
-        Long gameRoomEnterId = gameService.enterGameRoom(1L, 1L);
+        Long gameRoomEnterId = gameService.enterGameRoom(testGameRoomId, testUserId);
 
         // then
-        Assertions.assertThat(gameRoomEnterId).isEqualTo(1L);
+        Assertions.assertThat(gameRoomEnterId).isEqualTo(testGameRoomEntranceId);
+    }
+
+
+    @Test
+    @DisplayName("GameRoom 입장 - 유저가 현재 입장한 방이 있다면 실패")
+    public void enterGameRoomFailedWhenAlreadyUserEnteredRoom() {
+        // given
+        when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
+                .thenReturn(Boolean.TRUE);
+
+        Long gameRoomId = random.nextLong();
+        Long userId = random.nextLong();
+
+        // when
+        Assertions.assertThatThrownBy(() -> gameService.enterGameRoom(gameRoomId, userId))
+                .isInstanceOf(AlreadyEnteredRoomException.class);
+
+        // then
+    }
+
+    @Test
+    @DisplayName("GameRoom 입장 - 유저가 입장하려는 방의 상태가 WAITING이 아니면 실패")
+    public void enterGameRoomFailedWhenGameRoomStateIsNotWaiting() {
+        // given
+        when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
+                .thenReturn(Boolean.FALSE);
+        when(gameRoomRepository.findByIdWithEntrances(any(Long.class)))
+                .thenReturn(Optional.of(new GameRoom(GameRoomState.PLAYING, RandomCodeGenerator.generate(10))));
+
+        long gameRoomId = random.nextLong();
+        long userId = random.nextLong();
+
+        // when
+        Assertions.assertThatThrownBy(() -> gameService.enterGameRoom(gameRoomId, userId))
+                .isInstanceOf(IllegalGameRoomStateException.class)
+                .hasMessage("방이 현재 입장할 수 없는 상태입니다.");
+
+        // then
+    }
+
+    @Test
+    @DisplayName("GameRoom 입장 - 유저가 입장하려는 방의 현재 입장 정원이 모두 찬 경우 실패")
+    public void enterGameRoomFailedWhenGameRoomLimitationIsOver() {
+        // given
+        when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
+                .thenReturn(Boolean.FALSE);
+        GameRoom testGameRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10));
+        testGameRoom.addEntrance(new GameRoomEntrance());
+        testGameRoom.addEntrance(new GameRoomEntrance());
+        testGameRoom.addEntrance(new GameRoomEntrance());
+        testGameRoom.addEntrance(new GameRoomEntrance());
+        testGameRoom.addEntrance(new GameRoomEntrance());
+        testGameRoom.addEntrance(new GameRoomEntrance());
+        testGameRoom.addEntrance(new GameRoomEntrance());
+        testGameRoom.addEntrance(new GameRoomEntrance());
+
+        when(gameRoomRepository.findByIdWithEntrances(any(Long.class)))
+                .thenReturn(Optional.of(testGameRoom));
+
+        long gameRoomId = random.nextLong();
+        long userId = random.nextLong();
+
+        // when
+
+
+        Assertions.assertThatThrownBy(() -> gameService.enterGameRoom(gameRoomId, userId))
+                .isInstanceOf(IllegalGameRoomStateException.class)
+                .hasMessage("방의 정원이 모두 찼습니다.");
+
+        // then
     }
 
 
