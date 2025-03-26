@@ -15,4 +15,10 @@ public class UserService {
         return userRepository.findByUserToken(userToken)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다."));
     }
+
+    @Transactional(readOnly = true)
+    public User findUserByUserId(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다."));
+    }
 }
