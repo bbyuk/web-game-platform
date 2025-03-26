@@ -50,4 +50,8 @@ public class GameRoom {
         this.joinCode = joinCode;
     }
 
+    public void addEntrance(GameRoomEntrance entrance) {
+        entrances.add(entrance);
+    }
+
 }
