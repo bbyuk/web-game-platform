@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * 게임 유저의 persitence layer를 담당하는 레포지토리 클래스
+ */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 

@@ -9,21 +9,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 게임 방과 게임 세션 등 게임과 관련된 서비스를 처리하는 클래스
+ * 게임 방과 게임 세션 등 게임과 관련된 비즈니스 로직을 처리하는 서비스 클래스
  */
 @Service
 @RequiredArgsConstructor
 public class GameService {
 
+    /**
+     * 게임 방의 입장 코드 길이
+     */
     private final int JOIN_CODE_LENGTH = 10;
 
+
     /**
-     * 서비스
+     * 서비스 주입
      */
     private final UserService userService;
 
     /**
-     * 레포지토리
+     * 레포지토리 주입
      */
     private final GameRoomRepository gameRoomRepository;
     private final GameRoomEntranceRepository gameRoomEntranceRepository;
@@ -40,12 +44,14 @@ public class GameService {
                 .orElseThrow(() -> new GameRoomNotFoundException("현재 입장한 방을 찾읈 수 없습니다."));
     }
 
+
     /**
      * 유저 토큰으로 요청자를 식별해, 요청자를 호스트로 하는 방을 새로 생성해 게임 방을 리턴한다.
+     * @param hostUserToken
+     * @return gameRoomId
      */
     @Transactional
     public Long createGameRoom(String hostUserToken) {
-
         /**
          * join code 생성
          *
@@ -79,11 +85,28 @@ public class GameService {
         GameRoom newGameRoom = gameRoomRepository.save(new GameRoom(GameRoomStatus.WAITING, joinCode));
 
         /**
-         * TODO 게임 방 입장 Entity 생성 및 저장
+         * GameRoom 입장
          */
-        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(newGameRoom, userService.findUserByUserToken(hostUserToken));
-        gameRoomEntranceRepository.save(gameRoomEntrance);
+        enterGameRoom(newGameRoom.getId(), userService.findUserByUserToken(hostUserToken).getId());
+
 
         return newGameRoom.getId();
+    }
+
+    /**
+     * 게임 방에 유저를 입장시킨다.
+     * @param gameRoomId
+     * @param userId
+     * @return gameRoomEntranceId
+     */
+    @Transactional
+    public Long enterGameRoom(Long gameRoomId, Long userId) {
+        GameRoomEntrance gameRoomEntrance =
+                new GameRoomEntrance(
+                        gameRoomRepository.findById(gameRoomId).orElseThrow(() -> new GameRoomNotFoundException("게임 방을 찾을 수 없습니다."))
+                        , userService.findUserByUserId(userId));
+        GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
+
+        return newGameRoomEntrance.getId();
     }
 }
