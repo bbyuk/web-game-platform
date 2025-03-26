@@ -1,7 +1,9 @@
 package com.bb.webcanvasservice.domain.user;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * webcanvas 게임 내에서의 유저 정보 엔티티
@@ -10,6 +12,7 @@ import lombok.Getter;
 @Entity
 @Getter
 @Table(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
@@ -25,4 +28,8 @@ public class User {
      * 유저 식별 토큰
      */
     private String userToken;
+
+    public User(String userToken) {
+        this.userToken = userToken;
+    }
 }
