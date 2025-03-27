@@ -8,6 +8,7 @@ import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateExcepti
 import com.bb.webcanvasservice.domain.game.exception.JoinCodeNotGeneratedException;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
+import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,12 +55,21 @@ public class GameService {
 
 
     /**
-     * 유저 토큰으로 요청자를 식별해, 요청자를 호스트로 하는 방을 새로 생성해 게임 방을 리턴한다.
+     * 요청자를 호스트로 하는 방을 새로 생성해 게임 방을 리턴한다.
      * @param hostUserToken
      * @return gameRoomId
      */
     @Transactional
-    public Long createGameRoom(String hostUserToken) {
+    public Long createGameRoom(Long userId) {
+        /**
+         * 유저가 새로 게임을 생성할 수 있는 상태인지 확인한다.
+         * - 유저가 현재 아무 방에도 입장하지 않은 상태여야 한다.
+         */
+        User user = userService.findUserByUserId(userId);
+        if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(user.getId())) {
+            throw new AlreadyEnteredRoomException("이미 입장한 방이 있습니다.");
+        }
+
         /**
          * join code 생성
          *
@@ -96,7 +106,7 @@ public class GameService {
         /**
          * GameRoom 입장
          */
-        enterGameRoom(newGameRoom.getId(), userService.findUserByUserToken(hostUserToken).getId());
+        enterGameRoom(newGameRoom.getId(), user.getId());
 
 
         return newGameRoom.getId();
