@@ -44,8 +44,8 @@ public class GameService {
     /**
      * 요청자가 입장한 게임 방을 리턴한다.
      * 현재 입장한 게임 방이 없을 경우, GameRoomNotFoundException 발생
-     * @param userToken
-     * @return
+     * @param userId
+     * @return GameRoom
      */
     @Transactional
     public GameRoom findGameRoomByUserToken(Long userId) {
@@ -56,7 +56,7 @@ public class GameService {
 
     /**
      * 요청자를 호스트로 하는 방을 새로 생성해 게임 방을 리턴한다.
-     * @param hostUserToken
+     * @param userId
      * @return gameRoomId
      */
     @Transactional
