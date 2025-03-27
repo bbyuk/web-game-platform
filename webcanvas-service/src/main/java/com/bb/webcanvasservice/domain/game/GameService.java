@@ -42,14 +42,14 @@ public class GameService {
     private final GameRoomEntranceRepository gameRoomEntranceRepository;
 
     /**
-     * 유저 토큰으로 요청자를 식별해, 요청자가 입장한 게임 방을 리턴한다.
+     * 요청자가 입장한 게임 방을 리턴한다.
      * 현재 입장한 게임 방이 없을 경우, GameRoomNotFoundException 발생
      * @param userToken
      * @return
      */
     @Transactional
-    public GameRoom findGameRoomByUserToken(String userToken) {
-        return gameRoomRepository.findNotClosedGameRoomByUserToken(userToken)
+    public GameRoom findGameRoomByUserToken(Long userId) {
+        return gameRoomRepository.findNotClosedGameRoomByUserId(userId)
                 .orElseThrow(() -> new GameRoomNotFoundException("현재 입장한 방을 찾읈 수 없습니다."));
     }
 

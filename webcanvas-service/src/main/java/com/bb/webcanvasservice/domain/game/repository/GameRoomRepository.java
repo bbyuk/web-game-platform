@@ -1,7 +1,6 @@
 package com.bb.webcanvasservice.domain.game.repository;
 
 import com.bb.webcanvasservice.domain.game.GameRoom;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -24,9 +23,9 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
             join fetch GameRoom gr
             on          gre.gameRoom = gr
             where       gr.state != 'CLOSED'
-            and         gre.user.userToken = :userToken
+            and         gre.user.id = :userId
             """)
-    Optional<GameRoom> findNotClosedGameRoomByUserToken(@Param("userToken") String userToken);
+    Optional<GameRoom> findNotClosedGameRoomByUserId(@Param("userId") Long userId);
 
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

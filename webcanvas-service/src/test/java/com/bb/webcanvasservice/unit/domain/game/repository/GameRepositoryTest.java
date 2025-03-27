@@ -15,9 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest // JPA 관련 컴포넌트만 로드하여 테스트
@@ -31,7 +35,6 @@ class GameRepositoryTest {
 
     @Autowired
     private GameRoomEntranceRepository gameRoomEntranceRepository;
-
 
     private final String testUserToken = UUID.randomUUID().toString();
 
@@ -62,7 +65,7 @@ class GameRepositoryTest {
         enteredRoom.addEntrance(gameRoomEntrance);
 
         // when
-        Optional<GameRoom> queryResult = gameRoomRepository.findNotClosedGameRoomByUserToken(testUserToken);
+        Optional<GameRoom> queryResult = gameRoomRepository.findNotClosedGameRoomByUserId(testUser.getId());
 
         // then
         Assertions.assertThat(queryResult.isPresent()).isTrue();
@@ -83,6 +86,50 @@ class GameRepositoryTest {
 
         // then
         Assertions.assertThat(result).isTrue();
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("동시에 두 유저가 게임 방 생성 요청 - 같은 게임 입장 코드로 게임 방 생성 쿼리를 실행할 경우 락을 획득하지 못한 유저는 Exception 발생")
+    public void gameRoomJoinCodeConflict() throws Exception {
+        // given
+        String joinCode = RandomCodeGenerator.generate(10);
+
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        CountDownLatch latch = new CountDownLatch(2);
+
+        // when
+
+        Runnable task = () -> {
+            try {
+                 // 비관적 락 획득
+                if (!gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(joinCode)) {
+                    GameRoom lockTakenGameRoom = new GameRoom(GameRoomState.WAITING, joinCode);
+                    gameRoomRepository.save(lockTakenGameRoom);
+                }
+
+                Thread.sleep(3000); // 일부러 지연 -> 락 유지됨
+            }
+            catch (Exception e) {
+                System.out.println("e = " + e);
+                throw new IllegalStateException(e);
+            }
+            finally {
+                latch.countDown();
+            }
+        };
+
+        // 두 개의 스레드 동시 실행
+        executor.submit(task); // 첫 번째 스레드 실행 (락 획득 + insert)
+
+        Thread.sleep(500); // 약간의 지연을 주어 락이 걸릴 시간을 확보
+
+        executor.submit(task); // 두 번째 스레드 실행 (락이 걸린 상태에서 대기)
+
+        // then
+        latch.await(); // 모든 스레드가 끝날때까지 대기
+        executor.shutdown();
     }
 
     @Test
