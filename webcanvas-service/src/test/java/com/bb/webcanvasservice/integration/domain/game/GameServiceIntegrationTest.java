@@ -98,12 +98,14 @@ class GameServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("게임 방 생성")
+    @DisplayName("게임 방 생성 - 게임 방 생성 시 host로 생성된 게임 방에 자동 입장된다.")
     public void createGameRoom() {
-        // given
+        // given - 테스트 공통 유저 사용
 
         // when
+        Long gameRoomId = gameService.createGameRoom(testUser.getId());
 
         // then
+        Assertions.assertThat(gameRoomId).isNotNull();
     }
 }

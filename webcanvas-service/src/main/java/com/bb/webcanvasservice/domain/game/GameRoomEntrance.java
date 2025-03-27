@@ -40,6 +40,5 @@ public class GameRoomEntrance {
     public GameRoomEntrance(GameRoom gameRoom, User user) {
         this.gameRoom = gameRoom;
         this.user = user;
-        this.gameRoom.addEntrance(this);
     }
 }

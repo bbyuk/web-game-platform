@@ -134,14 +134,14 @@ class GameServiceUnitTest {
         when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
                 .thenReturn(Boolean.FALSE);
         GameRoom testGameRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10));
-        new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()));
-        new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()));
-        new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()));
-        new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()));
-        new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()));
-        new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()));
-        new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()));
-        new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
 
         when(gameRoomRepository.findByIdWithEntrances(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));

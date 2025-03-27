@@ -129,7 +129,7 @@ public class GameService {
             throw new AlreadyEnteredRoomException("이미 입장한 방이 있습니다.");
         }
 
-        GameRoom targetGameRoom = gameRoomRepository.findByIdWithEntrances(gameRoomId).orElseThrow(() -> new GameRoomNotFoundException("게임 방을 찾을 수 없습니다."));
+        GameRoom targetGameRoom = gameRoomRepository.findById(gameRoomId).orElseThrow(() -> new GameRoomNotFoundException("게임 방을 찾을 수 없습니다."));
         if (!targetGameRoom.getState().equals(GameRoomState.WAITING)) {
             throw new IllegalGameRoomStateException("방이 현재 입장할 수 없는 상태입니다.");
         }
@@ -142,7 +142,6 @@ public class GameService {
                 new GameRoomEntrance(
                         targetGameRoom
                         , userService.findUserByUserId(userId));
-
         GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
         targetGameRoom.addEntrance(newGameRoomEntrance);
 
