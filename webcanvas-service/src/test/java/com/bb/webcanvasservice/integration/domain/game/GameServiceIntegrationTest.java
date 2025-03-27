@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.UUID;
+import java.util.concurrent.*;
 
 @SpringBootTest
 class GameServiceIntegrationTest {
@@ -98,7 +99,7 @@ class GameServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("게임 방 생성 - 게임 방 생성 시 host로 생성된 게임 방에 자동 입장된다.")
+    @DisplayName("게임 방 생성 - 게임 방 생성 시 호스트로 생성된 게임 방에 자동 입장된다.")
     public void createGameRoom() {
         // given - 테스트 공통 유저 사용
 
@@ -108,4 +109,51 @@ class GameServiceIntegrationTest {
         // then
         Assertions.assertThat(gameRoomId).isNotNull();
     }
+
+    @Test
+    @DisplayName("GameRoom JoinCode 검증 - 동시에 두 유저가 게임 방을 생성할 때 동일한 JoinCode로 GameRoom을 생성하려는 경우 먼저 실행된 스레드에서 생성된 joinCode가 사용된다.")
+    public void verifyJoinCode() throws Exception {
+        // given
+
+        // 동시에 생성된 동일한 코드
+        String joinCode = RandomCodeGenerator.generate(10);
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        CountDownLatch latch = new CountDownLatch(2);
+
+        // when
+        Callable<String> task = () -> {
+            try {
+                String verifiedJoinCode = gameService.verifyJoinCode(joinCode);
+
+                // verify된 joinCode로 방을 먼저 생성한다. (단순테스트 로직)
+                gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, verifiedJoinCode));
+
+                Thread.sleep(3000); // 일부러 지연 -> 락 유지됨
+                return verifiedJoinCode;
+            }
+            catch (Exception e) {
+                System.out.println("e = " + e);
+                throw new IllegalStateException(e);
+            }
+            finally {
+                latch.countDown();
+            }
+        };
+
+        // then
+        // 두 개의 스레드 동시 실행
+        Future<String> firstThreadResult = executor.submit(task);// 첫 번째 스레드 실행 (락 획득 + insert)
+
+        Thread.sleep(500); // 약간의 지연을 주어 락이 걸릴 시간을 확보
+
+        Future<String> secondThreadResult = executor.submit(task);// 두 번째 스레드 실행 (락이 걸린 상태에서 대기)
+
+        // then
+        latch.await(); // 모든 스레드가 끝날때까지 대기
+        executor.shutdown();
+
+        Assertions.assertThat(firstThreadResult.get()).isNotEqualTo(secondThreadResult.get());
+    }
+
 }

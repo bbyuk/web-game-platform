@@ -81,22 +81,8 @@ public class GameService {
          *
          * conflict가 10번 초과하여 발생할 시 joinCode 생성 중 문제가 발생했다는 문구와 함께 잠시후 재시도 해달라는 문구 출력 필요
          */
+        String joinCode = verifyJoinCode(RandomCodeGenerator.generate(JOIN_CODE_LENGTH));
 
-        String joinCode = RandomCodeGenerator.generate(JOIN_CODE_LENGTH);
-        int conflictCount = 0;
-
-        while(gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(joinCode)) {
-            if (conflictCount == JOIN_CODE_MAX_CONFLICT_COUNT) {
-                log.error("join code 생성 중 충돌이 최대 횟수인 {}회 발생했습니다.", JOIN_CODE_MAX_CONFLICT_COUNT);
-                throw new JoinCodeNotGeneratedException("join code 생성 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
-            }
-            conflictCount++;
-            joinCode = RandomCodeGenerator.generate(JOIN_CODE_LENGTH);
-        }
-
-        if (joinCode.isEmpty()) {
-            throw new JoinCodeNotGeneratedException("join code가 정상적으로 생성되지 않았습니다.");
-        }
 
         /**
          * GameRoom 생성
@@ -110,6 +96,29 @@ public class GameService {
 
 
         return newGameRoom.getId();
+    }
+
+    /**
+     * joinCode가 사용 가능한지 verify한다.
+     * ACTIVE 상태 (WAITING || PLAYING)인 GameRoom들 중 파라미터로 전달 받은 joinCode가 충돌이 발생하는지 여부를
+     * 비관적 락을 걸어 조회해 확인 후 충돌 발생시 재생성 해 verify 한다.
+     * @param joinCode
+     * @return verifiedJoinCode
+     */
+    @Transactional
+    public String verifyJoinCode(String joinCode) {
+        String verifiedJoinCode = joinCode;
+        int conflictCount = 0;
+
+        while(gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(verifiedJoinCode)) {
+            if (conflictCount == JOIN_CODE_MAX_CONFLICT_COUNT) {
+                log.error("join code 생성 중 충돌이 최대 횟수인 {}회 발생했습니다.", JOIN_CODE_MAX_CONFLICT_COUNT);
+                throw new JoinCodeNotGeneratedException("join code 생성 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            }
+            conflictCount++;
+            verifiedJoinCode = RandomCodeGenerator.generate(JOIN_CODE_LENGTH);
+        }
+        return verifiedJoinCode;
     }
 
     /**

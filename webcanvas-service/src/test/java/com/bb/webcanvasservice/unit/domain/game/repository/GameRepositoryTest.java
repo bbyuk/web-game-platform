@@ -95,7 +95,6 @@ class GameRepositoryTest {
         // given
         String joinCode = RandomCodeGenerator.generate(10);
 
-
         ExecutorService executor = Executors.newFixedThreadPool(2);
         CountDownLatch latch = new CountDownLatch(2);
 
