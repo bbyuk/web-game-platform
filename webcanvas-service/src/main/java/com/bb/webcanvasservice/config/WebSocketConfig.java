@@ -21,7 +21,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.enableSimpleBroker("/canvas", "/chat");
 
         // 클라이언트로 메시지를 보낼 때 사용할 prefix 설정 (필요시)
-        registry.setApplicationDestinationPrefixes("/app");
+//        registry.setApplicationDestinationPrefixes("/canvas");
     }
 
     /**

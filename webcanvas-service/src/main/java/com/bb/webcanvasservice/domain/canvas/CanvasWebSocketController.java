@@ -11,7 +11,7 @@ public class CanvasWebSocketController {
 
     private final CanvasService canvasService;
 
-    @MessageMapping("stroke")
+    @MessageMapping("draw/stroke")
     public void broadcastStrokeOnRoom(Stroke stroke) {
         canvasService.broadcastStrokeOnRoom(stroke);
     }
