@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.domain.canvas;
 
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
+import com.bb.webcanvasservice.domain.game.GameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class CanvasService {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final GameService gameService;
 
     public void broadcastStrokeOnRoom(Stroke stroke) {
         log.debug("stroke occured at gameRoom = {}", stroke.gameRoomId());
@@ -23,4 +25,5 @@ public class CanvasService {
          */
         messagingTemplate.convertAndSend("/topic/canvas", stroke);
     }
+
 }

@@ -11,20 +11,29 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    // 메시지 브로커 설정
+    /**
+     * 메세지 브로커 설정
+     * @param registry
+     */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // 메시지 브로커 활성화: "/topic"과 "/queue"로 시작하는 경로에 대해 브로커를 활성화
-        registry.enableSimpleBroker("/topic", "/sample");
+        // 메시지 브로커 활성화: "/canvas"과 "/chat"로 시작하는 경로에 대해 브로커를 활성화
+        registry.enableSimpleBroker("/canvas", "/chat");
 
         // 클라이언트로 메시지를 보낼 때 사용할 prefix 설정 (필요시)
         registry.setApplicationDestinationPrefixes("/app");
     }
 
-    // WebSocket 엔드포인트 설정
+    /**
+     * WebSocket 엔드포인드 설정
+     * @param registry
+     */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")
+        /**
+         * canvas 웹 소켓 서버 엔드포인트 지정
+         */
+        registry.addEndpoint("/canvas")
                 .setAllowedOriginPatterns("*");
 //                .withSockJS();
     }
