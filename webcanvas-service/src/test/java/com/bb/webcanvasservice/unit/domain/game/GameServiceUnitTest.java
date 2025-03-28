@@ -68,7 +68,7 @@ class GameServiceUnitTest {
         testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser1));
         testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser2));
 
-        when(gameRoomRepository.findByIdWithEntrances(any(Long.class)))
+        when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
 
         // 테스트 게임 방 입장
@@ -113,7 +113,7 @@ class GameServiceUnitTest {
         // given
         when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
                 .thenReturn(Boolean.FALSE);
-        when(gameRoomRepository.findByIdWithEntrances(any(Long.class)))
+        when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(new GameRoom(GameRoomState.PLAYING, RandomCodeGenerator.generate(10))));
 
         long gameRoomId = random.nextLong();
@@ -143,7 +143,7 @@ class GameServiceUnitTest {
         testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
         testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
 
-        when(gameRoomRepository.findByIdWithEntrances(any(Long.class)))
+        when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
 
         long gameRoomId = random.nextLong();

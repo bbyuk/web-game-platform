@@ -47,15 +47,27 @@ public class GameService {
      * @param userId
      * @return GameRoom
      */
-    @Transactional
-    public GameRoom findGameRoomByUserToken(Long userId) {
+    @Transactional(readOnly = true)
+    public GameRoom findEnteredGameRoom(Long userId) {
         return gameRoomRepository.findNotClosedGameRoomByUserId(userId)
                 .orElseThrow(() -> new GameRoomNotFoundException("현재 입장한 방을 찾읈 수 없습니다."));
     }
 
 
     /**
-     * 요청자를 호스트로 하는 방을 새로 생성해 게임 방을 리턴한다.
+     * 게임 방을 새로 생성하고, 생성을 요청한 유저를 입장시킨다.
+     * @param userId
+     * @return gameRoomEntranceId
+     */
+    @Transactional
+    public Long createGameRoomAndEnter(Long userId) {
+        Long gameRoomId = createGameRoom(userId);
+        return enterGameRoom(gameRoomId, userId);
+    }
+
+
+    /**
+     * 게임 방을 새로 생성해 게임 방을 리턴한다.
      * @param userId
      * @return gameRoomId
      */
@@ -89,19 +101,13 @@ public class GameService {
          */
         GameRoom newGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, joinCode));
 
-        /**
-         * GameRoom 입장
-         */
-        enterGameRoom(newGameRoom.getId(), user.getId());
-
-
         return newGameRoom.getId();
     }
 
     /**
      * joinCode가 사용 가능한지 verify한다.
      * ACTIVE 상태 (WAITING || PLAYING)인 GameRoom들 중 파라미터로 전달 받은 joinCode가 충돌이 발생하는지 여부를
-     * 비관적 락을 걸어 조회해 확인 후 충돌 발생시 재생성 해 verify 한다.
+     * PESSIMISTIC_WRITE 락을 걸어 조회해 확인 후 충돌 발생시 재생성 해 verify 한다.
      * @param joinCode
      * @return verifiedJoinCode
      */
