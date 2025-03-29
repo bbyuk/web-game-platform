@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.integration.domain.canvas;
 import com.bb.webcanvasservice.domain.canvas.dto.Point;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -30,6 +32,7 @@ class CanvasWebSocketControllerTest {
     private final String CANVAS_SUBSCRIBE_TOPIC = "/canvas";
     private final String SEND_DESTINATION = "/draw/stroke";
     private WebSocketStompClient stompClient;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setup() {
@@ -39,7 +42,7 @@ class CanvasWebSocketControllerTest {
     }
 
     @Test
-    @DisplayName("웹 소켓 접속 - canvas 웹 소켓에 연결하고 메세지를 전송한다.")
+    @DisplayName("웹 소켓 접속 및 stroke 처리 - canvas 웹 소켓에 연결하고 stroke 이벤트 send시 구독중인 클라이언트로 stroe 메세지를 전송한다.")
     void testWebSocketDrawMessage() throws Exception {
         // given
 
@@ -47,7 +50,7 @@ class CanvasWebSocketControllerTest {
         StompSession session = stompClient.connectAsync(WEBSOCKET_URL, new WebSocketHttpHeaders(), new StompSessionHandlerAdapter() {}).get();
 
         // 구독
-        CompletableFuture<Object> subscribeFuture = new CompletableFuture<>();
+        CompletableFuture<Stroke> subscribeFuture = new CompletableFuture<>();
         session.subscribe(CANVAS_SUBSCRIBE_TOPIC, new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
@@ -56,7 +59,13 @@ class CanvasWebSocketControllerTest {
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                subscribeFuture.complete(payload);
+                try {
+                    subscribeFuture.complete(objectMapper.readValue((byte[]) payload, Stroke.class));
+                }
+                catch(IOException e) {
+                    System.out.println("e = " + e);
+                    subscribeFuture.completeExceptionally(e);
+                }
             }
         });
 
@@ -86,8 +95,12 @@ class CanvasWebSocketControllerTest {
         session.send(SEND_DESTINATION, testStroke);
 
         // then
-        Object result = subscribeFuture.get(3, TimeUnit.SECONDS);
-        System.out.println("result = " + result.toString());
+        Stroke result = subscribeFuture.get(3, TimeUnit.SECONDS);
+
+        Assertions.assertThat(result.getGameRoomId()).isEqualTo(testStroke.getGameRoomId());
+        Assertions.assertThat(result.getUserId()).isEqualTo(testStroke.getUserId());
+        Assertions.assertThat(result.getLineWidth()).isEqualTo(testStroke.getLineWidth());
+        Assertions.assertThat(result.getPoints().size()).isEqualTo(testStroke.getPoints().size());
     }
 
 }

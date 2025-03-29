@@ -1,14 +1,14 @@
 package com.bb.webcanvasservice.domain.canvas.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @ToString
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Stroke {
     // 어떤 방에서 그려진 데이터인지
     private Long gameRoomId;
