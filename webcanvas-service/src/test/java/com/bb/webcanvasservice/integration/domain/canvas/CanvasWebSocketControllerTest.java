@@ -1,11 +1,26 @@
 package com.bb.webcanvasservice.integration.domain.canvas;
 
+import com.bb.webcanvasservice.domain.canvas.dto.Point;
+import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompFrameHandler;
+import org.springframework.messaging.simp.stomp.StompHeaders;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
+
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CanvasWebSocketControllerTest {
@@ -16,9 +31,63 @@ class CanvasWebSocketControllerTest {
     private final String SEND_DESTINATION = "/draw/stroke";
     private WebSocketStompClient stompClient;
 
+    @BeforeEach
     void setup() {
-        WEBSOCKET_URL = String.format("ws://localhost:%s/ws", port);
+        WEBSOCKET_URL = String.format("ws://localhost:%s/canvas", port);
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
     }
+
+    @Test
+    @DisplayName("웹 소켓 접속 - canvas 웹 소켓에 연결하고 메세지를 전송한다.")
+    void testWebSocketDrawMessage() throws Exception {
+        // given
+
+        // WebSocket 연결 설정
+        StompSession session = stompClient.connectAsync(WEBSOCKET_URL, new WebSocketHttpHeaders(), new StompSessionHandlerAdapter() {}).get();
+
+        // 구독
+        CompletableFuture<Object> subscribeFuture = new CompletableFuture<>();
+        session.subscribe(CANVAS_SUBSCRIBE_TOPIC, new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return Object.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                subscribeFuture.complete(payload);
+            }
+        });
+
+        Stroke testStroke = Stroke.builder()
+                .gameRoomId(1L)
+                .userId(100L)
+                .color("#FF5733")  // 예제 색상 (주황빛 빨강)
+                .lineWidth(5)
+                .points(List.of(
+                        Point.builder()
+                                .x(10)
+                                .y(20)
+                                .build(),
+                        Point.builder()
+                                .x(20)
+                                .y(30)
+                                .build(),
+                        Point.builder()
+                                .x(30)
+                                .y(40)
+                                .build()
+                ))
+                .build();
+
+
+        // when
+        session.send(SEND_DESTINATION, testStroke);
+
+        // then
+        Object result = subscribeFuture.get(3, TimeUnit.SECONDS);
+        System.out.println("result = " + result.toString());
+    }
+
 }

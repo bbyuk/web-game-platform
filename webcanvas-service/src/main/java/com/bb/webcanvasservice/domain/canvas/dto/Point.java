@@ -1,7 +1,11 @@
 package com.bb.webcanvasservice.domain.canvas.dto;
 
-public record Point(int x, int y) {
-    public static Point of(int x, int y) {
-        return new Point(x, y);
-    }
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+public class Point {
+    private int x;
+    private int y;
 }
