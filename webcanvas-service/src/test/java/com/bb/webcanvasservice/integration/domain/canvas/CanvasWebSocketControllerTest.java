@@ -51,7 +51,7 @@ class CanvasWebSocketControllerTest {
 
         // 구독
         CompletableFuture<Stroke> subscribeFuture = new CompletableFuture<>();
-        session.subscribe(CANVAS_SUBSCRIBE_TOPIC, new StompFrameHandler() {
+        session.subscribe(String.format("%s/%d", CANVAS_SUBSCRIBE_TOPIC, 1L), new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
                 return Object.class;
@@ -72,7 +72,7 @@ class CanvasWebSocketControllerTest {
         Stroke testStroke = Stroke.builder()
                 .gameRoomId(1L)
                 .userId(100L)
-                .color("#FF5733")  // 예제 색상 (주황빛 빨강)
+                .color("FF5733")  // 예제 색상 (주황빛 빨강)
                 .lineWidth(5)
                 .points(List.of(
                         Point.builder()

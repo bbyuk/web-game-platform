@@ -1,12 +1,17 @@
 package com.bb.webcanvasservice.domain.canvas;
 
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
+import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 캔버스에 그려진 Stroke 획을 받아 브로드캐스팅 처리를 담당하는 서비스 클래스
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -15,15 +20,21 @@ public class CanvasService {
     private final SimpMessagingTemplate messagingTemplate;
     private final GameService gameService;
 
-    public void broadcastStrokeOnRoom(Stroke stroke) {
-        log.debug("stroke occured at gameRoom = {}", stroke.getGameRoomId());
-        log.debug("stroke made by user = {}", stroke.getUserId());
+    /**
+     * 웹 소켓 컨트롤러를 통해 들어온 Stroke 이벤트를 같은 방에 있는 유저들에게 브로드캐스팅한다.
+     * @param stroke
+     */
+    @Transactional(readOnly = true)
+    public void broadcastStrokeOnRoom(Stroke stroke, Long userId) {
+        /**
+         * 현재 입장한 방 조회
+         */
+        GameRoom enteredGameRoom = gameService.findEnteredGameRoom(userId);
 
         /**
-         * 1. gameRoom에 속해있는 유저들 목록 조회
-         * 2. gameRoom에 속해있는 유저들 타겟 토픽에 stroke 메세지 전송
+         * gameRoom id에 해당하는 토픽으로 브로드캐스팅
          */
-        messagingTemplate.convertAndSend("/canvas", stroke);
+        messagingTemplate.convertAndSend(String.format("/canvas/%d", enteredGameRoom.getId()), stroke);
     }
 
 }

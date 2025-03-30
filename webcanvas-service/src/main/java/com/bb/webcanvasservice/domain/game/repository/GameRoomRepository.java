@@ -20,7 +20,7 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
     @Query("""
             select      gre.gameRoom
             from        GameRoomEntrance gre
-            join fetch GameRoom gr
+            join fetch  GameRoom gr
             on          gre.gameRoom = gr
             where       gr.state != 'CLOSED'
             and         gre.user.id = :userId
@@ -31,20 +31,20 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
             select exists (
-                select 1
-                from GameRoom gr
-                where gr.state != 'CLOSED'
-                and gr.joinCode = :joinCode
+                select  1
+                from    GameRoom gr
+                where   gr.state != 'CLOSED'
+                and     gr.joinCode = :joinCode
             )
             """)
     boolean existsJoinCodeConflictOnActiveGameRoom(@Param("joinCode") String joinCode);
 
     @Query("""
-           select gr
-           from GameRoom gr
-           join fetch GameRoomEntrance gre
-           on gre.gameRoom = gr
-           where gr.id = :id
+            select       gr
+            from         GameRoom gr
+            join fetch   GameRoomEntrance gre
+            on           gre.gameRoom = gr
+            where        gr.id = :id
             """)
     Optional<GameRoom> findByIdWithEntrances(@Param("id") Long id);
 }
