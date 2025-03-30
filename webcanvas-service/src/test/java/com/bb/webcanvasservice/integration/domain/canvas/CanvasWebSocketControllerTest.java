@@ -42,7 +42,7 @@ class CanvasWebSocketControllerTest {
     }
 
     @Test
-    @DisplayName("웹 소켓 접속 및 stroke 처리 - canvas 웹 소켓에 연결하고 stroke 이벤트 send시 구독중인 클라이언트로 stroe 메세지를 전송한다.")
+    @DisplayName("웹 소켓 접속 및 stroke 처리 - canvas 웹 소켓에 연결하고 stroke 이벤트 send시 구독중인 클라이언트로 stroke 메세지를 전송한다.")
     void testWebSocketDrawMessage() throws Exception {
         // given
 
@@ -70,8 +70,6 @@ class CanvasWebSocketControllerTest {
         });
 
         Stroke testStroke = Stroke.builder()
-                .gameRoomId(1L)
-                .userId(100L)
                 .color("FF5733")  // 예제 색상 (주황빛 빨강)
                 .lineWidth(5)
                 .points(List.of(
@@ -97,8 +95,6 @@ class CanvasWebSocketControllerTest {
         // then
         Stroke result = subscribeFuture.get(3, TimeUnit.SECONDS);
 
-        Assertions.assertThat(result.getGameRoomId()).isEqualTo(testStroke.getGameRoomId());
-        Assertions.assertThat(result.getUserId()).isEqualTo(testStroke.getUserId());
         Assertions.assertThat(result.getLineWidth()).isEqualTo(testStroke.getLineWidth());
         Assertions.assertThat(result.getPoints().size()).isEqualTo(testStroke.getPoints().size());
     }
