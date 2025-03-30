@@ -27,6 +27,11 @@ public class JwtTokenManager {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
+    /**
+     * userId로 토큰 발행
+     * @param userId
+     * @return
+     */
     public String generateToken(Long userId) {
         return Jwts.builder()
                 .subject(userId.toString())
@@ -36,6 +41,11 @@ public class JwtTokenManager {
                 .compact();
     }
 
+    /**
+     * 토큰을 파싱해 userId를 리턴한다.
+     * @param token
+     * @return
+     */
     public Long getUserIdFromToken(String token) {
         return Long.parseLong(Jwts.parser()
                 .verifyWith(key)
@@ -46,6 +56,11 @@ public class JwtTokenManager {
         );
     }
 
+    /**
+     * 토큰이 유효한 토큰인지 검증한다.
+     * @param token
+     * @return isValidToken
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
@@ -56,6 +71,11 @@ public class JwtTokenManager {
         }
     }
 
+    /**
+     * HttpServletRequest의 request header로부터 bearer 토큰 값을 읽어온다.
+     * @param request
+     * @return
+     */
     public String resolveToken(HttpServletRequest request) {
         final String bearerToken = request.getHeader(BEARER_TOKEN);
         if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {

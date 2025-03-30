@@ -18,6 +18,10 @@ import org.springframework.security.messaging.access.intercept.MessageMatcherDel
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
+/**
+ * Spring Security, Spring Security Messaging 설정 클래스
+ */
 @Configuration
 @EnableWebSecurity
 @EnableWebSocketSecurity

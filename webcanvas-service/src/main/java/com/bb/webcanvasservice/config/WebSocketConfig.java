@@ -1,12 +1,15 @@
 package com.bb.webcanvasservice.config;
 
-import com.bb.webcanvasservice.security.JwtTokenManager;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+
+/**
+ * 웹소켓 엔드포인트, 메시지 브로커 등 설정 클래스
+ */
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {

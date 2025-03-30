@@ -21,6 +21,13 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
     private final JwtTokenManager jwtTokenManager;
 
+    /**
+     * 웹소켓 연결 및 웹소켓 메시지에 대한 인증 처리
+     * 인증후 Authentication 객체를 SecurityContextHolder에 저장
+     * @param message
+     * @param channel
+     * @return
+     */
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         log.info("JwtChannelInterceptor preSend ====== {}", message.getPayload());
