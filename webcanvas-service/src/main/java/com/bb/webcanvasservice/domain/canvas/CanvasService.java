@@ -26,6 +26,8 @@ public class CanvasService {
      */
     @Transactional(readOnly = true)
     public void broadcastStrokeOnRoom(Stroke stroke, Long userId) {
+        log.debug("message sender ====== {}", userId);
+
         /**
          * 현재 입장한 방 조회
          */

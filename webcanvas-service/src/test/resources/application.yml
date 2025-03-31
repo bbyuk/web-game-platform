@@ -18,3 +18,4 @@ spring:
 logging:
   level:
     org.springframework.web.socket: DEBUG
+    com.bb.webcanvasservice: DEBUG
