@@ -1,6 +1,10 @@
 package com.bb.webcanvasservice.config;
 
+import com.bb.webcanvasservice.security.JwtChannelInterceptor;
+import com.bb.webcanvasservice.security.JwtManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -12,7 +16,10 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  */
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final JwtManager jwtManager;
 
     /**
      * 메세지 브로커 설정
@@ -41,4 +48,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //                .withSockJS();
     }
 
+    /**
+     * 웹소켓 Connect 및 인바운드 메세지 요청에 대한 인증 처리 intetceptor 등록
+     * @param registration
+     */
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(new JwtChannelInterceptor(jwtManager));
+    }
 }

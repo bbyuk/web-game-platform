@@ -30,7 +30,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
      */
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        log.info("JwtChannelInterceptor preSend ====== {}", message.getPayload());
+        log.info("JwtChannelInterceptor preSend ====== {}", message);
 
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
