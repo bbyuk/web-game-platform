@@ -40,7 +40,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
         Optional<String> optionalJwt = Optional.ofNullable(accessor.getFirstNativeHeader(JwtManager.BEARER_TOKEN));
         String token = optionalJwt.filter(header -> header.startsWith(JwtManager.TOKEN_PREFIX))
-                .map(header -> header.substring(JwtManager.TOKEN_PREFIX.length()))
+                .map(header -> header.substring(JwtManager.TOKEN_PREFIX.length() + 1))
                 .filter(jwtManager::validateToken)
                 .orElseThrow(() -> new NotAuthenticatedException("잘못된 토큰입니다."));
 

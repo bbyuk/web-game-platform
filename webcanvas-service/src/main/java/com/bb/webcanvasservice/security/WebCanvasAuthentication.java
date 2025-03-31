@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.security;
 
+import lombok.Getter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * webcanvas-service의 인증 처리를 담당하는 커스텀 Authentication 클래스
  */
+@Getter
 public class WebCanvasAuthentication implements Authentication {
 
     private final Long userId;
