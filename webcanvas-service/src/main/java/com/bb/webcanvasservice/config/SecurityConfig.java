@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.config;
 
 import com.bb.webcanvasservice.security.JwtChannelInterceptor;
-import com.bb.webcanvasservice.security.JwtTokenManager;
+import com.bb.webcanvasservice.security.JwtManager;
 import com.bb.webcanvasservice.security.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +28,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtTokenManager jwtTokenManager;
+    private final JwtManager jwtManager;
 
     /**
      * 웹 http 요청의 인증 처리를 위한 SecurityFilterChain 설정
@@ -47,7 +47,7 @@ public class SecurityConfig {
                 // TODO 인증 프로세스 개발이 완료되기 전까지 모든 http 요청 permit
                 .authorizeHttpRequests(configurer -> configurer
                         .anyRequest().permitAll())
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenManager), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtManager), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -75,7 +75,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtChannelInterceptor jwtChannelInterceptor() {
-        return new JwtChannelInterceptor(jwtTokenManager);
+        return new JwtChannelInterceptor(jwtManager);
     }
 
 }

@@ -19,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtChannelInterceptor implements ChannelInterceptor {
 
-    private final JwtTokenManager jwtTokenManager;
+    private final JwtManager jwtManager;
 
     /**
      * 웹소켓 연결 및 웹소켓 메시지에 대한 인증 처리
@@ -38,13 +38,13 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
             return message;
         }
 
-        Optional<String> optionalJwt = Optional.ofNullable(accessor.getFirstNativeHeader(JwtTokenManager.BEARER_TOKEN));
-        String token = optionalJwt.filter(header -> header.startsWith(JwtTokenManager.TOKEN_PREFIX))
-                .map(header -> header.substring(JwtTokenManager.TOKEN_PREFIX.length()))
-                .filter(jwtTokenManager::validateToken)
+        Optional<String> optionalJwt = Optional.ofNullable(accessor.getFirstNativeHeader(JwtManager.BEARER_TOKEN));
+        String token = optionalJwt.filter(header -> header.startsWith(JwtManager.TOKEN_PREFIX))
+                .map(header -> header.substring(JwtManager.TOKEN_PREFIX.length()))
+                .filter(jwtManager::validateToken)
                 .orElseThrow(() -> new NotAuthenticatedException("잘못된 토큰입니다."));
 
-        Long userId = jwtTokenManager.getUserIdFromToken(token);
+        Long userId = jwtManager.getUserIdFromToken(token);
         WebCanvasAuthentication webCanvasAuthentication = new WebCanvasAuthentication(userId);
         accessor.setUser(webCanvasAuthentication);
 

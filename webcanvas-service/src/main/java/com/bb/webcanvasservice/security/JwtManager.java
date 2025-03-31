@@ -13,7 +13,7 @@ import java.util.Date;
  * JWT 토큰의 발급 및 검증 등 JWT 토큰 관리 컴포넌트 클래스
  */
 @Component
-public class JwtTokenManager {
+public class JwtManager {
 
     private final String secretKey = "E2fhmOQToTXJCtVmyCc8AzwQK2bNC9VJBMlBXi/bNEQ=";
     private final long expiration = 3600000; // 1시간 (ms)
@@ -23,7 +23,7 @@ public class JwtTokenManager {
 
     private final SecretKey key;
 
-    public JwtTokenManager() {
+    public JwtManager() {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 

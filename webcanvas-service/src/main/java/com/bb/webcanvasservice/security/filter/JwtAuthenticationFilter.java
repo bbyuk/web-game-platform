@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.security.filter;
 
-import com.bb.webcanvasservice.security.JwtTokenManager;
+import com.bb.webcanvasservice.security.JwtManager;
 import com.bb.webcanvasservice.security.WebCanvasAuthentication;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,14 +18,14 @@ import java.io.IOException;
  */
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtTokenManager jwtTokenManager;
+    private final JwtManager jwtManager;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = jwtTokenManager.resolveToken(request);
+        String token = jwtManager.resolveToken(request);
 
-        if (token != null && jwtTokenManager.validateToken(token)) {
-            Long userId = jwtTokenManager.getUserIdFromToken(token);
+        if (token != null && jwtManager.validateToken(token)) {
+            Long userId = jwtManager.getUserIdFromToken(token);
 
             SecurityContextHolder.getContext().setAuthentication(new WebCanvasAuthentication(userId));
         }
