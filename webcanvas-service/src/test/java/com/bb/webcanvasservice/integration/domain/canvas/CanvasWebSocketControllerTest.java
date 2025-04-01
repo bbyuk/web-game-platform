@@ -1,8 +1,6 @@
 package com.bb.webcanvasservice.integration.domain.canvas;
 
-import com.bb.webcanvasservice.domain.canvas.dto.Point;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
-import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameService;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserRepository;
@@ -21,6 +19,7 @@ import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -28,15 +27,23 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 @Transactional
+@ActiveProfiles("canvas-integration-test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CanvasWebSocketControllerTest {
+
+    /**
+     * 브로드캐스팅 타임아웃
+     * 브로드캐스팅 시간 테스트
+     */
+    private final int BROADCASTING_TIMEOUT = 200;
+
+
     @LocalServerPort
     private int port;
     private String WEBSOCKET_URL;
@@ -51,29 +58,9 @@ class CanvasWebSocketControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * testUserId
+     * 클라이언트에서 유지하고 있어야 하는 유저 JWT
      */
-    private Long testUserId;
-    private User testUser;
     private String testUserJwt;
-    private final Stroke testStroke = Stroke.builder()
-            .color("FF5733")  // 예제 색상 (주황빛 빨강)
-            .lineWidth(5)
-            .points(List.of(
-                    Point.builder()
-                            .x(10)
-                            .y(20)
-                            .build(),
-                    Point.builder()
-                            .x(20)
-                            .y(30)
-                            .build(),
-                    Point.builder()
-                            .x(30)
-                            .y(40)
-                            .build()
-            ))
-            .build();
 
     /**
      * 테스트에 필요한 bean 목록
@@ -84,6 +71,9 @@ class CanvasWebSocketControllerTest {
     private GameService gameService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CanvasTestDataLoader testDataLoader;
+
 
     /**
      * 테스트 클라이언트 게임 방 구독 메소드
@@ -145,9 +135,8 @@ class CanvasWebSocketControllerTest {
 
         /**
          * test 유저 생성
+         * CanvasTestDataLoader 클래스로 테스트 데이터 이동
          */
-        testUser = new User(UUID.randomUUID().toString());
-        testUserId = userRepository.save(testUser).getId();
 
         /**
          * WebSocket client 생성
@@ -157,7 +146,7 @@ class CanvasWebSocketControllerTest {
         /**
          * WebSocket Session 연결
          */
-        testUserJwt = jwtManager.generateToken(testUserId);
+        testUserJwt = jwtManager.generateToken(testDataLoader.testUser1.getId());
         testUserSession = connect(testUserClient, testUserJwt);
     }
 
@@ -166,16 +155,17 @@ class CanvasWebSocketControllerTest {
     void testWebSocketDrawMessage() throws Exception {
         // given
         // 방에 접속해 있어야한다.
-        Long gameRoomId = gameService.createGameRoomAndEnter(testUserId);
 
         // 구독
-        CompletableFuture<Stroke> subscribeFuture = subscribeRoomCanvas(this.testUserSession, gameRoomId);
+        CompletableFuture<Stroke> subscribeFuture = subscribeRoomCanvas(this.testUserSession, testDataLoader.testGameRoom.getId());
 
         // when
+        Stroke testStroke = testDataLoader.testStroke;
+
         testUserSession.send(SEND_DESTINATION, testStroke);
 
         // then
-        Stroke result = subscribeFuture.get(3, TimeUnit.SECONDS);
+        Stroke result = subscribeFuture.get(BROADCASTING_TIMEOUT, TimeUnit.MILLISECONDS);
 
         Assertions.assertThat(result.getLineWidth()).isEqualTo(testStroke.getLineWidth());
         Assertions.assertThat(result.getPoints().size()).isEqualTo(testStroke.getPoints().size());
@@ -186,16 +176,15 @@ class CanvasWebSocketControllerTest {
     @DisplayName("웹 소켓 접속 및 strke 처리 - 같은 방에 입장한 클라이언트는 stroke 이벤트를 받아볼 수 있다.")
     void testWebSocketDrawMessageAtOtherClients() throws Exception {
         // given
-        Long gameRoomId = gameService.createGameRoomAndEnter(testUserId);
 
         /**
          *  서버측 게임 방 접속 시나리오 로직
          */
         User otherUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameService.enterGameRoom(gameRoomId, otherUser1.getId());
+        gameService.enterGameRoom(testDataLoader.testGameRoom.getId(), otherUser1.getId());
 
         User otherUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameService.enterGameRoom(gameRoomId, otherUser2.getId());
+        gameService.enterGameRoom(testDataLoader.testGameRoom.getId(), otherUser2.getId());
 
         /**
          * 클라이언트에서 처리해야 할 웹소켓 접속 시나리오 로직
@@ -203,12 +192,12 @@ class CanvasWebSocketControllerTest {
         WebSocketStompClient otherUser1Client = createClient();
         String otherUser1Jwt = jwtManager.generateToken(otherUser1.getId());
         StompSession otherUser1Session = connect(otherUser1Client, otherUser1Jwt);
-        CompletableFuture<Stroke> otherUser1CompletableFuture = subscribeRoomCanvas(otherUser1Session, gameRoomId);
+        CompletableFuture<Stroke> otherUser1CompletableFuture = subscribeRoomCanvas(otherUser1Session, testDataLoader.testGameRoom.getId());
 
         WebSocketStompClient otherUser2Client = createClient();
         String otherUser2Jwt = jwtManager.generateToken(otherUser2.getId());
         StompSession otherUser2Session = connect(otherUser2Client, otherUser2Jwt);
-        CompletableFuture<Stroke> otherUser2CompletableFuture = subscribeRoomCanvas(otherUser2Session, gameRoomId);
+        CompletableFuture<Stroke> otherUser2CompletableFuture = subscribeRoomCanvas(otherUser2Session, testDataLoader.testGameRoom.getId());
 
 
         /**
@@ -220,26 +209,22 @@ class CanvasWebSocketControllerTest {
         messageHeader.add(JwtManager.BEARER_TOKEN, String.format("%s %s", JwtManager.TOKEN_PREFIX, testUserJwt));
         messageHeader.setDestination(SEND_DESTINATION);
 
-        testUserSession.send(messageHeader, testStroke);
+        testUserSession.send(messageHeader, testDataLoader.testStroke);
 
         // then
-        Stroke otherUser1ReceivedStroke = otherUser1CompletableFuture.get(3, TimeUnit.SECONDS);
-        Stroke otherUser2ReceivedStroke = otherUser2CompletableFuture.get(3, TimeUnit.SECONDS);
+        Stroke otherUser1ReceivedStroke = otherUser1CompletableFuture.get(BROADCASTING_TIMEOUT, TimeUnit.MILLISECONDS);
+        Stroke otherUser2ReceivedStroke = otherUser2CompletableFuture.get(BROADCASTING_TIMEOUT, TimeUnit.MILLISECONDS);
 
 
         /**
          * 테스트 유저가 보낸 testStroke - otherUser1이 받은 메세지 비교
          */
-        Assertions.assertThat(testStroke.getLineWidth()).isEqualTo(otherUser1ReceivedStroke.getLineWidth());
-        Assertions.assertThat(testStroke.getColor()).isEqualTo(otherUser1ReceivedStroke.getColor());
-        Assertions.assertThat(testStroke.getPoints().size()).isEqualTo(otherUser1ReceivedStroke.getPoints().size());
+        Assertions.assertThat(testDataLoader.testStroke).usingRecursiveComparison().isEqualTo(otherUser1ReceivedStroke);
 
         /**
          * otherUser1이 받은 메세지 - otherUser2가 받은 메세지 비교 - 동일해야 한다.
          */
-        Assertions.assertThat(otherUser1ReceivedStroke.getLineWidth()).isEqualTo(otherUser2ReceivedStroke.getLineWidth());
-        Assertions.assertThat(otherUser1ReceivedStroke.getColor()).isEqualTo(otherUser2ReceivedStroke.getColor());
-        Assertions.assertThat(otherUser1ReceivedStroke.getPoints().size()).isEqualTo(otherUser2ReceivedStroke.getPoints().size());
+        Assertions.assertThat(otherUser1ReceivedStroke).usingRecursiveComparison().isEqualTo(otherUser2ReceivedStroke);
 
     }
 }
