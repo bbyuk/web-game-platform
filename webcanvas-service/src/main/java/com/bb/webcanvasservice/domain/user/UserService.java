@@ -20,7 +20,7 @@ public class UserService {
     /**
      * 유저 토큰으로 유저를 조회해 리턴한다.
      * 찾지 못할 시 UserNotFoundException throw
-     * @param userToken
+     * @param userToken User 생성시 랜덤하게 주어지는 식별자
      * @return User
      */
     @Transactional(readOnly = true)
@@ -32,12 +32,20 @@ public class UserService {
     /**
      * 유저 ID로 유저를 조회해 리턴한다.
      * 찾지 못할 시 UserNotFoundException throw
-     * @param userId
+     * @param userId User 엔티티의 ID
      * @return User
      */
     @Transactional(readOnly = true)
     public User findUserByUserId(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다."));
+    }
+
+    /**
+     * 랜덤한 UUID를 유저 식별자로 하여 User를 저장하고 리턴한다.
+     */
+    @Transactional
+    public User createUser(String clientFingerprint) {
+        return userRepository.save(new User(clientFingerprint));
     }
 }
