@@ -1,6 +1,5 @@
-package com.bb.webcanvasservice.config;
+package com.bb.webcanvasservice.security.websocket;
 
-import com.bb.webcanvasservice.security.JwtChannelInterceptor;
 import com.bb.webcanvasservice.security.JwtManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

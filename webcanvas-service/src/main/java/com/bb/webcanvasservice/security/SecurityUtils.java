@@ -12,7 +12,6 @@ import java.security.Principal;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SecurityUtils {
 
-
     public static Long getUserIdFromPrincipal(Principal principal) {
         if (principal instanceof WebCanvasAuthentication authentication) {
             return authentication.getUserId();

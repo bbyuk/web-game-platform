@@ -1,7 +1,6 @@
-package com.bb.webcanvasservice.config;
+package com.bb.webcanvasservice.security.web;
 
 import com.bb.webcanvasservice.security.JwtManager;
-import com.bb.webcanvasservice.security.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class WebSecurityConfig {
 
     private final JwtManager jwtManager;
 

@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.config;
+package com.bb.webcanvasservice.security.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
@@ -28,6 +28,6 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
      */
     @Override
     protected boolean sameOriginDisabled() {
-        return true; 
+        return true;
     }
 }

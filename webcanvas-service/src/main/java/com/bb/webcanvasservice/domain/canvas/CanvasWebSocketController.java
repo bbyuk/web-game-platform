@@ -9,12 +9,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.Principal;
 
+/**
+ * Canvas 기능 중 브로드캐스팅 관련 API를 담당하는 웹 소켓 컨트롤러
+ */
 @Controller
 @RequiredArgsConstructor
 public class CanvasWebSocketController {
 
     private final CanvasService canvasService;
 
+    /**
+     * 요청 받은 Stroke 이벤트를 요청자가 입장해있는 방에 브로드캐스팅한다.
+     * @param stroke
+     * @param principal
+     */
     @MessageMapping("draw/stroke")
     public void broadcastStrokeOnRoom(@RequestBody Stroke stroke, Principal principal) {
         canvasService.broadcastStrokeOnRoom(stroke, SecurityUtils.getUserIdFromPrincipal(principal));

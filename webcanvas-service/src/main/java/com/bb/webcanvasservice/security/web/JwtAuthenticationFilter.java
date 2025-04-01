@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.security.filter;
+package com.bb.webcanvasservice.security.web;
 
 import com.bb.webcanvasservice.security.JwtManager;
 import com.bb.webcanvasservice.security.WebCanvasAuthentication;

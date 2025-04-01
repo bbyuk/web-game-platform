@@ -1,5 +1,7 @@
-package com.bb.webcanvasservice.security;
+package com.bb.webcanvasservice.security.websocket;
 
+import com.bb.webcanvasservice.security.JwtManager;
+import com.bb.webcanvasservice.security.WebCanvasAuthentication;
 import com.bb.webcanvasservice.security.exception.NotAuthenticatedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
