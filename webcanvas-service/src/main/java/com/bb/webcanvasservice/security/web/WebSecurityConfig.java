@@ -10,6 +10,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -21,6 +25,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private final JwtManager jwtManager;
+
+    private final List<String> whiteList = List.of("/user");
 
     /**
      * 웹 http 요청의 인증 처리를 위한 SecurityFilterChain 설정
@@ -36,9 +42,10 @@ public class WebSecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(configurer -> configurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // TODO 인증 프로세스 개발이 완료되기 전까지 모든 http 요청 permit
+                // TODO 인증 프로세스 개발이 완료되기 전까지 모든 요청 permitAll
                 .authorizeHttpRequests(configurer -> configurer
-                        .anyRequest().permitAll())
+                        .anyRequest().permitAll()
+                )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtManager), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

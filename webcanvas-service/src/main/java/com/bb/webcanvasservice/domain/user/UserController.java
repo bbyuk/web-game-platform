@@ -19,7 +19,6 @@ public class UserController {
 
     private final UserService userService;
 
-
     /**
      * 클라이언트의 정보를 받아 유저를 생성한다.
      * @param userCreateRequest 생성 요청 정보
