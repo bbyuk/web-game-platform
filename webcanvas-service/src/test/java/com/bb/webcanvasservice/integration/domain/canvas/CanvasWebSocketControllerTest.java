@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.integration.domain.canvas;
 
+import com.bb.webcanvasservice.config.JpaConfig;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.GameService;
 import com.bb.webcanvasservice.domain.user.User;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;

@@ -4,7 +4,6 @@ import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserController;
 import com.bb.webcanvasservice.domain.user.UserService;
 import com.bb.webcanvasservice.domain.user.dto.request.UserCreateRequest;
-import com.bb.webcanvasservice.security.web.WebSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(
         controllers = {UserController.class},
-        excludeAutoConfiguration = SecurityAutoConfiguration.class) // 단위테스트에서는 Spring Security 관련 항목 제외
+        excludeAutoConfiguration = {SecurityAutoConfiguration.class}) // 단위테스트에서는 Spring Security 관련 항목 제외
 class UserControllerTest {
 
     @Autowired
@@ -59,5 +57,4 @@ class UserControllerTest {
 
         // then
     }
-
 }
