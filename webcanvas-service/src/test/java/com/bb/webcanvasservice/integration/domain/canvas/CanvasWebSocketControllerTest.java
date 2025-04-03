@@ -1,11 +1,10 @@
 package com.bb.webcanvasservice.integration.domain.canvas;
 
-import com.bb.webcanvasservice.config.JpaConfig;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.GameService;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserRepository;
-import com.bb.webcanvasservice.security.JwtManager;
+import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
@@ -148,7 +146,7 @@ class CanvasWebSocketControllerTest {
         /**
          * WebSocket Session 연결
          */
-        testUserJwt = jwtManager.generateToken(testDataLoader.testUser1.getId());
+        testUserJwt = jwtManager.generateToken(testDataLoader.testUser1.getId(), testDataLoader.testUser1.getFingerprint());
         testUserSession = connect(testUserClient, testUserJwt);
     }
 
@@ -192,12 +190,12 @@ class CanvasWebSocketControllerTest {
          * 클라이언트에서 처리해야 할 웹소켓 접속 시나리오 로직
          */
         WebSocketStompClient otherUser1Client = createClient();
-        String otherUser1Jwt = jwtManager.generateToken(otherUser1.getId());
+        String otherUser1Jwt = jwtManager.generateToken(otherUser1.getId(), otherUser1.getFingerprint());
         StompSession otherUser1Session = connect(otherUser1Client, otherUser1Jwt);
         CompletableFuture<Stroke> otherUser1CompletableFuture = subscribeRoomCanvas(otherUser1Session, testDataLoader.testGameRoom.getId());
 
         WebSocketStompClient otherUser2Client = createClient();
-        String otherUser2Jwt = jwtManager.generateToken(otherUser2.getId());
+        String otherUser2Jwt = jwtManager.generateToken(otherUser2.getId(), otherUser2.getFingerprint());
         StompSession otherUser2Session = connect(otherUser2Client, otherUser2Jwt);
         CompletableFuture<Stroke> otherUser2CompletableFuture = subscribeRoomCanvas(otherUser2Session, testDataLoader.testGameRoom.getId());
 

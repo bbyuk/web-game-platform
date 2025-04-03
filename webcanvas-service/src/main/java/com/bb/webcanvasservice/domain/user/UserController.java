@@ -27,7 +27,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDto> registerNewUser(@RequestBody UserCreateRequest userCreateRequest) {
         User user = userService.createUser(userCreateRequest.clientFingerprint());
-        return ResponseEntity.ok(new UserDto(user.getId(), user.getUserToken()));
+        return ResponseEntity.ok(new UserDto(user.getId(), user.getFingerprint()));
     }
 
 }

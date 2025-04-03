@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.security.websocket;
 
-import com.bb.webcanvasservice.security.JwtManager;
+import com.bb.webcanvasservice.security.auth.JwtManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;

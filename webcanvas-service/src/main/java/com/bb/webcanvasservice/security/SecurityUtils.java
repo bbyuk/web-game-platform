@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.security;
 
+import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
 import com.bb.webcanvasservice.security.exception.NotAuthenticatedException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

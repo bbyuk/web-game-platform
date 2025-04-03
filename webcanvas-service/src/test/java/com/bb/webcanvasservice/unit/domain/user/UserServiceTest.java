@@ -18,6 +18,8 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
     @Mock
@@ -32,36 +34,23 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("User Token으로 유저 조회")
+    @DisplayName("클라이언트 fingerprint로 등록된 유저 조회 후 없을 시 유저 생성")
     void findUserByUserToken() throws Exception {
+        final String fingerprint = UUID.randomUUID().toString();
 
-        final String userToken = UUID.randomUUID().toString();
+        User mockUser = createMockUser(fingerprint);
 
-        User mockUser = createMockUser(userToken);
-        Mockito.when(userRepository.findByUserToken(userToken))
-                .thenReturn(Optional.of(mockUser));
-
-        // when
-        User findUser = userService.findUserByUserToken(userToken);
-
-        // then
-        Assertions.assertThat(findUser.getUserToken()).isEqualTo(userToken);
-    }
-
-    @Test
-    @DisplayName("요청한 쿼리에 대한 유저를 찾지 못한 경우 UserNotFoundException throw")
-    public void whenUserNotFound() throws Exception {
-        // given
-        String wrongToken = "wrong_token";
-        Mockito.when(userRepository.findByUserToken(wrongToken))
+        Mockito.when(userRepository.findByFingerprint(fingerprint))
                 .thenReturn(Optional.empty());
+        Mockito.when(userRepository.save(any())).thenReturn(mockUser);
 
         // when
-        Assertions.assertThatThrownBy(() -> userService.findUserByUserToken(wrongToken))
-                .isInstanceOf(UserNotFoundException.class);
+        User createdUser = userService.findOrCreateUser(fingerprint);
 
         // then
+        Assertions.assertThat(createdUser).usingRecursiveComparison().isEqualTo(mockUser);
     }
+
 
     private static User createMockUser(String userToken) throws NoSuchFieldException, IllegalAccessException {
         User savedUser = new User(userToken);

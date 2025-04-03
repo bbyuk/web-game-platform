@@ -13,10 +13,15 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    /**
+     * 클라이언트 fingerprint로 등록된 유저 조회
+     * @param fingerprint
+     * @return
+     */
     @Query("""
-            select u
-            from User u
-            where u.userToken = :userToken
+            select  u
+            from    User u
+            where   u.fingerprint = :fingerprint
             """)
-    Optional<User> findByUserToken(@Param("userToken") String userToken);
+    Optional<User> findByFingerprint(@Param("fingerprint") String fingerprint);
 }

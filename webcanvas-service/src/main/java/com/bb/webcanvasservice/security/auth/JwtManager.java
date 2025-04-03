@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.security;
+package com.bb.webcanvasservice.security.auth;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -32,9 +32,10 @@ public class JwtManager {
      * @param userId
      * @return
      */
-    public String generateToken(Long userId) {
+    public String generateToken(Long userId, String fingerprint) {
         return Jwts.builder()
                 .subject(userId.toString())
+                .claim("fingerprint", fingerprint)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(key, Jwts.SIG.HS256)
@@ -55,6 +56,21 @@ public class JwtManager {
                 .getSubject()
         );
     }
+
+    /**
+     * 토큰을 파싱해 fingerprint를 리턴한다.
+     * @param token
+     * @return
+     */
+    public String getFingerprintFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("fingerprint", String.class);
+    }
+
 
     /**
      * 토큰이 유효한 토큰인지 검증한다.

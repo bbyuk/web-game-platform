@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.security;
+package com.bb.webcanvasservice.security.auth;
 
 import lombok.Getter;
 import org.springframework.security.core.Authentication;

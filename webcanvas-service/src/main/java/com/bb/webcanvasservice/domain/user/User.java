@@ -23,13 +23,27 @@ public class User {
      */
     private Long id;
 
-    @Column(name = "user_token")
+    @Column(name = "fingerprint", updatable = false, nullable = false, unique = true)
     /**
-     * 유저 식별 토큰
+     * 클라이언트 fingerprint
      */
-    private String userToken;
+    private String fingerprint;
 
-    public User(String userToken) {
-        this.userToken = userToken;
+    @Column(name = "refresh_token")
+    /**
+     * 발급된 accessToken이 만료될 경우 refresh를 위한 토큰
+     */
+    private String refreshToken;
+
+    public User(String fingerprint) {
+        this.fingerprint = fingerprint;
+    }
+
+    /**
+     * 유저에게 할당된 refreshToken을 업데이트한다.
+     * @param refreshToken
+     */
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
