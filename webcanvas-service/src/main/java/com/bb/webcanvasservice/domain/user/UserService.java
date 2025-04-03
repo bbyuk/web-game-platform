@@ -49,4 +49,6 @@ public class UserService {
     public User createUser(String fingerprint) {
         return userRepository.save(new User(fingerprint));
     }
+
+
 }

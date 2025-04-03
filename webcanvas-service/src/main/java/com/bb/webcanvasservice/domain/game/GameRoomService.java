@@ -15,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * 게임 방과 관련된 비즈니스 로직을 처리하는 서비스 클래스
  */
@@ -31,12 +34,12 @@ public class GameRoomService {
     private final int GAME_ROOM_MAX_CAPACITY = 8;
 
     /**
-     * 서비스 주입
+     * 서비스
      */
     private final UserService userService;
 
     /**
-     * 레포지토리 주입
+     * 레포지토리
      */
     private final GameRoomRepository gameRoomRepository;
     private final GameRoomEntranceRepository gameRoomEntranceRepository;
@@ -44,6 +47,7 @@ public class GameRoomService {
     /**
      * 요청자가 입장한 게임 방을 리턴한다.
      * 현재 입장한 게임 방이 없을 경우, GameRoomNotFoundException 발생
+     *
      * @param userId
      * @return GameRoom
      */
@@ -53,9 +57,9 @@ public class GameRoomService {
                 .orElseThrow(() -> new GameRoomNotFoundException("현재 입장한 방을 찾읈 수 없습니다."));
     }
 
-
     /**
      * 게임 방을 새로 생성하고, 생성을 요청한 유저를 입장시킨다.
+     *
      * @param userId
      * @return gameRoomEntranceId
      */
@@ -67,9 +71,9 @@ public class GameRoomService {
         return new GameRoomCreateResponse(gameRoomId, gameRoomEntranceId);
     }
 
-
     /**
      * 게임 방을 새로 생성해 게임 방을 리턴한다.
+     *
      * @param userId
      * @return gameRoomId
      */
@@ -110,6 +114,7 @@ public class GameRoomService {
      * joinCode가 사용 가능한지 verify한다.
      * ACTIVE 상태 (WAITING || PLAYING)인 GameRoom들 중 파라미터로 전달 받은 joinCode가 충돌이 발생하는지 여부를
      * PESSIMISTIC_WRITE 락을 걸어 조회해 확인 후 충돌 발생시 재생성 해 verify 한다.
+     *
      * @param joinCode
      * @return verifiedJoinCode
      */
@@ -118,7 +123,7 @@ public class GameRoomService {
         String verifiedJoinCode = joinCode;
         int conflictCount = 0;
 
-        while(gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(verifiedJoinCode)) {
+        while (gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(verifiedJoinCode)) {
             if (conflictCount == JOIN_CODE_MAX_CONFLICT_COUNT) {
                 log.error("join code 생성 중 충돌이 최대 횟수인 {}회 발생했습니다.", JOIN_CODE_MAX_CONFLICT_COUNT);
                 throw new JoinCodeNotGeneratedException("join code 생성 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
@@ -131,7 +136,7 @@ public class GameRoomService {
 
     /**
      * 게임 방에 유저를 입장시킨다.
-     *
+     * <p>
      * - 입장시키려는 유저가 현재 아무 방에도 접속하지 않은 상태여야 한다. -> 방에서 나갈 시 삭제 처리
      * - 입장하려는 방의 상태가 WAITING이어야 한다.
      * - 입장하려는 방에 접속한 유저 세션의 수(entrances)는 최대 8이다.
@@ -163,5 +168,37 @@ public class GameRoomService {
         targetGameRoom.addEntrance(newGameRoomEntrance);
 
         return newGameRoomEntrance.getId();
+    }
+
+    /**
+     * 파라미터로 전달 받은 state에 있는 GameRoom 목록을 조회한다.
+     *
+     * @param state 게임 방의 상태
+     * @return gameRoomList 게임 방 Entity List
+     */
+    @Transactional(readOnly = true)
+    public List<GameRoom> findRoomsOnState(GameRoomState state) {
+        return gameRoomRepository.findByState(state);
+    }
+
+    /**
+     * 입장 가능한 게임 방을 조회해 리턴한다.
+     *
+     * 이미 입장한 방이 있는 경우, AlreadyEnteredRoomException 을 throw한다.
+     * @param userId 유저 ID
+     * @return GameRoomListResponse 게임 방 조회 응답 DTO
+     */
+    @Transactional(readOnly = true)
+    public GameRoomListResponse findEnterableGameRoom(Long userId) {
+        if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
+            throw new AlreadyEnteredRoomException("이미 방에 입장한 상태입니다.");
+        }
+
+        return new GameRoomListResponse(
+                findRoomsOnState(GameRoomState.WAITING)
+                        .stream()
+                        .map(gameRoom -> new GameRoomSummary(gameRoom.getId(), gameRoom.getJoinCode()))
+                        .collect(Collectors.toList())
+        );
     }
 }

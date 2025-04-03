@@ -115,12 +115,14 @@
     "status": "success",
     "code": 200,
     "message": "입장 가능한 방 조회 성공",
-    "data": [
-      {
-        "gameRoomId": 22,
-        "joinCode": "UD22E3"
-      }   
-    ]
+    "data": {
+      "roomList": [
+        {
+          "gameRoomId": 22,
+          "joinCode": "UD22E3"
+        }   
+      ]
+    }
   }
   ```
   ```json

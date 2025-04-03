@@ -2,14 +2,14 @@ package com.bb.webcanvasservice.domain.game;
 
 import com.bb.webcanvasservice.security.auth.Authenticated;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
-import com.bb.webcanvasservice.security.exception.NotAuthenticatedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
+import java.util.List;
 
 
 /**
@@ -33,6 +33,17 @@ public class GameController {
     @PostMapping("room")
     public ResponseEntity<GameRoomCreateResponse> createGameRoom(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(gameRoomService.createGameRoomAndEnter(authentication.getUserId()));
+    }
+
+    /**
+     * 입장 가능한 방 목록 조회
+     * <p>
+     * 요청을 보낸 유저가 입장할 수 있는 webcanvas-service 방의 목록을 조회한다.
+     * @return
+     */
+    @GetMapping("room")
+    public ResponseEntity<GameRoomListResponse> getEnterableGameRooms(@Authenticated WebCanvasAuthentication authentication) {
+        return ResponseEntity.ok(gameRoomService.findEnterableGameRoom(authentication.getUserId()));
     }
 
 }
