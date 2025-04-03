@@ -39,11 +39,14 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다."));
     }
 
+
     /**
-     * 랜덤한 UUID를 유저 식별자로 하여 User를 저장하고 리턴한다.
+     * 클라이언트의 fingerprint로 유저를 생성하고 저장 후 리턴한다.
+     * @param fingerprint
+     * @return
      */
     @Transactional
-    public User createUser(String clientFingerprint) {
-        return userRepository.save(new User(clientFingerprint));
+    public User createUser(String fingerprint) {
+        return userRepository.save(new User(fingerprint));
     }
 }
