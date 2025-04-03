@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,5 +58,28 @@ class GameRoomRepositoryTest {
         // then
         Assertions.assertThat(savedGameRoom.getId()).isEqualTo(findGameRoom.getId());
         Assertions.assertThat(findTestUser1GameRoom.getId()).isEqualTo(savedGameRoom.getId());
+    }
+
+    @Test
+    @DisplayName("GameRoom 상태로 게임 방 조회")
+    void findByState() throws Exception {
+        // given
+        gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6)));
+        gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6)));
+        gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6)));
+        gameRoomRepository.save(new GameRoom(GameRoomState.PLAYING, RandomCodeGenerator.generate(6)));
+        gameRoomRepository.save(new GameRoom(GameRoomState.PLAYING, RandomCodeGenerator.generate(6)));
+        gameRoomRepository.save(new GameRoom(GameRoomState.CLOSED, RandomCodeGenerator.generate(6)));
+
+        // when
+        List<GameRoom> waitingRooms = gameRoomRepository.findByState(GameRoomState.WAITING);
+        List<GameRoom> playingRooms = gameRoomRepository.findByState(GameRoomState.PLAYING);
+        List<GameRoom> closedRooms = gameRoomRepository.findByState(GameRoomState.CLOSED);
+
+        // then
+        Assertions.assertThat(waitingRooms.size()).isEqualTo(3);
+        Assertions.assertThat(playingRooms.size()).isEqualTo(2);
+        Assertions.assertThat(closedRooms.size()).isEqualTo(1);
+
     }
 }
