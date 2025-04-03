@@ -16,17 +16,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@WebMvcTest(
-//        controllers = {AuthenticationController.class},
-//        excludeAutoConfiguration = {SecurityAutoConfiguration.class}
-//)
-
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(
+        controllers = {AuthenticationController.class},
+        excludeAutoConfiguration = {SecurityAutoConfiguration.class}
+)
 class AuthenticationControllerTest {
 
     @Autowired
@@ -35,7 +33,8 @@ class AuthenticationControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private JwtManager jwtManager = new JwtManager();
+    @MockitoBean
+    private JwtManager jwtManager;
 
     @MockitoBean
     private AuthenticationService authenticationService;
@@ -45,9 +44,14 @@ class AuthenticationControllerTest {
     void login() throws Exception {
         // given
         String fingerprint = "3f8d47a3a92b77e5";
+        long userId = 1L;
+        JwtManager realJwtManager = new JwtManager();
+        String token = realJwtManager.generateToken(userId, fingerprint);
 
-        BDDMockito.given(authenticationService.login(fingerprint))
-                .willReturn(new LoginResponse(jwtManager.generateToken(1L, fingerprint), jwtManager.generateToken(1L, fingerprint)));
+        BDDMockito.given(jwtManager.generateToken(any(), any())).willReturn(token);
+
+        BDDMockito.given(authenticationService.login(any()))
+                .willReturn(new LoginResponse(realJwtManager.generateToken(userId, fingerprint), realJwtManager.generateToken(userId, fingerprint)));
 
         LoginRequest loginRequest = new LoginRequest(fingerprint);
 
