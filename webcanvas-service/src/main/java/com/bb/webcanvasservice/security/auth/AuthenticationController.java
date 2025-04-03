@@ -18,12 +18,13 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
 
+    /**
+     * 로그인 처리 후 발급된 토큰을 리턴한다.
+     * @param loginRequest
+     * @return
+     */
     @PostMapping("login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-
-        authenticationService.login(loginRequest.fingerprint());
-
-//        return ResponseEntity.ok();
-        return null;
+        return ResponseEntity.ok(authenticationService.login(loginRequest.fingerprint()));
     }
 }
