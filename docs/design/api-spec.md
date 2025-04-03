@@ -65,12 +65,12 @@
 
 ### ✅ 2. 입장한 방 조회
 
-- **URL**: `/game/canvas/room/entered`
+- **URL**: `/game/canvas/room/enterance`
 - **Method**: `GET`
 - **설명**: API를 요청한 사용자가 입장해있는 webcanvas-service 방의 정보를 조회한다.
 - **요청 예시**:
   ```http
-  GET /game/canvas/room
+  GET /game/canvas/room/entrance
   Authorization: Bearer {token}
   ```
 - **응답 예시**:
@@ -101,12 +101,12 @@
 
 ### ✅ 3. 방 목록 조회
 
-- **URL**: `/game/canvas/rooms`
+- **URL**: `/game/canvas/room`
 - **Method**: `GET`
 - **설명**: 요청을 보낸 유저가 입장할 수 있는 webcanvas-service 방의 목록을 조회한다.
 - **요청 예시**:
   ```http
-  GET /api/users
+  GET /game/canvas/room
   Authorization: Bearer {token}
   ```
 - **응답 예시**:
@@ -134,12 +134,12 @@
 
 ### ✅ 4. 방 입장 요청
 
-- **URL**: `/game/canvas/rooms/enter`
+- **URL**: `/game/canvas/room/enterance`
 - **Method**: `POST`
 - **설명**: 방에 입장을 요청한다.
 - **요청 예시**:
   ```http
-    POST /game/canvas/rooms/enter
+    POST /game/canvas/room/enterance
     Content-Type: application/json
     Authorization: Bearer {token}
     
@@ -155,21 +155,132 @@
     "message": "게임 방 입장 성공",
     "data": [
       {
-        "gameRoomEntranceId": 22,
-      }   
+        "gameRoomEntranceId": 22
+      }
     ]
   }
   ```
   ```json
   {
     "status": "failed",
+    "code": 422,
+    "message": "방이 입장 가능한 상태가 아닙니다.",
+    "data": null
+  }
+  ```
+  
+### ✅ 5. 방 만들기
+
+- **URL**: `/game/canvas/room`
+- **Method**: `POST`
+- **설명**: 방을 생성하고 입장한다.
+- **요청 예시**:
+  ```http
+    POST /game/canvas/room
+    Content-Type: application/json
+    Authorization: Bearer {token}
+
+  ```
+- **응답 예시**:
+  ```json
+  {
+    "status": "success",
+    "code": 200,
+    "message": "방 만들기 성공",
+    "data": [
+      {
+        "gameRoomId": 22,
+        "gameRoomEntranceId": 1223
+      }
+    ]
+  }
+  ```
+  ```json
+  {
+    "status": "failed",
+    "code": 409,
+    "message": "방을 만들 수 없는 상태입니다.",
+    "data": null
+  }
+  ```
+### ✅ 6. 방 나가기
+
+- **URL**: `/game/canvas/room/entrance`
+- **Method**: `DELETE`
+- **설명**: 방에서 나간다. - 클라이언트를 강제로 종료하게 되더라도 게임 세션이 끝나기 전까지 나가지지 않음.
+- **요청 예시**:
+  ```http
+    DELETE /game/canvas/room
+    Authorization: Bearer {token}
+
+  ```
+- **응답 예시**:
+  ```json
+  {
+    "status": "success",
+    "code": 200,
+    "message": "방 나가기 성공",
+    "data": {
+      "gameRoomId": 22
+    }
+  }
+  ```
+  ```json
+  {
+    "status": "failed",
     "code": 404,
-    "message": "현재 입장 가능한 방이 없습니다.",
+    "message": "입장한 방을 찾지 못했습니다.",
+    "data": null
+  }
+  ```
+  ```json
+  {
+    "status": "failed",
+    "code": 409,
+    "message": "방을 나갈 수 없는 상태입니다.",
     "data": null
   }
   ```
 
 
+### ✅ 7. 게임 시작
+
+- **URL**: `/game/canvas/session`
+- **Method**: `POST`
+- **설명**: 게임 세션을 시작한다.
+- **요청 예시**:
+  ```http
+    POST /game/canvas/session
+    Content-Type: application/json
+    Authorization: Bearer {token}
+  ```
+- **응답 예시**:
+  ```json
+  {
+    "status": "success",
+    "code": 200,
+    "message": "게임 시작",
+    "data": {
+      "gameSessionId": 22
+    }
+  }
+  ```
+  ```json
+  {
+    "status": "failed",
+    "code": 404,
+    "message": "입장한 방을 찾지 못했습니다.",
+    "data": null
+  }
+  ```
+  ```json
+  {
+    "status": "failed",
+    "code": 409,
+    "message": "게임을 시작할 수 없는 상태입니다.",
+    "data": null
+  }
+  ```
 ---
 
 ## 📌 기타 참고 사항
