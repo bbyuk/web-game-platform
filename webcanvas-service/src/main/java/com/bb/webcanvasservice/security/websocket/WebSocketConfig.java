@@ -3,11 +3,14 @@ package com.bb.webcanvasservice.security.websocket;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+
+import java.util.List;
 
 
 /**
@@ -19,6 +22,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtManager jwtManager;
+    private final WebSocketAuthenticationArgumentResolver webSocketAuthenticationArgumentResolver;
 
     /**
      * 메세지 브로커 설정
@@ -54,5 +58,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(new JwtChannelInterceptor(jwtManager));
+    }
+
+    /**
+     * 커스텀 Argument Resolver 등록.
+     * WebSocket 핸들러에서 Custom Authentication 객체(WebCanvasAuthentication)를 주입받을 수 있도록 설정.
+     * @param argumentResolvers
+     */
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(webSocketAuthenticationArgumentResolver);
     }
 }

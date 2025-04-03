@@ -60,9 +60,11 @@ public class GameRoomService {
      * @return gameRoomEntranceId
      */
     @Transactional
-    public Long createGameRoomAndEnter(Long userId) {
+    public GameRoomCreateResponse createGameRoomAndEnter(Long userId) {
         Long gameRoomId = createGameRoom(userId);
-        return enterGameRoom(gameRoomId, userId);
+        Long gameRoomEntranceId = enterGameRoom(gameRoomId, userId);
+
+        return new GameRoomCreateResponse(gameRoomId, gameRoomEntranceId);
     }
 
 
