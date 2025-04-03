@@ -29,7 +29,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final JwtManager jwtManager;
     private final WebAuthenticationArgumentResolver webAuthenticationArgumentResolver;
 
-    private final List<String> whiteList = List.of("/user");
+    private final List<String> whiteList = List.of("/auth/login");
 
     /**
      * 웹 http 요청의 인증 처리를 위한 SecurityFilterChain 설정
