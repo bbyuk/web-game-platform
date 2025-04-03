@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.integration.domain.canvas;
 
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
-import com.bb.webcanvasservice.domain.game.GameService;
+import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserRepository;
 import com.bb.webcanvasservice.security.auth.JwtManager;
@@ -68,7 +68,7 @@ class CanvasWebSocketControllerTest {
     @Autowired
     private JwtManager jwtManager;
     @Autowired
-    private GameService gameService;
+    private GameRoomService gameRoomService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -181,10 +181,10 @@ class CanvasWebSocketControllerTest {
          *  서버측 게임 방 접속 시나리오 로직
          */
         User otherUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameService.enterGameRoom(testDataLoader.testGameRoom.getId(), otherUser1.getId());
+        gameRoomService.enterGameRoom(testDataLoader.testGameRoom.getId(), otherUser1.getId());
 
         User otherUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameService.enterGameRoom(testDataLoader.testGameRoom.getId(), otherUser2.getId());
+        gameRoomService.enterGameRoom(testDataLoader.testGameRoom.getId(), otherUser2.getId());
 
         /**
          * 클라이언트에서 처리해야 할 웹소켓 접속 시나리오 로직

@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 게임 방과 게임 세션 등 게임과 관련된 비즈니스 로직을 처리하는 서비스 클래스
+ * 게임 방과 관련된 비즈니스 로직을 처리하는 서비스 클래스
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GameService {
+public class GameRoomService {
 
     /**
      * 게임 방의 입장 코드 길이

@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.unit.domain.game;
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.GameService;
+import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class GameServiceUnitTest {
+class GameRoomServiceUnitTest {
 
     @Mock
     private GameRoomRepository gameRoomRepository;
@@ -37,7 +37,7 @@ class GameServiceUnitTest {
     @Mock
     private UserService userService;
     @InjectMocks
-    private GameService gameService;
+    private GameRoomService gameRoomService;
 
     private final Random random = new Random();
 
@@ -83,7 +83,7 @@ class GameServiceUnitTest {
 
 
         // when
-        Long gameRoomEnterId = gameService.enterGameRoom(testGameRoomId, testUserId);
+        Long gameRoomEnterId = gameRoomService.enterGameRoom(testGameRoomId, testUserId);
 
         // then
         Assertions.assertThat(gameRoomEnterId).isEqualTo(testGameRoomEntranceId);
@@ -101,7 +101,7 @@ class GameServiceUnitTest {
         Long userId = random.nextLong();
 
         // when
-        Assertions.assertThatThrownBy(() -> gameService.enterGameRoom(gameRoomId, userId))
+        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId))
                 .isInstanceOf(AlreadyEnteredRoomException.class);
 
         // then
@@ -120,7 +120,7 @@ class GameServiceUnitTest {
         long userId = random.nextLong();
 
         // when
-        Assertions.assertThatThrownBy(() -> gameService.enterGameRoom(gameRoomId, userId))
+        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId))
                 .isInstanceOf(IllegalGameRoomStateException.class)
                 .hasMessage("방이 현재 입장할 수 없는 상태입니다.");
 
@@ -152,7 +152,7 @@ class GameServiceUnitTest {
         // when
 
 
-        Assertions.assertThatThrownBy(() -> gameService.enterGameRoom(gameRoomId, userId))
+        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId))
                 .isInstanceOf(IllegalGameRoomStateException.class)
                 .hasMessage("방의 정원이 모두 찼습니다.");
 

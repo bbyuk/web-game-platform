@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.domain.canvas;
 
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.GameRoom;
-import com.bb.webcanvasservice.domain.game.GameService;
+import com.bb.webcanvasservice.domain.game.GameRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CanvasService {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final GameService gameService;
+    private final GameRoomService gameRoomService;
 
     /**
      * 웹 소켓 컨트롤러를 통해 들어온 Stroke 이벤트를 같은 방에 있는 유저들에게 브로드캐스팅한다.
@@ -31,7 +31,7 @@ public class CanvasService {
         /**
          * 현재 입장한 방 조회
          */
-        GameRoom enteredGameRoom = gameService.findEnteredGameRoom(userId);
+        GameRoom enteredGameRoom = gameRoomService.findEnteredGameRoom(userId);
 
         /**
          * gameRoom id에 해당하는 토픽으로 브로드캐스팅

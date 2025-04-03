@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.integration.domain.game;
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.GameService;
+import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
@@ -24,10 +24,10 @@ import java.util.concurrent.*;
 
 @Transactional
 @SpringBootTest
-class GameServiceIntegrationTest {
+class GameRoomServiceIntegrationTest {
 
     @Autowired
-    private GameService gameService;
+    private GameRoomService gameRoomService;
 
     @Autowired
     private UserRepository userRepository;
@@ -66,7 +66,7 @@ class GameServiceIntegrationTest {
         // given - 공통 Entity 사용
 
         // when
-        Long enterGameRoomId = gameService.enterGameRoom(waitingRoom.getId(), testUser.getId());
+        Long enterGameRoomId = gameRoomService.enterGameRoom(waitingRoom.getId(), testUser.getId());
 
         // then
         Assertions.assertThat(enterGameRoomId).isNotNull();
@@ -78,7 +78,7 @@ class GameServiceIntegrationTest {
         // given - 공통 Entity 사용
 
         // when
-        Assertions.assertThatThrownBy(() -> gameService.enterGameRoom(playingRoom.getId(), testUser.getId()))
+        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(playingRoom.getId(), testUser.getId()))
                 .isInstanceOf(IllegalGameRoomStateException.class);
 
         // then
@@ -93,7 +93,7 @@ class GameServiceIntegrationTest {
         gameRoomEntranceRepository.save(new GameRoomEntrance(anotherGameRoom, testUser));
 
         // when
-        Assertions.assertThatThrownBy(() -> gameService.enterGameRoom(waitingRoom.getId(), testUser.getId()))
+        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(waitingRoom.getId(), testUser.getId()))
                 .isInstanceOf(AlreadyEnteredRoomException.class);
 
         // then
@@ -105,7 +105,7 @@ class GameServiceIntegrationTest {
         // given - 테스트 공통 유저 사용
 
         // when
-        Long gameRoomId = gameService.createGameRoom(testUser.getId());
+        Long gameRoomId = gameRoomService.createGameRoom(testUser.getId());
 
         // then
         Assertions.assertThat(gameRoomId).isNotNull();
@@ -125,7 +125,7 @@ class GameServiceIntegrationTest {
         // when
         Callable<String> task = () -> {
             try {
-                String verifiedJoinCode = gameService.verifyJoinCode(joinCode);
+                String verifiedJoinCode = gameRoomService.verifyJoinCode(joinCode);
 
                 // verify된 joinCode로 방을 먼저 생성한다. (단순테스트 로직)
                 gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, verifiedJoinCode));
