@@ -1,6 +1,8 @@
 package com.bb.webcanvasservice.domain.game.enums;
 
 
+import java.util.List;
+
 /**
  * 게임 방의 상태를 나타내는 상태 코드 enum
  */
@@ -17,5 +19,9 @@ public enum GameRoomState {
     /**
      * 현재 게임이 진행중인 상태
      */
-    PLAYING
+    PLAYING;
+
+    public static final List<GameRoomState> enterable() {
+        return List.of(WAITING);
+    };
 }

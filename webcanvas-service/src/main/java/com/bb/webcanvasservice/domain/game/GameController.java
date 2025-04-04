@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 
 /**
  * 게임 진행, 게임 방 등 게임 처리 API 엔드포인트
@@ -43,7 +41,7 @@ public class GameController {
      */
     @GetMapping("room")
     public ResponseEntity<GameRoomListResponse> getEnterableGameRooms(@Authenticated WebCanvasAuthentication authentication) {
-        return ResponseEntity.ok(gameRoomService.findEnterableGameRoom(authentication.getUserId()));
+        return ResponseEntity.ok(gameRoomService.findEnterableGameRooms(authentication.getUserId()));
     }
 
 }

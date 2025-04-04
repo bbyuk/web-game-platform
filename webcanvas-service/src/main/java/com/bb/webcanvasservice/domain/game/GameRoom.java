@@ -19,6 +19,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameRoom {
 
+    public static final int CAPACITY = 8;
+
     @Id
     @GeneratedValue
     @Column(name = "id")

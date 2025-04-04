@@ -160,6 +160,18 @@ class GameRoomServiceUnitTest {
     }
 
 
+    @Test
+    @DisplayName("입장 가능한 방 목록 조회")
+    void findEnterableGameRoom() {
+        // given
+
+        // when
+
+        // then
+
+    }
+
+
     private void setId(Object entity, Long id) throws NoSuchFieldException, IllegalAccessException {
         Field idField = entity.getClass().getDeclaredField("id");
         idField.setAccessible(true);

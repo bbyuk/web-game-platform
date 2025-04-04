@@ -31,7 +31,6 @@ public class GameRoomService {
      */
     private final int JOIN_CODE_LENGTH = 10;
     private final int JOIN_CODE_MAX_CONFLICT_COUNT = 10;
-    private final int GAME_ROOM_MAX_CAPACITY = 8;
 
     /**
      * 서비스
@@ -156,7 +155,7 @@ public class GameRoomService {
             throw new IllegalGameRoomStateException("방이 현재 입장할 수 없는 상태입니다.");
         }
 
-        if (targetGameRoom.getEntrances().size() >= GAME_ROOM_MAX_CAPACITY) {
+        if (targetGameRoom.getEntrances().size() >= GameRoom.CAPACITY) {
             throw new IllegalGameRoomStateException("방의 정원이 모두 찼습니다.");
         }
 
@@ -189,13 +188,14 @@ public class GameRoomService {
      * @return GameRoomListResponse 게임 방 조회 응답 DTO
      */
     @Transactional(readOnly = true)
-    public GameRoomListResponse findEnterableGameRoom(Long userId) {
+    public GameRoomListResponse findEnterableGameRooms(Long userId) {
         if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
             throw new AlreadyEnteredRoomException("이미 방에 입장한 상태입니다.");
         }
 
+
         return new GameRoomListResponse(
-                findRoomsOnState(GameRoomState.WAITING)
+                gameRoomRepository.findEnterableGameRooms(GameRoom.CAPACITY, GameRoomState.enterable())
                         .stream()
                         .map(gameRoom -> new GameRoomSummary(gameRoom.getId(), gameRoom.getJoinCode()))
                         .collect(Collectors.toList())
