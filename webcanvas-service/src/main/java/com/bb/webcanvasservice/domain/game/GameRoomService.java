@@ -1,6 +1,8 @@
 package com.bb.webcanvasservice.domain.game;
 
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomCreateResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomNotFoundException;
@@ -191,7 +193,7 @@ public class GameRoomService {
         return new GameRoomListResponse(
                 gameRoomRepository.findEnterableGameRooms(GameRoom.CAPACITY, GameRoomState.enterable())
                         .stream()
-                        .map(gameRoom -> new GameRoomSummary(gameRoom.getId(), gameRoom.getJoinCode()))
+                        .map(gameRoom -> new GameRoomListResponse.GameRoomSummary(gameRoom.getId(), gameRoom.getJoinCode()))
                         .collect(Collectors.toList())
         );
     }

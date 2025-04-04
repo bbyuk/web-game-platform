@@ -1,5 +1,9 @@
 package com.bb.webcanvasservice.domain.game;
 
+import com.bb.webcanvasservice.domain.game.dto.request.GameRoomEntranceRequest;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomCreateResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.security.auth.Authenticated;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
 import lombok.RequiredArgsConstructor;

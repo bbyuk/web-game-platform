@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.game;
+package com.bb.webcanvasservice.domain.game.dto.request;
 
 /**
  * 게임 방 입장 요청 DTO
