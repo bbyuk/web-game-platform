@@ -45,6 +45,14 @@ public class GameController {
         return ResponseEntity.ok(gameRoomService.findEnterableGameRooms(authentication.getUserId()));
     }
 
+    /**
+     * 게임 방 입장
+     *
+     * 요청을 보낸 유저를 대상 게임 방에 입장시킨다.
+     * @param entranceRequest
+     * @param authentication
+     * @return
+     */
     @PostMapping("room/enterance")
     public ResponseEntity<GameRoomEntranceResponse> enterGameRoom(@RequestBody GameRoomEntranceRequest entranceRequest,
                                                                   @Authenticated WebCanvasAuthentication authentication) {
