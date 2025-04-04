@@ -161,12 +161,16 @@ class GameRoomServiceUnitTest {
 
 
     @Test
-    @DisplayName("입장 가능한 방 목록 조회")
+    @DisplayName("입장 가능한 방 목록 조회 - 현재 입장한 방이 있다면 목록 조회 실패")
     void findEnterableGameRoom() {
         // given
+        when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
+                .thenReturn(Boolean.TRUE);
+        Long userId = random.nextLong();
 
         // when
-
+        Assertions.assertThatThrownBy(() -> gameRoomService.findEnterableGameRooms(userId))
+                .isInstanceOf(AlreadyEnteredRoomException.class);
         // then
 
     }

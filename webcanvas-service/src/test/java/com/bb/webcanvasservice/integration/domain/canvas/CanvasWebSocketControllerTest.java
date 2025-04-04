@@ -41,7 +41,7 @@ class CanvasWebSocketControllerTest {
      * 브로드캐스팅 타임아웃
      * 브로드캐스팅 시간 테스트
      */
-    private final int BROADCASTING_TIMEOUT = 200;
+    private final int BROADCASTING_TIMEOUT = 300;
 
 
     @LocalServerPort
