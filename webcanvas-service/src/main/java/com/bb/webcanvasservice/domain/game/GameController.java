@@ -4,10 +4,7 @@ import com.bb.webcanvasservice.security.auth.Authenticated;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
@@ -42,6 +39,13 @@ public class GameController {
     @GetMapping("room")
     public ResponseEntity<GameRoomListResponse> getEnterableGameRooms(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(gameRoomService.findEnterableGameRooms(authentication.getUserId()));
+    }
+
+    @PostMapping("room/enterance")
+    public ResponseEntity<GameRoomEntranceResponse> enterGameRoom(@RequestBody GameRoomEntranceRequest entranceRequest,
+                                                                  @Authenticated WebCanvasAuthentication authentication) {
+
+        return ResponseEntity.ok(new GameRoomEntranceResponse(null, null, null));
     }
 
 }

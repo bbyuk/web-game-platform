@@ -155,11 +155,15 @@
     "status": "success",
     "code": 200,
     "message": "게임 방 입장 성공",
-    "data": [
-      {
-        "gameRoomEntranceId": 22
-      }
-    ]
+    "data": {
+      "gameRoomId": 11,
+      "gameRoomEntranceId": 222,
+      "otherUsers": [
+        {
+          "userId": 1
+        }
+      ]
+    }
   }
   ```
   ```json
