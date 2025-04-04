@@ -27,12 +27,6 @@ import java.util.stream.Collectors;
 public class GameRoomService {
 
     /**
-     * 게임 방의 입장 코드 길이
-     */
-    private final int JOIN_CODE_LENGTH = 10;
-    private final int JOIN_CODE_MAX_CONFLICT_COUNT = 10;
-
-    /**
      * 서비스
      */
     private final UserService userService;
@@ -98,7 +92,7 @@ public class GameRoomService {
          *
          * conflict가 10번 초과하여 발생할 시 joinCode 생성 중 문제가 발생했다는 문구와 함께 잠시후 재시도 해달라는 문구 출력 필요
          */
-        String joinCode = verifyJoinCode(RandomCodeGenerator.generate(JOIN_CODE_LENGTH));
+        String joinCode = verifyJoinCode(RandomCodeGenerator.generate(GameRoom.JOIN_CODE_LENGTH));
 
 
         /**
@@ -123,12 +117,12 @@ public class GameRoomService {
         int conflictCount = 0;
 
         while (gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(verifiedJoinCode)) {
-            if (conflictCount == JOIN_CODE_MAX_CONFLICT_COUNT) {
-                log.error("join code 생성 중 충돌이 최대 횟수인 {}회 발생했습니다.", JOIN_CODE_MAX_CONFLICT_COUNT);
+            if (conflictCount == GameRoom.JOIN_CODE_MAX_CONFLICT_COUNT) {
+                log.error("join code 생성 중 충돌이 최대 횟수인 {}회 발생했습니다.", GameRoom.JOIN_CODE_MAX_CONFLICT_COUNT);
                 throw new JoinCodeNotGeneratedException("join code 생성 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
             }
             conflictCount++;
-            verifiedJoinCode = RandomCodeGenerator.generate(JOIN_CODE_LENGTH);
+            verifiedJoinCode = RandomCodeGenerator.generate(GameRoom.JOIN_CODE_LENGTH);
         }
         return verifiedJoinCode;
     }
