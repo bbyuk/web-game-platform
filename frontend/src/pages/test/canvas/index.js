@@ -9,12 +9,18 @@ export default function CanvasTest() {
         if (stroke.length > 0) {
             setStrokes((prevItems) => [...prevItems, stroke]);
         }
-    }
+    };
 
     const clear = () => {
         setStrokes([]);
         setReRenderingSignal(true);
-    }
+    };
+
+    const createGameRoom = () => {
+        fetch(`${apiBaseUrl}/users`)
+            .then(response => response.json())
+            .then(data => console.log(data));
+    };
 
     return <div >
         <Canvas
