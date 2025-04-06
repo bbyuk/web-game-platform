@@ -58,10 +58,6 @@ public class GameController {
     @PostMapping("room/enterance")
     public ResponseEntity<GameRoomEntranceResponse> enterGameRoom(@RequestBody GameRoomEntranceRequest entranceRequest,
                                                                   @Authenticated WebCanvasAuthentication authentication) {
-
-        log.debug("Entering gameRoom entrance");
-
-
         return ResponseEntity.ok(new GameRoomEntranceResponse(null, null, null));
     }
 
