@@ -56,6 +56,7 @@ public class GameController {
      * 요청을 보낸 유저가 입장한 게임 방과 입장 정보를 조회한다.
      *
      */
+    @Operation(summary = "현재 입장한 게임 방 조회", description = "요청을 보낸 유저가 입장한 게임 방과 입장 정보를 조회한다.")
     @GetMapping("room/entrance")
     public ResponseEntity<GameRoomEntranceResponse> getEnteredGameRoom(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(gameRoomService.findEnteredGameRoomInfo(authentication.getUserId()));

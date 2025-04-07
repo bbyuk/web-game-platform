@@ -46,7 +46,7 @@ dependencies {
 	implementation 'com.mysql:mysql-connector-j:9.2.0'
 
     /**
-     * swagger
+     * springdoc
      */
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
 
