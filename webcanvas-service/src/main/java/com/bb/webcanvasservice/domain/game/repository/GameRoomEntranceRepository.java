@@ -47,7 +47,7 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
 
     /**
      * 게임 방 ID로 해당 게임 방에 입장한 정보 조회
-     * @param id
+     * @param gameRoomId
      * @return gameRoomEntrances
      */
     @Query(
