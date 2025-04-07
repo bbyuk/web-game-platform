@@ -2,12 +2,10 @@ package com.bb.webcanvasservice.domain.game;
 
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomCreateResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
-import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
-import com.bb.webcanvasservice.domain.game.exception.GameRoomNotFoundException;
-import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
-import com.bb.webcanvasservice.domain.game.exception.JoinCodeNotGeneratedException;
+import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.User;
@@ -196,5 +194,14 @@ public class GameRoomService {
                         .map(gameRoom -> new GameRoomListResponse.GameRoomSummary(gameRoom.getId(), gameRoom.getJoinCode()))
                         .collect(Collectors.toList())
         );
+    }
+
+    @Transactional(readOnly = true)
+    public GameRoomEntranceResponse findEnteredGameRoomInfo(Long userId) {
+        if (!gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
+            throw new GameRoomEntranceNotFoundException("현재 입장한 게임 방을 찾지 못했습니다.");
+        }
+
+        return new GameRoomEntranceResponse(null, null, null);
     }
 }
