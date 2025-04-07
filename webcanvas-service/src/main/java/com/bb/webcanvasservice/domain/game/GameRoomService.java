@@ -205,10 +205,11 @@ public class GameRoomService {
      */
     @Transactional(readOnly = true)
     public GameRoomEntranceResponse findEnteredGameRoomInfo(Long userId) {
-        if (!gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
-            throw new GameRoomEntranceNotFoundException("현재 입장한 게임 방을 찾지 못했습니다.");
-        }
+        GameRoomEntrance gameRoomEntrance = gameRoomEntranceRepository.findByUserId(userId)
+                .orElseThrow(() -> new GameRoomEntranceNotFoundException("현재 입장한 게임 방을 찾지 못했습니다."));
 
-        return new GameRoomEntranceResponse(null, null, null);
+        gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoomEntrance.getGameRoom().getId());
+
+        return new GameRoomEntranceResponse(gameRoomEntrance.getGameRoom().getId(), gameRoomEntrance.getId(), null);
     }
 }
