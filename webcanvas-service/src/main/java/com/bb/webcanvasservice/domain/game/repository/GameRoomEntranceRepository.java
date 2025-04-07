@@ -60,4 +60,21 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             """
     )
     List<GameRoomEntrance> findGameRoomEntrancesByGameRoomId(@Param("gameRoomId") Long gameRoomId);
+
+    /**
+     * 유저 ID로 현재 입장한 게임 방의 입장 정보 조회
+     * TODO 쿼리 수정 필요
+     * @param userId
+     * @return
+     */
+    @Query(
+            """
+            select  gre
+            from    GameRoomEntrance gre
+            join    fetch User u on gre.user = u
+            join    fetch GameRoom gr on gre.gameRoom = gr
+            where   gre.user.id = :userId
+            """
+    )
+    List<GameRoomEntrance> findGameRoomEntrancesByUserId(@Param("userId") Long userId);
 }

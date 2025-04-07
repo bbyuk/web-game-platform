@@ -110,6 +110,27 @@ class GameRoomEntranceRepositoryTest {
         Assertions.assertThat(gameRoomEntrances.size()).isEqualTo(5);
     }
 
+    @Test
+    @DisplayName("유저 ID로 현재 입장한 게임 방의 입장 정보 조회")
+    void findGameRoomEntrancesByUserId() {
+        // given
+        User otherUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
+        User otherUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
+        User otherUser3 = userRepository.save(new User(UUID.randomUUID().toString()));
+        User otherUser4 = userRepository.save(new User(UUID.randomUUID().toString()));
+
+        enterTestRoom(otherUser1, testUser, otherUser2, otherUser3, otherUser4);
+        // when
+        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByUserId(testUser.getId());
+
+        // then
+        Assertions.assertThat(gameRoomEntrances.size()).isEqualTo(5);
+        Assertions.assertThat(
+                gameRoomEntrances.stream().filter(gameRoomEntrance -> gameRoomEntrance.getUser().getId().equals(testUser.getId()))
+                        .findFirst()
+        ).isPresent();
+    }
+
     private void enterTestRoom(User... enteredUsers) {
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6)));
         Arrays.stream(enteredUsers).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, enteredUser)));

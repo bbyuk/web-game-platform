@@ -207,14 +207,16 @@ public class GameRoomService {
      */
     @Transactional(readOnly = true)
     public GameRoomEntranceResponse findEnteredGameRoomInfo(Long userId) {
-        GameRoomEntrance gameRoomEntrance = gameRoomEntranceRepository.findByUserId(userId)
+        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByUserId(userId);
+
+        GameRoomEntrance userEntrance = gameRoomEntrances.stream()
+                .filter(gameRoomEntrance -> gameRoomEntrance.getUser().getId().equals(userId))
+                .findFirst()
                 .orElseThrow(() -> new GameRoomEntranceNotFoundException("현재 입장한 게임 방을 찾지 못했습니다."));
 
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoomEntrance.getGameRoom().getId());
-
         return new GameRoomEntranceResponse(
-                gameRoomEntrance.getGameRoom().getId(),
-                gameRoomEntrance.getId(),
+                userEntrance.getGameRoom().getId(),
+                userEntrance.getId(),
                 gameRoomEntrances.stream().map(
                                 entranceOfGameRoom ->
                                         new GameRoomEntranceResponse.EnteredUserSummary(
