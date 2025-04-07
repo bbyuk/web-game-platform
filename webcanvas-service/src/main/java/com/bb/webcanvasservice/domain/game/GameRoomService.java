@@ -196,6 +196,13 @@ public class GameRoomService {
         );
     }
 
+    /**
+     * 현재 입장한 게임 방과 입장 정보를 리턴한다.
+     * 
+     * TODO 개발 진행중
+     * @param userId
+     * @return
+     */
     @Transactional(readOnly = true)
     public GameRoomEntranceResponse findEnteredGameRoomInfo(Long userId) {
         if (!gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {

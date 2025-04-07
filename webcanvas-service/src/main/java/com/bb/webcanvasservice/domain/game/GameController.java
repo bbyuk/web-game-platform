@@ -65,6 +65,8 @@ public class GameController {
      * 게임 방 입장
      *
      * 요청을 보낸 유저를 대상 게임 방에 입장시킨다.
+     *
+     * TODO 개발 진행중
      * @param entranceRequest
      * @param authentication
      * @return
