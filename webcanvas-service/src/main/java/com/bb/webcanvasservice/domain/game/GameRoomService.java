@@ -176,8 +176,9 @@ public class GameRoomService {
 
     /**
      * 입장 가능한 게임 방을 조회해 리턴한다.
-     *
+     * <p>
      * 이미 입장한 방이 있는 경우, AlreadyEnteredRoomException 을 throw한다.
+     *
      * @param userId 유저 ID
      * @return GameRoomListResponse 게임 방 조회 응답 DTO
      */
@@ -198,8 +199,9 @@ public class GameRoomService {
 
     /**
      * 현재 입장한 게임 방과 입장 정보를 리턴한다.
-     * 
-     * TODO 개발 진행중
+     * <p>
+     * TODO 개발 진행중 - 테스트코드 작성 필요
+     *
      * @param userId
      * @return
      */
@@ -208,8 +210,18 @@ public class GameRoomService {
         GameRoomEntrance gameRoomEntrance = gameRoomEntranceRepository.findByUserId(userId)
                 .orElseThrow(() -> new GameRoomEntranceNotFoundException("현재 입장한 게임 방을 찾지 못했습니다."));
 
-        gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoomEntrance.getGameRoom().getId());
+        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoomEntrance.getGameRoom().getId());
 
-        return new GameRoomEntranceResponse(gameRoomEntrance.getGameRoom().getId(), gameRoomEntrance.getId(), null);
+        return new GameRoomEntranceResponse(
+                gameRoomEntrance.getGameRoom().getId(),
+                gameRoomEntrance.getId(),
+                gameRoomEntrances.stream().map(
+                                entranceOfGameRoom ->
+                                        new GameRoomEntranceResponse.EnteredUserSummary(
+                                                entranceOfGameRoom.getUser().getId()
+                                        )
+                        )
+                        .collect(Collectors.toList())
+        );
     }
 }
