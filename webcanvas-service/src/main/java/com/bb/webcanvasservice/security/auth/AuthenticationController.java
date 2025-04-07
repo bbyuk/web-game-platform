@@ -1,5 +1,7 @@
 package com.bb.webcanvasservice.security.auth;
 
+import com.bb.webcanvasservice.security.auth.dto.request.LoginRequest;
+import com.bb.webcanvasservice.security.auth.dto.response.LoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

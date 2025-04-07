@@ -23,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * 유저 등록
+     * 유저 생성
      * 
      * 클라이언트의 정보를 받아 유저를 생성한다.
      * @param userCreateRequest 생성 요청 정보
@@ -31,7 +31,7 @@ public class UserController {
      */
     @PostMapping
     @Operation(summary = "유저 등록", description = "클라이언트의 정보를 받아 유저를 생성한다.")
-    public ResponseEntity<UserInfo> registerNewUser(@RequestBody UserCreateRequest userCreateRequest) {
+    public ResponseEntity<UserInfo> createNewUser(@RequestBody UserCreateRequest userCreateRequest) {
         User user = userService.createUser(userCreateRequest.clientFingerprint());
         return ResponseEntity.ok(new UserInfo(user.getId(), user.getFingerprint()));
     }

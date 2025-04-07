@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.security.auth;
 
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
+import com.bb.webcanvasservice.security.auth.dto.response.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
