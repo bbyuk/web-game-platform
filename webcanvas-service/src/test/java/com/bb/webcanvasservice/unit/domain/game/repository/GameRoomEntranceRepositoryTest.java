@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Transactional
@@ -121,14 +122,12 @@ class GameRoomEntranceRepositoryTest {
 
         enterTestRoom(otherUser1, testUser, otherUser2, otherUser3, otherUser4);
         // when
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByUserId(testUser.getId());
+        Optional<GameRoomEntrance> gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId());
 
         // then
-        Assertions.assertThat(gameRoomEntrances.size()).isEqualTo(5);
-        Assertions.assertThat(
-                gameRoomEntrances.stream().filter(gameRoomEntrance -> gameRoomEntrance.getUser().getId().equals(testUser.getId()))
-                        .findFirst()
-        ).isPresent();
+        Assertions.assertThat(gameRoomEntrance).isPresent();
+        Assertions.assertThat(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoomEntrance.get().getGameRoom().getId()))
+                .hasSize(5);
     }
 
     private void enterTestRoom(User... enteredUsers) {

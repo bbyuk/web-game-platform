@@ -76,5 +76,5 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             where   gre.user.id = :userId
             """
     )
-    List<GameRoomEntrance> findGameRoomEntrancesByUserId(@Param("userId") Long userId);
+    Optional<GameRoomEntrance> findGameRoomEntranceByUserId(@Param("userId") Long userId);
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -207,22 +208,17 @@ public class GameRoomService {
      */
     @Transactional(readOnly = true)
     public GameRoomEntranceResponse findEnteredGameRoomInfo(Long userId) {
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByUserId(userId);
-
-        GameRoomEntrance userEntrance = gameRoomEntrances.stream()
-                .filter(gameRoomEntrance -> gameRoomEntrance.getUser().getId().equals(userId))
-                .findFirst()
+        GameRoomEntrance userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId)
                 .orElseThrow(() -> new GameRoomEntranceNotFoundException("현재 입장한 게임 방을 찾지 못했습니다."));
 
         return new GameRoomEntranceResponse(
                 userEntrance.getGameRoom().getId(),
                 userEntrance.getId(),
-                gameRoomEntrances.stream().map(
-                                entranceOfGameRoom ->
-                                        new GameRoomEntranceResponse.EnteredUserSummary(
-                                                entranceOfGameRoom.getUser().getId()
-                                        )
-                        )
+                gameRoomEntranceRepository
+                        .findGameRoomEntrancesByGameRoomId(userEntrance.getGameRoom().getId())
+                        .stream()
+                        .map(gameRoomEntrance ->
+                                new GameRoomEntranceResponse.EnteredUserSummary(gameRoomEntrance.getId()))
                         .collect(Collectors.toList())
         );
     }
