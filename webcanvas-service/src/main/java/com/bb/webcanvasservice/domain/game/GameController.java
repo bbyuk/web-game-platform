@@ -6,8 +6,9 @@ import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.security.auth.Authenticated;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 게임 진행, 게임 방 등 게임 처리 API 엔드포인트
  */
-@Slf4j
+@Tag(name = "Game API", description = "게임 방 및 게임 세션 진행 관련 API")
 @RestController
 @RequestMapping("game/canvas")
 @RequiredArgsConstructor
@@ -25,13 +26,14 @@ public class GameController {
 
 
     /**
-     * 방 만들기
+     * 게임 방 생성
      * <p>
      * 방을 생성하고 입장한다.
      * @param authentication 유저 인증 정보
      * @return
      */
     @PostMapping("room")
+    @Operation(summary = "게임 방 생성", description = "게임 방을 생성하고 입장한다.")
     public ResponseEntity<GameRoomCreateResponse> createGameRoom(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(gameRoomService.createGameRoomAndEnter(authentication.getUserId()));
     }
@@ -43,6 +45,7 @@ public class GameController {
      * @return
      */
     @GetMapping("room")
+    @Operation(summary = "입장 가능한 방 목록 조회", description = "요청을 보낸 유저가 입장할 수 있는 webcanvas-service 방의 목록을 조회한다.")
     public ResponseEntity<GameRoomListResponse> getEnterableGameRooms(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(gameRoomService.findEnterableGameRooms(authentication.getUserId()));
     }
@@ -56,6 +59,7 @@ public class GameController {
      * @return
      */
     @PostMapping("room/enterance")
+    @Operation(summary = "게임 방 입장", description = "요청읇 보낸 유저를 대상 게임 방에 입장시킨다.")
     public ResponseEntity<GameRoomEntranceResponse> enterGameRoom(@RequestBody GameRoomEntranceRequest entranceRequest,
                                                                   @Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(new GameRoomEntranceResponse(null, null, null));
