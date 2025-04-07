@@ -5,7 +5,7 @@ package com.bb.webcanvasservice.domain.user.dto.response;
  * @param userId 유저 식별 ID
  * @param userToken
  */
-public record UserDto(
+public record UserInfo(
         Long userId,
         String userToken
 ) {}

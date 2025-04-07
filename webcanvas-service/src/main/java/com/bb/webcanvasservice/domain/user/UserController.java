@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.domain.user;
 
 import com.bb.webcanvasservice.domain.user.dto.request.UserCreateRequest;
-import com.bb.webcanvasservice.domain.user.dto.response.UserDto;
+import com.bb.webcanvasservice.domain.user.dto.response.UserInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +31,9 @@ public class UserController {
      */
     @PostMapping
     @Operation(summary = "유저 등록", description = "클라이언트의 정보를 받아 유저를 생성한다.")
-    public ResponseEntity<UserDto> registerNewUser(@RequestBody UserCreateRequest userCreateRequest) {
+    public ResponseEntity<UserInfo> registerNewUser(@RequestBody UserCreateRequest userCreateRequest) {
         User user = userService.createUser(userCreateRequest.clientFingerprint());
-        return ResponseEntity.ok(new UserDto(user.getId(), user.getFingerprint()));
+        return ResponseEntity.ok(new UserInfo(user.getId(), user.getFingerprint()));
     }
 
 }
