@@ -4,6 +4,7 @@ import com.bb.webcanvasservice.common.RandomCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
@@ -66,10 +67,11 @@ class GameRoomServiceIntegrationTest {
         // given - 공통 Entity 사용
 
         // when
-        Long enterGameRoomId = gameRoomService.enterGameRoom(waitingRoom.getId(), testUser.getId());
+        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoom(waitingRoom.getId(), testUser.getId());
 
         // then
-        Assertions.assertThat(enterGameRoomId).isNotNull();
+        Assertions.assertThat(gameRoomEntranceResponse.gameRoomId()).isEqualTo(waitingRoom.getId());
+        Assertions.assertThat(gameRoomEntranceResponse.gameRoomEntranceId()).isNotNull();
     }
 
     @Test

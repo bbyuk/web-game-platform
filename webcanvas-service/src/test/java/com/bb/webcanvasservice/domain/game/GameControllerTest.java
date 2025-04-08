@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.domain.game;
 
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomCreateResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,7 +54,7 @@ class GameControllerTest {
         String token = new JwtManager().generateToken(userId, fingerprint);
 
         BDDMockito.given(gameRoomService.createGameRoomAndEnter(any()))
-                .willReturn(new GameRoomCreateResponse(gameRoomId, gameRoomEntranceId));
+                .willReturn(new GameRoomEntranceResponse(gameRoomId, gameRoomEntranceId));
 
         BDDMockito.given(jwtManager.generateToken(any(), any()))
                 .willReturn(token);

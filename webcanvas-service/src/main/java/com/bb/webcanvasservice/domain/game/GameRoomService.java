@@ -58,11 +58,9 @@ public class GameRoomService {
      * @return gameRoomEntranceId
      */
     @Transactional
-    public GameRoomCreateResponse createGameRoomAndEnter(Long userId) {
+    public GameRoomEntranceResponse createGameRoomAndEnter(Long userId) {
         Long gameRoomId = createGameRoom(userId);
-        Long gameRoomEntranceId = enterGameRoom(gameRoomId, userId);
-
-        return new GameRoomCreateResponse(gameRoomId, gameRoomEntranceId);
+        return enterGameRoom(gameRoomId, userId);
     }
 
     /**
@@ -131,7 +129,7 @@ public class GameRoomService {
     /**
      * 게임 방에 유저를 입장시킨다.
      * <p>
-     * - 입장시키려는 유저가 현재 아무 방에도 접속하지 않은 상태여야 한다. -> 방에서 나갈 시 삭제 처리
+     * - 입장시키려는 유저가 현재 아무 방에도 접속하지 않은 상태여야 한다.
      * - 입장하려는 방의 상태가 WAITING이어야 한다.
      * - 입장하려는 방에 접속한 유저 세션의 수(entrances)는 최대 8이다.
      *
@@ -140,7 +138,7 @@ public class GameRoomService {
      * @return gameRoomEntranceId
      */
     @Transactional
-    public Long enterGameRoom(Long gameRoomId, Long userId) {
+    public GameRoomEntranceResponse enterGameRoom(Long gameRoomId, Long userId) {
         if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
             throw new AlreadyEnteredRoomException("이미 입장한 방이 있습니다.");
         }
@@ -161,7 +159,21 @@ public class GameRoomService {
         GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
         targetGameRoom.addEntrance(newGameRoomEntrance);
 
-        return newGameRoomEntrance.getId();
+        return new GameRoomEntranceResponse(targetGameRoom.getId(), newGameRoomEntrance.getId());
+    }
+
+    /**
+     * Join Code로 게임 방에 입장한다.
+     * @param joinCode
+     * @param userId
+     * @return
+     */
+    @Transactional
+    public GameRoomEntranceResponse enterGameRoomWithJoinCode(String joinCode, Long userId) {
+        GameRoom targetGameRoom = gameRoomRepository.findRoomWithJoinCodeForEnter(joinCode)
+                .orElseThrow(() -> new GameRoomNotFoundException(String.format("%s에 해당하는 방을 찾지 못했습니다.", joinCode)));
+
+        return enterGameRoom(targetGameRoom.getId(), userId);
     }
 
     /**
@@ -220,23 +232,5 @@ public class GameRoomService {
                                 new GameRoomEntranceInfoResponse.EnteredUserSummary(gameRoomEntrance.getId()))
                         .collect(Collectors.toList())
         );
-    }
-
-    /**
-     * 게임 방에 입장한다.
-     * @param joinCode
-     * @param userId
-     * @return
-     */
-    @Transactional
-    public GameRoomEntranceResponse enterGameRoom(String joinCode, Long userId) {
-        GameRoom targetGameRoom = gameRoomRepository.findRoomWithJoinCodeForEnter(joinCode)
-                .orElseThrow(() -> new GameRoomNotFoundException(String.format("%s에 해당하는 방을 찾지 못했습니다.", joinCode)));
-
-        GameRoomEntrance gameRoomEntrance = gameRoomEntranceRepository.save(
-                new GameRoomEntrance(targetGameRoom, userService.findUserByUserId(userId)));
-        targetGameRoom.addEntrance(gameRoomEntrance);
-
-        return new GameRoomEntranceResponse(targetGameRoom.getId(), gameRoomEntrance.getId());
     }
 }

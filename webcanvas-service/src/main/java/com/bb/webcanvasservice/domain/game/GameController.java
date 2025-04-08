@@ -1,7 +1,5 @@
 package com.bb.webcanvasservice.domain.game;
 
-import com.bb.webcanvasservice.domain.game.dto.request.GameRoomEntranceRequest;
-import com.bb.webcanvasservice.domain.game.dto.response.GameRoomCreateResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
@@ -35,7 +33,7 @@ public class GameController {
      */
     @PostMapping("room")
     @Operation(summary = "게임 방 생성", description = "게임 방을 생성하고 입장한다.")
-    public ResponseEntity<GameRoomCreateResponse> createGameRoom(@Authenticated WebCanvasAuthentication authentication) {
+    public ResponseEntity<GameRoomEntranceResponse> createGameRoom(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(gameRoomService.createGameRoomAndEnter(authentication.getUserId()));
     }
 
@@ -63,21 +61,37 @@ public class GameController {
         return ResponseEntity.ok(gameRoomService.findEnteredGameRoomInfo(authentication.getUserId()));
     }
 
+
     /**
      * 게임 방 입장
      *
      * 요청을 보낸 유저를 대상 게임 방에 입장시킨다.
      *
-     * TODO 개발 진행중
-     * @param entranceRequest
+     * @param gameRoomId
      * @param authentication
      * @return
      */
-    @PostMapping("room/enterance")
-    @Operation(summary = "게임 방 입장", description = "요청읇 보낸 유저를 대상 게임 방에 입장시킨다.")
-    public ResponseEntity<GameRoomEntranceResponse> enterGameRoom(@RequestBody GameRoomEntranceRequest entranceRequest,
-                                                                  @Authenticated WebCanvasAuthentication authentication) {
-        return ResponseEntity.ok(gameRoomService.enterGameRoom(entranceRequest.joinCode(), authentication.getUserId()));
+    @PostMapping("room/{gameRoomId}/entrance")
+    @Operation(summary = "게임 방 입장", description = "입장 요청을 보낸 유저를 대상 게임 방에 입장시킨다.")
+    public ResponseEntity<GameRoomEntranceResponse> enterGameRoom(@PathVariable("gameRoomId") Long gameRoomId, @Authenticated WebCanvasAuthentication authentication) {
+        return ResponseEntity.ok(gameRoomService.enterGameRoom(gameRoomId, authentication.getUserId()));
+    }
+
+    /**
+     * joinCode로 게임 방 입장
+     *
+     * 요청을 보낸 유저를 대상 게임 방에 입장시킨다.
+     *
+     * TODO 개발 진행중
+     * @param joinCode
+     * @param authentication
+     * @return
+     */
+    @PostMapping("room/{joinCode}/enterance")
+    @Operation(summary = "Join Code로 게임 방 입장", description = "Join Code로 입장 요청읇 보낸 유저를 대상 게임 방에 입장시킨다.")
+    public ResponseEntity<GameRoomEntranceResponse> enterGameRoomWithJoinCode(@PathVariable("joinCode") String joinCode,
+                                                                              @Authenticated WebCanvasAuthentication authentication) {
+        return ResponseEntity.ok(gameRoomService.enterGameRoomWithJoinCode(joinCode, authentication.getUserId()));
     }
 
 }

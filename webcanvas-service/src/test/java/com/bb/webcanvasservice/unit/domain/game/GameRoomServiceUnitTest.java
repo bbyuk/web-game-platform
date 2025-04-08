@@ -86,10 +86,10 @@ class GameRoomServiceUnitTest {
 
 
         // when
-        Long gameRoomEnterId = gameRoomService.enterGameRoom(testGameRoomId, testUserId);
+        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoom(testGameRoomId, testUserId);
 
         // then
-        Assertions.assertThat(gameRoomEnterId).isEqualTo(testGameRoomEntranceId);
+        Assertions.assertThat(gameRoomEntranceResponse.gameRoomEntranceId()).isEqualTo(testGameRoomEntranceId);
     }
 
 
@@ -215,7 +215,7 @@ class GameRoomServiceUnitTest {
     }
 
     @Test
-    @DisplayName("게임 방 입장 - 게임 방에 입장 후 입장한 방의 ID와 입장 ID를 리턴한다.")
+    @DisplayName("Join Code로 게임 방 입장 - Join Code로 게임 방에 입장 후 입장한 방의 ID와 입장 ID를 리턴한다.")
     void enterGameRoom() throws Exception {
         // given
         var testRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6));
@@ -226,7 +226,9 @@ class GameRoomServiceUnitTest {
         setId(testRoom, random.nextLong());
         setId(testGameRoomEntrance, random.nextLong());
 
-
+        /**
+         * JoinCode 처리 mock
+         */
         when(gameRoomRepository.findRoomWithJoinCodeForEnter(testRoom.getJoinCode()))
                 .thenReturn(Optional.of(testRoom));
 
@@ -234,13 +236,20 @@ class GameRoomServiceUnitTest {
 
         when(userService.findUserByUserId(testUser.getId())).thenReturn(testUser);
 
+        /**
+         * 입장 mock
+         */
+        when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class))).thenReturn(Boolean.FALSE);
+        when(gameRoomRepository.findById(testRoom.getId())).thenReturn(Optional.of(testRoom));
+
         // when
-        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoom(testRoom.getJoinCode(), testUser.getId());
+        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoomWithJoinCode(testRoom.getJoinCode(), testUser.getId());
 
         // then
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomId()).isEqualTo(testRoom.getId());
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomEntranceId()).isEqualTo(testGameRoomEntrance.getId());
     }
+
 
 
     private void setId(Object entity, Long id) throws NoSuchFieldException, IllegalAccessException {
