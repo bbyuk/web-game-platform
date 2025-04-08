@@ -4,6 +4,7 @@ import com.bb.webcanvasservice.common.RandomCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
@@ -20,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -173,6 +175,42 @@ class GameRoomServiceUnitTest {
                 .isInstanceOf(AlreadyEnteredRoomException.class);
         // then
 
+    }
+
+    @Test
+    @DisplayName("현재 입장한 게임 방과 입장 정보를 리턴한다.")
+    void findEnteredGameRoomInfo() throws Exception {
+        // given
+        var testGameRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10));
+        var testUser0 = new User(UUID.randomUUID().toString());
+        var testUser1 = new User(UUID.randomUUID().toString());
+        var testUser2 = new User(UUID.randomUUID().toString());
+        var testGameRoomEntrance0 = new GameRoomEntrance(testGameRoom, testUser0);
+        var testGameRoomEntrance1 = new GameRoomEntrance(testGameRoom, testUser1);
+        var testGameRoomEntrance2 = new GameRoomEntrance(testGameRoom, testUser2);
+
+        setId(testGameRoom, random.nextLong());
+        setId(testUser0, random.nextLong());
+        setId(testUser1, random.nextLong());
+        setId(testUser2, random.nextLong());
+        setId(testGameRoomEntrance0, random.nextLong());
+        setId(testGameRoomEntrance1, random.nextLong());
+        setId(testGameRoomEntrance2, random.nextLong());
+
+        when(gameRoomEntranceRepository.findGameRoomEntranceByUserId(any(Long.class)))
+                .thenReturn(Optional.of(testGameRoomEntrance0));
+
+        when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(any(Long.class)))
+                .thenReturn(List.of(testGameRoomEntrance0, testGameRoomEntrance1, testGameRoomEntrance2));
+
+        // when
+
+        GameRoomEntranceResponse enteredGameRoomInfo = gameRoomService.findEnteredGameRoomInfo(testUser0.getId());
+
+        // then
+        Assertions.assertThat(enteredGameRoomInfo.gameRoomEntranceId()).isEqualTo(testGameRoomEntrance0.getId());
+        Assertions.assertThat(enteredGameRoomInfo.gameRoomId()).isEqualTo(testGameRoom.getId());
+        Assertions.assertThat(enteredGameRoomInfo.otherUsers()).hasSize(2);
     }
 
 

@@ -201,8 +201,6 @@ public class GameRoomService {
     /**
      * 현재 입장한 게임 방과 입장 정보를 리턴한다.
      * <p>
-     * TODO 개발 진행중 - 테스트코드 작성 필요
-     *
      * @param userId
      * @return
      */
@@ -217,6 +215,7 @@ public class GameRoomService {
                 gameRoomEntranceRepository
                         .findGameRoomEntrancesByGameRoomId(userEntrance.getGameRoom().getId())
                         .stream()
+                        .filter(gameRoomEntrance -> !gameRoomEntrance.getUser().getId().equals(userId))
                         .map(gameRoomEntrance ->
                                 new GameRoomEntranceResponse.EnteredUserSummary(gameRoomEntrance.getId()))
                         .collect(Collectors.toList())
