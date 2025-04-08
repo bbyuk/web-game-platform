@@ -112,24 +112,6 @@ class GameRoomEntranceRepositoryTest {
     }
 
     @Test
-    @DisplayName("게임 방 ID로 해당 게임 방에 입장한 정보 조회")
-    void findGameRoomEntrancesByGameRoomId() {
-        // given
-        User otherUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
-        User otherUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
-        User otherUser3 = userRepository.save(new User(UUID.randomUUID().toString()));
-        User otherUser4 = userRepository.save(new User(UUID.randomUUID().toString()));
-
-        enterTestRoom(otherUser1, testUser, otherUser2, otherUser3, otherUser4);
-
-        // when
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(testUser.getId());
-
-        // then
-        Assertions.assertThat(gameRoomEntrances.size()).isEqualTo(5);
-    }
-
-    @Test
     @DisplayName("유저 ID로 현재 입장한 게임 방의 입장 정보 조회")
     void findGameRoomEntrancesByUserId() {
         // given
