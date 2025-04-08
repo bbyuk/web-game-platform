@@ -4,7 +4,7 @@ import com.bb.webcanvasservice.common.RandomCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
-import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
@@ -205,7 +205,7 @@ class GameRoomServiceUnitTest {
 
         // when
 
-        GameRoomEntranceResponse enteredGameRoomInfo = gameRoomService.findEnteredGameRoomInfo(testUser0.getId());
+        GameRoomEntranceInfoResponse enteredGameRoomInfo = gameRoomService.findEnteredGameRoomInfo(testUser0.getId());
 
         // then
         Assertions.assertThat(enteredGameRoomInfo.gameRoomEntranceId()).isEqualTo(testGameRoomEntrance0.getId());

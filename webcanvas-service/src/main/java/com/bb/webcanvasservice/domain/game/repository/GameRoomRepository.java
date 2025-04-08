@@ -82,5 +82,22 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
             having      count(gre) < :gameRoomCapacity
             """
     )
-    List<GameRoom> findEnterableGameRooms(int gameRoomCapacity, List<GameRoomState> enterableStates);
+    List<GameRoom> findEnterableGameRooms(@Param("gameRoomCapacity") int gameRoomCapacity,
+                                          @Param("enterableStates") List<GameRoomState> enterableStates);
+
+    /**
+     * JoinCode로 입장할 방 조회
+     * GameRoom.state = 'WAITING' 이어야 한다.
+     * 
+     * TODO - 테스트코드 작성 필요
+     * @param joinCode
+     * @return
+     */
+    @Query("""
+           select   gr
+           from     GameRoom gr
+           where    gr.joinCode =: joinCode
+           and      gr.state = 'WAITING'
+           """)
+    Optional<GameRoom> findRoomWithJoinCodeForEnter(String joinCode);
 }

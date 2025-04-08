@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.domain.game;
 
 import com.bb.webcanvasservice.common.RandomCodeGenerator;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomCreateResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -205,11 +205,11 @@ public class GameRoomService {
      * @return
      */
     @Transactional(readOnly = true)
-    public GameRoomEntranceResponse findEnteredGameRoomInfo(Long userId) {
+    public GameRoomEntranceInfoResponse findEnteredGameRoomInfo(Long userId) {
         GameRoomEntrance userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId)
                 .orElseThrow(() -> new GameRoomEntranceNotFoundException("현재 입장한 게임 방을 찾지 못했습니다."));
 
-        return new GameRoomEntranceResponse(
+        return new GameRoomEntranceInfoResponse(
                 userEntrance.getGameRoom().getId(),
                 userEntrance.getId(),
                 gameRoomEntranceRepository
@@ -217,8 +217,26 @@ public class GameRoomService {
                         .stream()
                         .filter(gameRoomEntrance -> !gameRoomEntrance.getUser().getId().equals(userId))
                         .map(gameRoomEntrance ->
-                                new GameRoomEntranceResponse.EnteredUserSummary(gameRoomEntrance.getId()))
+                                new GameRoomEntranceInfoResponse.EnteredUserSummary(gameRoomEntrance.getId()))
                         .collect(Collectors.toList())
         );
+    }
+
+    /**
+     * 게임 방에 입장한다.
+     * @param joinCode
+     * @param userId
+     * @return
+     */
+    @Transactional
+    public GameRoomEntranceResponse enterGameRoom(String joinCode, Long userId) {
+        GameRoom targetGameRoom = gameRoomRepository.findRoomWithJoinCodeForEnter(joinCode)
+                .orElseThrow(() -> new GameRoomNotFoundException(String.format("%s에 해당하는 방을 찾지 못했습니다.", joinCode)));
+
+        GameRoomEntrance gameRoomEntrance = gameRoomEntranceRepository.save(
+                new GameRoomEntrance(targetGameRoom, userService.findUserByUserId(userId)));
+        targetGameRoom.addEntrance(gameRoomEntrance);
+
+        return new GameRoomEntranceResponse(targetGameRoom.getId(), gameRoomEntrance.getId());
     }
 }
