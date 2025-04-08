@@ -233,4 +233,9 @@ public class GameRoomService {
                         .collect(Collectors.toList())
         );
     }
+
+    @Transactional(readOnly = true)
+    public boolean canEnterWebSocketGameRoom(Long gameRoomId, Long userId) {
+        return gameRoomEntranceRepository.existsActiveEntrance(gameRoomId, userId);
+    }
 }

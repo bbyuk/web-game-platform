@@ -130,6 +130,29 @@ class GameRoomEntranceRepositoryTest {
                 .hasSize(5);
     }
 
+    @Test
+    @DisplayName("GameRoom에 입장되어 있는지 여부를 조회한다.")
+    void findGameRoomEntrancesByGameRoomId() throws Exception {
+        // given
+        /**
+         * testUser1은 입장, testUser2는 입장하지 않음
+         */
+        GameRoom testGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6)));
+
+        User testUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
+        User testUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
+
+        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1));
+
+        // when
+        boolean isTestUser1EnteredTestGameRoom = gameRoomEntranceRepository.existsActiveEntrance(testGameRoom.getId(), testUser1.getId());
+        boolean isTestUser2EnteredTestGameRoom = gameRoomEntranceRepository.existsActiveEntrance(testGameRoom.getId(), testUser2.getId());
+
+        // then
+        Assertions.assertThat(isTestUser1EnteredTestGameRoom).isTrue();
+        Assertions.assertThat(isTestUser2EnteredTestGameRoom).isFalse();
+    }
+
     private void enterTestRoom(User... enteredUsers) {
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6)));
         Arrays.stream(enteredUsers).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, enteredUser)));

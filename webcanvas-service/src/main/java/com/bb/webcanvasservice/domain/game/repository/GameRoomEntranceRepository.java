@@ -80,4 +80,23 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             """
     )
     Optional<GameRoomEntrance> findGameRoomEntranceByUserId(@Param("userId") Long userId);
+
+    /**
+     * gameRoom에 입장되어 있는지 여부를 조회한다.
+     * @param gameRoomId
+     * @param userId
+     * @return
+     */
+    @Query(
+            """
+            select exists (
+                 select 1
+                 from   GameRoomEntrance gre
+                 where  gre.gameRoom.id = :gameRoomId
+                 and    gre.user.id = :userId
+                 and    gre.state = 'ACTIVE'
+            )
+            """
+    )
+    boolean existsActiveEntrance(@Param("gameRoomId") Long gameRoomId, @Param("userId") Long userId);
 }
