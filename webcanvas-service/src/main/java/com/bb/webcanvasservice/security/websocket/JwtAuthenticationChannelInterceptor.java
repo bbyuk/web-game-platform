@@ -19,7 +19,7 @@ import java.util.Optional;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class JwtChannelInterceptor implements ChannelInterceptor {
+public class JwtAuthenticationChannelInterceptor implements ChannelInterceptor {
 
     private final JwtManager jwtManager;
 
