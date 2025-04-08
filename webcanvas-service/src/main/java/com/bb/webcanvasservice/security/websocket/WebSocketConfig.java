@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.security.websocket;
 
+import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtManager jwtManager;
     private final WebSocketAuthenticationArgumentResolver webSocketAuthenticationArgumentResolver;
+    /**
+     * 게임 방과 연관되어 있는 웹소켓 이벤트 브로커 구독 요청의 validation 처리를 위한 서비스 주입
+     */
+    private final GameRoomService gameRoomService;
 
     /**
      * 메세지 브로커 설정
@@ -57,7 +62,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
      */
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new JwtAuthenticationChannelInterceptor(jwtManager));
+        registration.interceptors(
+                new JwtAuthenticationChannelInterceptor(jwtManager),
+                new SubscribeChannelInterceptor(gameRoomService)
+        );
     }
 
     /**

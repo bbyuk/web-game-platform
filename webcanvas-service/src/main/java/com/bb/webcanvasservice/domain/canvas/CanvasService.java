@@ -19,10 +19,12 @@ public class CanvasService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final GameRoomService gameRoomService;
+    public static final String CANVAS_DESTINATION_PREFIX = "/canvas/";
 
     /**
      * 웹 소켓 컨트롤러를 통해 들어온 Stroke 이벤트를 같은 방에 있는 유저들에게 브로드캐스팅한다.
      * @param stroke
+     *
      */
     @Transactional(readOnly = true)
     public void broadcastStrokeOnRoom(Stroke stroke, Long userId) {
@@ -36,7 +38,7 @@ public class CanvasService {
         /**
          * gameRoom id에 해당하는 토픽으로 브로드캐스팅
          */
-        messagingTemplate.convertAndSend(String.format("/canvas/%d", enteredGameRoom.getId()), stroke);
+        messagingTemplate.convertAndSend(String.format("%s%d", CANVAS_DESTINATION_PREFIX ,enteredGameRoom.getId()), stroke);
     }
 
 }
