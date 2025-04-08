@@ -22,11 +22,12 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
      */
     @Query("""
             select exists(
-                select 1
-                from GameRoomEntrance gre
-                join User u
-                on gre.user = u
-                where gre.user.id = :userId
+                select  1
+                from    GameRoomEntrance gre
+                join    User u
+                on      gre.user = u
+                where   gre.user.id = :userId
+                and     gre.state = 'ACTIVE'
             )
             """)
     boolean existsGameRoomEntranceByUserId(@Param("userId") Long userId);
@@ -37,11 +38,12 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
      * @return gameRoomEntrance
      */
     @Query("""
-            select  gre
-            from    GameRoomEntrance gre
-            join    User u
-            on      gre.user = u
-            where   gre.user.id = :userId
+           select  gre
+           from    GameRoomEntrance gre
+           join    User u
+           on      gre.user = u
+           where   gre.user.id = :userId
+           and     gre.state = 'ACTIVE'
            """)
     Optional<GameRoomEntrance> findByUserId(@Param("userId") Long userId);
 
@@ -52,18 +54,18 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
      */
     @Query(
             """
-            select  gre
-            from    GameRoomEntrance gre
-            join fetch User u on gre.user = u
-            join fetch GameRoom gr on gre.gameRoom = gr
-            where gre.gameRoom.id = :gameRoomId
+            select      gre
+            from        GameRoomEntrance gre
+            join fetch  User u on gre.user = u
+            join fetch  GameRoom gr on gre.gameRoom = gr
+            where       gre.gameRoom.id = :gameRoomId
+            and         gre.state = 'ACTIVE'
             """
     )
     List<GameRoomEntrance> findGameRoomEntrancesByGameRoomId(@Param("gameRoomId") Long gameRoomId);
 
     /**
      * 유저 ID로 현재 입장한 게임 방의 입장 정보 조회
-     * TODO 쿼리 수정 필요
      * @param userId
      * @return
      */
@@ -74,6 +76,7 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             join    fetch User u on gre.user = u
             join    fetch GameRoom gr on gre.gameRoom = gr
             where   gre.user.id = :userId
+            and     gre.state = 'ACTIVE'
             """
     )
     Optional<GameRoomEntrance> findGameRoomEntranceByUserId(@Param("userId") Long userId);

@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.domain.game;
 
+import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -37,8 +38,20 @@ public class GameRoomEntrance {
      */
     private User user;
 
+    /**
+     * 게임 방 입장 기록 상태
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gaem_room_entrance_state")
+    private GameRoomEntranceState state;
+
     public GameRoomEntrance(GameRoom gameRoom, User user) {
         this.gameRoom = gameRoom;
         this.user = user;
+        this.state = GameRoomEntranceState.ACTIVE;
+    }
+
+    public void exit() {
+        this.state = GameRoomEntranceState.INACTIVE;
     }
 }

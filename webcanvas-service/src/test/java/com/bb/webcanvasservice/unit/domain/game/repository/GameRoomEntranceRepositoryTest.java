@@ -4,6 +4,7 @@ import com.bb.webcanvasservice.common.RandomCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
+import com.bb.webcanvasservice.domain.game.exception.GameRoomEntranceNotFoundException;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.User;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
@@ -67,6 +69,22 @@ class GameRoomEntranceRepositoryTest {
         // then
         Assertions.assertThat(exists).isTrue();
     }
+
+    @Test
+    @DisplayName("게임 방 입장 여부 조회 - 게임 방 입장 기록 중 ACTIVE 상태가 없다면 false return")
+    void existsGameRoomEntranceByUserIdFalseWhenNoActive() {
+        // given
+        enterTestRoom(testUser);
+        GameRoomEntrance gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId()).orElseThrow(() -> new GameRoomEntranceNotFoundException("왜 여기서,,?"));
+        exit(gameRoomEntrance);
+
+        // when
+        Assertions.assertThat(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(testUser.getId())).isFalse();
+
+
+        // then
+    }
+
 
     @Test
     @DisplayName("입장한 방 찾기 - 입장한 방이 없다면 Optional.empty() 리턴")
@@ -135,5 +153,8 @@ class GameRoomEntranceRepositoryTest {
         Arrays.stream(enteredUsers).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, enteredUser)));
     }
 
+    public void exit(GameRoomEntrance entrance) {
+        entrance.exit();
+    }
 
 }
