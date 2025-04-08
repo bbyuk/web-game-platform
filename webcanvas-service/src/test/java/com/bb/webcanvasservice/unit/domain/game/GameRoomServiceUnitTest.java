@@ -5,6 +5,7 @@ import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
@@ -211,6 +212,34 @@ class GameRoomServiceUnitTest {
         Assertions.assertThat(enteredGameRoomInfo.gameRoomEntranceId()).isEqualTo(testGameRoomEntrance0.getId());
         Assertions.assertThat(enteredGameRoomInfo.gameRoomId()).isEqualTo(testGameRoom.getId());
         Assertions.assertThat(enteredGameRoomInfo.otherUsers()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("게임 방 입장 - 게임 방에 입장 후 입장한 방의 ID와 입장 ID를 리턴한다.")
+    void enterGameRoom() throws Exception {
+        // given
+        var testRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6));
+        var testUser = new User(UUID.randomUUID().toString());
+        var testGameRoomEntrance = new GameRoomEntrance(testRoom, testUser);
+
+        setId(testUser, random.nextLong());
+        setId(testRoom, random.nextLong());
+        setId(testGameRoomEntrance, random.nextLong());
+
+
+        when(gameRoomRepository.findRoomWithJoinCodeForEnter(testRoom.getJoinCode()))
+                .thenReturn(Optional.of(testRoom));
+
+        when(gameRoomEntranceRepository.save(any())).thenReturn(testGameRoomEntrance);
+
+        when(userService.findUserByUserId(testUser.getId())).thenReturn(testUser);
+
+        // when
+        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoom(testRoom.getJoinCode(), testUser.getId());
+
+        // then
+        Assertions.assertThat(gameRoomEntranceResponse.gameRoomId()).isEqualTo(testRoom.getId());
+        Assertions.assertThat(gameRoomEntranceResponse.gameRoomEntranceId()).isEqualTo(testGameRoomEntrance.getId());
     }
 
 
