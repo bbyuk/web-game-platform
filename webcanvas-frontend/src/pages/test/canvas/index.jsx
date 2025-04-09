@@ -1,6 +1,6 @@
-import Canvas from "@components/canvas/index.jsx";
+import Canvas from "@components/canvas";
 import {useEffect, useState} from "react";
-import GameRoomList from "../../../components/game-room-list/index.jsx";
+import GameRoomList from "@components/game-room-list";
 
 export default function CanvasTest() {
     const [strokes, setStrokes] = useState([]);
@@ -9,31 +9,30 @@ export default function CanvasTest() {
     const [gameRoomCreating, setGameRoomCreating] = useState(false);
     const [loggedIn, setLoggedIn] = useState(false);
     const apiUrl = import.meta.env.VITE_WEB_CANVAS_SERVICE;
-
-    const [gameRooms, setGameRooms] = useState([
-        { id: 1, name: "Canvas Room A"},
-        { id: 2, name: "초록 방"}
-    ]);
-    const onEnterRoom = (roomId) => {
-        alert(`${roomId}번 방으로 입장 시도`);
-    }
-
     const ongoingMessage = "이미 요청을 처리중입니다.";
 
 
+    /**
+     * ======================== 화면 컴포넌트 메소드 ========================
+     */
 
-    const onStrokeHandler = (stroke) => {
-        if (stroke.length > 0) {
-            setStrokes((prevItems) => [...prevItems, stroke]);
-        }
-    };
-
+    /**
+     * 캔버스를 clear하고 그려진 stroke들을 제거한 후, 캔버스 컴포넌트에 rerendering signal을 준다.
+     */
     const clear = () => {
         setStrokes([]);
         setReRenderingSignal(true);
     };
 
+    /**
+     * ========================    이벤트 핸들러    ========================
+     */
 
+    /**
+     * 로그인 버튼 클릭 이벤트 핸들러
+     * @param e
+     * @returns {Promise<void>}
+     */
     const onLoginButtonClickHandler = async (e) => {
         if (loginProcessing) {
             alert(ongoingMessage);
@@ -41,11 +40,41 @@ export default function CanvasTest() {
         }
         const loggedIn = await login();
     }
+    /**
+     * 게임 방 생성 버튼 클릭 이벤트 핸들러
+     * @param e
+     * @returns {Promise<void>}
+     */
+    const onCreateGameRoomButtonClickHandler = async (e) => {
+        if (gameRoomCreating) {
+            alert(ongoingMessage);
+            return;
+        }
 
+        const created = await createGameRoom();
+
+    }
+
+    /**
+     * 캔버스 컴포넌트 stroke 이벤트 핸들러
+     * @param stroke
+     */
+    const onStrokeHandler = (stroke) => {
+        if (stroke.length > 0) {
+            setStrokes((prevItems) => [...prevItems, stroke]);
+        }
+    };
+
+    /**
+     * ========================    서버 API 요청   ========================
+     */
+
+    /**
+     * 로그인
+     * @returns {Promise<boolean>}
+     */
     const login = async () => {
         try {
-
-
             /**
              * 로그인 로직
              */
@@ -79,16 +108,10 @@ export default function CanvasTest() {
         }
     }
 
-
-    const onCreateGameRoomButtonClickHandler = async (e) => {
-        if (gameRoomCreating) {
-            alert(ongoingMessage);
-            return;
-        }
-
-        const created = await createGameRoom();
-
-    }
+    /**
+     * 게임 방 생성
+     * @returns {Promise<boolean>}
+     */
     const createGameRoom = async () => {
         try {
             const response = await fetch(`${apiUrl}/game/canvas/room`, {
@@ -106,6 +129,21 @@ export default function CanvasTest() {
         }
     };
 
+    /**
+     *
+     */
+
+    /**
+     * useEffect hook
+     */
+    useEffect(() => {
+        const accessToken = localStorage.getItem("accessToken");
+
+        if (accessToken) {
+            setLoggedIn(true);
+        }
+    }, []);
+
     return <div>
         <Canvas
             strokes={strokes}
@@ -115,7 +153,7 @@ export default function CanvasTest() {
             color={"green"}
         />
 
-        <GameRoomList />
+        { loggedIn ? <GameRoomList /> : null }
 
         <div>
             <br/>
