@@ -1,5 +1,6 @@
 import Canvas from "@components/canvas/index.jsx";
 import {useEffect, useState} from "react";
+import GameRoomList from "../../../components/game-room-list/index.jsx";
 
 export default function CanvasTest() {
     const [strokes, setStrokes] = useState([]);
@@ -114,17 +115,7 @@ export default function CanvasTest() {
             color={"green"}
         />
 
-        <div>
-            <h2>게임 방 목록</h2>
-            <ul>
-                {gameRooms.map((room) => (
-                    <li key={room.id} style={{ marginBottom: "10px" }}>
-                        <span>방 이름: {room.name}</span>
-                        <button onClick={() => onEnterRoom(room.id)}>입장</button>
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <GameRoomList />
 
         <div>
             <br/>

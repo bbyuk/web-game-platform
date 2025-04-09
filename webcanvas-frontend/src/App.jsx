@@ -1,5 +1,4 @@
 import {useState} from 'react'
-import './App.css'
 import CanvasTest from '@pages/test/canvas';
 
 function App() {
