@@ -11,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -63,4 +64,16 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(webAuthenticationArgumentResolver);
     }
+
+    /**
+     * WebMvcConfigurer의 Cors 매핑 열기
+     * @param registry
+     */
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**") // 모든 경로에 대해
+                .allowedOrigins("*") // 또는 .allowedOriginPatterns("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+//                .allowCredentials(true); // 쿠키 등 자격 증명 허용 시
+        }
 }

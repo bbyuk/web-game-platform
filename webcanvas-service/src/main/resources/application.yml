@@ -32,8 +32,8 @@ logging:
   level:
     org:
       springframework:
-        web:
-          socket: debug
+        security: debug
+        web: debug
         messaging: debug
 
 springdoc:
