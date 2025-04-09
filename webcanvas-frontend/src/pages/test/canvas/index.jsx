@@ -1,4 +1,4 @@
-import Canvas from "components/canvas";
+import Canvas from "@components/canvas/index.jsx";
 import {useEffect, useState} from "react";
 
 export default function CanvasTest() {
@@ -7,6 +7,7 @@ export default function CanvasTest() {
     const [loginProcessing, setLoginProcessing] = useState(false);
     const [gameRoomCreating, setGameRoomCreating] = useState(false);
     const [loggedIn, setLoggedIn] = useState(false);
+    const apiUrl = import.meta.env.VITE_WEB_CANVAS_SERVICE;
 
     const [gameRooms, setGameRooms] = useState([
         { id: 1, name: "Canvas Room A"},
@@ -42,10 +43,12 @@ export default function CanvasTest() {
 
     const login = async () => {
         try {
+
+
             /**
              * 로그인 로직
              */
-            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/auth/login`, {
+            const response = await fetch(`${apiUrl}/auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -87,7 +90,7 @@ export default function CanvasTest() {
     }
     const createGameRoom = async () => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/game/canvas/room`, {
+            const response = await fetch(`${apiUrl}/game/canvas/room`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -101,10 +104,6 @@ export default function CanvasTest() {
             setGameRoomCreating(false);
         }
     };
-
-    useEffect(() => {
-
-    }, [localStorage.getItem("accessToken")]);
 
     return <div>
         <Canvas

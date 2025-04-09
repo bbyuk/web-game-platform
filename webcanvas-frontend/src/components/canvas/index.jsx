@@ -1,4 +1,4 @@
-import "index.css";
+import "./index.css";
 import {useEffect, useRef, useState} from "react";
 
 export default function Canvas({
