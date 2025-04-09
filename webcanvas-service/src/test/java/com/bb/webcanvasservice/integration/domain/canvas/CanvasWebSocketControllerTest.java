@@ -30,6 +30,7 @@ import java.lang.reflect.Type;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Transactional
 @ActiveProfiles("canvas-integration-test")
@@ -41,7 +42,13 @@ class CanvasWebSocketControllerTest {
      * 브로드캐스팅 타임아웃
      * 브로드캐스팅 시간 테스트
      */
-    private final int BROADCASTING_TIMEOUT = 300;
+    private final int BROADCASTING_TIMEOUT = 500;
+
+    /**
+     * 방 입장시 소켓 구독 처리에 대한 타임아웃
+     * 3s
+     */
+    private final int ROOM_ENTRANCE_CANVAS_SUBSCRIBE_TIMEOUT = 3000;
 
 
     @LocalServerPort
@@ -151,13 +158,37 @@ class CanvasWebSocketControllerTest {
     }
 
     @Test
-    @DisplayName("웹 소켓 접속 및 stroke 처리 - canvas 웹 소켓에 연결하고 stroke 이벤트 send시 같은 방에 입장해 웹 소켓에 연결되어 있는 클라이언트로 stroke 메세지를 전송한다.")
+    @DisplayName("게임 방 입장시 게임방과 관련된 캔버스 웹소켓 이벤트 구독 요청 처리 - 현재 입장한 방의 캔버스만 구독할 수 있다.")
+    void testWebSocketSubscriptionValidation() throws Exception {
+        // given
+        // 게임 방에 접속해있지 않으나, 다른 게임방의 웹소켓 이벤트를 구독하려는 악의적인 유저
+        User maliciousUser = userRepository.save(new User(UUID.randomUUID().toString()));
+        
+        WebSocketStompClient maliciousUserClient = createClient();
+        String maliciousUserJwt = jwtManager.generateToken(maliciousUser.getId(), maliciousUser.getFingerprint());
+        StompSession maliciousUserSession = connect(maliciousUserClient, maliciousUserJwt);
+
+        // when
+        // 아무 방에 접속해있지 않은 상태 -> test GameRoom의 웹소켓에 악의적으로 구독 요청
+        CompletableFuture<Stroke> subscribeFuture = subscribeRoomCanvas(maliciousUserSession, testDataLoader.testGameRoom.getId());
+
+        // then
+        Assertions.assertThatThrownBy(() -> subscribeFuture.get(3, TimeUnit.SECONDS))
+                .isInstanceOf(TimeoutException.class);
+    }
+
+    @Test
+    @DisplayName("웹소켓 접속 및 stroke 처리 - canvas 웹 소켓에 연결하고 stroke 이벤트 send시 같은 방에 입장해 웹 소켓에 연결되어 있는 클라이언트로 stroke 메세지를 전송한다.")
     void testWebSocketDrawMessage() throws Exception {
         // given
         // 방에 접속해 있어야한다.
+        WebSocketStompClient subUserClient = createClient();
+
+        String subUserJwt = jwtManager.generateToken(testDataLoader.testUser2.getId(), testDataLoader.testUser2.getFingerprint());
+        StompSession subUserSession = connect(subUserClient, subUserJwt);
 
         // 구독
-        CompletableFuture<Stroke> subscribeFuture = subscribeRoomCanvas(this.testUserSession, testDataLoader.testGameRoom.getId());
+        CompletableFuture<Stroke> subscribeFuture = subscribeRoomCanvas(subUserSession, testDataLoader.testGameRoom.getId());
 
         // when
         Stroke testStroke = testDataLoader.testStroke;
@@ -165,7 +196,7 @@ class CanvasWebSocketControllerTest {
         testUserSession.send(SEND_DESTINATION, testStroke);
 
         // then
-        Stroke result = subscribeFuture.get(BROADCASTING_TIMEOUT, TimeUnit.MILLISECONDS);
+        Stroke result = subscribeFuture.get(ROOM_ENTRANCE_CANVAS_SUBSCRIBE_TIMEOUT, TimeUnit.MILLISECONDS);
 
         Assertions.assertThat(result.getLineWidth()).isEqualTo(testStroke.getLineWidth());
         Assertions.assertThat(result.getPoints().size()).isEqualTo(testStroke.getPoints().size());

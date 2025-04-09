@@ -60,6 +60,10 @@ public class CanvasTestDataLoader {
         testUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
         testUser3 = userRepository.save(new User(UUID.randomUUID().toString()));
 
+        System.out.println("testUser1 = " + testUser1.getId());
+        System.out.println("testUser2 = " + testUser2.getId());
+        System.out.println("testUser3 = " + testUser3.getId());
+
         testGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6)));
 
         gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1));
