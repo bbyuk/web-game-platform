@@ -1,15 +1,19 @@
 import Canvas from "@components/canvas";
 import {useEffect, useState} from "react";
 import GameRoomList from "@components/game-room-list";
+import { useApiLock } from "@api/lock";
 
 export default function CanvasTest() {
-    const [strokes, setStrokes] = useState([]);
+
+    /**
+     * API 중복 호출을 막는 락 커스텀 hook
+     */
+    const { apiLock } = useApiLock();
     const [reRenderingSignal, setReRenderingSignal] = useState(false);
-    const [loginProcessing, setLoginProcessing] = useState(false);
-    const [gameRoomCreating, setGameRoomCreating] = useState(false);
+
+    const [strokes, setStrokes] = useState([]);
     const [loggedIn, setLoggedIn] = useState(false);
     const apiUrl = import.meta.env.VITE_WEB_CANVAS_SERVICE;
-    const ongoingMessage = "이미 요청을 처리중입니다.";
 
 
     /**
@@ -34,11 +38,7 @@ export default function CanvasTest() {
      * @returns {Promise<void>}
      */
     const onLoginButtonClickHandler = async (e) => {
-        if (loginProcessing) {
-            alert(ongoingMessage);
-            return;
-        }
-        const loggedIn = await login();
+        const loggedIn = await apiLock("login", login);
     }
     /**
      * 게임 방 생성 버튼 클릭 이벤트 핸들러
@@ -46,13 +46,7 @@ export default function CanvasTest() {
      * @returns {Promise<void>}
      */
     const onCreateGameRoomButtonClickHandler = async (e) => {
-        if (gameRoomCreating) {
-            alert(ongoingMessage);
-            return;
-        }
-
-        const created = await createGameRoom();
-
+        const created = await apiLock("create-game-room", createGameRoom);
     }
 
     /**
@@ -102,10 +96,7 @@ export default function CanvasTest() {
         catch(error) {
             alert(`API 요청 실패 ${error}`);
             return false;
-        }
-        finally {
-            setLoginProcessing(false);
-        }
+        };
     }
 
     /**
@@ -124,14 +115,17 @@ export default function CanvasTest() {
             alert("API 요청 실패 " + error);
             console.log(error);
             return false;
-        } finally {
-            setGameRoomCreating(false);
-        }
+        };
     };
 
-    /**
-     *
-     */
+    const getEnterableGameRooms = async () => {
+        try {
+
+        }
+        catch(error) {
+
+        }
+    };
 
     /**
      * useEffect hook
