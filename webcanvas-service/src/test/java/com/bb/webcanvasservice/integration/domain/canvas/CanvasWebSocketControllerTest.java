@@ -196,7 +196,7 @@ class CanvasWebSocketControllerTest {
         testUserSession.send(SEND_DESTINATION, testStroke);
 
         // then
-        Stroke result = subscribeFuture.get(ROOM_ENTRANCE_CANVAS_SUBSCRIBE_TIMEOUT, TimeUnit.MILLISECONDS);
+        Stroke result = subscribeFuture.get(BROADCASTING_TIMEOUT, TimeUnit.MILLISECONDS);
 
         Assertions.assertThat(result.getLineWidth()).isEqualTo(testStroke.getLineWidth());
         Assertions.assertThat(result.getPoints().size()).isEqualTo(testStroke.getPoints().size());
@@ -208,25 +208,17 @@ class CanvasWebSocketControllerTest {
     void testWebSocketDrawMessageAtOtherClients() throws Exception {
         // given
 
-        /**
-         *  서버측 게임 방 접속 시나리오 로직
-         */
-        User otherUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameRoomService.enterGameRoom(testDataLoader.testGameRoom.getId(), otherUser1.getId());
-
-        User otherUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameRoomService.enterGameRoom(testDataLoader.testGameRoom.getId(), otherUser2.getId());
 
         /**
          * 클라이언트에서 처리해야 할 웹소켓 접속 시나리오 로직
          */
         WebSocketStompClient otherUser1Client = createClient();
-        String otherUser1Jwt = jwtManager.generateToken(otherUser1.getId(), otherUser1.getFingerprint());
+        String otherUser1Jwt = jwtManager.generateToken(testDataLoader.testUser2.getId(), testDataLoader.testUser2.getFingerprint());
         StompSession otherUser1Session = connect(otherUser1Client, otherUser1Jwt);
         CompletableFuture<Stroke> otherUser1CompletableFuture = subscribeRoomCanvas(otherUser1Session, testDataLoader.testGameRoom.getId());
 
         WebSocketStompClient otherUser2Client = createClient();
-        String otherUser2Jwt = jwtManager.generateToken(otherUser2.getId(), otherUser2.getFingerprint());
+        String otherUser2Jwt = jwtManager.generateToken(testDataLoader.testUser3.getId(), testDataLoader.testUser3.getFingerprint());
         StompSession otherUser2Session = connect(otherUser2Client, otherUser2Jwt);
         CompletableFuture<Stroke> otherUser2CompletableFuture = subscribeRoomCanvas(otherUser2Session, testDataLoader.testGameRoom.getId());
 
