@@ -105,7 +105,7 @@ export default function CanvasTest() {
         setGameRoomEntranceId(gameRoomEntranceId);
         setEnteredGameRoomId(gameRoomId);
 
-        alert(`게임 방 생성 및 입장 성공! 게임 방 ID : ${enteredGameRoomId}`);
+        alert(`게임 방 생성 및 입장 성공! 게임 방 ID : ${gameRoomId}`);
     };
 
     /**
@@ -149,8 +149,6 @@ export default function CanvasTest() {
             color={"green"}
         />
 
-        { loggedIn ? <GameRoomList rooms={enterableGameRoomList} /> : null }
-
         <div>
             <br/>
             <br/>
@@ -162,5 +160,9 @@ export default function CanvasTest() {
             <br/>
             <br/>
         </div>
+
+        { loggedIn ? <GameRoomList rooms={enterableGameRoomList} /> : null }
+
+
     </div>;
 }
