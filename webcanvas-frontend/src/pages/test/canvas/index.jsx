@@ -2,6 +2,7 @@ import Canvas from "@components/canvas";
 import {useEffect, useState} from "react";
 import GameRoomList from "@components/game-room-list";
 import { useApiLock } from "@api/lock";
+import {post, get} from "@api";
 
 export default function CanvasTest() {
 
@@ -15,6 +16,16 @@ export default function CanvasTest() {
     const [loggedIn, setLoggedIn] = useState(false);
     const apiUrl = import.meta.env.VITE_WEB_CANVAS_SERVICE;
 
+    /**
+     * 게임방 생성 및 입장 API 응답값
+     */
+    const [enteredGameRoomId, setEnteredGameRoomId] = useState(null);
+    const [gameRoomEntranceId, setGameRoomEntranceId] = useState(null);
+
+    /**
+     * 입장가능한 게임 방 목록 조회 API 응답값
+     */
+    const [enterableGameRoomList, setEnterableGameRoomList] = useState([]);
 
     /**
      * ======================== 화면 컴포넌트 메소드 ========================
@@ -68,35 +79,20 @@ export default function CanvasTest() {
      * @returns {Promise<boolean>}
      */
     const login = async () => {
-        try {
-            /**
-             * 로그인 로직
-             */
-            const response = await fetch(`${apiUrl}/auth/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    fingerprint: "testuser1234"
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`error status : ${response.status}`);
-            }
-
-            const {accessToken, refreshToken} = await response.json();
-            localStorage.setItem("accessToken", accessToken);
-            localStorage.setItem("refreshToken", refreshToken);
-
-            setLoggedIn(true);
-            alert("로그인 성공!");
-        }
-        catch(error) {
-            alert(`API 요청 실패 ${error}`);
-            return false;
+        /**
+         * 로그인 로직
+         */
+        const requestData = {
+            fingerprint: "testuser1234"
         };
+
+        const {accessToken, refreshToken} = await post(`${apiUrl}/auth/login`, requestData);
+
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+
+        setLoggedIn(true);
+        alert("로그인 성공!");
     }
 
     /**
@@ -104,27 +100,22 @@ export default function CanvasTest() {
      * @returns {Promise<boolean>}
      */
     const createGameRoom = async () => {
-        try {
-            const response = await fetch(`${apiUrl}/game/canvas/room`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            });
-        } catch (error) {
-            alert("API 요청 실패 " + error);
-            console.log(error);
-            return false;
-        };
+        const { gameRoomId, gameRoomEntranceId } = await post(`${apiUrl}/game/canvas/room`);
+
+        setGameRoomEntranceId(gameRoomEntranceId);
+        setEnteredGameRoomId(gameRoomId);
+
+        alert(`게임 방 생성 및 입장 성공! 게임 방 ID : ${enteredGameRoomId}`);
     };
 
+    /**
+     * 입장 가능한 게임 방 목록 조회
+     * @returns {Promise<void>}
+     */
     const getEnterableGameRooms = async () => {
-        try {
+        const { roomList } = await get(`${apiUrl}/game/canvas/room`);
 
-        }
-        catch(error) {
-
-        }
+        setEnterableGameRoomList(roomList);
     };
 
     /**
@@ -138,6 +129,17 @@ export default function CanvasTest() {
         }
     }, []);
 
+    /**
+     * 로그인 되었을 시 처리
+     */
+    useEffect(() => {
+        if (!loggedIn) {
+            return;
+        }
+
+        apiLock("get-enterable-game-room", getEnterableGameRooms);
+    }, [loggedIn]);
+
     return <div>
         <Canvas
             strokes={strokes}
@@ -147,7 +149,7 @@ export default function CanvasTest() {
             color={"green"}
         />
 
-        { loggedIn ? <GameRoomList /> : null }
+        { loggedIn ? <GameRoomList rooms={enterableGameRoomList} /> : null }
 
         <div>
             <br/>
