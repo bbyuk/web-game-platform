@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.domain.user.exception;
 
 import com.bb.webcanvasservice.common.exception.BusinessException;
+import org.springframework.http.HttpStatus;
 
 
 /**
@@ -8,6 +9,6 @@ import com.bb.webcanvasservice.common.exception.BusinessException;
  */
 public class UserNotFoundException extends BusinessException {
     public UserNotFoundException(String message) {
-        super(message);
+        super(message, HttpStatus.NOT_FOUND);
     }
 }
