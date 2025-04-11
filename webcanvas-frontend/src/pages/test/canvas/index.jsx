@@ -71,6 +71,14 @@ export default function CanvasTest() {
     };
 
     /**
+     * 게임 방 입장 버튼 클릭 이벤트 핸들러
+     * @param gameRoomId
+     */
+    const enterButtonClickHandler = async (gameRoomId) => {
+        await apiLock("enter-game-room", () => enterGameRoom(gameRoomId));
+    }
+
+    /**
      * ========================    서버 API 요청   ========================
      */
 
@@ -79,20 +87,31 @@ export default function CanvasTest() {
      * @returns {Promise<boolean>}
      */
     const login = async () => {
-        /**
-         * 로그인 로직
-         */
+        const savedFingerprint = localStorage.getItem("fingerprint");
         const requestData = {
-            fingerprint: "testuser1234"
+            fingerprint: savedFingerprint ? savedFingerprint : ""
         };
 
-        const {accessToken, refreshToken} = await post(`${apiUrl}/auth/login`, requestData);
+        const {fingerprint, accessToken, refreshToken} = await post(`${apiUrl}/auth/login`, requestData);
 
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("fingerprint", fingerprint);
 
         setLoggedIn(true);
         alert("로그인 성공!");
+    }
+
+    /**
+     * 게임 방 입장
+     * @param targetGameRoomId
+     * @returns {Promise<void>}
+     */
+    const enterGameRoom = async (targetGameRoomId) => {
+        const {gameRoomId, gameRoomEntranceId} = await post(`${apiUrl}/game/canvas/room/${targetGameRoomId}/entrance`);
+
+        alert("게임 방 입장 성공!");
+        // 게임 방 캔버스 웹 소켓 구독처리
     }
 
     /**
@@ -161,7 +180,7 @@ export default function CanvasTest() {
             <br/>
         </div>
 
-        { loggedIn ? <GameRoomList rooms={enterableGameRoomList} /> : null }
+        { loggedIn ? <GameRoomList rooms={enterableGameRoomList} onEnterButtonClick={enterButtonClickHandler}/> : null }
 
 
     </div>;
