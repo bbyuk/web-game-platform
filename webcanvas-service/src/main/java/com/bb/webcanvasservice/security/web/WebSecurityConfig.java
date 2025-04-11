@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.security.web;
 
 import com.bb.webcanvasservice.security.auth.JwtManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSecurityConfig implements WebMvcConfigurer {
 
+    private final ObjectMapper objectMapper;
     private final JwtManager jwtManager;
     private final WebAuthenticationArgumentResolver webAuthenticationArgumentResolver;
 
@@ -49,6 +51,13 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 // TODO 인증 프로세스 개발이 완료되기 전까지 모든 요청 permitAll
                 .authorizeHttpRequests(configurer -> configurer
                         .anyRequest().permitAll()
+                )
+                .exceptionHandling(
+                        configurer -> configurer
+                                // 인증 실패에 대한 공통 예외 처리
+                                .authenticationEntryPoint(new WebAuthenticationEntryPoint(objectMapper))
+                                // 인가 실패에 대한 공통 예외 처리
+                                .accessDeniedHandler(new WebAccessDeniedHandler(objectMapper))
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtManager), UsernamePasswordAuthenticationFilter.class)
                 .build();
