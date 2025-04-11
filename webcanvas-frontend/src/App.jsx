@@ -1,10 +1,11 @@
-import CanvasTest from '@/pages/test/canvas';
+import { Route, Routes } from 'react-router-dom';
+import { routes } from '@/router';
 
 function App() {
   return (
-    <div className="App">
-      <CanvasTest />
-    </div>
+    <Routes>
+      {routes.map(({ path, element }) => (<Route key={path} path={path} element={element} />))}
+    </Routes>
   );
 }
 
