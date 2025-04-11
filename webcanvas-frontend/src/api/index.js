@@ -31,19 +31,20 @@ const request = async (method, url, data = {}, options = {}) => {
     return fetch(processedUrl, fetchOption)
         .then(async response => {
             if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
+                const error = await response.json();
 
                 throw {
                     status: response.status,
-                    message: response.statusText,
                     ...error
                 };
             }
 
-            return response.json()
-                .catch(() => {
-                    alert("응답 json 가져오는 중 error");
-                });
+
+            return response.json();
+        })
+        .catch(error => {
+            console.log(error);
+            alert(error.message);
         });
 }
 
