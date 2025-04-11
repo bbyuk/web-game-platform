@@ -163,6 +163,7 @@ public class GameRoomService {
 
     /**
      * Join Code로 게임 방에 입장한다.
+     *
      * @param joinCode
      * @param userId
      * @return
@@ -204,7 +205,14 @@ public class GameRoomService {
         return new GameRoomListResponse(
                 gameRoomRepository.findEnterableGameRooms(GameRoom.CAPACITY, GameRoomState.enterable())
                         .stream()
-                        .map(gameRoom -> new GameRoomListResponse.GameRoomSummary(gameRoom.getId(), gameRoom.getJoinCode()))
+                        .map(gameRoom ->
+                                new GameRoomListResponse.GameRoomSummary(
+                                        gameRoom.getId(),
+                                        GameRoom.CAPACITY,
+                                        gameRoom.getEntrances().size(),
+                                        gameRoom.getJoinCode()
+                                )
+                        )
                         .collect(Collectors.toList())
         );
     }
@@ -212,6 +220,7 @@ public class GameRoomService {
     /**
      * 현재 입장한 게임 방과 입장 정보를 리턴한다.
      * <p>
+     *
      * @param userId
      * @return
      */
@@ -235,6 +244,7 @@ public class GameRoomService {
 
     /**
      * 게임 방 입장 여부를 확인 해 웹소켓 서버의 게임 방 단위 이벤트 브로커 구독 여부를 체크한다.
+     *
      * @param gameRoomId
      * @param userId
      * @return

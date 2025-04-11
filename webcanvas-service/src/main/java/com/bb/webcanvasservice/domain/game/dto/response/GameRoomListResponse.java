@@ -30,6 +30,18 @@ public record GameRoomListResponse(
             Long gameRoomId,
 
             /**
+             * 게임 방의 입장정원
+             */
+            @Schema(description = "게임 방의 입장정원")
+            int capacity,
+
+            /**
+             * 현재 입장한 인원 수
+             */
+            @Schema(description = "현재 입장한 인원 수")
+            int enterCount,
+
+            /**
              * 게임 방 입장 코드
              */
             @Schema(description = "게임 방 입장 코드")
