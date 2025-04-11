@@ -1,4 +1,4 @@
-import CanvasTest from '@pages/test/canvas';
+import CanvasTest from '@/pages/test/canvas';
 
 function App() {
   return (

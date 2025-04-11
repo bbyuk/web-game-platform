@@ -1,8 +1,8 @@
-import Canvas from '@components/canvas';
+import Canvas from '@/components/canvas';
 import { useEffect, useState } from 'react';
-import GameRoomList from '@components/game-room-list';
-import { useApiLock } from '@api/lock';
-import { post, get } from '@api';
+import GameRoomList from '@/components/game-room-list';
+import { useApiLock } from '@/api/lock';
+import { get, post } from '@/api';
 
 export default function CanvasTest() {
 
