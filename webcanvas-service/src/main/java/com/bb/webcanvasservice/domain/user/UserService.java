@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.domain.user;
 
-import com.bb.webcanvasservice.common.exception.AlreadyExistsException;
+import com.bb.webcanvasservice.common.exception.BusinessException;
 import com.bb.webcanvasservice.domain.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -54,7 +54,7 @@ public class UserService {
         userRepository.findByFingerprint(fingerprint)
                 .ifPresent(
                         user -> {
-                            throw new AlreadyExistsException("이미 등록된 fingerprint 입니다. 관리자에게 문의해주세요.");
+                            throw new BusinessException("이미 등록된 fingerprint 입니다. 관리자에게 문의해주세요.");
                         }
                 );
 
