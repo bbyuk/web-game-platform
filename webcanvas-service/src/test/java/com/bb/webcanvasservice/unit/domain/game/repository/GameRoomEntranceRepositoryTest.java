@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.unit.domain.game.repository;
 
-import com.bb.webcanvasservice.common.RandomCodeGenerator;
+import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
@@ -16,11 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -137,7 +135,7 @@ class GameRoomEntranceRepositoryTest {
         /**
          * testUser1은 입장, testUser2는 입장하지 않음
          */
-        GameRoom testGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6)));
+        GameRoom testGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
 
         User testUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
         User testUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
@@ -154,7 +152,7 @@ class GameRoomEntranceRepositoryTest {
     }
 
     private void enterTestRoom(User... enteredUsers) {
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6)));
+        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
         Arrays.stream(enteredUsers).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, enteredUser)));
     }
 

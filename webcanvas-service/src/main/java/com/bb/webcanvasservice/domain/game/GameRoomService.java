@@ -1,7 +1,6 @@
 package com.bb.webcanvasservice.domain.game;
 
-import com.bb.webcanvasservice.common.RandomCodeGenerator;
-import com.bb.webcanvasservice.domain.game.dto.response.GameRoomCreateResponse;
+import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
@@ -91,7 +90,7 @@ public class GameRoomService {
          *
          * conflict가 10번 초과하여 발생할 시 joinCode 생성 중 문제가 발생했다는 문구와 함께 잠시후 재시도 해달라는 문구 출력 필요
          */
-        String joinCode = verifyJoinCode(RandomCodeGenerator.generate(GameRoom.JOIN_CODE_LENGTH));
+        String joinCode = verifyJoinCode(JoinCodeGenerator.generate(GameRoom.JOIN_CODE_LENGTH));
 
 
         /**
@@ -121,7 +120,7 @@ public class GameRoomService {
                 throw new JoinCodeNotGeneratedException("join code 생성 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
             }
             conflictCount++;
-            verifiedJoinCode = RandomCodeGenerator.generate(GameRoom.JOIN_CODE_LENGTH);
+            verifiedJoinCode = JoinCodeGenerator.generate(GameRoom.JOIN_CODE_LENGTH);
         }
         return verifiedJoinCode;
     }

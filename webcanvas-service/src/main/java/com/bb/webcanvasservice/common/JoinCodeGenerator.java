@@ -3,9 +3,11 @@ package com.bb.webcanvasservice.common;
 import java.security.SecureRandom;
 
 /**
- * length 길이의 영문 대문자 + 숫자로 이루어진 랜덤한 코드를 생성
+ * length 길이의 영문 대문자 + 숫자로 이루어진 게임 방 입장 코드를 생성
  */
-public class RandomCodeGenerator {
+public class JoinCodeGenerator {
+
+    private JoinCodeGenerator() {}
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final SecureRandom RANDOM = new SecureRandom();

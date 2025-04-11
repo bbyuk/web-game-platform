@@ -25,7 +25,7 @@ public class User {
 
     @Column(name = "fingerprint", updatable = false, nullable = false, unique = true)
     /**
-     * 클라이언트 fingerprint
+     * 서버에서 유저 등록시 생성된 유저 fingerprint
      */
     private String fingerprint;
 

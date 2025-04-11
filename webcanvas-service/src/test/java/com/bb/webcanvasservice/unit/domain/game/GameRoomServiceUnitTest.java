@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.unit.domain.game;
 
-import com.bb.webcanvasservice.common.RandomCodeGenerator;
+import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
@@ -63,7 +63,7 @@ class GameRoomServiceUnitTest {
                 .thenReturn(testUser);
 
         // 테스트 게임 방
-        String joinCode = RandomCodeGenerator.generate(10);
+        String joinCode = JoinCodeGenerator.generate(10);
         GameRoom testGameRoom = new GameRoom(GameRoomState.WAITING, joinCode);
         long testGameRoomId = random.nextLong();
         setId(testGameRoom, testGameRoomId);
@@ -117,7 +117,7 @@ class GameRoomServiceUnitTest {
         when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
                 .thenReturn(Boolean.FALSE);
         when(gameRoomRepository.findById(any(Long.class)))
-                .thenReturn(Optional.of(new GameRoom(GameRoomState.PLAYING, RandomCodeGenerator.generate(10))));
+                .thenReturn(Optional.of(new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(10))));
 
         long gameRoomId = random.nextLong();
         long userId = random.nextLong();
@@ -136,7 +136,7 @@ class GameRoomServiceUnitTest {
         // given
         when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
                 .thenReturn(Boolean.FALSE);
-        GameRoom testGameRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10));
+        GameRoom testGameRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
         testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
         testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
         testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
@@ -182,7 +182,7 @@ class GameRoomServiceUnitTest {
     @DisplayName("현재 입장한 게임 방과 입장 정보를 리턴한다.")
     void findEnteredGameRoomInfo() throws Exception {
         // given
-        var testGameRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10));
+        var testGameRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
         var testUser0 = new User(UUID.randomUUID().toString());
         var testUser1 = new User(UUID.randomUUID().toString());
         var testUser2 = new User(UUID.randomUUID().toString());
@@ -218,7 +218,7 @@ class GameRoomServiceUnitTest {
     @DisplayName("Join Code로 게임 방 입장 - Join Code로 게임 방에 입장 후 입장한 방의 ID와 입장 ID를 리턴한다.")
     void enterGameRoom() throws Exception {
         // given
-        var testRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6));
+        var testRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6));
         var testUser = new User(UUID.randomUUID().toString());
         var testGameRoomEntrance = new GameRoomEntrance(testRoom, testUser);
 

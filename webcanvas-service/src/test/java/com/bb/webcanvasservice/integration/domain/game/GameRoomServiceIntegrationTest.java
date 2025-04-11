@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.integration.domain.game;
 
-import com.bb.webcanvasservice.common.RandomCodeGenerator;
+import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
@@ -53,8 +53,8 @@ class GameRoomServiceIntegrationTest {
         playingRoomHost = userRepository.save(new User(UUID.randomUUID().toString()));
 
         // 테스트 공통 게임 방 저장
-        waitingRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10)));
-        playingRoom = gameRoomRepository.save(new GameRoom(GameRoomState.PLAYING, RandomCodeGenerator.generate(10)));
+        waitingRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10)));
+        playingRoom = gameRoomRepository.save(new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(10)));
 
         // 테스트 공통 방 호스트 입장
         gameRoomEntranceRepository.save(new GameRoomEntrance(waitingRoom, waitingRoomHost));
@@ -90,7 +90,7 @@ class GameRoomServiceIntegrationTest {
     @DisplayName("게임 방 입장 - 요청 유저가 현재 게임 방에 입장해있을 시 실패")
     public void enterGameRoomFailedWhenUserAlreadyEnterAnyGameRoom() {
         // given - 다른 방에 이미 입장해 있는 경우
-        GameRoom anotherGameRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10));
+        GameRoom anotherGameRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
         gameRoomRepository.save(anotherGameRoom);
         gameRoomEntranceRepository.save(new GameRoomEntrance(anotherGameRoom, testUser));
 
@@ -119,7 +119,7 @@ class GameRoomServiceIntegrationTest {
         // given
 
         // 동시에 생성된 동일한 코드
-        String joinCode = RandomCodeGenerator.generate(10);
+        String joinCode = JoinCodeGenerator.generate(10);
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
         CountDownLatch latch = new CountDownLatch(2);

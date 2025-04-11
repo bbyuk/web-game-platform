@@ -7,6 +7,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(description = "로그인 응답 Dto")
 public record LoginResponse(
+
+        /**
+         * 서버에서 생성된 유저의 fingerprint
+         */
+        @Schema(description = "서버에서 생성된 유저의 fingerprint")
+        String fingerprint,
+
         /**
          * 인증에 사용되는 access token
          */

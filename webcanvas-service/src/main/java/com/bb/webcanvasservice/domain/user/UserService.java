@@ -45,7 +45,7 @@ public class UserService {
 
 
     /**
-     * 클라이언트의 fingerprint로 유저를 생성하고 저장 후 리턴한다.
+     * 생성된 fingerprint로 유저를 생성하고 저장 후 리턴한다.
      *
      * @param fingerprint
      * @return

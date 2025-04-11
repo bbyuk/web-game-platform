@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.unit.domain.game.repository;
 
-import com.bb.webcanvasservice.common.RandomCodeGenerator;
+import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
@@ -51,8 +51,8 @@ class GameRepositoryTest {
     @DisplayName("유저 토큰으로 유저가 현재 입장한 방 조회 - 데이터 존재할 시 성공")
     public void findNotClosedRoomByUserToken() {
         // given
-        String enteredRoomCode = RandomCodeGenerator.generate(10);
-        String otherRoomCode = RandomCodeGenerator.generate(10);
+        String enteredRoomCode = JoinCodeGenerator.generate(10);
+        String otherRoomCode = JoinCodeGenerator.generate(10);
 
         GameRoom enteredRoom = new GameRoom(GameRoomState.WAITING, enteredRoomCode);
         GameRoom otherRoom = new GameRoom(GameRoomState.WAITING, otherRoomCode);
@@ -77,7 +77,7 @@ class GameRepositoryTest {
     @DisplayName("활성 상태인 게임 방의 입장 코드와 충돌이 발생했을 때 true 리턴")
     public void returnTrueWhenJoinCodeConflict() {
         // given
-        String testRoomCode = RandomCodeGenerator.generate(10);
+        String testRoomCode = JoinCodeGenerator.generate(10);
         GameRoom playingGameRoom = new GameRoom(GameRoomState.PLAYING, testRoomCode);
 
         gameRoomRepository.save(playingGameRoom);
@@ -94,7 +94,7 @@ class GameRepositoryTest {
     @DisplayName("동시에 두 유저가 게임 방 생성 요청 - 같은 게임 입장 코드로 게임 방 생성 쿼리를 실행할 경우 락을 획득하지 못한 유저는 Exception 발생")
     public void gameRoomJoinCodeConflict() throws Exception {
         // given
-        String joinCode = RandomCodeGenerator.generate(10);
+        String joinCode = JoinCodeGenerator.generate(10);
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
         CountDownLatch latch = new CountDownLatch(2);
@@ -138,8 +138,8 @@ class GameRepositoryTest {
         // given
         Long testUserId = testUser.getId();
 
-        GameRoom waitingRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10));
-        GameRoom playingRoom = new GameRoom(GameRoomState.PLAYING, RandomCodeGenerator.generate(10));
+        GameRoom waitingRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
+        GameRoom playingRoom = new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(10));
 
         gameRoomRepository.save(waitingRoom);
         gameRoomRepository.save(playingRoom);
@@ -157,8 +157,8 @@ class GameRepositoryTest {
         // given
         Long testUserId = testUser.getId();
 
-        GameRoom waitingRoom = new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(10));
-        GameRoom playingRoom = new GameRoom(GameRoomState.PLAYING, RandomCodeGenerator.generate(10));
+        GameRoom waitingRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
+        GameRoom playingRoom = new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(10));
 
         gameRoomRepository.save(waitingRoom);
         gameRoomRepository.save(playingRoom);

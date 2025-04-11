@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.integration.domain.canvas;
 
-import com.bb.webcanvasservice.common.RandomCodeGenerator;
+import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.canvas.dto.Point;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.GameRoom;
@@ -64,7 +64,7 @@ public class CanvasTestDataLoader {
         System.out.println("testUser2 = " + testUser2.getId());
         System.out.println("testUser3 = " + testUser3.getId());
 
-        testGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, RandomCodeGenerator.generate(6)));
+        testGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
 
         gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1));
         gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser2));

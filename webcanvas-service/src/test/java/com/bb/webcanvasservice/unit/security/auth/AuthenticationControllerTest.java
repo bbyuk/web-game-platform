@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.unit.security.auth;
 
+import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.security.auth.*;
 import com.bb.webcanvasservice.security.auth.dto.request.LoginRequest;
 import com.bb.webcanvasservice.security.auth.dto.response.LoginResponse;
@@ -42,7 +43,7 @@ class AuthenticationControllerTest {
     @DisplayName("로그인 API - 인증 토큰 발급")
     void login() throws Exception {
         // given
-        String fingerprint = "3f8d47a3a92b77e5";
+        String fingerprint = FingerprintGenerator.generate();
         long userId = 1L;
         JwtManager realJwtManager = new JwtManager();
         String token = realJwtManager.generateToken(userId, fingerprint);
@@ -50,7 +51,7 @@ class AuthenticationControllerTest {
         BDDMockito.given(jwtManager.generateToken(any(), any())).willReturn(token);
 
         BDDMockito.given(authenticationService.login(any()))
-                .willReturn(new LoginResponse(realJwtManager.generateToken(userId, fingerprint), realJwtManager.generateToken(userId, fingerprint)));
+                .willReturn(new LoginResponse(fingerprint, realJwtManager.generateToken(userId, fingerprint), realJwtManager.generateToken(userId, fingerprint)));
 
         LoginRequest loginRequest = new LoginRequest(fingerprint);
 
