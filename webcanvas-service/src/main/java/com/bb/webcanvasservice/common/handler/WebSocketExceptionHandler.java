@@ -1,5 +1,6 @@
-package com.bb.webcanvasservice.common.exception;
+package com.bb.webcanvasservice.common.handler;
 
+import com.bb.webcanvasservice.common.exception.BusinessException;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.simp.annotation.SendToUser;
 

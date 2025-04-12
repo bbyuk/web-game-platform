@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.security.web;
 
-import com.bb.webcanvasservice.common.exception.ExceptionResponse;
+import com.bb.webcanvasservice.common.dto.ExceptionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.common.exception;
+package com.bb.webcanvasservice.common.dto;
 
 import java.time.LocalDateTime;
 

@@ -1,5 +1,7 @@
-package com.bb.webcanvasservice.common.exception;
+package com.bb.webcanvasservice.common.handler;
 
+import com.bb.webcanvasservice.common.exception.BusinessException;
+import com.bb.webcanvasservice.common.dto.ExceptionResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
