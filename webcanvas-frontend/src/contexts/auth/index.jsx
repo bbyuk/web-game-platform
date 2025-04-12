@@ -1,12 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { a } from 'tailwindcss/dist/chunk-HTB5LLOP.mjs';
 
 
 const AuthContext = createContext(null);
 const accessTokenKey = 'accessToken';
 const refreshTokenKey = 'refreshToken';
 
-export function AuthProvider({ childeren }) {
+export function AuthProvider({ children }) {
   const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,6 +13,7 @@ export function AuthProvider({ childeren }) {
 
   useEffect(() => {
     // 앱 시작 시 localStorage에서 JWT 복원
+
     const storedAccessToken = localStorage.getItem(accessTokenKey);
     const storedRefreshToken = localStorage.getItem(refreshTokenKey);
 
@@ -39,6 +39,7 @@ export function AuthProvider({ childeren }) {
     setRefreshToken(null);
   };
 
+
   return (
     <AuthContext.Provider value={{
       accessToken,
@@ -48,7 +49,7 @@ export function AuthProvider({ childeren }) {
       isAuthenticated: !!accessToken,
       loading
     }}>
-      {childeren}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
