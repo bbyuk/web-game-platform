@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.common.exception;
 
+import com.bb.webcanvasservice.common.code.ErrorCode;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 import java.io.Serial;
 
@@ -11,15 +11,10 @@ public class BusinessException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final HttpStatus httpStatus;
+    private final ErrorCode errorCode;
 
-    public BusinessException(String message) {
+    public BusinessException(ErrorCode errorCode, String message) {
         super(message);
-        httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-    }
-
-    public BusinessException(String message, HttpStatus httpStatus) {
-        super(message);
-        this.httpStatus = httpStatus;
+        this.errorCode = errorCode;
     }
 }

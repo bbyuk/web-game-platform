@@ -3,7 +3,6 @@ package com.bb.webcanvasservice.unit.domain.user;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserRepository;
 import com.bb.webcanvasservice.domain.user.UserService;
-import com.bb.webcanvasservice.domain.user.exception.UserNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

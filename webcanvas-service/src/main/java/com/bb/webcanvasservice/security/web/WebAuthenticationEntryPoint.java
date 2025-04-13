@@ -1,6 +1,8 @@
 package com.bb.webcanvasservice.security.web;
 
+import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.common.dto.ExceptionResponse;
+import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +37,20 @@ public class WebAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        response.getWriter().write(objectMapper.writeValueAsString(new ExceptionResponse(LocalDateTime.now(), authException.getMessage(), request.getRequestURI())));
+        ErrorCode errorCode = (authException instanceof ApplicationAuthenticationException)
+                ? ((ApplicationAuthenticationException) authException).getErrorCode()
+                : ErrorCode.INVALID_ACCESS_TOKEN;
+
+        response.getWriter()
+                .write(
+                        objectMapper.writeValueAsString(
+                                new ExceptionResponse(
+                                        LocalDateTime.now(),
+                                        errorCode.getCode(),
+                                        authException.getMessage(),
+                                        request.getRequestURI()
+                                )
+                        )
+                );
     }
 }

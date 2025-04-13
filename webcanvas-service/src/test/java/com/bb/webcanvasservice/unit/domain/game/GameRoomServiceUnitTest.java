@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import static com.bb.webcanvasservice.common.code.ErrorCode.GAME_ROOM_HAS_ILLEGAL_STATUS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -125,7 +126,7 @@ class GameRoomServiceUnitTest {
         // when
         Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId))
                 .isInstanceOf(IllegalGameRoomStateException.class)
-                .hasMessage("방이 현재 입장할 수 없는 상태입니다.");
+                .hasMessage(GAME_ROOM_HAS_ILLEGAL_STATUS.getDefaultMessage());
 
         // then
     }

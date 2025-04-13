@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.bb.webcanvasservice.common.code.ErrorCode.GAME_ROOM_JOIN_CODE_NOT_GENERATED;
+
 /**
  * 게임 방과 관련된 비즈니스 로직을 처리하는 서비스 클래스
  */
@@ -47,7 +49,7 @@ public class GameRoomService {
     @Transactional(readOnly = true)
     public GameRoom findEnteredGameRoom(Long userId) {
         return gameRoomRepository.findNotClosedGameRoomByUserId(userId)
-                .orElseThrow(() -> new GameRoomNotFoundException("현재 입장한 방을 찾읈 수 없습니다."));
+                .orElseThrow(() -> new GameRoomNotFoundException("현재 입장한 방을 찾지 못했습니다."));
     }
 
     /**
@@ -76,7 +78,7 @@ public class GameRoomService {
          */
         User user = userService.findUserByUserId(userId);
         if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(user.getId())) {
-            throw new AlreadyEnteredRoomException("이미 입장한 방이 있습니다.");
+            throw new AlreadyEnteredRoomException();
         }
 
         /**
@@ -117,7 +119,7 @@ public class GameRoomService {
         while (gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(verifiedJoinCode)) {
             if (conflictCount == GameRoom.JOIN_CODE_MAX_CONFLICT_COUNT) {
                 log.error("join code 생성 중 충돌이 최대 횟수인 {}회 발생했습니다.", GameRoom.JOIN_CODE_MAX_CONFLICT_COUNT);
-                throw new JoinCodeNotGeneratedException("join code 생성 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
+                throw new JoinCodeNotGeneratedException();
             }
             conflictCount++;
             verifiedJoinCode = JoinCodeGenerator.generate(GameRoom.JOIN_CODE_LENGTH);
@@ -139,12 +141,12 @@ public class GameRoomService {
     @Transactional
     public GameRoomEntranceResponse enterGameRoom(Long gameRoomId, Long userId) {
         if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
-            throw new AlreadyEnteredRoomException("이미 입장한 방이 있습니다.");
+            throw new AlreadyEnteredRoomException();
         }
 
-        GameRoom targetGameRoom = gameRoomRepository.findById(gameRoomId).orElseThrow(() -> new GameRoomNotFoundException("게임 방을 찾을 수 없습니다."));
+        GameRoom targetGameRoom = gameRoomRepository.findById(gameRoomId).orElseThrow(GameRoomNotFoundException::new);
         if (!targetGameRoom.getState().equals(GameRoomState.WAITING)) {
-            throw new IllegalGameRoomStateException("방이 현재 입장할 수 없는 상태입니다.");
+            throw new IllegalGameRoomStateException();
         }
 
         if (targetGameRoom.getEntrances().size() >= GameRoom.CAPACITY) {
@@ -171,7 +173,7 @@ public class GameRoomService {
     @Transactional
     public GameRoomEntranceResponse enterGameRoomWithJoinCode(String joinCode, Long userId) {
         GameRoom targetGameRoom = gameRoomRepository.findRoomWithJoinCodeForEnter(joinCode)
-                .orElseThrow(() -> new GameRoomNotFoundException(String.format("%s에 해당하는 방을 찾지 못했습니다.", joinCode)));
+                .orElseThrow(() -> new GameRoomNotFoundException(String.format("입장 코드가 %s인 방을 찾지 못했습니다.", joinCode)));
 
         return enterGameRoom(targetGameRoom.getId(), userId);
     }
@@ -227,7 +229,7 @@ public class GameRoomService {
     @Transactional(readOnly = true)
     public GameRoomEntranceInfoResponse findEnteredGameRoomInfo(Long userId) {
         GameRoomEntrance userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId)
-                .orElseThrow(() -> new GameRoomEntranceNotFoundException("현재 입장한 게임 방을 찾지 못했습니다."));
+                .orElseThrow(GameRoomEntranceNotFoundException::new);
 
         return new GameRoomEntranceInfoResponse(
                 userEntrance.getGameRoom().getId(),

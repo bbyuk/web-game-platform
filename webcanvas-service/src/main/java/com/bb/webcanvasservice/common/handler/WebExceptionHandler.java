@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.common.handler;
 
+import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.common.exception.BusinessException;
 import com.bb.webcanvasservice.common.dto.ExceptionResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,8 +18,14 @@ public class WebExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ExceptionResponse> handleBusinessException(BusinessException e, HttpServletRequest request) {
+        ErrorCode errorCode = e.getErrorCode();
+        
         return ResponseEntity
-                .status(e.getHttpStatus())
-                .body(new ExceptionResponse(LocalDateTime.now(), e.getMessage(), request.getRequestURI()));
+                .status(errorCode.getHttpStatus())
+                .body(new ExceptionResponse(
+                        LocalDateTime.now(),
+                        errorCode.getCode(),
+                        e.getMessage(),
+                        request.getRequestURI()));
     }
 }

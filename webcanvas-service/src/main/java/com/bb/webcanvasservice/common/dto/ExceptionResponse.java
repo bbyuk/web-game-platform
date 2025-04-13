@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
  */
 public record ExceptionResponse(
         LocalDateTime timestamp,
+        String code,
         String message,
         String path
 ) {

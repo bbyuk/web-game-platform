@@ -1,6 +1,5 @@
 package com.bb.webcanvasservice.domain.user;
 
-import com.bb.webcanvasservice.common.exception.BusinessException;
 import com.bb.webcanvasservice.domain.user.exception.AlreadyRegisteredUserException;
 import com.bb.webcanvasservice.domain.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +39,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findUserByUserId(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다."));
+                .orElseThrow(UserNotFoundException::new);
     }
 
 
@@ -55,7 +54,7 @@ public class UserService {
         userRepository.findByFingerprint(fingerprint)
                 .ifPresent(
                         user -> {
-                            throw new AlreadyRegisteredUserException("이미 등록된 fingerprint 입니다. 관리자에게 문의해주세요.");
+                            throw new AlreadyRegisteredUserException();
                         }
                 );
 
