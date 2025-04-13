@@ -43,6 +43,11 @@ const request = async (method, url, data = {}, options = {}) => {
       return response.json();
     })
     .catch(error => {
+      if (error.status === 401) {
+        /**
+         * 토큰 refresh 요청
+         */
+      }
       console.log(error);
       alert(error.message);
     });
