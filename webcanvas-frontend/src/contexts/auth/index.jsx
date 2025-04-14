@@ -1,15 +1,13 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-
+import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
-const accessTokenKey = 'accessToken';
-const refreshTokenKey = 'refreshToken';
+const accessTokenKey = "accessToken";
+const refreshTokenKey = "refreshToken";
 
 export function AuthProvider({ children }) {
   const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
   const [loading, setLoading] = useState(true);
-
 
   useEffect(() => {
     // 앱 시작 시 localStorage에서 JWT 복원
@@ -39,16 +37,17 @@ export function AuthProvider({ children }) {
     setRefreshToken(null);
   };
 
-
   return (
-    <AuthContext.Provider value={{
-      accessToken,
-      refreshToken,
-      login,
-      logout,
-      isAuthenticated: !!accessToken,
-      loading
-    }}>
+    <AuthContext.Provider
+      value={{
+        accessToken,
+        refreshToken,
+        login,
+        logout,
+        isAuthenticated: !!accessToken,
+        loading,
+      }}
+    >
       {!loading && children}
     </AuthContext.Provider>
   );

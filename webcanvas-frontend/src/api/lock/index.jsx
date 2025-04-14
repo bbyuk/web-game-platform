@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef } from "react";
 
 /**
  * API 중복 호출을 막기위한 apiLock를 제공하는 hook
@@ -9,7 +9,7 @@ export const useApiLock = () => {
 
   const apiLock = async (key, fn) => {
     if (lockMapRef.current.get(key)) {
-      alert('작업을 수행중입니다.');
+      alert("작업을 수행중입니다.");
       return;
     }
 

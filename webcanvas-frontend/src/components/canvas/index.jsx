@@ -1,23 +1,20 @@
-import './index.css';
-import { useEffect, useRef, useState } from 'react';
+import "./index.css";
+import { useEffect, useRef, useState } from "react";
 
 export default function Canvas({
-                                 strokes = [],
-                                 onStroke = (stroke) => {
-                                 },
-                                 color = 'black',
-                                 width = 1000,
-                                 height = 700,
-                                 reRenderingSignal = false,
-                                 afterReRendering = () => {
-                                 }
-                               }) {
-  const elementId = 'canvas';
+  strokes = [],
+  onStroke = (stroke) => {},
+  color = "black",
+  width = 1000,
+  height = 700,
+  reRenderingSignal = false,
+  afterReRendering = () => {},
+}) {
+  const elementId = "canvas";
   const canvasRef = useRef(null);
   const [canvasContext, setCanvasContext] = useState(null);
   const [painting, setPainting] = useState(false);
   const [currentStroke, setCurrentStroke] = useState([]);
-
 
   const startPainting = () => {
     setPainting(true);
@@ -37,7 +34,10 @@ export default function Canvas({
     if (painting) {
       canvasContext.lineTo(offsetX, offsetY);
       canvasContext.stroke();
-      setCurrentStroke((prevItems) => [...prevItems, { x: Math.round(offsetX), y: Math.round(offsetY) }]);
+      setCurrentStroke((prevItems) => [
+        ...prevItems,
+        { x: Math.round(offsetX), y: Math.round(offsetY) },
+      ]);
     } else {
       canvasContext.beginPath();
       canvasContext.moveTo(offsetX, offsetY);
@@ -49,10 +49,10 @@ export default function Canvas({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
 
     ctx.lineWidth = 5;
-    ctx.lineCap = 'round';
+    ctx.lineCap = "round";
 
     setCanvasContext(ctx);
   }, []);
@@ -67,7 +67,7 @@ export default function Canvas({
       }
       canvasContext.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-      strokes.forEach(stroke => {
+      strokes.forEach((stroke) => {
         if (stroke.length === 0) {
           return;
         }
@@ -94,17 +94,19 @@ export default function Canvas({
     }
   }, [canvasContext, color]);
 
-  return <>
-    <canvas
-      id={elementId}
-      ref={canvasRef}
-      style={{ border: 'solid 1px black' }}
-      width={width}
-      height={height}
-      onMouseMove={e => onMouseMove(e)}
-      onMouseDown={startPainting}
-      onMouseUp={stopPainting}
-      onMouseLeave={stopPainting}
-    />
-  </>;
+  return (
+    <>
+      <canvas
+        id={elementId}
+        ref={canvasRef}
+        style={{ border: "solid 1px black" }}
+        width={width}
+        height={height}
+        onMouseMove={(e) => onMouseMove(e)}
+        onMouseDown={startPainting}
+        onMouseUp={stopPainting}
+        onMouseLeave={stopPainting}
+      />
+    </>
+  );
 }

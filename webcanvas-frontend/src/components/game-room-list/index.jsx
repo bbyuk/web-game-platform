@@ -1,10 +1,6 @@
-import React from 'react';
+import React from "react";
 
-export default function GameRoomList({
-                                       rooms = []
-                                       , onEnterButtonClick = (id) => {
-  }
-                                     }) {
+export default function GameRoomList({ rooms = [], onEnterButtonClick = (id) => {} }) {
   const handleEnter = (roomId) => {
     console.log(`방 ${roomId} 입장!`);
   };
@@ -20,7 +16,9 @@ export default function GameRoomList({
           >
             <div>
               <h3 className="text-lg font-semibold text-gray-900">{room.joinCode}</h3>
-              <p className="text-sm text-gray-500">({room.enterCount} / {room.capacity})</p>
+              <p className="text-sm text-gray-500">
+                ({room.enterCount} / {room.capacity})
+              </p>
             </div>
             <button
               onClick={() => onEnterButtonClick(room.gameRoomId)}

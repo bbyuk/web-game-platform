@@ -1,11 +1,10 @@
-import Canvas from '@/components/canvas';
-import { useEffect, useState } from 'react';
-import GameRoomList from '@/components/game-room-list';
-import { useApiLock } from '@/api/lock';
-import { get, post } from '@/api';
+import Canvas from "@/components/canvas";
+import { useEffect, useState } from "react";
+import GameRoomList from "@/components/game-room-list";
+import { useApiLock } from "@/api/lock";
+import { get, post } from "@/api";
 
 export default function CanvasTest() {
-
   /**
    * API 중복 호출을 막는 락 커스텀 hook
    */
@@ -49,7 +48,7 @@ export default function CanvasTest() {
    * @returns {Promise<void>}
    */
   const onLoginButtonClickHandler = async (e) => {
-    const loggedIn = await apiLock('login', login);
+    const loggedIn = await apiLock("login", login);
   };
   /**
    * 게임 방 생성 버튼 클릭 이벤트 핸들러
@@ -57,7 +56,7 @@ export default function CanvasTest() {
    * @returns {Promise<void>}
    */
   const onCreateGameRoomButtonClickHandler = async (e) => {
-    const created = await apiLock('create-game-room', createGameRoom);
+    const created = await apiLock("create-game-room", createGameRoom);
   };
 
   /**
@@ -75,7 +74,7 @@ export default function CanvasTest() {
    * @param gameRoomId
    */
   const enterButtonClickHandler = async (gameRoomId) => {
-    await apiLock('enter-game-room', () => enterGameRoom(gameRoomId));
+    await apiLock("enter-game-room", () => enterGameRoom(gameRoomId));
   };
 
   /**
@@ -87,19 +86,22 @@ export default function CanvasTest() {
    * @returns {Promise<boolean>}
    */
   const login = async () => {
-    const savedFingerprint = localStorage.getItem('fingerprint');
+    const savedFingerprint = localStorage.getItem("fingerprint");
     const requestData = {
-      fingerprint: savedFingerprint ? savedFingerprint : ''
+      fingerprint: savedFingerprint ? savedFingerprint : "",
     };
 
-    const { fingerprint, accessToken, refreshToken } = await post(`${apiUrl}/auth/login`, requestData);
+    const { fingerprint, accessToken, refreshToken } = await post(
+      `${apiUrl}/auth/login`,
+      requestData
+    );
 
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-    localStorage.setItem('fingerprint', fingerprint);
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+    localStorage.setItem("fingerprint", fingerprint);
 
     setLoggedIn(true);
-    alert('로그인 성공!');
+    alert("로그인 성공!");
   };
 
   /**
@@ -108,9 +110,11 @@ export default function CanvasTest() {
    * @returns {Promise<void>}
    */
   const enterGameRoom = async (targetGameRoomId) => {
-    const { gameRoomId, gameRoomEntranceId } = await post(`${apiUrl}/game/canvas/room/${targetGameRoomId}/entrance`);
+    const { gameRoomId, gameRoomEntranceId } = await post(
+      `${apiUrl}/game/canvas/room/${targetGameRoomId}/entrance`
+    );
 
-    alert('게임 방 입장 성공!');
+    alert("게임 방 입장 성공!");
     // 게임 방 캔버스 웹 소켓 구독처리
   };
 
@@ -141,7 +145,7 @@ export default function CanvasTest() {
    * useEffect hook
    */
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = localStorage.getItem("accessToken");
 
     if (accessToken) {
       setLoggedIn(true);
@@ -156,32 +160,34 @@ export default function CanvasTest() {
       return;
     }
 
-    apiLock('get-enterable-game-room', getEnterableGameRooms);
+    apiLock("get-enterable-game-room", getEnterableGameRooms);
   }, [loggedIn]);
 
-  return <div>
-    <Canvas
-      strokes={strokes}
-      onStroke={onStrokeHandler}
-      reRenderingSignal={reRenderingSignal}
-      afterReRendering={() => setReRenderingSignal(false)}
-      color={'green'}
-    />
-
+  return (
     <div>
-      <br />
-      <br />
-      <button onClick={onLoginButtonClickHandler}>로그인</button>
-      <button onClick={onCreateGameRoomButtonClickHandler}>테스트 방 만들기</button>
-      <button onClick={e => console.log(strokes)}>현재까지의 데이터 로그 찍기</button>
-      <button onClick={clear}>전체 지우기</button>
-      <br />
-      <br />
-      <br />
+      <Canvas
+        strokes={strokes}
+        onStroke={onStrokeHandler}
+        reRenderingSignal={reRenderingSignal}
+        afterReRendering={() => setReRenderingSignal(false)}
+        color={"green"}
+      />
+
+      <div>
+        <br />
+        <br />
+        <button onClick={onLoginButtonClickHandler}>로그인</button>
+        <button onClick={onCreateGameRoomButtonClickHandler}>테스트 방 만들기</button>
+        <button onClick={(e) => console.log(strokes)}>현재까지의 데이터 로그 찍기</button>
+        <button onClick={clear}>전체 지우기</button>
+        <br />
+        <br />
+        <br />
+      </div>
+
+      {loggedIn ? (
+        <GameRoomList rooms={enterableGameRoomList} onEnterButtonClick={enterButtonClickHandler} />
+      ) : null}
     </div>
-
-    {loggedIn ? <GameRoomList rooms={enterableGameRoomList} onEnterButtonClick={enterButtonClickHandler} /> : null}
-
-
-  </div>;
+  );
 }
