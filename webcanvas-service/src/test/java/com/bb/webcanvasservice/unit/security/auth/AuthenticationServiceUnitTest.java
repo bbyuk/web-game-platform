@@ -5,7 +5,8 @@ import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
 import com.bb.webcanvasservice.security.auth.AuthenticationService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
-import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationResponse;
+import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationApiResponse;
+import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationInnerResponse;
 import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -53,10 +54,10 @@ class AuthenticationServiceUnitTest {
                 .thenReturn(realJwtManagerObject.generateToken(userId, fingerprint, expiration));
 
         // when
-        AuthenticationResponse authenticationResponse = authenticationService.login(fingerprint);
+        AuthenticationInnerResponse authenticationInnerResponse = authenticationService.login(fingerprint);
 
-        String accessToken = authenticationResponse.accessToken();
-        String refreshToken = authenticationResponse.refreshToken();
+        String accessToken = authenticationInnerResponse.accessToken();
+        String refreshToken = authenticationInnerResponse.refreshToken();
 
         // then
         Assertions.assertThat(accessToken).isNotBlank();
@@ -109,10 +110,11 @@ class AuthenticationServiceUnitTest {
         when(jwtManager.calculateRemainingExpiration(any())).thenReturn(Long.valueOf(3 * 24 * 60 * 60 * 1000));
 
         // when
-        AuthenticationResponse tokenRefreshResponse = authenticationService.refreshToken(userRefreshToken);
+        AuthenticationInnerResponse tokenRefreshResponse = authenticationService.refreshToken(userRefreshToken);
 
         // then
-        Assertions.assertThat(tokenRefreshResponse).isNotEqualTo(user.getRefreshToken());
+        Assertions.assertThat(tokenRefreshResponse.refreshToken()).isNotEqualTo(userRefreshToken);
+        Assertions.assertThat(tokenRefreshResponse.refreshTokenReissued()).isTrue();
     }
 
 }

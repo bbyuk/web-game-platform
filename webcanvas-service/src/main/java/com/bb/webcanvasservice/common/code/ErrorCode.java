@@ -31,6 +31,7 @@ public enum ErrorCode {
     AUTH_HEADER_FORMAT_INVALID("A011", "Authorization 헤더 형식이 잘못되었습니다.", HttpStatus.UNAUTHORIZED),
     TOKEN_PARSING_ERROR("A012", "토큰 파싱 도중 오류가 발생했습니다.", HttpStatus.UNAUTHORIZED),
     AUTH_USER_NOT_FOUND("A013", "인증 대상 사용자를 찾을 수 없습니다.", HttpStatus.UNAUTHORIZED),
+    REFRESH_TOKEN_NOT_FOUND("A014", "Refresh Token을 찾지 못했습니다.", HttpStatus.UNAUTHORIZED),
     ACCESS_DENIED("A999", "접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
     USER_NOT_FOUND("U000", "유저를 찾지 못했습니다.", HttpStatus.NOT_FOUND),
     USER_ALREADY_REGISTERED("U001", "이미 등록된 fingerprint 입니다. 관리자에게 문의해주세요.", HttpStatus.CONFLICT),

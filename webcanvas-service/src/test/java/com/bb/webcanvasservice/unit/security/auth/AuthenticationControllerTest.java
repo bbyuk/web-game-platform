@@ -3,7 +3,8 @@ package com.bb.webcanvasservice.unit.security.auth;
 import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.security.auth.*;
 import com.bb.webcanvasservice.security.auth.dto.request.LoginRequest;
-import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationResponse;
+import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationApiResponse;
+import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationInnerResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,7 @@ class AuthenticationControllerTest {
         BDDMockito.given(jwtManager.generateToken(any(), any(), anyLong())).willReturn(token);
 
         BDDMockito.given(authenticationService.login(any()))
-                .willReturn(new AuthenticationResponse(fingerprint, realJwtManager.generateToken(userId, fingerprint, expiration), realJwtManager.generateToken(userId, fingerprint, expiration)));
+                .willReturn(new AuthenticationInnerResponse(fingerprint, realJwtManager.generateToken(userId, fingerprint, expiration), realJwtManager.generateToken(userId, fingerprint, expiration), true));
 
         LoginRequest loginRequest = new LoginRequest(fingerprint);
 
