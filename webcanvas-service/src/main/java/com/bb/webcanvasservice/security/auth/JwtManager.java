@@ -2,10 +2,7 @@ package com.bb.webcanvasservice.security.auth;
 
 import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -17,7 +14,7 @@ import java.util.Date;
 
 /**
  * JWT 토큰의 발급 및 검증 등 JWT 토큰 관리 컴포넌트 클래스
- *
+ * <p>
  * TODO signedClaims 캐싱 처리 (우선순위 낮음)
  */
 @Component
@@ -36,9 +33,10 @@ public class JwtManager {
 
     /**
      * userId, fingerprint 토큰 발행
-     * @param userId 유저 ID
+     *
+     * @param userId      유저 ID
      * @param fingerprint 서버 등록시 발급된 유저 fingerprint
-     * @param expiration 토큰 만료 시간 (ms)
+     * @param expiration  토큰 만료 시간 (ms)
      * @return
      */
     public String generateToken(Long userId, String fingerprint, long expiration) {
@@ -53,14 +51,13 @@ public class JwtManager {
 
     /**
      * 토큰을 파싱해 userId를 리턴한다.
+     *
      * @param token
      * @return
      */
     public Long getUserIdFromToken(String token) {
-        return Long.parseLong(Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
+        return Long.parseLong(
+                parseSignedClaims(token)
                 .getPayload()
                 .getSubject()
         );
@@ -68,14 +65,12 @@ public class JwtManager {
 
     /**
      * 토큰을 파싱해 fingerprint를 리턴한다.
+     *
      * @param token
      * @return
      */
     public String getFingerprintFromToken(String token) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
+        return parseSignedClaims(token)
                 .getPayload()
                 .get("fingerprint", String.class);
     }
@@ -83,14 +78,18 @@ public class JwtManager {
 
     /**
      * 토큰이 유효한 토큰인지 검증한다.
+     *
      * @param token
      * @return isValidToken
      */
     public void validateToken(String token) {
+        parseSignedClaims(token);
+    }
+
+    private Jws<Claims> parseSignedClaims(String token) {
         try {
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
-        }
-        catch (ExpiredJwtException e) {
+            return Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+        } catch (ExpiredJwtException e) {
             throw new ApplicationAuthenticationException(ErrorCode.TOKEN_EXPIRED);
         } catch (SignatureException e) {
             throw new ApplicationAuthenticationException(ErrorCode.INVALID_SIGNATURE);
@@ -105,6 +104,7 @@ public class JwtManager {
 
     /**
      * HttpServletRequest의 request header로부터 bearer 토큰 값을 읽어온다.
+     *
      * @param request
      * @return
      */
@@ -121,11 +121,10 @@ public class JwtManager {
      * 토큰의 expiration time까지 남은 시간을 계산하여 ms로 리턴
      */
     public long calculateRemainingExpiration(String token) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload().getExpiration().getTime() - System.currentTimeMillis();
+        return parseSignedClaims(token)
+                .getPayload()
+                .getExpiration()
+                .getTime() - System.currentTimeMillis();
     }
 
 }
