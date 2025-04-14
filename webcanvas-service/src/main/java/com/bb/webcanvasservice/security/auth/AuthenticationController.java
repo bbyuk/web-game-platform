@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.security.auth;
 
 import com.bb.webcanvasservice.security.auth.dto.request.LoginRequest;
-import com.bb.webcanvasservice.security.auth.dto.response.LoginResponse;
+import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class AuthenticationController {
      */
     @Operation(summary = "로그인", description = "로그인 처리 후 발급된 토큰을 리턴한다.")
     @PostMapping("login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(authenticationService.login(loginRequest.fingerprint()));
     }
 }

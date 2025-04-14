@@ -50,13 +50,14 @@ class GameControllerTest {
         long userId = 1L;
         long gameRoomId = 9999L;
         long gameRoomEntranceId = 21313L;
+        long expiration = 3600000; // 1시간 (ms)
         String fingerprint = "qwdoiasjdassa";
-        String token = new JwtManager().generateToken(userId, fingerprint);
+        String token = new JwtManager().generateToken(userId, fingerprint, expiration);
 
         BDDMockito.given(gameRoomService.createGameRoomAndEnter(any()))
                 .willReturn(new GameRoomEntranceResponse(gameRoomId, gameRoomEntranceId));
 
-        BDDMockito.given(jwtManager.generateToken(any(), any()))
+        BDDMockito.given(jwtManager.generateToken(any(), any(), anyLong()))
                 .willReturn(token);
         BDDMockito.given(jwtManager.resolveToken(any()))
                 .willReturn(token);
@@ -67,7 +68,7 @@ class GameControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/game/canvas/room")
                 .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtManager.BEARER_TOKEN, String.format("%s %s", JwtManager.TOKEN_PREFIX
-                                , jwtManager.generateToken(userId, fingerprint)))
+                                , jwtManager.generateToken(userId, fingerprint, expiration)))
                 .with(csrf())
         )
                 .andExpect(status().isOk())

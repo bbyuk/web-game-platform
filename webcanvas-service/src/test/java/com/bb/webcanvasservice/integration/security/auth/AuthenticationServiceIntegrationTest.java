@@ -4,7 +4,7 @@ import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserRepository;
 import com.bb.webcanvasservice.security.auth.AuthenticationService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
-import com.bb.webcanvasservice.security.auth.dto.response.LoginResponse;
+import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,14 +33,14 @@ class AuthenticationServiceIntegrationTest {
         User savedUser = userRepository.save(new User(fingerprint));
 
         // when
-        LoginResponse loginResponse = authenticationService.login(fingerprint);
+        AuthenticationResponse authenticationResponse = authenticationService.login(fingerprint);
         User findUser = userRepository.findById(savedUser.getId()).get();
 
         // then
-        Assertions.assertThat(jwtManager.getFingerprintFromToken(loginResponse.accessToken())).isEqualTo(fingerprint);
-        Assertions.assertThat(jwtManager.getFingerprintFromToken(loginResponse.refreshToken())).isEqualTo(fingerprint);
+        Assertions.assertThat(jwtManager.getFingerprintFromToken(authenticationResponse.accessToken())).isEqualTo(fingerprint);
+        Assertions.assertThat(jwtManager.getFingerprintFromToken(authenticationResponse.refreshToken())).isEqualTo(fingerprint);
 
-        Assertions.assertThat(findUser.getRefreshToken()).isEqualTo(loginResponse.refreshToken());
+        Assertions.assertThat(findUser.getRefreshToken()).isEqualTo(authenticationResponse.refreshToken());
     }
 
     @Test
@@ -50,16 +50,16 @@ class AuthenticationServiceIntegrationTest {
         String fingerprint = "asdwqujdqwi12j3b1jbsd";
 
         // when
-        LoginResponse loginResponse = authenticationService.login(fingerprint);
+        AuthenticationResponse authenticationResponse = authenticationService.login(fingerprint);
 
         // then
-        Assertions.assertThat(jwtManager.getFingerprintFromToken(loginResponse.accessToken())).isEqualTo(fingerprint);
-        Assertions.assertThat(jwtManager.getFingerprintFromToken(loginResponse.refreshToken())).isEqualTo(fingerprint);
+        Assertions.assertThat(jwtManager.getFingerprintFromToken(authenticationResponse.accessToken())).isEqualTo(fingerprint);
+        Assertions.assertThat(jwtManager.getFingerprintFromToken(authenticationResponse.refreshToken())).isEqualTo(fingerprint);
 
 
         userRepository.findByFingerprint(fingerprint)
                 .ifPresentOrElse(
-                        user -> Assertions.assertThat(user.getRefreshToken()).isEqualTo(loginResponse.refreshToken()),
+                        user -> Assertions.assertThat(user.getRefreshToken()).isEqualTo(authenticationResponse.refreshToken()),
                         org.junit.jupiter.api.Assertions::fail
                 );
     }

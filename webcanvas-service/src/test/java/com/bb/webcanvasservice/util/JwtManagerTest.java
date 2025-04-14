@@ -15,9 +15,10 @@ class JwtManagerTest {
         // given
         Long userId = 1L;
         String fingerprint = "abcdefg";
+        long expiration = 3600000; // 1시간 (ms)
 
         // when
-        String token = jwtManager.generateToken(userId, fingerprint);
+        String token = jwtManager.generateToken(userId, fingerprint, expiration);
 
         // then
         Assertions.assertThat(token).isNotBlank();

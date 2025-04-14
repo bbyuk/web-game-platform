@@ -50,6 +50,8 @@ class CanvasWebSocketControllerTest {
      */
     private final int ROOM_ENTRANCE_CANVAS_SUBSCRIBE_TIMEOUT = 3000;
 
+    private final int tokenExpiration = 3600000;
+
 
     @LocalServerPort
     private int port;
@@ -153,7 +155,7 @@ class CanvasWebSocketControllerTest {
         /**
          * WebSocket Session 연결
          */
-        testUserJwt = jwtManager.generateToken(testDataLoader.testUser1.getId(), testDataLoader.testUser1.getFingerprint());
+        testUserJwt = jwtManager.generateToken(testDataLoader.testUser1.getId(), testDataLoader.testUser1.getFingerprint(), tokenExpiration);
         testUserSession = connect(testUserClient, testUserJwt);
     }
 
@@ -165,7 +167,7 @@ class CanvasWebSocketControllerTest {
         User maliciousUser = userRepository.save(new User(UUID.randomUUID().toString()));
         
         WebSocketStompClient maliciousUserClient = createClient();
-        String maliciousUserJwt = jwtManager.generateToken(maliciousUser.getId(), maliciousUser.getFingerprint());
+        String maliciousUserJwt = jwtManager.generateToken(maliciousUser.getId(), maliciousUser.getFingerprint(), tokenExpiration);
         StompSession maliciousUserSession = connect(maliciousUserClient, maliciousUserJwt);
 
         // when
@@ -184,7 +186,7 @@ class CanvasWebSocketControllerTest {
         // 방에 접속해 있어야한다.
         WebSocketStompClient subUserClient = createClient();
 
-        String subUserJwt = jwtManager.generateToken(testDataLoader.testUser2.getId(), testDataLoader.testUser2.getFingerprint());
+        String subUserJwt = jwtManager.generateToken(testDataLoader.testUser2.getId(), testDataLoader.testUser2.getFingerprint(), tokenExpiration);
         StompSession subUserSession = connect(subUserClient, subUserJwt);
 
         // 구독
@@ -213,12 +215,12 @@ class CanvasWebSocketControllerTest {
          * 클라이언트에서 처리해야 할 웹소켓 접속 시나리오 로직
          */
         WebSocketStompClient otherUser1Client = createClient();
-        String otherUser1Jwt = jwtManager.generateToken(testDataLoader.testUser2.getId(), testDataLoader.testUser2.getFingerprint());
+        String otherUser1Jwt = jwtManager.generateToken(testDataLoader.testUser2.getId(), testDataLoader.testUser2.getFingerprint(), tokenExpiration);
         StompSession otherUser1Session = connect(otherUser1Client, otherUser1Jwt);
         CompletableFuture<Stroke> otherUser1CompletableFuture = subscribeRoomCanvas(otherUser1Session, testDataLoader.testGameRoom.getId());
 
         WebSocketStompClient otherUser2Client = createClient();
-        String otherUser2Jwt = jwtManager.generateToken(testDataLoader.testUser3.getId(), testDataLoader.testUser3.getFingerprint());
+        String otherUser2Jwt = jwtManager.generateToken(testDataLoader.testUser3.getId(), testDataLoader.testUser3.getFingerprint(), tokenExpiration);
         StompSession otherUser2Session = connect(otherUser2Client, otherUser2Jwt);
         CompletableFuture<Stroke> otherUser2CompletableFuture = subscribeRoomCanvas(otherUser2Session, testDataLoader.testGameRoom.getId());
 

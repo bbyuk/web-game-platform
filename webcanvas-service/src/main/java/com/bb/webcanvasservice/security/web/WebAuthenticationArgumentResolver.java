@@ -12,6 +12,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.security.Principal;
 
+import static com.bb.webcanvasservice.common.code.ErrorCode.AUTH_USER_NOT_FOUND;
+
 @Component
 public class WebAuthenticationArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
@@ -29,6 +31,6 @@ public class WebAuthenticationArgumentResolver implements HandlerMethodArgumentR
         if (principal instanceof WebCanvasAuthentication authentication) {
             return authentication;
         }
-        throw new NotAuthenticatedException("유저 인증 정보를 찾을 수 없습니다.");
+        throw new NotAuthenticatedException(AUTH_USER_NOT_FOUND);
     }
 }

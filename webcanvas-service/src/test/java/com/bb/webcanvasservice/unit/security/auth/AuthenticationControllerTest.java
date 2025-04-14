@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.unit.security.auth;
 import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.security.auth.*;
 import com.bb.webcanvasservice.security.auth.dto.request.LoginRequest;
-import com.bb.webcanvasservice.security.auth.dto.response.LoginResponse;
+import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,12 +47,13 @@ class AuthenticationControllerTest {
         String fingerprint = FingerprintGenerator.generate();
         long userId = 1L;
         JwtManager realJwtManager = new JwtManager();
-        String token = realJwtManager.generateToken(userId, fingerprint);
+        long expiration = 3600000; // 1시간 (ms)
+        String token = realJwtManager.generateToken(userId, fingerprint, expiration);
 
-        BDDMockito.given(jwtManager.generateToken(any(), any())).willReturn(token);
+        BDDMockito.given(jwtManager.generateToken(any(), any(), anyLong())).willReturn(token);
 
         BDDMockito.given(authenticationService.login(any()))
-                .willReturn(new LoginResponse(fingerprint, realJwtManager.generateToken(userId, fingerprint), realJwtManager.generateToken(userId, fingerprint)));
+                .willReturn(new AuthenticationResponse(fingerprint, realJwtManager.generateToken(userId, fingerprint, expiration), realJwtManager.generateToken(userId, fingerprint, expiration)));
 
         LoginRequest loginRequest = new LoginRequest(fingerprint);
 

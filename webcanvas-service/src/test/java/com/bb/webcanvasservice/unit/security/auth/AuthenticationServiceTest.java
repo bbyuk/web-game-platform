@@ -4,7 +4,7 @@ import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
 import com.bb.webcanvasservice.security.auth.AuthenticationService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
-import com.bb.webcanvasservice.security.auth.dto.response.LoginResponse;
+import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,18 +40,21 @@ class AuthenticationServiceTest {
         User user = new User(fingerprint);
         Field idField = User.class.getDeclaredField("id");
         idField.setAccessible(true);
-        idField.set(user, 1L);
+        long userId = 1L;
+        idField.set(user, userId);
+
+        long expiration = 3600000; // 1시간 (ms)
 
         when(userService.findOrCreateUser(any()))
                 .thenReturn(user);
-        when(jwtManager.generateToken(any(), eq(fingerprint)))
-                .thenReturn(realJwtManagerObject.generateToken(1L, fingerprint));
+        when(jwtManager.generateToken(any(), any(), anyLong()))
+                .thenReturn(realJwtManagerObject.generateToken(userId, fingerprint, expiration));
 
         // when
-        LoginResponse loginResponse = authenticationService.login(fingerprint);
+        AuthenticationResponse authenticationResponse = authenticationService.login(fingerprint);
 
-        String accessToken = loginResponse.accessToken();
-        String refreshToken = loginResponse.refreshToken();
+        String accessToken = authenticationResponse.accessToken();
+        String refreshToken = authenticationResponse.refreshToken();
 
         // then
         Assertions.assertThat(accessToken).isNotBlank();

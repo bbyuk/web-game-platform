@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.security.Principal;
 
+import static com.bb.webcanvasservice.common.code.ErrorCode.AUTH_USER_NOT_FOUND;
+
 /**
  * WebSocket 핸들러에서 Principal 대신 Custom Authentication 객체인 WebCanvasAuthentication를 주입받기 위한 ArgumentResolver.
  * Spring Security의 Principal을 WebCanvasAuthentication으로 변환하여 컨트롤러 핸들러 메서드에서 직접 사용할 수 있도록 함.
@@ -44,6 +46,6 @@ public class WebSocketAuthenticationArgumentResolver implements HandlerMethodArg
         if (principal instanceof WebCanvasAuthentication authentication) {
             return authentication;
         }
-        throw new NotAuthenticatedException("유저 인증 정보를 찾을 수 없습니다.");
+        throw new NotAuthenticatedException(AUTH_USER_NOT_FOUND);
     }
 }

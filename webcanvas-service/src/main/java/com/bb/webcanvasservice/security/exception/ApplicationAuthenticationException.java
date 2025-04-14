@@ -12,7 +12,7 @@ public class ApplicationAuthenticationException extends AuthenticationException 
 
     private final ErrorCode errorCode;
 
-    public ApplicationAuthenticationException(String message, ErrorCode errorCode) {
+    public ApplicationAuthenticationException(ErrorCode errorCode, String message) {
         super(message);
         this.errorCode = errorCode;
     }

@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.security.websocket;
 
+import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
 import com.bb.webcanvasservice.security.exception.NotAuthenticatedException;
@@ -44,7 +45,7 @@ public class JwtAuthenticationChannelInterceptor implements ChannelInterceptor {
         String token = optionalJwt.filter(header -> header.startsWith(JwtManager.TOKEN_PREFIX))
                 .map(header -> header.substring(JwtManager.TOKEN_PREFIX.length() + 1))
                 .filter(jwtManager::validateToken)
-                .orElseThrow(() -> new NotAuthenticatedException("잘못된 토큰입니다."));
+                .orElseThrow(() -> new NotAuthenticatedException(ErrorCode.INVALID_TOKEN));
 
         Long userId = jwtManager.getUserIdFromToken(token);
         WebCanvasAuthentication webCanvasAuthentication = new WebCanvasAuthentication(userId);

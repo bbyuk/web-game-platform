@@ -16,7 +16,7 @@ import java.util.Date;
 public class JwtManager {
 
     private final String secretKey = "E2fhmOQToTXJCtVmyCc8AzwQK2bNC9VJBMlBXi/bNEQ=";
-    private final long expiration = 3600000; // 1시간 (ms)
+//    private final long expiration = 3600000; // 1시간 (ms)
 
     public static final String BEARER_TOKEN = "Authorization";
     public static final String TOKEN_PREFIX = "Bearer ";
@@ -28,11 +28,13 @@ public class JwtManager {
     }
 
     /**
-     * userId로 토큰 발행
-     * @param userId
+     * userId, fingerprint 토큰 발행
+     * @param userId 유저 ID
+     * @param fingerprint 서버 등록시 발급된 유저 fingerprint
+     * @param expiration 토큰 만료 시간 (ms)
      * @return
      */
-    public String generateToken(Long userId, String fingerprint) {
+    public String generateToken(Long userId, String fingerprint, long expiration) {
         return Jwts.builder()
                 .subject(userId.toString())
                 .claim("fingerprint", fingerprint)
@@ -99,6 +101,17 @@ public class JwtManager {
         }
 
         return null;
+    }
+
+    /**
+     * 토큰의 expiration time까지 남은 시간을 계산하여 ms로 리턴
+     */
+    public long calculateRemainingExpiration(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload().getExpiration().getTime() - System.currentTimeMillis();
     }
 
 }
