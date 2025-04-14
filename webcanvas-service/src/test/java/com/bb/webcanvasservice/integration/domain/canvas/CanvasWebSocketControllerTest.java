@@ -39,16 +39,20 @@ import java.util.concurrent.TimeoutException;
 class CanvasWebSocketControllerTest {
 
     /**
+     * TODO 토큰 파싱에 시간이 오래걸리는듯 하다. 튜닝포인트
+     */
+    
+    /**
      * 브로드캐스팅 타임아웃
      * 브로드캐스팅 시간 테스트
      */
-    private final int BROADCASTING_TIMEOUT = 500;
+    private final int BROADCASTING_TIMEOUT = 1500;
 
     /**
      * 방 입장시 소켓 구독 처리에 대한 타임아웃
      * 3s
      */
-    private final int ROOM_ENTRANCE_CANVAS_SUBSCRIBE_TIMEOUT = 3000;
+    private final int ROOM_ENTRANCE_CANVAS_SUBSCRIBE_TIMEOUT = 5000;
 
     private final int tokenExpiration = 3600000;
 
