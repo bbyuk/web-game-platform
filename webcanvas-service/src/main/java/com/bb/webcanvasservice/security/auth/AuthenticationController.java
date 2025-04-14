@@ -49,8 +49,9 @@ public class AuthenticationController {
 
     /**
      * 로그인
-     *
+     * <p>
      * 로그인 처리 후 발급된 토큰을 리턴한다.
+     *
      * @param loginRequest
      * @return
      */
@@ -68,8 +69,9 @@ public class AuthenticationController {
 
     /**
      * 토큰 refresh
-     *
+     * <p>
      * 로그인 시 accessToken과 함께 발급받은 refreshToken으로 토큰을 refresh한다.
+     *
      * @param request
      * @return
      */
@@ -80,12 +82,14 @@ public class AuthenticationController {
                 .filter(cookie -> cookie.getName().equals("refresh-token"))
                 .findFirst()
                 .orElseThrow(() -> new ApplicationAuthenticationException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
-        
+
         AuthenticationInnerResponse authenticationInnerResponse = authenticationService.refreshToken(refreshTokenRequestCookie.getValue());
-        ResponseCookie refreshTokenResponseCookie = getResponseCookie(authenticationInnerResponse.refreshToken());
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, refreshTokenResponseCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, authenticationInnerResponse.refreshTokenReissued()
+                        ? getResponseCookie(authenticationInnerResponse.refreshToken()).toString()
+                        : null
+                )
                 .body(new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), authenticationInnerResponse.accessToken()));
     }
 }
