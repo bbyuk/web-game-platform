@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.security.websocket;
 
 import com.bb.webcanvasservice.security.auth.Authenticated;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
-import com.bb.webcanvasservice.security.exception.NotAuthenticatedException;
+import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
@@ -46,6 +46,6 @@ public class WebSocketAuthenticationArgumentResolver implements HandlerMethodArg
         if (principal instanceof WebCanvasAuthentication authentication) {
             return authentication;
         }
-        throw new NotAuthenticatedException(AUTH_USER_NOT_FOUND);
+        throw new ApplicationAuthenticationException(AUTH_USER_NOT_FOUND);
     }
 }

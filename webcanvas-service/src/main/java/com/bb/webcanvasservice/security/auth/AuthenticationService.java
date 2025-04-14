@@ -5,7 +5,7 @@ import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
 import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationResponse;
-import com.bb.webcanvasservice.security.exception.NotAuthenticatedException;
+import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,6 +75,8 @@ public class AuthenticationService {
      */
     @Transactional
     public AuthenticationResponse refreshToken(String token) {
+        jwtManager.validateToken(token);
+
         /**
          * 이 토큰이 유저에게 할당된 refreshToken인지 validation
          */
@@ -85,7 +87,7 @@ public class AuthenticationService {
             log.error("유저에게 할당되지 않은 refresh token 입니다.");
             log.error("유저 ID : {}", userId);
             log.error("요청된 refreshToken : {}", token);
-            throw new NotAuthenticatedException(ErrorCode.INVALID_TOKEN);
+            throw new ApplicationAuthenticationException(ErrorCode.INVALID_TOKEN);
         }
 
         /**

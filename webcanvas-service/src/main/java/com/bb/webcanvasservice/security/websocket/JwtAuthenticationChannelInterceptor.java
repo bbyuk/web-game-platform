@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.security.websocket;
 import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
-import com.bb.webcanvasservice.security.exception.NotAuthenticatedException;
+import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -42,12 +42,20 @@ public class JwtAuthenticationChannelInterceptor implements ChannelInterceptor {
         }
 
         Optional<String> optionalJwt = Optional.ofNullable(accessor.getFirstNativeHeader(JwtManager.BEARER_TOKEN));
-        String token = optionalJwt.filter(header -> header.startsWith(JwtManager.TOKEN_PREFIX))
+        String validatedToken = optionalJwt.filter(header -> header.startsWith(JwtManager.TOKEN_PREFIX))
                 .map(header -> header.substring(JwtManager.TOKEN_PREFIX.length() + 1))
-                .filter(jwtManager::validateToken)
-                .orElseThrow(() -> new NotAuthenticatedException(ErrorCode.INVALID_TOKEN));
+                .filter(token -> {
+                    try {
+                        jwtManager.validateToken(token);
+                        return true;
+                    }
+                    catch (Exception e) {
+                        return false;
+                    }
+                })
+                .orElseThrow(() -> new ApplicationAuthenticationException(ErrorCode.INVALID_TOKEN));
 
-        Long userId = jwtManager.getUserIdFromToken(token);
+        Long userId = jwtManager.getUserIdFromToken(validatedToken);
         WebCanvasAuthentication webCanvasAuthentication = new WebCanvasAuthentication(userId);
         accessor.setUser(webCanvasAuthentication);
 

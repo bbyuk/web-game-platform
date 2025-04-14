@@ -19,7 +19,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class AuthenticationServiceTest {
+class AuthenticationServiceUnitTest {
 
     @Mock
     private UserService userService;
@@ -31,7 +31,7 @@ class AuthenticationServiceTest {
     private AuthenticationService authenticationService;
 
     @Test
-    @DisplayName("로그인 단위테스트 - fingerprint로 등록되어 있는지 여부와 상관없이 토큰이 발급되어 리턴되어야 한다.")
+    @DisplayName("로그인 - fingerprint로 등록되어 있는지 여부와 상관없이 토큰이 발급되어 리턴되어야 한다.")
     void testLogin() throws Exception {
         // given
         String fingerprint = "asdwqujdqwi12j3b1jbsd";
@@ -60,4 +60,6 @@ class AuthenticationServiceTest {
         Assertions.assertThat(accessToken).isNotBlank();
         Assertions.assertThat(refreshToken).isNotBlank();
     }
+
+
 }

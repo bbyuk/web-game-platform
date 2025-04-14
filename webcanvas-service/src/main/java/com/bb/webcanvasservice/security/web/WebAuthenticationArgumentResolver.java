@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.security.web;
 
 import com.bb.webcanvasservice.security.auth.Authenticated;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
-import com.bb.webcanvasservice.security.exception.NotAuthenticatedException;
+import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -31,6 +31,6 @@ public class WebAuthenticationArgumentResolver implements HandlerMethodArgumentR
         if (principal instanceof WebCanvasAuthentication authentication) {
             return authentication;
         }
-        throw new NotAuthenticatedException(AUTH_USER_NOT_FOUND);
+        throw new ApplicationAuthenticationException(AUTH_USER_NOT_FOUND);
     }
 }

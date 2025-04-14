@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.security.web;
 
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
+import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,10 +27,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = jwtManager.resolveToken(request);
 
-        if (token != null && jwtManager.validateToken(token)) {
+        try {
+            jwtManager.validateToken(token);
             Long userId = jwtManager.getUserIdFromToken(token);
 
             SecurityContextHolder.getContext().setAuthentication(new WebCanvasAuthentication(userId));
+        }
+        catch (ApplicationAuthenticationException e) {
+            log.debug(e.getMessage());
         }
 
         filterChain.doFilter(request, response);

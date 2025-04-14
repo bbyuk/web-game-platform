@@ -1,8 +1,14 @@
 package com.bb.webcanvasservice.security.auth;
 
+import com.bb.webcanvasservice.common.code.ErrorCode;
+import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
@@ -11,12 +17,13 @@ import java.util.Date;
 
 /**
  * JWT 토큰의 발급 및 검증 등 JWT 토큰 관리 컴포넌트 클래스
+ *
+ * TODO signedClaims 캐싱 처리 (우선순위 낮음)
  */
 @Component
 public class JwtManager {
 
     private final String secretKey = "E2fhmOQToTXJCtVmyCc8AzwQK2bNC9VJBMlBXi/bNEQ=";
-//    private final long expiration = 3600000; // 1시간 (ms)
 
     public static final String BEARER_TOKEN = "Authorization";
     public static final String TOKEN_PREFIX = "Bearer ";
@@ -79,13 +86,20 @@ public class JwtManager {
      * @param token
      * @return isValidToken
      */
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
-            return true;
         }
-        catch(Exception e) {
-            return false;
+        catch (ExpiredJwtException e) {
+            throw new ApplicationAuthenticationException(ErrorCode.TOKEN_EXPIRED);
+        } catch (SignatureException e) {
+            throw new ApplicationAuthenticationException(ErrorCode.INVALID_SIGNATURE);
+        } catch (MalformedJwtException e) {
+            throw new ApplicationAuthenticationException(ErrorCode.MALFORMED_TOKEN);
+        } catch (UnsupportedJwtException e) {
+            throw new ApplicationAuthenticationException(ErrorCode.UNSUPPORTED_TOKEN);
+        } catch (Exception e) {
+            throw new ApplicationAuthenticationException(ErrorCode.INVALID_TOKEN);
         }
     }
 

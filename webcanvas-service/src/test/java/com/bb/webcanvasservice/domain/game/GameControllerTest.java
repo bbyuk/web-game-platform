@@ -61,8 +61,7 @@ class GameControllerTest {
                 .willReturn(token);
         BDDMockito.given(jwtManager.resolveToken(any()))
                 .willReturn(token);
-        BDDMockito.given(jwtManager.validateToken(any()))
-                .willReturn(true);
+
 
         // when
         mockMvc.perform(MockMvcRequestBuilders.post("/game/canvas/room")

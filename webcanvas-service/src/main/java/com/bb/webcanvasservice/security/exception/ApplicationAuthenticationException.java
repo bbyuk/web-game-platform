@@ -16,4 +16,9 @@ public class ApplicationAuthenticationException extends AuthenticationException 
         super(message);
         this.errorCode = errorCode;
     }
+
+    public ApplicationAuthenticationException(ErrorCode errorCode) {
+        super(errorCode.getDefaultMessage());
+        this.errorCode = errorCode;
+    }
 }
