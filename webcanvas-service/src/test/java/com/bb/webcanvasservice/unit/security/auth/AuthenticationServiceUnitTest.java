@@ -1,10 +1,12 @@
 package com.bb.webcanvasservice.unit.security.auth;
 
+import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
 import com.bb.webcanvasservice.security.auth.AuthenticationService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationResponse;
+import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,5 +63,56 @@ class AuthenticationServiceUnitTest {
         Assertions.assertThat(refreshToken).isNotBlank();
     }
 
+
+    @Test
+    @DisplayName("토큰 리프레시 - 유저에게 할당되지 않은 refreshToken으로 refresh 요청시 ApplicationAuthenticationException 발생")
+    void testRefreshTokenFailedWhenNotUserOwnToken() throws Exception{
+        // given
+        JwtManager realJwtManagerObject = new JwtManager();
+        Long userId = 1L;
+        User user = new User(FingerprintGenerator.generate());
+        Field idField = User.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(user, userId);
+        String userRefreshToken = realJwtManagerObject.generateToken(userId, user.getFingerprint(), 15 * 60 * 1000);
+        user.updateRefreshToken(userRefreshToken);
+
+        when(userService.findUserByUserId(any(Long.class))).thenReturn(user);
+        when(jwtManager.getUserIdFromToken(any())).thenReturn(userId);
+
+        // when
+        String anotherValidToken = realJwtManagerObject.generateToken(userId, user.getFingerprint(), 15 * 60 * 1001);
+
+        Assertions.assertThatThrownBy(() -> authenticationService.refreshToken(anotherValidToken))
+                .isInstanceOf(ApplicationAuthenticationException.class);
+
+        // then
+    }
+
+    @Test
+    @DisplayName("토큰 리프레시 - refreshToken의 expiration까지 3일 이내로 남았을 경우 refreshToken도 재발급 및 rotate")
+    void refreshTokenRefreshedEitherWhenExpirationLessThanThreshold() throws Exception {
+        // given
+        JwtManager realJwtManagerObject = new JwtManager();
+        Long userId = 1L;
+        User user = new User(FingerprintGenerator.generate());
+        String userRefreshToken = realJwtManagerObject.generateToken(userId, FingerprintGenerator.generate(), 20000);
+        user.updateRefreshToken(userRefreshToken);
+
+        Field idField = User.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(user, userId);
+
+        when(userService.findUserByUserId(any(Long.class))).thenReturn(user);
+        when(jwtManager.getUserIdFromToken(any())).thenReturn(userId);
+        when(jwtManager.generateToken(any(), any(), anyLong())).thenReturn(realJwtManagerObject.generateToken(user.getId(), user.getFingerprint(), 15 * 60 * 1000));
+        when(jwtManager.calculateRemainingExpiration(any())).thenReturn(Long.valueOf(3 * 24 * 60 * 60 * 1000));
+
+        // when
+        AuthenticationResponse tokenRefreshResponse = authenticationService.refreshToken(userRefreshToken);
+
+        // then
+        Assertions.assertThat(tokenRefreshResponse).isNotEqualTo(user.getRefreshToken());
+    }
 
 }
