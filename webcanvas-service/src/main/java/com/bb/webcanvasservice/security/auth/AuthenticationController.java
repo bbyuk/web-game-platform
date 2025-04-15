@@ -35,10 +35,11 @@ public class AuthenticationController {
 
     private ResponseCookie getResponseCookie(String token) {
         return ResponseCookie.from("refresh-token", token)
+                .secure(true)
                 .httpOnly(true)
                 .path("/")
-                .maxAge(securityProperties.refreshTokenExpiration())
-                .sameSite("Strict")
+                .maxAge(securityProperties.refreshTokenExpirationSeconds())
+                .sameSite("None")
                 .build();
     }
 

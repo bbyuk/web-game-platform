@@ -42,6 +42,10 @@ public record SecurityProperties(
         return refreshTokenExpiration * 1000;
     }
 
+    public long refreshTokenExpirationSeconds() {
+        return refreshTokenExpiration;
+    }
+
     public long refreshTokenReissueThreshold() {
         return refreshTokenReissueThreshold * 1000;
     }
