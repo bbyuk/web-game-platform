@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.unit.domain.game.repository;
 
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
+import com.bb.webcanvasservice.domain.game.GameProperties;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
@@ -34,6 +35,8 @@ class GameRoomRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    private GameProperties gameProperties = new GameProperties(8, 10, 10);
 
 
     @Test
@@ -107,13 +110,13 @@ class GameRoomRepositoryTest {
 
         gameRoomEntranceRepository.saveAll(
                 Stream.generate(() -> new GameRoomEntrance(room5, userRepository.save(new User(UUID.randomUUID().toString()))))
-                        .limit(GameRoom.CAPACITY)
+                        .limit(gameProperties.gameRoomCapacity())
                         .collect(Collectors.toList())
         );
 
 
         // when
-        List<GameRoom> enterableGameRooms = gameRoomRepository.findEnterableGameRooms(GameRoom.CAPACITY, GameRoomState.enterable());
+        List<GameRoom> enterableGameRooms = gameRoomRepository.findEnterableGameRooms(gameProperties.gameRoomCapacity(), GameRoomState.enterable());
 
         // then
         Assertions.assertThat(enterableGameRooms.size()).isEqualTo(3);

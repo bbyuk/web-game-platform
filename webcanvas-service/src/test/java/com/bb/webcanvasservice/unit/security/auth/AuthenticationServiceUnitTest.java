@@ -5,7 +5,6 @@ import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
 import com.bb.webcanvasservice.security.auth.AuthenticationService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
-import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationApiResponse;
 import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationInnerResponse;
 import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import org.assertj.core.api.Assertions;
@@ -18,7 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

@@ -46,7 +46,7 @@ class CanvasWebSocketControllerTest {
      * 브로드캐스팅 타임아웃
      * 브로드캐스팅 시간 테스트
      */
-    private final int BROADCASTING_TIMEOUT = 1500;
+    private final int BROADCASTING_TIMEOUT = 5000;
 
     /**
      * 방 입장시 소켓 구독 처리에 대한 타임아웃

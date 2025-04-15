@@ -19,19 +19,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameRoom {
 
-    /**
-     * 게임 방 입장 최대 정원
-     */
-    public static final int CAPACITY = 8;
-    /**
-     * 게임 방의 JoinCode 충돌 발생시 재생성 최대 횟수
-     */
-    public static final int JOIN_CODE_MAX_CONFLICT_COUNT = 10;
-    /**
-     * 게임 방의 입장 코드 길이
-     */
-    public static final int JOIN_CODE_LENGTH = 10;
-
     @Id
     @GeneratedValue
     @Column(name = "id")

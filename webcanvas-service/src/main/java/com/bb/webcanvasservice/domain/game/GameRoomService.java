@@ -18,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.bb.webcanvasservice.common.code.ErrorCode.GAME_ROOM_JOIN_CODE_NOT_GENERATED;
-
 /**
  * 게임 방과 관련된 비즈니스 로직을 처리하는 서비스 클래스
  */
@@ -38,6 +36,11 @@ public class GameRoomService {
      */
     private final GameRoomRepository gameRoomRepository;
     private final GameRoomEntranceRepository gameRoomEntranceRepository;
+
+    /**
+     * 설정 변수
+     */
+    private final GameProperties gameProperties;
 
     /**
      * 요청자가 입장한 게임 방을 리턴한다.
@@ -92,7 +95,7 @@ public class GameRoomService {
          *
          * conflict가 10번 초과하여 발생할 시 joinCode 생성 중 문제가 발생했다는 문구와 함께 잠시후 재시도 해달라는 문구 출력 필요
          */
-        String joinCode = verifyJoinCode(JoinCodeGenerator.generate(GameRoom.JOIN_CODE_LENGTH));
+        String joinCode = verifyJoinCode(JoinCodeGenerator.generate(gameProperties.joinCodeLength()));
 
 
         /**
@@ -117,12 +120,12 @@ public class GameRoomService {
         int conflictCount = 0;
 
         while (gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(verifiedJoinCode)) {
-            if (conflictCount == GameRoom.JOIN_CODE_MAX_CONFLICT_COUNT) {
-                log.error("join code 생성 중 충돌이 최대 횟수인 {}회 발생했습니다.", GameRoom.JOIN_CODE_MAX_CONFLICT_COUNT);
+            if (conflictCount == gameProperties.joinCodeMaxConflictCount()) {
+                log.error("join code 생성 중 충돌이 최대 횟수인 {}회 발생했습니다.", gameProperties.joinCodeMaxConflictCount());
                 throw new JoinCodeNotGeneratedException();
             }
             conflictCount++;
-            verifiedJoinCode = JoinCodeGenerator.generate(GameRoom.JOIN_CODE_LENGTH);
+            verifiedJoinCode = JoinCodeGenerator.generate(gameProperties.joinCodeLength());
         }
         return verifiedJoinCode;
     }
@@ -149,7 +152,7 @@ public class GameRoomService {
             throw new IllegalGameRoomStateException();
         }
 
-        if (targetGameRoom.getEntrances().size() >= GameRoom.CAPACITY) {
+        if (targetGameRoom.getEntrances().size() >= gameProperties.gameRoomCapacity()) {
             throw new IllegalGameRoomStateException("방의 정원이 모두 찼습니다.");
         }
 
@@ -205,12 +208,12 @@ public class GameRoomService {
 
 
         return new GameRoomListResponse(
-                gameRoomRepository.findEnterableGameRooms(GameRoom.CAPACITY, GameRoomState.enterable())
+                gameRoomRepository.findEnterableGameRooms(gameProperties.gameRoomCapacity(), GameRoomState.enterable())
                         .stream()
                         .map(gameRoom ->
                                 new GameRoomListResponse.GameRoomSummary(
                                         gameRoom.getId(),
-                                        GameRoom.CAPACITY,
+                                        gameProperties.gameRoomCapacity(),
                                         gameRoom.getEntrances().size(),
                                         gameRoom.getJoinCode()
                                 )

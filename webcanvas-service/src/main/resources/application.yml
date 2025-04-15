@@ -36,6 +36,20 @@ logging:
         web: debug
         messaging: debug
 
+application:
+  domain:
+    game:
+      # 게임 방 입장 최대 정원
+      game-room-capacity: 8
+      # 게임 방 생성중 입장코드 충돌 발생 시 재생성 시도 최대 횟수
+      join-code-max-conflict-count: 10
+      # 게임 방의 입장 코드 길이
+      join-code-length: 10;
+#  security:
+#    web:
+#    web-socket:
+
+
 springdoc:
   api-docs:
     path: /api-docs

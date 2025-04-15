@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.unit.domain.game;
 
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
+import com.bb.webcanvasservice.domain.game.GameProperties;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
@@ -14,6 +15,7 @@ import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,8 +42,17 @@ class GameRoomServiceUnitTest {
     private GameRoomEntranceRepository gameRoomEntranceRepository;
     @Mock
     private UserService userService;
-    @InjectMocks
+
+    /**
+     * mock
+     */
+    private GameProperties gameProperties = new GameProperties(8, 10, 10);
     private GameRoomService gameRoomService;
+
+    @BeforeEach
+    void setUp() {
+        this.gameRoomService = new GameRoomService(userService, gameRoomRepository, gameRoomEntranceRepository, gameProperties);
+    }
 
     private final Random random = new Random();
 
@@ -59,6 +70,7 @@ class GameRoomServiceUnitTest {
         User testUser = new User(testUserToken);
         long testUserId = random.nextLong();
         setId(testUser, testUserId);
+
 
         when(userService.findUserByUserId(any(Long.class)))
                 .thenReturn(testUser);
