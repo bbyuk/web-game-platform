@@ -44,7 +44,7 @@ application:
       # 게임 방 생성중 입장코드 충돌 발생 시 재생성 시도 최대 횟수
       join-code-max-conflict-count: 10
       # 게임 방의 입장 코드 길이
-      join-code-length: 10;
+      join-code-length: 10
   security:
     ## 단위 초 (s)
     # 15분 (15 * 60)
