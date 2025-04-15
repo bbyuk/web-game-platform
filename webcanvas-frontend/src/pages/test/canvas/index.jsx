@@ -93,7 +93,10 @@ export default function CanvasTest() {
 
     const { fingerprint, accessToken, refreshToken } = await post(
       `${apiUrl}/auth/login`,
-      requestData
+      requestData,
+      {
+        credentials: "include"
+      }
     );
 
     localStorage.setItem("accessToken", accessToken);
