@@ -25,6 +25,7 @@ import java.util.concurrent.*;
 
 @Transactional
 @SpringBootTest
+@DisplayName("게임 방 서비스 통합테스트")
 class GameRoomServiceIntegrationTest {
 
     @Autowired

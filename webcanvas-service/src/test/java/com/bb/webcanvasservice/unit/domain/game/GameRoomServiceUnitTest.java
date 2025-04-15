@@ -34,6 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("게임 방 서비스 단위테스트")
 class GameRoomServiceUnitTest {
 
     @Mock
@@ -50,7 +51,7 @@ class GameRoomServiceUnitTest {
     private GameRoomService gameRoomService;
 
     @BeforeEach
-    void setUp() {
+    void setup() {
         this.gameRoomService = new GameRoomService(userService, gameRoomRepository, gameRoomEntranceRepository, gameProperties);
     }
 

@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.security.auth;
 
 import com.bb.webcanvasservice.common.code.ErrorCode;
+import com.bb.webcanvasservice.security.SecurityProperties;
 import com.bb.webcanvasservice.security.auth.dto.request.LoginRequest;
 import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationApiResponse;
 import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationInnerResponse;
@@ -30,19 +31,13 @@ import java.util.Arrays;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
-
-    /**
-     * TODO - 설정 파일로 이동
-     * Refresh Token 만료시간
-     * 14일 (ms)
-     */
-    private final long refreshTokenExpiration = 14 * 24 * 60 * 60 * 1000;
+    private final SecurityProperties securityProperties;
 
     private ResponseCookie getResponseCookie(String token) {
         return ResponseCookie.from("refresh-token", token)
                 .httpOnly(true)
                 .path("/")
-                .maxAge(refreshTokenExpiration)
+                .maxAge(securityProperties.refreshTokenExpiration())
                 .sameSite("Strict")
                 .build();
     }

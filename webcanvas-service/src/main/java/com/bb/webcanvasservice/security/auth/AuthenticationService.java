@@ -4,7 +4,7 @@ import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
-import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationApiResponse;
+import com.bb.webcanvasservice.security.SecurityProperties;
 import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationInnerResponse;
 import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import io.micrometer.common.util.StringUtils;
@@ -21,30 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    /**
-     * TODO - 설정 파일로 이동
-     * Access Token 만료시간
-     * 15분 (ms)
-     */
-    private final long accessTokenExpiration = 15 * 60 * 1000;
-
-    /**
-     * TODO - 설정 파일로 이동
-     * Refresh Token 만료시간
-     * 14일 (ms)
-     */
-    private final long refreshTokenExpiration = 14 * 24 * 60 * 60 * 1000;
-    /**
-     * TODO - 설정 파일로 이동
-     * Refresh Token 재발급 임계 시간
-     * 현재 시각부터 입력받은 refresh token의 expiration time 까지 남은 시간이
-     * refreshTokenReissueThreshold보다 작을 경우 Refresh Token 재발급 및 rotate
-     * 3일 (72시간) (ms)
-     */
-    private final long refreshTokenReissueThreshold = 3 * 24 * 60 * 60 * 1000;
-
     private final JwtManager jwtManager;
     private final UserService userService;
+    private final SecurityProperties securityProperties;
 
     /**
      * fingerprint를 username으로 로그인 처리를 수행한다.
@@ -64,8 +43,8 @@ public class AuthenticationService {
                         ? FingerprintGenerator.generate()
                         : fingerprint);
 
-        String accessToken = jwtManager.generateToken(user.getId(), user.getFingerprint(), accessTokenExpiration);
-        String refreshToken = jwtManager.generateToken(user.getId(), user.getFingerprint(), refreshTokenExpiration);
+        String accessToken = jwtManager.generateToken(user.getId(), user.getFingerprint(), securityProperties.accessTokenExpiration());
+        String refreshToken = jwtManager.generateToken(user.getId(), user.getFingerprint(), securityProperties.refreshTokenExpiration());
         user.updateRefreshToken(refreshToken);
 
         return new AuthenticationInnerResponse(user.getFingerprint(), accessToken, refreshToken, true);
@@ -96,7 +75,7 @@ public class AuthenticationService {
         /**
          * validation 통과시 Access Token 재발급
          */
-        String reissuedAccessToken = jwtManager.generateToken(userId, user.getFingerprint(), accessTokenExpiration);
+        String reissuedAccessToken = jwtManager.generateToken(userId, user.getFingerprint(), securityProperties.accessTokenExpiration());
 
         boolean refreshTokenReissued = false;
         /**
@@ -105,8 +84,8 @@ public class AuthenticationService {
          *
          * refreshToken 재발급 및 rotate
          */
-        if (jwtManager.calculateRemainingExpiration(token) <= refreshTokenReissueThreshold) {
-            user.updateRefreshToken(jwtManager.generateToken(userId, user.getFingerprint(), refreshTokenExpiration));
+        if (jwtManager.calculateRemainingExpiration(token) <= securityProperties.refreshTokenReissueThreshold()) {
+            user.updateRefreshToken(jwtManager.generateToken(userId, user.getFingerprint(), securityProperties.refreshTokenExpiration()));
             refreshTokenReissued = true;
         }
 

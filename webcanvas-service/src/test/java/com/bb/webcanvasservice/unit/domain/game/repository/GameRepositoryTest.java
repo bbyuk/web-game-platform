@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 @Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest // JPA 관련 컴포넌트만 로드하여 테스트
+@DisplayName("게임 persistence layer 단위테스트")
 class GameRepositoryTest {
 
     @Autowired
@@ -103,19 +104,17 @@ class GameRepositoryTest {
 
         Runnable task = () -> {
             try {
-                 // 비관적 락 획득
+                // 비관적 락 획득
                 if (!gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(joinCode)) {
                     GameRoom lockTakenGameRoom = new GameRoom(GameRoomState.WAITING, joinCode);
                     gameRoomRepository.save(lockTakenGameRoom);
                 }
 
                 Thread.sleep(3000); // 일부러 지연 -> 락 유지됨
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("e = " + e);
                 throw new IllegalStateException(e);
-            }
-            finally {
+            } finally {
                 latch.countDown();
             }
         };

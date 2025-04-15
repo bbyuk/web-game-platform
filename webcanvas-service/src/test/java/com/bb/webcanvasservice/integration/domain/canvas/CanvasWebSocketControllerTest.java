@@ -36,6 +36,7 @@ import java.util.concurrent.TimeoutException;
 @ActiveProfiles("canvas-integration-test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DisplayName("canvas 웹소켓 컨트롤러 단위 테스트")
 class CanvasWebSocketControllerTest {
 
     /**

@@ -39,7 +39,7 @@ class GameRoomEntranceRepositoryTest {
     private User testUser;
 
     @BeforeEach
-    void setUp() {
+    void setup() {
         testUser = userRepository.save(new User(UUID.randomUUID().toString()));
     }
 

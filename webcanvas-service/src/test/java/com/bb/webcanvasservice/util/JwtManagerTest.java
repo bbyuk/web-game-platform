@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("JWT 처리 로직 단위 테스트")
 class JwtManagerTest {
 
     private JwtManager jwtManager = new JwtManager();

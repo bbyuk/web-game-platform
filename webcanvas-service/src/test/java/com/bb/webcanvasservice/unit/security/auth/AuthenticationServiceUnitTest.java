@@ -3,11 +3,13 @@ package com.bb.webcanvasservice.unit.security.auth;
 import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
+import com.bb.webcanvasservice.security.SecurityProperties;
 import com.bb.webcanvasservice.security.auth.AuthenticationService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationInnerResponse;
 import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("인증 서비스 단위테스트")
 class AuthenticationServiceUnitTest {
 
     @Mock
@@ -30,8 +33,16 @@ class AuthenticationServiceUnitTest {
     @Mock
     private JwtManager jwtManager;
 
-    @InjectMocks
+    /**
+     * Mock
+     */
+    private SecurityProperties securityProperties = new SecurityProperties(900000, 1209600000, 259200000);
     private AuthenticationService authenticationService;
+
+    @BeforeEach
+    void setup() throws Exception {
+        authenticationService = new AuthenticationService(jwtManager, userService, securityProperties);
+    }
 
     @Test
     @DisplayName("로그인 - fingerprint로 등록되어 있는지 여부와 상관없이 토큰이 발급되어 리턴되어야 한다.")
@@ -46,7 +57,7 @@ class AuthenticationServiceUnitTest {
         long userId = 1L;
         idField.set(user, userId);
 
-        long expiration = 3600000; // 1시간 (ms)
+        long expiration = 3600000; // 1시간 (m)
 
         when(userService.findOrCreateUser(any()))
                 .thenReturn(user);

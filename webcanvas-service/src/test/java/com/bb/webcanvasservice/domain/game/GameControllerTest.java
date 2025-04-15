@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         controllers = {GameController.class},
         excludeAutoConfiguration = {SecurityAutoConfiguration.class}
 )
+@DisplayName("게임 API Controller WebMvcTest 단위테스트")
 class GameControllerTest {
 
     @Autowired

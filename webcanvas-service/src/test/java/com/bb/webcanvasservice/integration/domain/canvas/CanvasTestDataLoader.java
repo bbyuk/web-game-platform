@@ -55,7 +55,7 @@ public class CanvasTestDataLoader {
             .build();
 
     @EventListener(ApplicationReadyEvent.class)
-    public void setUpTestData() {
+    public void setupTestData() {
         testUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
         testUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
         testUser3 = userRepository.save(new User(UUID.randomUUID().toString()));

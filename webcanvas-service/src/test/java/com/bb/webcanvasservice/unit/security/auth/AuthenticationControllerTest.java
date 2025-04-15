@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.unit.security.auth;
 import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
+import com.bb.webcanvasservice.security.SecurityProperties;
 import com.bb.webcanvasservice.security.auth.AuthenticationController;
 import com.bb.webcanvasservice.security.auth.AuthenticationService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
@@ -11,6 +12,7 @@ import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationInnerRes
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -35,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         controllers = {AuthenticationController.class},
         excludeAutoConfiguration = {SecurityAutoConfiguration.class}
 )
+@DisplayName("인증 API Controller WebMvcTest 단위테스트")
 class AuthenticationControllerTest {
 
     @Autowired
@@ -51,6 +54,14 @@ class AuthenticationControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private SecurityProperties securityProperties;
+
+    @BeforeEach
+    void setup() throws Exception {
+        securityProperties = new SecurityProperties(900000, 1209600000, 259200000);
+    }
 
     @Test
     @DisplayName("로그인  - 인증 토큰 발급")
