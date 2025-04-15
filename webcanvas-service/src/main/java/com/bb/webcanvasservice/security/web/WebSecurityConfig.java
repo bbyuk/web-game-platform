@@ -81,8 +81,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 모든 경로에 대해
-                .allowedOrigins("*") // 또는 .allowedOriginPatterns("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
-//                .allowCredentials(true); // 쿠키 등 자격 증명 허용 시
+                .allowedOrigins("http://localhost:5173") // 또는 .allowedOriginPatterns("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowCredentials(true); // 쿠키 등 자격 증명 허용 시
         }
 }

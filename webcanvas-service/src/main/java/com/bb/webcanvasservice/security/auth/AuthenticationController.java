@@ -39,7 +39,7 @@ public class AuthenticationController {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(securityProperties.refreshTokenExpirationSeconds())
-                .sameSite("None")
+                .sameSite("Lax")
                 .build();
     }
 
