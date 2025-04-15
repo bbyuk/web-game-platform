@@ -121,4 +121,26 @@ class GameRoomRepositoryTest {
         // then
         Assertions.assertThat(enterableGameRooms.size()).isEqualTo(3);
     }
+
+    @Test
+    @DisplayName("JoinCode로 입장할 방 조회 - GameRoom.state = 'WAITING' 이어야 한다.")
+    void testSelectEnterableGameRoomWithJoinCode() throws Exception {
+        // given
+        List<GameRoom> gameRooms = List.of(
+                new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
+                new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
+                new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
+                new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
+                new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
+                new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
+                new GameRoom(GameRoomState.CLOSED, JoinCodeGenerator.generate(gameProperties.joinCodeLength()))
+        );
+
+        gameRoomRepository.saveAll(gameRooms);
+        // when
+        List<GameRoom> enterableGameRooms = gameRoomRepository.findEnterableGameRooms(gameProperties.gameRoomCapacity(), List.of(GameRoomState.WAITING));
+
+        // then
+        Assertions.assertThat(enterableGameRooms).hasSize(4);
+    }
 }

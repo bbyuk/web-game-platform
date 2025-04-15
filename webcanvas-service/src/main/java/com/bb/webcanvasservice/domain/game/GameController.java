@@ -82,7 +82,6 @@ public class GameController {
      *
      * 요청을 보낸 유저를 대상 게임 방에 입장시킨다.
      *
-     * TODO 개발 진행중
      * @param joinCode
      * @param authentication
      * @return

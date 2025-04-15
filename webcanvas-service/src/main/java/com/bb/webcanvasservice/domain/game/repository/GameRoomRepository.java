@@ -89,7 +89,6 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
      * JoinCode로 입장할 방 조회
      * GameRoom.state = 'WAITING' 이어야 한다.
      * 
-     * TODO - 테스트코드 작성 필요
      * @param joinCode
      * @return
      */
