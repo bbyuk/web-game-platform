@@ -6,17 +6,14 @@ const refreshTokenKey = "refreshToken";
 
 export function AuthProvider({ children }) {
   const [accessToken, setAccessToken] = useState(null);
-  const [refreshToken, setRefreshToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // 앱 시작 시 localStorage에서 JWT 복원
 
     const storedAccessToken = localStorage.getItem(accessTokenKey);
-    const storedRefreshToken = localStorage.getItem(refreshTokenKey);
 
     if (storedAccessToken) setAccessToken(storedAccessToken);
-    if (storedRefreshToken) setRefreshToken(storedRefreshToken);
 
     setLoading(false);
   }, []);
@@ -26,7 +23,6 @@ export function AuthProvider({ children }) {
     localStorage.setItem(refreshTokenKey, refreshToken);
 
     setAccessToken(accessToken);
-    setRefreshToken(refreshToken);
   };
 
   const logout = () => {
@@ -34,14 +30,12 @@ export function AuthProvider({ children }) {
     localStorage.removeItem(refreshTokenKey);
 
     setAccessToken(null);
-    setRefreshToken(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
         accessToken,
-        refreshToken,
         login,
         logout,
         isAuthenticated: !!accessToken,

@@ -2,7 +2,7 @@ import Canvas from "@/components/canvas";
 import { useEffect, useState } from "react";
 import GameRoomList from "@/components/game-room-list";
 import { useApiLock } from "@/api/lock";
-import { get, post } from "@/api";
+import { get, post } from "@/utils/request";
 
 export default function CanvasTest() {
   /**

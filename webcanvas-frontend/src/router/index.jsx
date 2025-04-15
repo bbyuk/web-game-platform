@@ -4,8 +4,9 @@ import { Navigate } from "react-router-dom";
 
 export const publicRoutes = [
   { path: "/", element: <MainPage /> },
-  { path: "/test", element: <CanvasTest /> },
   { path: "*", element: <Navigate to="/" replace /> },
 ];
 
-export const privateRoutes = [];
+export const privateRoutes = [
+  { path: "/test", element: <CanvasTest /> },
+];
