@@ -1,10 +1,13 @@
-import Canvas from "@/components/canvas";
-import { useEffect, useState } from "react";
-import GameRoomList from "@/components/game-room-list";
-import { useApiLock } from "@/api/lock";
-import { get, post } from "@/utils/request";
+import Canvas from '@/components/canvas';
+import { useEffect, useState } from 'react';
+import GameRoomList from '@/components/game-room-list';
+import { useApiLock } from '@/api/lock';
+import { useApplicationContext } from '@/contexts/application/index.jsx';
+import { auth, game } from '@/api/index.js';
 
 export default function CanvasTest() {
+  const { api } = useApplicationContext();
+
   /**
    * API 중복 호출을 막는 락 커스텀 hook
    */
@@ -13,7 +16,6 @@ export default function CanvasTest() {
 
   const [strokes, setStrokes] = useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
-  const apiUrl = import.meta.env.VITE_WEB_CANVAS_SERVICE;
 
   /**
    * 게임방 생성 및 입장 API 응답값
@@ -91,8 +93,8 @@ export default function CanvasTest() {
       fingerprint: savedFingerprint ? savedFingerprint : "",
     };
 
-    const { fingerprint, accessToken, refreshToken } = await post(
-      `${apiUrl}/auth/login`,
+    const { fingerprint, accessToken, refreshToken } = await api.post(
+      auth.login,
       requestData,
       {
         credentials: "include"
@@ -113,9 +115,7 @@ export default function CanvasTest() {
    * @returns {Promise<void>}
    */
   const enterGameRoom = async (targetGameRoomId) => {
-    const { gameRoomId, gameRoomEntranceId } = await post(
-      `${apiUrl}/game/canvas/room/${targetGameRoomId}/entrance`
-    );
+    const { gameRoomId, gameRoomEntranceId } = await api.post(game.enterGameRoom(targetGameRoomId));
 
     alert("게임 방 입장 성공!");
     // 게임 방 캔버스 웹 소켓 구독처리
@@ -126,7 +126,7 @@ export default function CanvasTest() {
    * @returns {Promise<boolean>}
    */
   const createGameRoom = async () => {
-    const { gameRoomId, gameRoomEntranceId } = await post(`${apiUrl}/game/canvas/room`);
+    const { gameRoomId, gameRoomEntranceId } = await api.post(game.createGameRoom);
 
     setGameRoomEntranceId(gameRoomEntranceId);
     setEnteredGameRoomId(gameRoomId);
@@ -139,32 +139,20 @@ export default function CanvasTest() {
    * @returns {Promise<void>}
    */
   const getEnterableGameRooms = async () => {
-    const { roomList } = await get(`${apiUrl}/game/canvas/room`);
+    const { roomList } = await api.get(game.getEnterableRooms);
 
     setEnterableGameRoomList(roomList);
   };
 
   /**
-   * useEffect hook
-   */
-  useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-
-    if (accessToken) {
-      setLoggedIn(true);
-    }
-  }, []);
-
-  /**
    * 로그인 되었을 시 처리
    */
   useEffect(() => {
-    if (!loggedIn) {
-      return;
-    }
-
-    apiLock("get-enterable-game-room", getEnterableGameRooms);
-  }, [loggedIn]);
+    apiLock("get-enterable-game-room", getEnterableGameRooms)
+      .then(response => {
+        console.log(response);
+      });
+  }, []);
 
   return (
     <div>

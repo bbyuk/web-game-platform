@@ -1,11 +1,10 @@
-import { useAuthentication } from "@/contexts/authentication/index.jsx";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet } from 'react-router-dom';
+import { useApplicationContext } from '@/contexts/application/index.jsx';
 
 export default function ProtectedRoute() {
-  const { isAuthenticated, loading } = useAuthentication();
+  const { authentication } = useApplicationContext();
 
-  if (loading) return <div>로딩 중...</div>;
-  if (!isAuthenticated) return <Navigate to={"/login"} replace />;
+  if (!authentication.isAuthenticated) return <Navigate to={"/login"} replace />;
 
   return <Outlet />;
 }
