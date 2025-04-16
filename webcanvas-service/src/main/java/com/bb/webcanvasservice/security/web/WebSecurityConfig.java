@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.security.web;
 
+import com.bb.webcanvasservice.security.SecurityProperties;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -34,6 +36,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final ObjectMapper objectMapper;
     private final JwtManager jwtManager;
     private final WebAuthenticationArgumentResolver webAuthenticationArgumentResolver;
+    private final SecurityProperties securityProperties;
 
     private final List<String> whiteList = List.of("/auth/login");
 
@@ -60,9 +63,12 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 )
                 .sessionManagement(configurer -> configurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // TODO 인증 프로세스 개발이 완료되기 전까지 모든 요청 permitAll
                 .authorizeHttpRequests(configurer -> configurer
-                        .anyRequest().permitAll()
+                        .requestMatchers(securityProperties.whiteList()
+                                .stream()
+                                .map(AntPathRequestMatcher::new)
+                                .toArray(AntPathRequestMatcher[]::new)).permitAll()
+                        .anyRequest().denyAll()
                 )
                 .exceptionHandling(
                         configurer -> configurer

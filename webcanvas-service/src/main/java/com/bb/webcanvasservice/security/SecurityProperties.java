@@ -2,13 +2,16 @@ package com.bb.webcanvasservice.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * security 및 인증 관련 주입 설정 클래스
  * @param accessTokenExpiration
  * @param refreshTokenExpiration
  * @param refreshTokenReissueThreshold
  */
-@ConfigurationProperties
+@ConfigurationProperties(prefix = "application.security")
 public record SecurityProperties(
         /**
          * Access Token 만료시간
@@ -26,12 +29,14 @@ public record SecurityProperties(
          * refreshTokenReissueThreshold보다 작을 경우 Refresh Token 재발급 및 rotate
          * 3일 (72시간) (ms)
          */
-        long refreshTokenReissueThreshold
+        long refreshTokenReissueThreshold,
+        List<String> whiteList
 ) {
     public SecurityProperties {
         if (accessTokenExpiration == 0) accessTokenExpiration = 900;
         if (refreshTokenExpiration == 0) refreshTokenExpiration = 1209600;
         if (refreshTokenReissueThreshold == 0) refreshTokenReissueThreshold = 259200;
+        if (whiteList == null) whiteList = new ArrayList<>();
     }
 
     public long accessTokenExpiration() {
