@@ -2,13 +2,13 @@ import { Route, Routes } from "react-router-dom";
 import { publicRoutes, privateRoutes } from "@/router";
 import ProtectedRoute from "@/router/protected/index.jsx";
 import { useEffect } from 'react';
-import { useAuth } from '@/contexts/auth/index.jsx';
+import { useAuthentication } from '@/contexts/authentication/index.jsx';
 import { post } from '@/utils/request.js';
 import { auth } from '@/api/index.js';
 
 function App() {
   const routeMapping = ({ path, element }) => <Route key={path} path={path} element={element} />;
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthentication();
 
   useEffect(() => {
     if (!isAuthenticated) {
