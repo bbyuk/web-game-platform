@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.security.web;
 
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -20,7 +23,7 @@ import java.util.List;
 
 /**
  * Spring Security, Spring Security Messaging 설정 클래스
- *
+ * <p>
  * Authentication 객체 공통 처리를 위한 ArgumentResolver 추가를 위해 WebMvcConfigurer implements 하도록 설정 (25.04.03)
  */
 @Configuration
@@ -36,6 +39,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     /**
      * 웹 http 요청의 인증 처리를 위한 SecurityFilterChain 설정
+     *
      * @param http
      * @return
      * @throws Exception
@@ -44,8 +48,16 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                // TODO 인증 프로세스 개발이 완료되기 전까지 cors disable
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(configurer ->
+                        configurer.configurationSource(request -> {
+                            var config = new org.springframework.web.cors.CorsConfiguration();
+                            config.setAllowedOrigins(List.of("http://localhost:5173"));
+                            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                            config.setAllowedHeaders(List.of("*"));
+                            config.setAllowCredentials(true); // 쿠키 등 인증정보 포함 허용
+                            return config;
+                        })
+                )
                 .sessionManagement(configurer -> configurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // TODO 인증 프로세스 개발이 완료되기 전까지 모든 요청 permitAll
@@ -67,22 +79,11 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     /**
      * 커스텀 Argument Resolver 등록.
      * Web 핸들러에서 Custom Authentication 객체(WebCanvasAuthentication)를 주입받을 수 있도록 설정.
+     *
      * @param resolvers
      */
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(webAuthenticationArgumentResolver);
     }
-
-    /**
-     * WebMvcConfigurer의 Cors 매핑 열기
-     * @param registry
-     */
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // 모든 경로에 대해
-                .allowedOrigins("http://localhost:5173") // 또는 .allowedOriginPatterns("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowCredentials(true); // 쿠키 등 자격 증명 허용 시
-        }
 }
