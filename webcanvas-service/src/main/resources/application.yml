@@ -48,7 +48,7 @@ application:
   security:
     ## 단위 초 (s)
     # 15분 (15 * 60)
-    access-token-expiration: 10
+    access-token-expiration: 900
     # 14일 (14 * 24 * 60 * 60)
     refresh-token-expiration: 1209600
     # 3일 (3 * 24 * 60 * 60)
