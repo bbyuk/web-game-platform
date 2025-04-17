@@ -70,15 +70,26 @@ export function ApplicationContextProvider({ children }) {
           /**
            * 토큰 refresh
            */
-          const { accessToken, fingerprint } = await api.post(auth.refresh, {}, {
-            credentials: "include"
-          });
-          authentication.saveAuthentication({accessToken, fingerprint});
+          const accessToken = await api.tokenRefresh();
+
+          if (!accessToken) {
+            /**
+             * 인증 실패 -> 토큰 만료시 refresh 시도 -> refresh마저 실패시 unauthorized handling
+             */
+            authentication.handleUnauthorized();
+            return;
+          }
 
           /**
            * API 재요청
            */
           return request(method, url, data, options, accessToken);
+        }
+        else {
+          /**
+           * TODO alert modal로 변경
+           */
+          alert(error.message);
         }
       });
   };
@@ -88,6 +99,40 @@ export function ApplicationContextProvider({ children }) {
     },
     post: async (url, data = {}, options = {}) => {
       return request("POST", url, data, options);
+    },
+    tokenRefresh: async () => {
+      const processedUrl = `${api.constants.serverDomain}${auth.refresh}`;
+      const options = {
+        credentials: "include"
+      };
+      const fetchOption = {
+        method: "POST",
+        ...options,
+        headers: api.constants.defaultHeaders,
+      }
+
+      return fetch(processedUrl, fetchOption)
+        .then(async (response) => {
+          if (!response.ok) {
+            const error = await response.json();
+
+            throw {
+              status: response.status,
+              ...error
+            };
+          }
+          /**
+           * refresh 성공
+           */
+          const { accessToken, fingerprint } = await response.json();
+          authentication.saveAuthentication({accessToken, fingerprint});
+
+          return accessToken;
+        })
+        .catch(error => {
+          alert(error.message);
+          return null;
+        });
     },
     constants: {
       serverDomain:  import.meta.env.VITE_WEB_CANVAS_SERVICE,
