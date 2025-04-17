@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.security.web;
 
+import com.bb.webcanvasservice.security.SecurityProperties;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
 import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -22,21 +24,26 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtManager jwtManager;
+    private final SecurityProperties securityProperties;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = jwtManager.resolveToken(request);
 
-        try {
-            jwtManager.validateToken(token);
-            Long userId = jwtManager.getUserIdFromToken(token);
+        jwtManager.validateToken(token);
+        Long userId = jwtManager.getUserIdFromToken(token);
 
-            SecurityContextHolder.getContext().setAuthentication(new WebCanvasAuthentication(userId));
-        }
-        catch (ApplicationAuthenticationException e) {
-            log.debug(e.getMessage());
-        }
+        SecurityContextHolder.getContext().setAuthentication(new WebCanvasAuthentication(userId));
 
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return securityProperties
+                .whiteList()
+                .stream()
+                .map(AntPathRequestMatcher::new)
+                .anyMatch(antPathRequestMatcher -> antPathRequestMatcher.matches(request));
     }
 }

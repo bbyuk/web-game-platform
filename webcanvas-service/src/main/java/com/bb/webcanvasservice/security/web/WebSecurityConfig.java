@@ -68,7 +68,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                 .stream()
                                 .map(AntPathRequestMatcher::new)
                                 .toArray(AntPathRequestMatcher[]::new)).permitAll()
-                        .anyRequest().denyAll()
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(
                         configurer -> configurer
@@ -77,7 +77,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                 // 인가 실패에 대한 공통 예외 처리
                                 .accessDeniedHandler(new WebAccessDeniedHandler(objectMapper))
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtManager), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtManager, securityProperties), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
