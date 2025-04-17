@@ -1,6 +1,6 @@
-import { Route, Routes } from 'react-router-dom';
-import { privateRoutes, publicRoutes } from '@/router';
-import ProtectedRoute from '@/router/protected/index.jsx';
+import { Route, Routes } from "react-router-dom";
+import { privateRoutes, publicRoutes } from "@/router";
+import ProtectedRoute from "@/router/protected/index.jsx";
 
 function App() {
   const routeMapping = ({ path, element }) => <Route key={path} path={path} element={element} />;

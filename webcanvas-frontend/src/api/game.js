@@ -10,5 +10,5 @@ export const game = {
   // 입장 코드로 게임 방 입장
   enterGameRoomWithJoinCode: (joinCode) => `${BASE}/room/${joinCode}/entrance`,
   // 현재 입장한 게임 방 조회
-  getCurrentEnteredGameRoom: `${BASE}/room/entrance`
+  getCurrentEnteredGameRoom: `${BASE}/room/entrance`,
 };

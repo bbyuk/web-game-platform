@@ -7,6 +7,4 @@ export const publicRoutes = [
   { path: "*", element: <Navigate to="/" replace /> },
 ];
 
-export const privateRoutes = [
-  { path: "/test", element: <CanvasTest /> },
-];
+export const privateRoutes = [{ path: "/test", element: <CanvasTest /> }];

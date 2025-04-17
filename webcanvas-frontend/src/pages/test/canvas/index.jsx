@@ -1,9 +1,9 @@
-import Canvas from '@/components/canvas';
-import { useEffect, useState } from 'react';
-import GameRoomList from '@/components/game-room-list';
-import { useApiLock } from '@/api/lock';
-import { useApplicationContext } from '@/contexts/application/index.jsx';
-import { auth, game } from '@/api/index.js';
+import Canvas from "@/components/canvas";
+import { useEffect, useState } from "react";
+import GameRoomList from "@/components/game-room-list";
+import { useApiLock } from "@/api/lock";
+import { useApplicationContext } from "@/contexts/application/index.jsx";
+import { auth, game } from "@/api/index.js";
 
 export default function CanvasTest() {
   const { api } = useApplicationContext();
@@ -93,13 +93,9 @@ export default function CanvasTest() {
       fingerprint: savedFingerprint ? savedFingerprint : "",
     };
 
-    const { fingerprint, accessToken, refreshToken } = await api.post(
-      auth.login,
-      requestData,
-      {
-        credentials: "include"
-      }
-    );
+    const { fingerprint, accessToken, refreshToken } = await api.post(auth.login, requestData, {
+      credentials: "include",
+    });
 
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
@@ -148,10 +144,9 @@ export default function CanvasTest() {
    * 로그인 되었을 시 처리
    */
   useEffect(() => {
-    apiLock("get-enterable-game-room", getEnterableGameRooms)
-      .then(response => {
-        console.log(response);
-      });
+    apiLock("get-enterable-game-room", getEnterableGameRooms).then((response) => {
+      console.log(response);
+    });
   }, []);
 
   return (

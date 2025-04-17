@@ -1,14 +1,12 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from '@/api/index.js';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useContext, useEffect, useState } from "react";
+import { auth } from "@/api/index.js";
+import { useNavigate } from "react-router-dom";
 
 const ApplicationContext = createContext(null);
 
 export function ApplicationContextProvider({ children }) {
-
   const navigate = useNavigate();
   const [savedAccessToken, setSavedAccessToken] = useState(localStorage.getItem("accessToken"));
-
 
   /**
    * constant with hook
@@ -84,8 +82,7 @@ export function ApplicationContextProvider({ children }) {
            * API 재요청
            */
           return request(method, url, data, options, accessToken);
-        }
-        else {
+        } else {
           /**
            * TODO alert modal로 변경
            */
@@ -103,13 +100,13 @@ export function ApplicationContextProvider({ children }) {
     tokenRefresh: async () => {
       const processedUrl = `${api.constants.serverDomain}${auth.refresh}`;
       const options = {
-        credentials: "include"
+        credentials: "include",
       };
       const fetchOption = {
         method: "POST",
         ...options,
         headers: api.constants.defaultHeaders,
-      }
+      };
 
       return fetch(processedUrl, fetchOption)
         .then(async (response) => {
@@ -118,34 +115,34 @@ export function ApplicationContextProvider({ children }) {
 
             throw {
               status: response.status,
-              ...error
+              ...error,
             };
           }
           /**
            * refresh 성공
            */
           const { accessToken, fingerprint } = await response.json();
-          authentication.saveAuthentication({accessToken, fingerprint});
+          authentication.saveAuthentication({ accessToken, fingerprint });
 
           return accessToken;
         })
-        .catch(error => {
+        .catch((error) => {
           alert(error.message);
           return null;
         });
     },
     constants: {
-      serverDomain:  import.meta.env.VITE_WEB_CANVAS_SERVICE,
+      serverDomain: import.meta.env.VITE_WEB_CANVAS_SERVICE,
       defaultHeaders: {
         "Content-Type": "application/json",
-      }
+      },
     },
     utils: {
       buildUrlWithParams: (url, params = {}) => {
         const query = new URLSearchParams(params).toString();
         return query ? `${url}?${query}` : url;
-      }
-    }
+      },
+    },
   };
   const authentication = {
     /**
@@ -166,9 +163,9 @@ export function ApplicationContextProvider({ children }) {
       localStorage.removeItem("accessToken");
       setSavedAccessToken(null);
 
-      navigate("/", { replace : true });
+      navigate("/", { replace: true });
     },
-    isAuthenticated: !!savedAccessToken
+    isAuthenticated: !!savedAccessToken,
   };
 
   useEffect(() => {
@@ -177,18 +174,27 @@ export function ApplicationContextProvider({ children }) {
        * 앱 진입 후 authenticated 상태가 아니면 자동 로그인 요청
        */
       const fingerprint = localStorage.getItem("fingerprint");
-      api.post(auth.login, {
-        fingerprint: fingerprint
-      }, {
-        credentials: "include"
-      })
-        .then( (response = {
-          accessToken: String,
-          fingerprint: String
-        }) => {
-          authentication.saveAuthentication(response);
-        })
-        .catch(error => {
+      api
+        .post(
+          auth.login,
+          {
+            fingerprint: fingerprint,
+          },
+          {
+            credentials: "include",
+          }
+        )
+        .then(
+          (
+            response = {
+              accessToken: String,
+              fingerprint: String,
+            }
+          ) => {
+            authentication.saveAuthentication(response);
+          }
+        )
+        .catch((error) => {
           console.log(error);
         });
     }
@@ -198,7 +204,7 @@ export function ApplicationContextProvider({ children }) {
     <ApplicationContext.Provider
       value={{
         api,
-        authentication
+        authentication,
       }}
     >
       {children}
