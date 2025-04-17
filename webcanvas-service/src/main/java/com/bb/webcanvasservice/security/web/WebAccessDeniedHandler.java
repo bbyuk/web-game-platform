@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
  * Spring Security Web 인가 실패에 대한 공통 처리
  */
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class WebAccessDeniedHandler implements AccessDeniedHandler {
 

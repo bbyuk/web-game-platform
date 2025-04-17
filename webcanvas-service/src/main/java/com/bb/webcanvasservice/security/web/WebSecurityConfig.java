@@ -2,8 +2,8 @@ package com.bb.webcanvasservice.security.web;
 
 import com.bb.webcanvasservice.security.SecurityProperties;
 import com.bb.webcanvasservice.security.auth.JwtManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
+import com.bb.webcanvasservice.security.filter.ApplicationSecurityExceptionHandlingFilter;
+import com.bb.webcanvasservice.security.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,10 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -33,10 +30,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSecurityConfig implements WebMvcConfigurer {
 
-    private final ObjectMapper objectMapper;
     private final JwtManager jwtManager;
     private final WebAuthenticationArgumentResolver webAuthenticationArgumentResolver;
     private final SecurityProperties securityProperties;
+    private final WebAuthenticationEntryPoint authenticationEntryPoint;
+    private final WebAccessDeniedHandler accessDeniedHandler;
 
     private final List<String> whiteList = List.of("/auth/login");
 
@@ -73,11 +71,12 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .exceptionHandling(
                         configurer -> configurer
                                 // 인증 실패에 대한 공통 예외 처리
-                                .authenticationEntryPoint(new WebAuthenticationEntryPoint(objectMapper))
+                                .authenticationEntryPoint(authenticationEntryPoint)
                                 // 인가 실패에 대한 공통 예외 처리
-                                .accessDeniedHandler(new WebAccessDeniedHandler(objectMapper))
+                                .accessDeniedHandler(accessDeniedHandler)
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtManager, securityProperties), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new ApplicationSecurityExceptionHandlingFilter(authenticationEntryPoint), JwtAuthenticationFilter.class)
                 .build();
     }
 
