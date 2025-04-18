@@ -46,23 +46,32 @@ export default function EditorArea() {
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-800">
-      {/* 파일 탭 */}
-      <FileTabContainer>
-        {tabs.map((tab, index) => (
-          <FileTab key={`tab-${index}`} description={tab.description} name={tab.name} />
-        ))}
-      </FileTabContainer>
-      {/* 코드 캔버스 */}
-      <CanvasContainer>
-        <Canvas
-          strokes={strokes}
-          onStroke={onStrokeHandler}
-          reRenderingSignal={reRenderingSignal}
-          afterReRendering={() => setReRenderingSignal(false)}
-          color={"green"}
-        />
-      </CanvasContainer>
+    <div className="flex flex-col flex-1 bg-gray-800 border-r border-gray-700 overflow-hidden">
+      {/* 상단 탭 */}
+      <div className="flex border-b border-gray-700 bg-gray-800">
+        <div className="px-4 py-2 bg-gray-900 text-white border-r border-gray-700">
+          index.js
+        </div>
+        <div className="px-4 py-2 bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 border-r border-gray-700 cursor-pointer">
+          App.jsx
+        </div>
+        <div className="px-4 py-2 bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 cursor-pointer">
+          styles.css
+        </div>
+      </div>
+
+      {/* 캔버스 영역 (고정 사이즈) */}
+      <div className="flex justify-center items-center flex-1 bg-gray-800 relative">
+        <div
+          className="bg-white rounded shadow-lg"
+          style={{
+            width: '800px',  // 고정 크기
+            height: '600px', // 고정 크기 (4:3 비율)
+          }}
+        >
+          <canvas id="main-canvas" className="w-full h-full"></canvas>
+        </div>
+      </div>
     </div>
   );
 }
