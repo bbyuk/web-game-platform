@@ -21,7 +21,7 @@ const FileTab = ({ description, name }) => {
 const CanvasContainer = ({ children }) => {
   return (
     <div className="flex-1 p-4 overflow-auto">
-      <div className="w-full h-full bg-gray-100 rounded-lg p-6">{children}</div>
+      <div className="w-full h-full bg-gray-100 rounded-lg">{children}</div>
     </div>
   );
 };

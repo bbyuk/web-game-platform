@@ -4,25 +4,35 @@ export default function Canvas({
   strokes = [],
   onStroke = (stroke) => {},
   color = "black",
-  width = 1000,
-  height = 700,
   reRenderingSignal = false,
   afterReRendering = () => {},
 }) {
   const elementId = "canvas";
+  /**
+   * canvas ref
+   * @type {React.RefObject<null>}
+   */
   const canvasRef = useRef(null);
-  const [canvasContext, setCanvasContext] = useState(null);
+
+  /**
+   * 현재 마우스를 누르고 그리고 있는 중인지 여부
+   */
   const [painting, setPainting] = useState(false);
+  /**
+   * Stroke 이벤트마다 집계되는 stroke 획 state
+   */
   const [currentStroke, setCurrentStroke] = useState([]);
 
-  const startPainting = () => {
-    setPainting(true);
-  };
-  const stopPainting = () => {
-    setPainting(false);
-  };
+  /**
+   * ====================================== 이벤트 핸들러 ======================================
+   */
+  /**
+   * 마우스 이동 이벤트 핸들러
+   * @param event
+   */
   const onMouseMove = (event) => {
-    if (!canvasContext) {
+    const ctx = getCanvasContext();
+    if (!ctx) {
       return;
     }
 
@@ -31,107 +41,165 @@ export default function Canvas({
     const offsetY = event.clientY - rect.top;
 
     if (painting) {
-      canvasContext.lineTo(offsetX, offsetY);
-      canvasContext.stroke();
+      ctx.lineTo(offsetX, offsetY);
+      ctx.stroke();
       setCurrentStroke((prevItems) => [
         ...prevItems,
         { x: Math.round(offsetX), y: Math.round(offsetY) },
       ]);
     } else {
-      canvasContext.beginPath();
-      canvasContext.moveTo(offsetX, offsetY);
+      ctx.beginPath();
+      ctx.moveTo(offsetX, offsetY);
 
       onStroke(currentStroke);
       setCurrentStroke([]);
     }
   };
+  /**
+   * ====================================== 이벤트 핸들러 ======================================
+   */
 
-  useEffect(() => {
+
+  /**
+   * ====================================== 커스텀 메소드 ======================================
+   */
+
+  /**
+   * stroke scale 처리
+   * @param originalStrokes
+   * @param oldWidth
+   * @param oldHeight
+   * @param newWidth
+   * @param newHeight
+   * @returns {*}
+   */
+  const scaleStrokes = (originalStrokes, oldWidth, oldHeight, newWidth, newHeight) => {
+    return originalStrokes.map(stroke =>
+      stroke.map(point => ({
+        x: point.x  * (newWidth / oldWidth),
+        y: point.y * (newHeight / oldWidth),
+      }))
+    );
+  };
+
+
+  /**
+   * canvas context 리턴
+   */
+  const getCanvasContext = () => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    return canvas.getContext("2d");;
+  }
 
-    // 부모 크기 측정 및 캔버스 resize
-    const resizeCanvas = () => {
-      const parent = canvas.parentElement;
-      const { clientWidth, clientHeight } = parent;
 
-      // 실제 캔버스 내부 크기 설정 (픽셀 크기)
-      canvas.width = clientWidth;
-      canvas.height = clientHeight;
+  /**
+   * 캔버스 rerendering
+   */
+  const reRendering = () => {
+    const ctx = getCanvasContext();
+    if (!ctx) {
+      return;
+    }
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-      // 보이는 크기는 CSS로 100% 고정
-      canvas.style.width = "100%";
-      canvas.style.height = "100%";
+    strokes.forEach((stroke) => {
+      if (stroke.length === 0) {
+        return;
+      }
+      stroke.forEach((point, index) => {
+        if (index > 0) {
+          ctx.lineTo(point.x, point.y);
+          ctx.stroke();
+        }
 
-      // if (canvasContext) {
-      //   canvasContext.lineWidth = 5;
-      //   canvasContext.lineCap = "round";
-      // }
-      // else {
-      //   ctx.lineWidth = 5;
-      //   ctx.lineCap = "round";
-      // }
-    };
+        ctx.beginPath();
+        ctx.moveTo(point.x, point.y);
+      });
+    });
+  };
 
-    resizeCanvas();
+  /**
+   * canvas 반응형 resize
+   */
+  const resize = () => {
+    const parent = canvas.parentElement;
+    const ctx = getCanvasContext();
+
+    const { clientWidth, clientHeight } = parent;
+
+    const oldWidth = canvas.width;
+    const oldHeight = canvas.height;
+
+    // 실제 캔버스 내부 크기 설정 (픽셀 크기)
+    canvas.width = clientWidth;
+    canvas.height = clientHeight;
+
+    // 보이는 크기는 CSS로 100% 고정
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+
     ctx.lineWidth = 5;
     ctx.lineCap = "round";
+    ctx.strokeStyle = color;
+
+    scaleStrokes(strokes, oldWidth, oldHeight, canvas.width, canvas.height);
+
+    reRendering();
+  };
+
+  /**
+   * 화면에 그림 그리기 시작 (마우스 클릭 시작)
+   */
+  const startPainting = () => {
+    setPainting(true);
+  };
+  /**
+   * 화면에 그림 그리기 종료 (마우스 클릭 종료)
+   */
+  const stopPainting = () => {
+    setPainting(false);
+  };
+
+  /**
+   * ====================================== 커스텀 메소드 ======================================
+   */
+
+
+
+  useEffect(() => {
+    resize();
 
     /**
-     * 윈도우 리사이즈시 캔ㅂ스도 함께 리사이즈
+     * 윈도우 리사이즈시 캔버스도 함께 리사이즈
      */
-    window.addEventListener("resize", resizeCanvas);
-
-    setCanvasContext(ctx);
+    window.addEventListener("resize", resize);
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas);
+      window.removeEventListener("resize", resize);
     };
   }, []);
   useEffect(() => {
-    if (!canvasContext) {
+    if (!getCanvasContext()) {
       return;
     }
-
-    const reRendering = () => {
-      if (!canvasContext) {
-        return;
-      }
-      canvasContext.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-      strokes.forEach((stroke) => {
-        if (stroke.length === 0) {
-          return;
-        }
-        stroke.forEach((point, index) => {
-          if (index > 0) {
-            canvasContext.lineTo(point.x, point.y);
-            canvasContext.stroke();
-          }
-
-          canvasContext.beginPath();
-          canvasContext.moveTo(point.x, point.y);
-        });
-      });
-    };
 
     if (reRenderingSignal) {
       reRendering();
       afterReRendering();
     }
-  }, [canvasContext, reRenderingSignal, afterReRendering]);
+  }, [reRenderingSignal, afterReRendering]);
   useEffect(() => {
-    if (canvasContext) {
-      canvasContext.strokeStyle = color;
+    const ctx = getCanvasContext();
+    if (ctx) {
+      ctx.strokeStyle = color;
     }
-  }, [canvasContext, color]);
+  }, [color]);
 
   return (
     <>
       <canvas
         id={elementId}
         ref={canvasRef}
-        style={{ border: "solid 1px black" }}
         onMouseMove={(e) => onMouseMove(e)}
         onMouseDown={startPainting}
         onMouseUp={stopPainting}
