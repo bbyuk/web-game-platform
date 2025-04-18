@@ -22,6 +22,10 @@ export default function Canvas({
    * Stroke 이벤트마다 집계되는 stroke 획 state
    */
   const [currentStroke, setCurrentStroke] = useState([]);
+  /**
+   * 화면에 그려질 scaled strokes
+   */
+  const [scaledStrokes, setScaledStrokes] = useState(strokes);
 
   /**
    * ====================================== 이벤트 핸들러 ======================================
@@ -75,10 +79,14 @@ export default function Canvas({
    */
   const scaleStrokes = (originalStrokes, oldWidth, oldHeight, newWidth, newHeight) => {
     return originalStrokes.map(stroke =>
-      stroke.map(point => ({
-        x: point.x  * (newWidth / oldWidth),
-        y: point.y * (newHeight / oldWidth),
-      }))
+      stroke.map(point => {
+        console.log(`width : ${oldWidth} => ${newWidth}`)
+        console.log(`x : ${point.x} => ${point.x * (newWidth / oldWidth)}`);
+        return {
+          x: point.x * (newWidth / oldWidth),
+          y: point.y * (newHeight / oldWidth),
+        };
+      })
     );
   };
 
@@ -102,7 +110,7 @@ export default function Canvas({
     }
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-    strokes.forEach((stroke) => {
+    scaledStrokes.forEach((stroke) => {
       if (stroke.length === 0) {
         return;
       }
@@ -122,7 +130,9 @@ export default function Canvas({
    * canvas 반응형 resize
    */
   const resize = () => {
+    const canvas = canvasRef.current;
     const parent = canvas.parentElement;
+
     const ctx = getCanvasContext();
 
     const { clientWidth, clientHeight } = parent;
@@ -142,8 +152,7 @@ export default function Canvas({
     ctx.lineCap = "round";
     ctx.strokeStyle = color;
 
-    scaleStrokes(strokes, oldWidth, oldHeight, canvas.width, canvas.height);
-
+    setScaledStrokes(scaleStrokes(strokes, oldWidth, oldHeight, canvas.width, canvas.height));
     reRendering();
   };
 
@@ -194,10 +203,15 @@ export default function Canvas({
       ctx.strokeStyle = color;
     }
   }, [color]);
+  useEffect(() => {
+    console.log("rerender");
+    reRendering();
+  }, [scaledStrokes]);
 
   return (
-    <>
+    <div className="relative w-full h-auto" style={{ aspectRatio: '4 / 3' }}>
       <canvas
+        className="absolute top-0 left-0 w-full h-full"
         id={elementId}
         ref={canvasRef}
         onMouseMove={(e) => onMouseMove(e)}
@@ -205,6 +219,6 @@ export default function Canvas({
         onMouseUp={stopPainting}
         onMouseLeave={stopPainting}
       />
-    </>
+    </div>
   );
 }
