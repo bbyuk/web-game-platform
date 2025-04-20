@@ -6,7 +6,7 @@ export default function Canvas({
   color = "black",
   reRenderingSignal = false,
   afterReRendering = () => {},
-  className = String,
+  className = new String(),
 }) {
   const elementId = "canvas";
   /**
@@ -86,15 +86,14 @@ export default function Canvas({
       if (stroke.length === 0) {
         return;
       }
-      stroke.forEach((point, index) => {
-        if (index > 0) {
-          ctx.lineTo(point.x, point.y);
-          ctx.stroke();
-        }
+      ctx.beginPath();
+      ctx.moveTo(stroke[0].x, stroke[0].y);
 
-        ctx.beginPath();
-        ctx.moveTo(point.x, point.y);
-      });
+      for (let i = 1; i < stroke.length; i++) {
+        ctx.lineTo(stroke[i].x, stroke[i].y);
+      }
+
+      ctx.stroke();
     });
   };
 

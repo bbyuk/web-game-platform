@@ -27,7 +27,7 @@ const CanvasContainer = ({ children }) => {
         className="bg-white rounded shadow-lg"
         style={{
           width: "800px", // 고정 크기
-          height: "600px", // 고정 크기 (4:3 비율)
+          height: "360px", // 고정 크기 (16:9 비율)
         }}
       >
         {children}
