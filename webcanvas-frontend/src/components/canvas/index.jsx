@@ -23,10 +23,6 @@ export default function Canvas({
    * Stroke 이벤트마다 집계되는 stroke 획 state
    */
   const [currentStroke, setCurrentStroke] = useState([]);
-  /**
-   * 화면에 그려질 scaled strokes
-   */
-  const [scaledStrokes, setScaledStrokes] = useState(strokes);
 
   /**
    * ====================================== 이벤트 핸들러 ======================================
@@ -69,28 +65,6 @@ export default function Canvas({
    */
 
   /**
-   * stroke scale 처리
-   * @param originalStrokes
-   * @param oldWidth
-   * @param oldHeight
-   * @param newWidth
-   * @param newHeight
-   * @returns {*}
-   */
-  const scaleStrokes = (originalStrokes, oldWidth, oldHeight, newWidth, newHeight) => {
-    return originalStrokes.map((stroke) =>
-      stroke.map((point) => {
-        console.log(`width : ${oldWidth} => ${newWidth}`);
-        console.log(`x : ${point.x} => ${point.x * (newWidth / oldWidth)}`);
-        return {
-          x: point.x * (newWidth / oldWidth),
-          y: point.y * (newHeight / oldWidth),
-        };
-      })
-    );
-  };
-
-  /**
    * canvas context 리턴
    */
   const getCanvasContext = () => {
@@ -99,7 +73,7 @@ export default function Canvas({
   };
 
   /**
-   * 캔버스 rerendering
+   * 캔버스 reRendering
    */
   const reRendering = () => {
     const ctx = getCanvasContext();
@@ -108,7 +82,7 @@ export default function Canvas({
     }
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-    scaledStrokes.forEach((stroke) => {
+    strokes.forEach((stroke) => {
       if (stroke.length === 0) {
         return;
       }
@@ -135,9 +109,6 @@ export default function Canvas({
 
     const { clientWidth, clientHeight } = parent;
 
-    const oldWidth = canvas.width;
-    const oldHeight = canvas.height;
-
     // 실제 캔버스 내부 크기 설정 (픽셀 크기)
     canvas.width = clientWidth;
     canvas.height = clientHeight;
@@ -149,8 +120,6 @@ export default function Canvas({
     ctx.lineWidth = 5;
     ctx.lineCap = "round";
     ctx.strokeStyle = color;
-
-    setScaledStrokes(scaleStrokes(strokes, oldWidth, oldHeight, canvas.width, canvas.height));
     reRendering();
   };
 
@@ -199,10 +168,6 @@ export default function Canvas({
       ctx.strokeStyle = color;
     }
   }, [color]);
-  useEffect(() => {
-    console.log("rerender");
-    reRendering();
-  }, [scaledStrokes]);
 
   return (
     <div className="relative w-full h-auto" style={{ aspectRatio: "4 / 3" }}>
