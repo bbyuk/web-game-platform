@@ -6,6 +6,7 @@ export default function Canvas({
   color = "black",
   reRenderingSignal = false,
   afterReRendering = () => {},
+  className = String,
 }) {
   const elementId = "canvas";
   /**
@@ -63,7 +64,6 @@ export default function Canvas({
    * ====================================== 이벤트 핸들러 ======================================
    */
 
-
   /**
    * ====================================== 커스텀 메소드 ======================================
    */
@@ -78,9 +78,9 @@ export default function Canvas({
    * @returns {*}
    */
   const scaleStrokes = (originalStrokes, oldWidth, oldHeight, newWidth, newHeight) => {
-    return originalStrokes.map(stroke =>
-      stroke.map(point => {
-        console.log(`width : ${oldWidth} => ${newWidth}`)
+    return originalStrokes.map((stroke) =>
+      stroke.map((point) => {
+        console.log(`width : ${oldWidth} => ${newWidth}`);
         console.log(`x : ${point.x} => ${point.x * (newWidth / oldWidth)}`);
         return {
           x: point.x * (newWidth / oldWidth),
@@ -90,15 +90,13 @@ export default function Canvas({
     );
   };
 
-
   /**
    * canvas context 리턴
    */
   const getCanvasContext = () => {
     const canvas = canvasRef.current;
-    return canvas.getContext("2d");;
-  }
-
+    return canvas.getContext("2d");
+  };
 
   /**
    * 캔버스 rerendering
@@ -173,8 +171,6 @@ export default function Canvas({
    * ====================================== 커스텀 메소드 ======================================
    */
 
-
-
   useEffect(() => {
     resize();
 
@@ -209,9 +205,9 @@ export default function Canvas({
   }, [scaledStrokes]);
 
   return (
-    <div className="relative w-full h-auto" style={{ aspectRatio: '4 / 3' }}>
+    <div className="relative w-full h-auto" style={{ aspectRatio: "4 / 3" }}>
       <canvas
-        className="absolute top-0 left-0 w-full h-full"
+        className={className}
         id={elementId}
         ref={canvasRef}
         onMouseMove={(e) => onMouseMove(e)}

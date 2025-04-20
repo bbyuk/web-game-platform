@@ -1,6 +1,6 @@
 export default function Terminal() {
   return (
-    <div className="h-95 bg-gray-900 flex flex-col border-t border-gray-700">
+    <div className="h-120 bg-gray-900 flex flex-col border-t border-gray-700">
       {/* 터미널 탭 */}
       <div className="h-10 flex items-center px-4 border-b border-gray-700">
         <div className="flex items-center bg-gray-800 rounded-t mx-1 px-3 py-1 shadow-sm">
