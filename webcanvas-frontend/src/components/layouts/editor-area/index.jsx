@@ -23,15 +23,7 @@ const FileTab = ({ name, selected = false, onClick }) => {
 const CanvasContainer = ({ children }) => {
   return (
     <div className="flex justify-center items-center flex-1 bg-gray-800 relative">
-      <div
-        className="bg-white rounded shadow-lg"
-        style={{
-          width: "800px", // 고정 크기
-          height: "360px", // 고정 크기 (16:9 비율)
-        }}
-      >
-        {children}
-      </div>
+      <div className="bg-white rounded shadow-lg">{children}</div>
     </div>
   );
 };

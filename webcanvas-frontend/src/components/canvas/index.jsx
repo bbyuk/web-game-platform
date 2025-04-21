@@ -16,6 +16,12 @@ export default function Canvas({
   const canvasRef = useRef(null);
 
   /**
+   * resize timer
+   * @type {React.RefObject<null>}
+   */
+  const resizeTimer = useRef(null);
+
+  /**
    * 현재 마우스를 누르고 그리고 있는 중인지 여부
    */
   const [painting, setPainting] = useState(false);
@@ -41,13 +47,13 @@ export default function Canvas({
     const offsetX = event.clientX - rect.left;
     const offsetY = event.clientY - rect.top;
 
+    const scaledX = offsetX / canvasRef.current.width;
+    const scaledY = offsetY / canvasRef.current.height;
+
     if (painting) {
       ctx.lineTo(offsetX, offsetY);
       ctx.stroke();
-      setCurrentStroke((prevItems) => [
-        ...prevItems,
-        { x: Math.round(offsetX), y: Math.round(offsetY) },
-      ]);
+      setCurrentStroke((prevItems) => [...prevItems, { x: scaledX, y: scaledY }]);
     } else {
       ctx.beginPath();
       ctx.moveTo(offsetX, offsetY);
@@ -80,46 +86,38 @@ export default function Canvas({
     if (!ctx) {
       return;
     }
+
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-    strokes.forEach((stroke) => {
-      if (stroke.length === 0) {
-        return;
-      }
-      ctx.beginPath();
-      ctx.moveTo(stroke[0].x, stroke[0].y);
+    const canvasWidth = canvasRef.current.width;
+    const canvasHeight = canvasRef.current.height;
 
-      for (let i = 1; i < stroke.length; i++) {
-        ctx.lineTo(stroke[i].x, stroke[i].y);
-      }
+    strokes.forEach((stroke) => {
+      ctx.beginPath();
+      ctx.moveTo(stroke[0].x * canvasWidth, stroke[0].y * canvasHeight);
+
+      stroke.forEach((point, index) => {
+        if (index === 0) {
+          return;
+        }
+        ctx.lineTo(point.x * canvasWidth, point.y * canvasHeight);
+      });
 
       ctx.stroke();
     });
   };
 
   /**
-   * canvas 반응형 resize
+   * canvas resize
    */
   const resize = () => {
-    const canvas = canvasRef.current;
-    const parent = canvas.parentElement;
-
-    const ctx = getCanvasContext();
-
-    const { clientWidth, clientHeight } = parent;
-
-    // 실제 캔버스 내부 크기 설정 (픽셀 크기)
-    canvas.width = clientWidth;
-    canvas.height = clientHeight;
-
-    // 보이는 크기는 CSS로 100% 고정
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
-
-    ctx.lineWidth = 5;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = color;
-    reRendering();
+    if (resizeTimer.current) {
+      clearTimeout(resizeTimer.current);
+    }
+    resizeTimer.current = setTimeout(() => {
+      console.log(strokes);
+      reRendering();
+    }, 200); // 200ms 후에 한번만 리렌더
   };
 
   /**
@@ -139,18 +137,33 @@ export default function Canvas({
    * ====================================== 커스텀 메소드 ======================================
    */
 
+  /**
+   * onComponentLoad
+   */
   useEffect(() => {
-    resize();
+    const canvas = canvasRef.current;
+    const parent = canvas.parentElement;
 
-    /**
-     * 윈도우 리사이즈시 캔버스도 함께 리사이즈
-     */
-    window.addEventListener("resize", resize);
+    const ctx = getCanvasContext();
 
-    return () => {
-      window.removeEventListener("resize", resize);
-    };
+    const { clientWidth, clientHeight } = parent;
+
+    // 실제 캔버스 내부 크기 설정 (픽셀 크기)
+    canvas.width = clientWidth;
+    canvas.height = clientHeight;
+
+    // 보이는 크기는 CSS로 100% 고정
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+
+    ctx.lineWidth = 5;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = color;
   }, []);
+
+  /**
+   * 부모 컴포넌트에서 온디맨드 리렌더링 처리
+   */
   useEffect(() => {
     if (!getCanvasContext()) {
       return;
@@ -161,6 +174,10 @@ export default function Canvas({
       afterReRendering();
     }
   }, [reRenderingSignal, afterReRendering]);
+
+  /**
+   * 컬러 변경
+   */
   useEffect(() => {
     const ctx = getCanvasContext();
     if (ctx) {
@@ -174,6 +191,8 @@ export default function Canvas({
         className={className}
         id={elementId}
         ref={canvasRef}
+        width={800}
+        height={600}
         onMouseMove={(e) => onMouseMove(e)}
         onMouseDown={startPainting}
         onMouseUp={stopPainting}

@@ -20,7 +20,7 @@ export default function Main() {
       </div>
 
       {/* 하단 터미널 (채팅) */}
-      <Terminal />
+      {/*<Terminal />*/}
     </div>
   );
 }
