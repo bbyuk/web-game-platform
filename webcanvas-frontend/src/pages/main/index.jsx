@@ -3,9 +3,11 @@ import CenterBoard from "@/components/layouts/center-board/index.jsx";
 import Terminal from "@/components/layouts/terminal/index.jsx";
 import RightPanel from "@/components/layouts/right-panel/index.jsx";
 import { useState } from "react";
+import {LobbyPlaceholder} from "@/components/lobby-placeholder/index.jsx";
 
 export default function Main() {
   const [roomList, setRoomList] = useState([{ label: "방1" }, { label: "방2" }, { label: "방3" }]);
+  const [gameRoomEntered, setGameRoomEntered] = useState(false);
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-gray-200">
