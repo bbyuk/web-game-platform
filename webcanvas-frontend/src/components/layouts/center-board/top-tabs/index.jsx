@@ -3,7 +3,7 @@ const Container = ({ children }) => {
 };
 
 
-const Tab = ({ name, selected = false, onClick }) => {
+const Tab = ({ label, selected = false, onClick }) => {
   return (
     <div
       onClick={onClick}
@@ -13,7 +13,8 @@ const Tab = ({ name, selected = false, onClick }) => {
           : "px-4 py-2 bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 border-r border-gray-700 cursor-pointer"
       }
     >
-      {name}
+      <div className={`w-3 h-3 ${label === "black" ? "bg-black" : `bg-${label}-400`} rounded-full inline-block mr-2`} />
+      {label}
     </div>
   );
 };
@@ -25,7 +26,7 @@ const TopTabs = ({tabs, selectedIndex, onSelected}) => {
         <Tab
           key={`file-tab-${index}`}
           description={tab.description}
-          name={tab.name}
+          label={tab.label}
           selected={index === selectedIndex}
           onClick={() => onSelected(index)}
         />

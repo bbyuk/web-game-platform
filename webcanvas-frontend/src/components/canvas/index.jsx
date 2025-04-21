@@ -59,7 +59,7 @@ export default function Canvas({
     if (painting) {
       ctx.lineTo(offsetX, offsetY);
       ctx.stroke();
-      setCurrentStroke((prevItems) => [...prevItems, { x: scaledX, y: scaledY }]);
+      setCurrentStroke((prevItems) => [...prevItems, { x: scaledX, y: scaledY, color: color }]);
     } else {
       ctx.beginPath();
       ctx.moveTo(offsetX, offsetY);
@@ -105,12 +105,14 @@ export default function Canvas({
 
     strokes.forEach((stroke) => {
       ctx.beginPath();
+      ctx.strokeStyle = stroke[0].color;
       ctx.moveTo(stroke[0].x * canvasWidth, stroke[0].y * canvasHeight);
 
       stroke.forEach((point, index) => {
         if (index === 0) {
           return;
         }
+        ctx.strokeStyle = stroke[index].color;
         ctx.lineTo(point.x * canvasWidth, point.y * canvasHeight);
       });
 
