@@ -1,18 +1,16 @@
-import { useEffect, useState } from 'react';
-import Canvas from '@/components/canvas/index.jsx';
-import { LobbyPlaceholder } from '@/components/lobby-placeholder/index.jsx';
-import MainPanel from '@/components/layouts/center-board/main-panel/index.jsx';
-import TopTabs from '@/components/layouts/center-board/top-tabs/index.jsx';
+import { useEffect, useState } from "react";
+import Canvas from "@/components/canvas/index.jsx";
+import { LobbyPlaceholder } from "@/components/lobby-placeholder/index.jsx";
+import MainPanel from "@/components/layouts/center-board/main-panel/index.jsx";
+import TopTabs from "@/components/layouts/center-board/top-tabs/index.jsx";
 
 export default function CenterBoard({
-                                      gameRoomEntered = Boolean(),
-                                      strokes = [],
-                                      onStroke = (stroke) => {
-                                      },
-                                      reRenderingSignal = false,
-                                      onReRendering = () => {
-                                      }
-                                    }) {
+  gameRoomEntered = Boolean(),
+  strokes = [],
+  onStroke = (stroke) => {},
+  reRenderingSignal = false,
+  onReRendering = () => {},
+}) {
   const [tabs, setTabs] = useState([]);
   const [selectedTopTabIndex, setSelectedTopTabIndex] = useState(0);
 
@@ -21,7 +19,13 @@ export default function CenterBoard({
       /**
        * gameRoomEntered => 캔버스 컬러 팔레트 역할
        */
-      setTabs([{ label: 'black' }, { label: 'blue' }, { label: 'green' }, { label: 'red' }, { label: 'yellow' }]);
+      setTabs([
+        { label: "black" },
+        { label: "blue" },
+        { label: "green" },
+        { label: "red" },
+        { label: "yellow" },
+      ]);
     }
   }, []);
 
@@ -44,7 +48,7 @@ export default function CenterBoard({
             color={tabs[selectedTopTabIndex] ? tabs[selectedTopTabIndex].label : "black"}
           />
         ) : (
-          <LobbyPlaceholder className={'w-full h-full'} />
+          <LobbyPlaceholder className={"w-full h-full"} />
         )}
       </MainPanel>
     </div>
