@@ -6,7 +6,7 @@ export default function Canvas({
   color = "black",
   reRenderingSignal = false,
   afterReRendering = () => {},
-  className = new String(),
+  className = String(),
 }) {
   const elementId = "canvas";
   /**
@@ -14,12 +14,7 @@ export default function Canvas({
    * @type {React.RefObject<null>}
    */
   const canvasRef = useRef(null);
-
-  /**
-   * resize timer
-   * @type {React.RefObject<null>}
-   */
-  const resizeTimer = useRef(null);
+  const contextRef = useRef(null);
 
   /**
    * 현재 마우스를 누르고 그리고 있는 중인지 여부
@@ -31,6 +26,17 @@ export default function Canvas({
   const [currentStroke, setCurrentStroke] = useState([]);
 
   /**
+   * resize 이벤트 디바운스 타이머
+   * @type {React.RefObject<null>}
+   */
+  const resizeTimer = useRef(null);
+
+  /**
+   * 현재 브라우저 윈도우가 resizing 중인지 여부
+   */
+  const [resizing, setResizing] = useState(false);
+
+  /**
    * ====================================== 이벤트 핸들러 ======================================
    */
   /**
@@ -38,7 +44,7 @@ export default function Canvas({
    * @param event
    */
   const onMouseMove = (event) => {
-    const ctx = getCanvasContext();
+    const ctx = contextRef.current;
     if (!ctx) {
       return;
     }
@@ -62,6 +68,19 @@ export default function Canvas({
       setCurrentStroke([]);
     }
   };
+
+  const onResize = () => {
+    if (resizeTimer.current) {
+      clearTimeout(resizeTimer.current);
+    }
+
+    setResizing(true);
+
+    // 200ms 동안 resize 이벤트가 더이상 발생하지 않으면 resize 작업 수행
+    resizeTimer.current = setTimeout(() => {
+      setResizing(false);
+    }, 200);
+  };
   /**
    * ====================================== 이벤트 핸들러 ======================================
    */
@@ -71,18 +90,10 @@ export default function Canvas({
    */
 
   /**
-   * canvas context 리턴
-   */
-  const getCanvasContext = () => {
-    const canvas = canvasRef.current;
-    return canvas.getContext("2d");
-  };
-
-  /**
    * 캔버스 reRendering
    */
   const reRendering = () => {
-    const ctx = getCanvasContext();
+    const ctx = contextRef.current;
     if (!ctx) {
       return;
     }
@@ -108,19 +119,6 @@ export default function Canvas({
   };
 
   /**
-   * canvas resize
-   */
-  const resize = () => {
-    if (resizeTimer.current) {
-      clearTimeout(resizeTimer.current);
-    }
-    resizeTimer.current = setTimeout(() => {
-      console.log(strokes);
-      reRendering();
-    }, 200); // 200ms 후에 한번만 리렌더
-  };
-
-  /**
    * 화면에 그림 그리기 시작 (마우스 클릭 시작)
    */
   const startPainting = () => {
@@ -133,6 +131,27 @@ export default function Canvas({
     setPainting(false);
   };
 
+  const initCanvas = () => {
+    const canvas = canvasRef.current;
+    const parent = canvas.parentElement;
+    const ctx = canvas.getContext("2d");
+
+    contextRef.current = ctx;
+
+    const { clientWidth, clientHeight } = parent;
+
+    // 실제 캔버스 내부 크기 설정 (픽셀 크기)
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+
+    canvas.width = clientWidth;
+    canvas.height = clientHeight;
+
+    ctx.lineWidth = 5;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = color;
+  };
+
   /**
    * ====================================== 커스텀 메소드 ======================================
    */
@@ -141,31 +160,18 @@ export default function Canvas({
    * onComponentLoad
    */
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const parent = canvas.parentElement;
+    window.addEventListener("resize", onResize);
 
-    const ctx = getCanvasContext();
-
-    const { clientWidth, clientHeight } = parent;
-
-    // 실제 캔버스 내부 크기 설정 (픽셀 크기)
-    canvas.width = clientWidth;
-    canvas.height = clientHeight;
-
-    // 보이는 크기는 CSS로 100% 고정
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
-
-    ctx.lineWidth = 5;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = color;
+    return () => {
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   /**
    * 부모 컴포넌트에서 온디맨드 리렌더링 처리
    */
   useEffect(() => {
-    if (!getCanvasContext()) {
+    if (!contextRef.current) {
       return;
     }
 
@@ -179,20 +185,29 @@ export default function Canvas({
    * 컬러 변경
    */
   useEffect(() => {
-    const ctx = getCanvasContext();
-    if (ctx) {
-      ctx.strokeStyle = color;
+    if (contextRef.current) {
+      contextRef.current.strokeStyle = color;
     }
   }, [color]);
 
+  /**
+   * resizing handling
+   */
+  useEffect(() => {
+    if (!resizing) {
+      initCanvas();
+      reRendering();
+    }
+  }, [resizing]);
+
   return (
-    <div className="relative w-full h-auto" style={{ aspectRatio: "4 / 3" }}>
+    <div
+      className={`relative w-full bg-white rounded shadow-lg flex justify-center items-center`}
+      style={{ aspectRatio: "4 / 3" }}
+    >
       <canvas
-        className={className}
         id={elementId}
         ref={canvasRef}
-        width={800}
-        height={600}
         onMouseMove={(e) => onMouseMove(e)}
         onMouseDown={startPainting}
         onMouseUp={stopPainting}

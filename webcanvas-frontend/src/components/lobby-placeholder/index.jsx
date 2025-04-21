@@ -1,6 +1,6 @@
-export function LobbyPlaceholder() {
+export function LobbyPlaceholder({ className = String() }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full text-gray-400">
+    <div className={`flex flex-col items-center justify-center h-full text-gray-400 ${className}`}>
       <div className="text-6xl mb-4">🖌️</div>
       <div className="text-xl font-semibold mb-2">아직 참여 중인 게임이 없습니다</div>
       <div className="text-sm mb-6">방을 생성하거나 대기중인 방에 입장하세요.</div>
@@ -8,6 +8,5 @@ export function LobbyPlaceholder() {
         + 새 방 만들기
       </button>
     </div>
-
   );
 }
