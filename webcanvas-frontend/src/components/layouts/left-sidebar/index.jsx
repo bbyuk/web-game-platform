@@ -1,6 +1,4 @@
-import { useState } from "react";
-
-export default function LNB({ list }) {
+export default function LeftSidebar({ list }) {
   return (
     <div className="w-60 bg-gray-900 border-r border-gray-700 p-2">
       <div className="text-lg font-bold mb-4">Web Canvas</div>

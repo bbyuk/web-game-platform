@@ -1,7 +1,7 @@
-import LNB from "@/components/layouts/lnb/index.jsx";
-import EditorArea from "@/components/layouts/editor-area/index.jsx";
+import LeftSidebar from "@/components/layouts/left-sidebar/index.jsx";
+import CenterBoard from "@/components/layouts/center-board/index.jsx";
 import Terminal from "@/components/layouts/terminal/index.jsx";
-import RightArea from "@/components/layouts/right-area/index.jsx";
+import RightPanel from "@/components/layouts/right-panel/index.jsx";
 import { useState } from "react";
 
 export default function Main() {
@@ -11,12 +11,12 @@ export default function Main() {
     <div className="flex flex-col h-screen bg-gray-900 text-gray-200">
       {/* 메인 위쪽 */}
       <div className="flex flex-1 overflow-hidden">
-        <LNB list={roomList} />
+        <LeftSidebar list={roomList} />
 
-        <EditorArea />
+        <CenterBoard />
 
         {/* 우측 빌드툴 영역 */}
-        <RightArea />
+        <RightPanel />
       </div>
 
       {/* 하단 터미널 (채팅) */}

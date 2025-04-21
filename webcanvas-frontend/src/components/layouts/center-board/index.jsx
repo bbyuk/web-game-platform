@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import Canvas from "@/components/canvas/index.jsx";
 
-const FileTabContainer = ({ children }) => {
+const TopTabsContainer = ({ children }) => {
   return <div className="flex border-b border-gray-700 bg-gray-800">{children}</div>;
 };
 
-const FileTab = ({ name, selected = false, onClick }) => {
+const TopTab = ({ name, selected = false, onClick }) => {
   return (
     <div
       onClick={onClick}
@@ -28,7 +28,7 @@ const CanvasContainer = ({ children }) => {
   );
 };
 
-export default function EditorArea() {
+export default function CenterBoard() {
   const [tabs, setTabs] = useState([]);
   const [strokes, setStrokes] = useState([]);
   const [reRenderingSignal, setReRenderingSignal] = useState(false);
@@ -50,9 +50,9 @@ export default function EditorArea() {
   return (
     <div className="flex flex-col flex-1 bg-gray-800 border-r border-gray-700 overflow-hidden">
       {/* 상단 탭 */}
-      <FileTabContainer>
+      <TopTabsContainer>
         {tabs.map((tab, index) => (
-          <FileTab
+          <TopTab
             key={`file-tab-${index}`}
             description={tab.description}
             name={tab.name}
@@ -60,7 +60,7 @@ export default function EditorArea() {
             onClick={() => setSelectedFileTabIndex(index)}
           />
         ))}
-      </FileTabContainer>
+      </TopTabsContainer>
       <CanvasContainer>
         <Canvas
           className="w-full h-full"
