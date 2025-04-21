@@ -1,40 +1,18 @@
-import { useEffect, useState } from "react";
-import Canvas from "@/components/canvas/index.jsx";
-import { LobbyPlaceholder } from "@/components/lobby-placeholder/index.jsx";
+import { useEffect, useState } from 'react';
+import Canvas from '@/components/canvas/index.jsx';
+import { LobbyPlaceholder } from '@/components/lobby-placeholder/index.jsx';
+import MainPanel from '@/components/layouts/center-board/main-panel/index.jsx';
+import TopTabs from '@/components/layouts/center-board/top-tabs/index.jsx';
 
 const TopTabsContainer = ({ children }) => {
   return <div className="flex border-b border-gray-700 bg-gray-800">{children}</div>;
 };
 
-const TopTab = ({ name, selected = false, onClick }) => {
-  return (
-    <div
-      onClick={onClick}
-      className={
-        selected
-          ? "px-4 py-2 bg-gray-900 text-white border-r border-gray-700"
-          : "px-4 py-2 bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 border-r border-gray-700 cursor-pointer"
-      }
-    >
-      {name}
-    </div>
-  );
-};
-
-const MainPanel = ({ children }) => {
-  return (
-    <div className="flex-1 justify-center items-center bg-gray-800 relative">
-      <div className="p-4 flex justify-center items-center w-full h-full">{children}</div>
-    </div>
-  );
-};
-
-export default function CenterBoard() {
+export default function CenterBoard({ gameRoomEntered = Boolean() }) {
   const [tabs, setTabs] = useState([]);
   const [strokes, setStrokes] = useState([]);
   const [reRenderingSignal, setReRenderingSignal] = useState(false);
-  const [selectedFileTabIndex, setSelectedFileTabIndex] = useState(0);
-  const [enteredRoom, setEnteredRoom] = useState(true);
+  const [selectedTopTabIndex, setSelectedTopTabIndex] = useState(0);
 
   /**
    * 캔버스 컴포넌트 stroke 이벤트 핸들러
@@ -47,25 +25,24 @@ export default function CenterBoard() {
   };
 
   useEffect(() => {
-    setTabs([{ name: "canvas.js" }, { name: "App.jsx" }, { name: "style.css" }]);
+    if (gameRoomEntered) {
+      /**
+       * gameRoomEntered => 캔버스 컬러 팔레트 역할
+       */
+      setTabs([{ name: "canvas.js" }, { name: "App.jsx" }, { name: "style.css" }]);
+    }
   }, []);
 
   return (
     <div className="flex flex-col flex-1 bg-gray-800 border-r border-gray-700 overflow-hidden">
-      {/* 상단 탭 */}
-      <TopTabsContainer>
-        {tabs.map((tab, index) => (
-          <TopTab
-            key={`file-tab-${index}`}
-            description={tab.description}
-            name={tab.name}
-            selected={index === selectedFileTabIndex}
-            onClick={() => setSelectedFileTabIndex(index)}
-          />
-        ))}
-      </TopTabsContainer>
+      <TopTabs
+        tabs={tabs}
+        selectedIndex={selectedTopTabIndex}
+        onSelected={(index) => setSelectedTopTabIndex(index)}
+      />
+
       <MainPanel>
-        {enteredRoom ? (
+        {gameRoomEntered ? (
           <Canvas
             className="flex-1"
             strokes={strokes}

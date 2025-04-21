@@ -1,9 +1,7 @@
-import LeftSidebar from "@/components/layouts/left-sidebar/index.jsx";
-import CenterBoard from "@/components/layouts/center-board/index.jsx";
-import Terminal from "@/components/layouts/terminal/index.jsx";
-import RightPanel from "@/components/layouts/right-panel/index.jsx";
-import { useState } from "react";
-import { LobbyPlaceholder } from "@/components/lobby-placeholder/index.jsx";
+import LeftSidebar from '@/components/layouts/left-sidebar/index.jsx';
+import CenterBoard from '@/components/layouts/center-board/index.jsx';
+import RightPanel from '@/components/layouts/right-panel/index.jsx';
+import { useState } from 'react';
 
 export default function Main() {
   const [roomList, setRoomList] = useState([{ label: "방1" }, { label: "방2" }, { label: "방3" }]);
@@ -15,7 +13,7 @@ export default function Main() {
       <div className="flex flex-1 overflow-hidden">
         <LeftSidebar list={roomList} />
 
-        <CenterBoard />
+        <CenterBoard gameRoomEntered={gameRoomEntered}/>
 
         {/* 우측 빌드툴 영역 */}
         <RightPanel />
