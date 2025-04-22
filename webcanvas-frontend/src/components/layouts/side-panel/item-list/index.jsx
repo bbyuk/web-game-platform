@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { useEffect } from 'react';
 
 const Container = ({ children }) => {
   return <ul className="space-y-2">{children}</ul>;
@@ -30,16 +31,18 @@ const Item = ({ label, color, current = -1, capacity = -1, isButton = false }) =
   );
 };
 
-const ItemList = ({ value, gameRoomEntered }) => {
+
+const ItemList = ({ value }) => {
   return (
     <Container>
       {value.map((el, index) => (
         <Item
+          key={`left-item-${index}`}
           label={el.label}
           color={el.color}
           current={el.current}
           capacity={el.capacity}
-          isButton={!gameRoomEntered}
+          isButton={el.isButton}
         />
       ))}
     </Container>

@@ -202,7 +202,7 @@ export function ApplicationContextProvider({ children }) {
 
   /**
    * 상단 탭 관련 context
-   * @type {{selectedIndex: number, onSelected: (function(*): void), value: *[], clear: topTabs.clear, setValue: topTabs.setValue}}
+   * @type {{selectedIndex: number, onSelected: (function(*): void), items: *[], clear: topTabs.clear, setValue: topTabs.setValue}}
    */
   const topTabs = {
     selectedIndex: selectedTopTabIndex,
@@ -212,7 +212,7 @@ export function ApplicationContextProvider({ children }) {
       setTopTabItems([]);
       setSelectedTopTabIndex(-1);
     },
-    setValue: (value) => {
+    setItems: (value) => {
       setTopTabItems(value);
       setSelectedTopTabIndex(0);
     }
@@ -223,7 +223,13 @@ export function ApplicationContextProvider({ children }) {
    * @type {{}}
    */
   const leftSidebar = {
-    items: leftSidebarItems
+    items: leftSidebarItems,
+    setItems: (value) => {
+      setLeftSidebarItems(value);
+    },
+    clear: () => {
+      setLeftSidebarItems([]);
+    }
   };
 
   useEffect(() => {
@@ -263,7 +269,8 @@ export function ApplicationContextProvider({ children }) {
       value={{
         api,
         authentication,
-        topTabs
+        topTabs,
+        leftSidebar
       }}
     >
       {children}

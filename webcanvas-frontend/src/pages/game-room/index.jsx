@@ -17,8 +17,16 @@ export default function GameRoomPage() {
   /**
    * 상단 탭 전역 컨텍스트
    */
-  const { topTabs } = useApplicationContext();
+  const { topTabs, leftSidebar } = useApplicationContext();
 
+  /**
+   * 게임 방에 입장한 유저 목록
+   */
+  const [enteredUserList, setEnteredUserList] = useState([
+    { label: "Alice", color: "#FF5733", isButton: false },
+    { label: "Bob", color: "#33A1FF", isButton: false },
+    { label: "Charlie", color: "#8D33FF", isButton: false },
+  ]);
 
   /**
    * =========================== 이벤트 핸들러 =============================
@@ -46,10 +54,12 @@ export default function GameRoomPage() {
    * =========================== 이벤트 핸들러 =============================
    */
   useEffect(() => {
-    topTabs.setValue([{label: "black"}, {label: "blue"}, {label: "green"}, {label: "red"}, {label: "yellow"}]);
+    topTabs.setItems([{label: "black"}, {label: "blue"}, {label: "green"}, {label: "red"}, {label: "yellow"}]);
+    leftSidebar.setItems(enteredUserList);
 
     return () => {
       topTabs.clear();
+      leftSidebar.clear();
     };
   }, []);
 
