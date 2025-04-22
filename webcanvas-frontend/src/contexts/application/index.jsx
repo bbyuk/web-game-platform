@@ -197,6 +197,8 @@ export function ApplicationContextProvider({ children }) {
         .catch((error) => {
           console.log(error);
         });
+    } else {
+      navigate("/platform", { replace: true });
     }
   }, [savedAccessToken]);
 

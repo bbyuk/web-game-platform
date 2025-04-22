@@ -1,4 +1,4 @@
-export default function Terminal() {
+export default function BottomPanel() {
   return (
     <div className="h-60 bg-gray-900 flex flex-col border-t border-gray-700">
       {/* 터미널 탭 */}
