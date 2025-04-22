@@ -4,22 +4,23 @@ import LandingPage from "@/pages/landing/index.jsx";
 import GameRoomPage from "@/pages/game-room/index.jsx";
 import LobbyPage from "@/pages/lobby/index.jsx";
 
+export const routeMap = {
+  landing: "/",
+  lobby: "/platform",
+  gameRoom: "/platform/game/room",
+};
+
 export const publicRoutes = [
-  { path: "/", element: <LandingPage /> },
-  { path: "*", element: <Navigate to="/" replace /> },
+  { path: routeMap.landing, element: <LandingPage /> },
 ];
 
 export const privateRoutes = [
   {
-    path: "/platform",
+    path: routeMap.lobby,
     element: <MainLayout />,
     children: [
-      { path: "/platform", element: <LobbyPage /> },
-      { path: "/platform/game/room/:roomId", element: <GameRoomPage /> },
+      { path: routeMap.lobby, element: <LobbyPage /> },
+      { path: `${routeMap.gameRoom}/:roomId`, element: <GameRoomPage /> },
     ],
   },
-  // {
-  //   path: "*",
-  //   element: <Navigate to={"/platform"} replace />,
-  // },
 ];

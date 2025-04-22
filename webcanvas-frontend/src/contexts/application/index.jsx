@@ -5,8 +5,30 @@ import { useNavigate } from "react-router-dom";
 const ApplicationContext = createContext(null);
 
 export function ApplicationContextProvider({ children }) {
+  /**
+   * ========================= states ===========================
+   */
+
   const navigate = useNavigate();
+  /**
+   * api authentication 관련 토큰 state
+   */
   const [savedAccessToken, setSavedAccessToken] = useState(localStorage.getItem("accessToken"));
+
+  /**
+   * 상단 바 관련 state
+   */
+  const [selectedTopTabIndex, setSelectedTopTabIndex] = useState(-1);
+  const [topTabItems, setTopTabItems] = useState([]);
+
+  /**
+   * 좌측 sidebar 관련 state
+   */
+  const [leftSidebarItems, setLeftSidebarItems] = useState([]);
+
+  /**
+   * ========================= states ===========================
+   */
 
   /**
    * constant with hook
@@ -90,6 +112,11 @@ export function ApplicationContextProvider({ children }) {
         }
       });
   };
+
+  /**
+   * api 요청 클라이언트
+   * @type {{get: (function(*, {}=, {}=): Promise<*>), post: (function(*, {}=, {}=): Promise<*>), tokenRefresh: (function(): Promise<*>), constants: {serverDomain: any, defaultHeaders: {'Content-Type': string}}, utils: {buildUrlWithParams: (function(*, {}=): string|*)}}}
+   */
   const api = {
     get: async (url, params = {}, options = {}) => {
       return request("GET", url, params, options);
@@ -144,6 +171,11 @@ export function ApplicationContextProvider({ children }) {
       },
     },
   };
+
+  /**
+   * 인증에 관련된 전역 상태 context
+   * @type {{saveAuthentication: authentication.saveAuthentication, handleUnauthorized: authentication.handleUnauthorized, isAuthenticated: boolean}}
+   */
   const authentication = {
     /**
      * 로그인 API 응답 받은 후 클라이언트 localStorage Authentication token과 유저 등록시 생성된 fingerprint를 저장한다.
@@ -166,6 +198,32 @@ export function ApplicationContextProvider({ children }) {
       navigate("/", { replace: true });
     },
     isAuthenticated: !!savedAccessToken,
+  };
+
+  /**
+   * 상단 탭 관련 context
+   * @type {{selectedIndex: number, onSelected: (function(*): void), value: *[], clear: topTabs.clear, setValue: topTabs.setValue}}
+   */
+  const topTabs = {
+    selectedIndex: selectedTopTabIndex,
+    onSelected: (index) => (setSelectedTopTabIndex(index)),
+    items: topTabItems,
+    clear: () => {
+      setTopTabItems([]);
+      setSelectedTopTabIndex(-1);
+    },
+    setValue: (value) => {
+      setTopTabItems(value);
+      setSelectedTopTabIndex(0);
+    }
+  }
+
+  /**
+   * 좌측 sidebar 관련 context
+   * @type {{}}
+   */
+  const leftSidebar = {
+    items: leftSidebarItems
   };
 
   useEffect(() => {
@@ -197,8 +255,6 @@ export function ApplicationContextProvider({ children }) {
         .catch((error) => {
           console.log(error);
         });
-    } else {
-      navigate("/platform", { replace: true });
     }
   }, [savedAccessToken]);
 
@@ -207,6 +263,7 @@ export function ApplicationContextProvider({ children }) {
       value={{
         api,
         authentication,
+        topTabs
       }}
     >
       {children}

@@ -23,11 +23,6 @@ export default function MainLayout() {
     { label: "Charlie", color: "#8D33FF" },
   ]);
 
-  /**
-   * 현재 게임 방에 입장해있는지 여부
-   */
-  const [gameRoomEntered, setGameRoomEntered] = useState(false);
-
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-gray-200">
       <div className="flex flex-1 overflow-hidden">
@@ -46,7 +41,6 @@ export default function MainLayout() {
         />
       </div>
 
-      {/*<Terminal />*/}
     </div>
   );
 }
