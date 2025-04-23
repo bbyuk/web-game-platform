@@ -22,7 +22,7 @@ const Item = ({ label, color, current = -1, capacity = -1, isButton = false }) =
         )}
         {/* 인원 display */}
         {current > 0 && capacity > 0 && current <= capacity ? (
-          <span className="text-gray-400 text-xs">
+          <span className={`text-xs ${current === capacity ? "text-red-400" : "text-gray-400"}`}>
             {current} / {capacity}
           </span>
         ) : null}
