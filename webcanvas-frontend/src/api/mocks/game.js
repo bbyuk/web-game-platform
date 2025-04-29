@@ -20,11 +20,7 @@ export const mockGameRoomData = {
     { label: "QWER112233", current: 5, capacity: 5, isButton: false },
   ],
   // 생성된 방 정보
-  createdRoom: {
-
-  },
+  createdRoom: {},
   // 입장한 방 정보
-  enteredRoom: {
-
-  }
+  enteredRoom: {},
 };

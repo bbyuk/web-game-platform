@@ -50,7 +50,6 @@ export default function GameRoomPage() {
    */
   useEffect(() => {
     // mock 데이터 사용시 mock 데이터 set
-
   }, []);
 
   return (

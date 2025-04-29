@@ -15,7 +15,9 @@ export default function SidePanel({
       className={`w-60 bg-gray-900 ${left ? "border-r" : right ? "border-l" : ""} border-gray-700 p-4`}
     >
       <Title label={title.label} icon={title.icon} />
-      {left ? <ItemList value={leftSidebar.items} emptyPlaceholder={leftSidebar.emptyPlaceholder}/> : null}
+      {left ? (
+        <ItemList value={leftSidebar.items} emptyPlaceholder={leftSidebar.emptyPlaceholder} />
+      ) : null}
     </div>
   );
 }

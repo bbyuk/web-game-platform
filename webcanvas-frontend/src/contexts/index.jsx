@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from '@/api/index.js';
-import { useNavigate } from 'react-router-dom';
-import { EMPTY_MESSAGES } from '@/constants/message.js';
+import { createContext, useContext, useEffect, useState } from "react";
+import { auth } from "@/api/index.js";
+import { useNavigate } from "react-router-dom";
+import { EMPTY_MESSAGES } from "@/constants/message.js";
 
 const ApplicationContext = createContext(null);
 
@@ -26,7 +26,9 @@ export function ApplicationContextProvider({ children }) {
    * 좌측 sidebar 관련 state
    */
   const [leftSidebarItems, setLeftSidebarItems] = useState([]);
-  const [leftSidebarEmptyPlaceholder, setLeftSidebarEmptyPlaceholder] = useState(EMPTY_MESSAGES.GENERIC);
+  const [leftSidebarEmptyPlaceholder, setLeftSidebarEmptyPlaceholder] = useState(
+    EMPTY_MESSAGES.GENERIC
+  );
 
   /**
    * ========================= states ===========================
