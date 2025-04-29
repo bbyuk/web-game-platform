@@ -3,19 +3,13 @@ import { useEffect, useState } from "react";
 import { useApplicationContext } from "@/contexts/index.jsx";
 
 export default function LobbyPage() {
-  const { leftSidebar } = useApplicationContext();
-
-  /**
-   * 게임 방 목록
-   */
-  const [roomList, setRoomList] = useState([
-    { label: "ABCD123456", current: 2, capacity: 5, isButton: true },
-    { label: "WXYZ987654", current: 1, capacity: 4, isButton: true },
-    { label: "QWER112233", current: 5, capacity: 5, isButton: false },
-  ]);
+  const { leftSidebar, mock } = useApplicationContext();
 
   useEffect(() => {
-    leftSidebar.setItems(roomList);
+    // mock 데이터 사용시 mock 데이터 set
+    if (mock.use) {
+      leftSidebar.setItems(mock.pages.lobby.leftSidebar);
+    }
   }, []);
 
   return (

@@ -1,5 +1,4 @@
 import Canvas from "@/components/canvas/index.jsx";
-import TopTabs from "@/components/layouts/center-panel/top-tabs/index.jsx";
 import { useEffect, useState } from "react";
 import { useApplicationContext } from "@/contexts/index.jsx";
 
@@ -17,11 +16,8 @@ export default function GameRoomPage() {
   /**
    * 상단 탭 전역 컨텍스트
    */
-  const { topTabs, leftSidebar } = useApplicationContext();
+  const { topTabs, leftSidebar, mock } = useApplicationContext();
 
-  /**
-   * 게임 방에 입장한 유저 목록
-   */
   const [enteredUserList, setEnteredUserList] = useState([
     { label: "Alice", color: "#FF5733", isButton: false },
     { label: "Bob", color: "#33A1FF", isButton: false },
@@ -53,19 +49,11 @@ export default function GameRoomPage() {
    * =========================== 이벤트 핸들러 =============================
    */
   useEffect(() => {
-    topTabs.setItems([
-      { label: "black" },
-      { label: "blue" },
-      { label: "green" },
-      { label: "red" },
-      { label: "yellow" },
-    ]);
-    leftSidebar.setItems(enteredUserList);
-
-    return () => {
-      topTabs.clear();
-      leftSidebar.clear();
-    };
+    // mock 데이터 사용시 mock 데이터 set
+    if (mock.use) {
+      topTabs.setItems(mock.pages.gameRoom.topTabs);
+      leftSidebar.setItems(mock.pages.gameRoom.leftSidebar);
+    }
   }, []);
 
   return (
