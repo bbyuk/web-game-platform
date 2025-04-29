@@ -31,6 +31,15 @@ export function ApplicationContextProvider({ children }) {
   );
 
   /**
+   * 현재 입장한 게임 방 관련 state
+   */
+  // 현재 입장한 방의 ID
+  const [currentGameRoomId, setCurrentGameRoomId] = useState(null);
+  // 현재 입장 ID
+  const [currentGameRoomEntranceId, setCurrentGameRoomEntranceId] = useState(null);
+  const [currentGameRoomEnteredUsers, setCurrentGameRoomEnteredUsers] = useState([]);
+
+  /**
    * ========================= states ===========================
    */
 
@@ -115,6 +124,7 @@ export function ApplicationContextProvider({ children }) {
            * TODO alert modal로 변경
            */
           alert(error.message);
+          throw error;
         }
       });
   };
@@ -137,7 +147,7 @@ export function ApplicationContextProvider({ children }) {
       return request("POST", target.url, data, options);
     },
     tokenRefresh: async () => {
-      const processedUrl = `${api.constants.serverDomain}${auth.refresh}`;
+      const processedUrl = `${api.constants.serverDomain}${auth.refresh.url}`;
       const options = {
         credentials: "include",
       };
@@ -249,6 +259,25 @@ export function ApplicationContextProvider({ children }) {
     },
   };
 
+  /**
+   * current gameRoom
+   */
+  const currentGame = {
+    gameRoomId: currentGameRoomId,
+    gameRoomEntranceId: currentGameRoomEntranceId,
+    otherUsers: currentGameRoomEnteredUsers,
+    setEntranceInfo: ({gameRoomId, gameRoomEntranceId, otherUsers}) => {
+      setCurrentGameRoomId(gameRoomEntranceId);
+      setCurrentGameRoomEntranceId(gameRoomEntranceId);
+      setCurrentGameRoomEnteredUsers(otherUsers);
+    },
+    clearEntranceInfo: () => {
+      setCurrentGameRoomId(null);
+      setCurrentGameRoomEntranceId(null);
+      setCurrentGameRoomEnteredUsers([]);
+    }
+  };
+
   useEffect(() => {
     if (!savedAccessToken) {
       /**
@@ -288,6 +317,7 @@ export function ApplicationContextProvider({ children }) {
         authentication,
         topTabs,
         leftSidebar,
+        currentGame
       }}
     >
       {children}
