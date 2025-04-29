@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useApplicationContext } from "@/contexts/application/index.jsx";
+import { useApplicationContext } from "@/contexts/index.jsx";
 
 export default function ProtectedRoute() {
   const { authentication } = useApplicationContext();

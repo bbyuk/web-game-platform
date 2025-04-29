@@ -1,6 +1,6 @@
 import { LobbyPlaceholder } from "@/components/lobby-placeholder/index.jsx";
-import { useEffect, useState } from 'react';
-import { useApplicationContext } from '@/contexts/application/index.jsx';
+import { useEffect, useState } from "react";
+import { useApplicationContext } from "@/contexts/index.jsx";
 
 export default function LobbyPage() {
   const { leftSidebar } = useApplicationContext();

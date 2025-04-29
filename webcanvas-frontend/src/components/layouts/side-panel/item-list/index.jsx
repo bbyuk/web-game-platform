@@ -1,5 +1,5 @@
 import { ChevronRight } from "lucide-react";
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 const Container = ({ children }) => {
   return <ul className="space-y-2">{children}</ul>;
@@ -30,7 +30,6 @@ const Item = ({ label, color, current = -1, capacity = -1, isButton = false }) =
     </li>
   );
 };
-
 
 const ItemList = ({ value }) => {
   return (

@@ -16,7 +16,6 @@ function App() {
     return <Route key={route.path} path={route.path} element={route.element} />;
   };
 
-
   return (
     <Routes>
       {publicRoutes.map(routeMapping)}

@@ -5,7 +5,6 @@ import SidePanel from "@/components/layouts/side-panel/index.jsx";
 import { Outlet } from "react-router-dom";
 
 export default function MainLayout() {
-
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-gray-200">
       <div className="flex flex-1 overflow-hidden">
@@ -23,7 +22,6 @@ export default function MainLayout() {
           title={{ label: "chat", icon: <MessageCircle size={20} className="text-gray-400" /> }}
         />
       </div>
-
     </div>
   );
 }

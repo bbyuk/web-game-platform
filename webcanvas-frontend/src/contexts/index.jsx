@@ -206,7 +206,7 @@ export function ApplicationContextProvider({ children }) {
    */
   const topTabs = {
     selectedIndex: selectedTopTabIndex,
-    onSelected: (index) => (setSelectedTopTabIndex(index)),
+    onSelected: (index) => setSelectedTopTabIndex(index),
     items: topTabItems,
     clear: () => {
       setTopTabItems([]);
@@ -215,8 +215,8 @@ export function ApplicationContextProvider({ children }) {
     setItems: (value) => {
       setTopTabItems(value);
       setSelectedTopTabIndex(0);
-    }
-  }
+    },
+  };
 
   /**
    * 좌측 sidebar 관련 context
@@ -229,7 +229,7 @@ export function ApplicationContextProvider({ children }) {
     },
     clear: () => {
       setLeftSidebarItems([]);
-    }
+    },
   };
 
   useEffect(() => {
@@ -270,7 +270,7 @@ export function ApplicationContextProvider({ children }) {
         api,
         authentication,
         topTabs,
-        leftSidebar
+        leftSidebar,
       }}
     >
       {children}

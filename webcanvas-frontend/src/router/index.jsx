@@ -1,7 +1,7 @@
-import MainLayout from '@/components/layouts/index.jsx';
-import LandingPage from '@/pages/landing/index.jsx';
-import GameRoomPage from '@/pages/game-room/index.jsx';
-import LobbyPage from '@/pages/lobby/index.jsx';
+import MainLayout from "@/components/layouts/index.jsx";
+import LandingPage from "@/pages/landing/index.jsx";
+import GameRoomPage from "@/pages/game-room/index.jsx";
+import LobbyPage from "@/pages/lobby/index.jsx";
 
 export const pages = {
   landing: "/",
@@ -9,9 +9,7 @@ export const pages = {
   gameRoom: "/platform/game/room",
 };
 
-export const publicRoutes = [
-  { path: pages.landing, element: <LandingPage /> },
-];
+export const publicRoutes = [{ path: pages.landing, element: <LandingPage /> }];
 
 export const privateRoutes = [
   {
