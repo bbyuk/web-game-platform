@@ -266,7 +266,7 @@ export function ApplicationContextProvider({ children }) {
     gameRoomId: currentGameRoomId,
     gameRoomEntranceId: currentGameRoomEntranceId,
     otherUsers: currentGameRoomEnteredUsers,
-    setEntranceInfo: ({gameRoomId, gameRoomEntranceId, otherUsers}) => {
+    setEntranceInfo: ({ gameRoomId, gameRoomEntranceId, otherUsers }) => {
       setCurrentGameRoomId(gameRoomEntranceId);
       setCurrentGameRoomEntranceId(gameRoomEntranceId);
       setCurrentGameRoomEnteredUsers(otherUsers);
@@ -275,7 +275,7 @@ export function ApplicationContextProvider({ children }) {
       setCurrentGameRoomId(null);
       setCurrentGameRoomEntranceId(null);
       setCurrentGameRoomEnteredUsers([]);
-    }
+    },
   };
 
   useEffect(() => {
@@ -317,7 +317,7 @@ export function ApplicationContextProvider({ children }) {
         authentication,
         topTabs,
         leftSidebar,
-        currentGame
+        currentGame,
       }}
     >
       {children}

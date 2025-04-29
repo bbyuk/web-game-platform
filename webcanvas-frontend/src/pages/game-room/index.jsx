@@ -1,14 +1,13 @@
 import Canvas from "@/components/canvas/index.jsx";
 import { useEffect, useState } from "react";
 import { useApplicationContext } from "@/contexts/index.jsx";
-import { EMPTY_MESSAGES } from '@/constants/message.js';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { game } from '@/api/index.js';
-import { useApiLock } from '@/api/lock/index.jsx';
-import { pages } from '@/router/index.jsx';
+import { EMPTY_MESSAGES } from "@/constants/message.js";
+import { useLocation, useNavigate } from "react-router-dom";
+import { game } from "@/api/index.js";
+import { useApiLock } from "@/api/lock/index.jsx";
+import { pages } from "@/router/index.jsx";
 
 export default function GameRoomPage() {
-
   // 현재 캔버스의 획 모음
   const [strokes, setStrokes] = useState([]);
 
@@ -52,24 +51,23 @@ export default function GameRoomPage() {
 
     if (!(currentGame.gameRoomId && currentGame.gameRoomEntranceId)) {
       // 방 정보 조회
-      api.get(game.getCurrentEnteredGameRoom)
-        .then(response => {
+      api
+        .get(game.getCurrentEnteredGameRoom)
+        .then((response) => {
           currentGame.setEntranceInfo(response);
           navigate(`${pages.gameRoom}/${response.gameRoomId}`, { replace: true });
         })
-        .catch(error => {
+        .catch((error) => {
           alert("테스트 alert => 에러발생");
           console.log(error);
-        })
-    }
-    else {
+        });
+    } else {
       alert(`${currentGame.gameRoomId} 방에 입장했습니다.`);
     }
 
     /**
      * TODO canvas 팔레트 서비스 개발 및 조회 API 요청
      */
-
   }, [location.pathname]);
 
   return (

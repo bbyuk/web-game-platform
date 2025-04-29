@@ -4,17 +4,15 @@ import { useApplicationContext } from "@/contexts/index.jsx";
 import { game } from "@/api/index.js";
 import { useApiLock } from "@/api/lock/index.jsx";
 import { EMPTY_MESSAGES } from "@/constants/message.js";
-import { useNavigate } from 'react-router-dom';
-import { pages } from '@/router/index.jsx';
+import { useNavigate } from "react-router-dom";
+import { pages } from "@/router/index.jsx";
 
 export default function LobbyPage() {
-
   // 전역 context
   const { leftSidebar, api, currentGame } = useApplicationContext();
   // API 중복 요청을 block하기 위한 lock
   const { apiLock } = useApiLock();
   const navigate = useNavigate();
-
 
   useEffect(() => {
     if (currentGame.gameRoomId && currentGame.gameRoomEntranceId) {
@@ -34,7 +32,8 @@ export default function LobbyPage() {
      */
     leftSidebar.setEmptyPlaceholder(EMPTY_MESSAGES.ROOM_LIST);
 
-    api.get(game.getEnterableRooms)
+    api
+      .get(game.getEnterableRooms)
       .then((response) => {
         leftSidebar.setItems(response);
       })
@@ -53,7 +52,10 @@ export default function LobbyPage() {
    * ========================= 유저 함수 ==========================
    */
   const makeRoom = async () => {
-    const response = await apiLock(game.createGameRoom, async () => await api.post(game.createGameRoom));
+    const response = await apiLock(
+      game.createGameRoom,
+      async () => await api.post(game.createGameRoom)
+    );
   };
 
   const moveToGameRoom = (gameRoomId = "temp") => {
