@@ -1,8 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "@/api/index.js";
-import { useNavigate } from "react-router-dom";
-import { mockLobbyData } from "@/mocks/lobbyData.js";
-import { mockGameRoomData } from "@/mocks/gameRoomData.js";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { auth } from '@/api/index.js';
+import { useNavigate } from 'react-router-dom';
 
 const ApplicationContext = createContext(null);
 
@@ -31,6 +29,8 @@ export function ApplicationContextProvider({ children }) {
   /**
    * ========================= states ===========================
    */
+
+  const useMock = import.meta.env.VITE_USE_MOCK === "true";
 
   /**
    * constant with hook
@@ -120,11 +120,17 @@ export function ApplicationContextProvider({ children }) {
    * @type {{get: (function(*, {}=, {}=): Promise<*>), post: (function(*, {}=, {}=): Promise<*>), tokenRefresh: (function(): Promise<*>), constants: {serverDomain: any, defaultHeaders: {'Content-Type': string}}, utils: {buildUrlWithParams: (function(*, {}=): string|*)}}}
    */
   const api = {
-    get: async (url, params = {}, options = {}) => {
-      return request("GET", url, params, options);
+    get: async (target, params = {}, options = {}) => {
+      if (useMock) {
+        return Promise.resolve(target.mock);
+      }
+      return request("GET", target.url, params, options);
     },
-    post: async (url, data = {}, options = {}) => {
-      return request("POST", url, data, options);
+    post: async (target, data = {}, options = {}) => {
+      if (useMock) {
+        return Promise.resolve(target.mock);
+      }
+      return request("POST", target.url, data, options);
     },
     tokenRefresh: async () => {
       const processedUrl = `${api.constants.serverDomain}${auth.refresh}`;
@@ -234,27 +240,6 @@ export function ApplicationContextProvider({ children }) {
     },
   };
 
-  /**
-   * mock 관련 context
-   * @type {{}}
-   */
-  const mock = {
-    // mock 데이터 사용 여부
-    use: import.meta.env.VITE_USE_MOCK === "true",
-    // 페이지 단위 mock 데이터
-    pages: {
-      // lobby 페이지 mock 데이터
-      lobby: {
-        leftSidebar: mockLobbyData.enterableRooms,
-      },
-      // game-room 페이지 mock 데이터
-      gameRoom: {
-        leftSidebar: mockGameRoomData.enteredUsers,
-        topTabs: mockGameRoomData.canvasColors,
-      },
-    },
-  };
-
   useEffect(() => {
     if (!savedAccessToken) {
       /**
@@ -294,7 +279,6 @@ export function ApplicationContextProvider({ children }) {
         authentication,
         topTabs,
         leftSidebar,
-        mock,
       }}
     >
       {children}
