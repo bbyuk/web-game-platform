@@ -1,5 +1,5 @@
-import { ChevronRight } from "lucide-react";
-import { useEffect } from "react";
+import { ChevronRight } from 'lucide-react';
+import { useEffect } from 'react';
 
 const Container = ({ children }) => {
   return <ul className="space-y-2">{children}</ul>;
@@ -8,7 +8,7 @@ const Container = ({ children }) => {
 const Item = ({ label, color, current = -1, capacity = -1, isButton = false }) => {
   return (
     <li
-      className={`flex items-start space-x-2 p-2 rounded ${isButton ? "hover:bg-gray-700 cursor-pointer" : ""}`}
+      className={`flex items-start space-x-2 p-2 rounded ${isButton ? 'hover:bg-gray-700 cursor-pointer' : ''}`}
     >
       <ChevronRight size={16} className="text-gray-400 shrink-0 mt-1" />
       <div className="flex flex-col">
@@ -22,7 +22,7 @@ const Item = ({ label, color, current = -1, capacity = -1, isButton = false }) =
         )}
         {/* 인원 display */}
         {current > 0 && capacity > 0 && current <= capacity ? (
-          <span className={`text-xs ${current === capacity ? "text-red-400" : "text-gray-400"}`}>
+          <span className={`text-xs ${current === capacity ? 'text-red-400' : 'text-gray-400'}`}>
             {current} / {capacity}
           </span>
         ) : null}
@@ -31,19 +31,29 @@ const Item = ({ label, color, current = -1, capacity = -1, isButton = false }) =
   );
 };
 
-const ItemList = ({ value }) => {
+const ItemList = ({ value, emptyPlaceholder }) => {
+  const hasData = value && value.length > 0;
+
   return (
     <Container>
-      {value.map((el, index) => (
-        <Item
-          key={`left-item-${index}`}
-          label={el.label}
-          color={el.color}
-          current={el.current}
-          capacity={el.capacity}
-          isButton={el.isButton}
-        />
-      ))}
+      {hasData ?
+        (value.map((el, index) => (
+          <Item
+            key={`left-item-${index}`}
+            label={el.label}
+            color={el.color}
+            current={el.current}
+            capacity={el.capacity}
+            isButton={el.isButton}
+          />
+        )))
+        :
+        (
+          <li className="text-sm text-gray-500 px-2 py-4 text-center border border-dashed border-gray-600 rounded">
+            { emptyPlaceholder }
+          </li>
+        )
+      }
     </Container>
   );
 };

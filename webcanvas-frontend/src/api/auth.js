@@ -1,6 +1,6 @@
 import { mockAuthData } from '@/api/mocks/auth.js';
 
-const BASE = "/auth.js";
+const BASE = "/auth";
 
 export const auth = {
   // 로그인
