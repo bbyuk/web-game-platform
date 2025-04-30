@@ -38,6 +38,9 @@ public record GameRoomEntranceInfoResponse(
              * 유저 ID
              */
             @Schema(description = "유저 ID", example = "512")
-            Long userId
+            Long userId,
+
+            @Schema(description = "방 노출 컬러", example = "#1e9000")
+            String color
     ) {};
 }

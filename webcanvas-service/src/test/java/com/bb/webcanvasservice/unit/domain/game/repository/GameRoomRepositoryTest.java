@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -37,7 +38,7 @@ class GameRoomRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    private GameProperties gameProperties = new GameProperties(8, 10, 10);
+    private GameProperties gameProperties = new GameProperties(8, 10, 10, new ArrayList<>());
 
 
     @Test

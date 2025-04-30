@@ -24,10 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 import static com.bb.webcanvasservice.common.code.ErrorCode.GAME_ROOM_HAS_ILLEGAL_STATUS;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,7 +44,7 @@ class GameRoomServiceUnitTest {
     /**
      * mock
      */
-    private GameProperties gameProperties = new GameProperties(8, 10, 10);
+    private GameProperties gameProperties = new GameProperties(8, 10, 10, List.of("#ff3c00", "#0042ff", "#1e9000", "#f2cb00", "#8400a8", "#00c8c8", "#ff68ff", "#969696"));
     private GameRoomService gameRoomService;
 
     @BeforeEach
@@ -218,6 +215,7 @@ class GameRoomServiceUnitTest {
         when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(any(Long.class)))
                 .thenReturn(List.of(testGameRoomEntrance0, testGameRoomEntrance1, testGameRoomEntrance2));
 
+
         // when
 
         GameRoomEntranceInfoResponse enteredGameRoomInfo = gameRoomService.findEnteredGameRoomInfo(testUser0.getId());
@@ -226,6 +224,13 @@ class GameRoomServiceUnitTest {
         Assertions.assertThat(enteredGameRoomInfo.gameRoomEntranceId()).isEqualTo(testGameRoomEntrance0.getId());
         Assertions.assertThat(enteredGameRoomInfo.gameRoomId()).isEqualTo(testGameRoom.getId());
         Assertions.assertThat(enteredGameRoomInfo.enteredUsers()).hasSize(3);
+
+
+        // 250430 - 유저 Summary 데이터에 노출 컬러 필드 추가
+        Assertions.assertThat(enteredGameRoomInfo.enteredUsers().get(0).color()).isEqualTo("#ff3c00");
+        Assertions.assertThat(enteredGameRoomInfo.enteredUsers().get(1).color()).isEqualTo("#0042ff");
+        Assertions.assertThat(enteredGameRoomInfo.enteredUsers().get(2).color()).isEqualTo("#1e9000");
+
     }
 
     @Test

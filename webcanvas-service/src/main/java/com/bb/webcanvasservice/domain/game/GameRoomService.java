@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -226,6 +227,8 @@ public class GameRoomService {
      * 현재 입장한 게임 방과 입장 정보를 리턴한다.
      * <p>
      *
+     * 250430 - 유저 Summary 데이터에 노출 컬러 필드 추가
+     *
      * @param userId
      * @return
      */
@@ -234,15 +237,20 @@ public class GameRoomService {
         GameRoomEntrance userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId)
                 .orElseThrow(GameRoomEntranceNotFoundException::new);
 
+        AtomicInteger index = new AtomicInteger(0);
+
         return new GameRoomEntranceInfoResponse(
                 userEntrance.getGameRoom().getId(),
                 userEntrance.getId(),
                 gameRoomEntranceRepository
                         .findGameRoomEntrancesByGameRoomId(userEntrance.getGameRoom().getId())
                         .stream()
-//                        .filter(gameRoomEntrance -> !gameRoomEntrance.getUser().getId().equals(userId))
                         .map(gameRoomEntrance ->
-                                new GameRoomEntranceInfoResponse.EnteredUserSummary(gameRoomEntrance.getId()))
+                                new GameRoomEntranceInfoResponse.EnteredUserSummary(
+                                        gameRoomEntrance.getId(),
+                                        gameProperties.gameRoomUserColors().get(index.getAndIncrement())
+                                )
+                        )
                         .collect(Collectors.toList())
         );
     }
