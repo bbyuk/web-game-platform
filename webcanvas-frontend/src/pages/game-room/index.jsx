@@ -43,38 +43,45 @@ export default function GameRoomPage() {
     setReRenderingSignal(false);
   };
 
-  /**
-   * =========================== 이벤트 핸들러 =============================
-   */
-  useEffect(() => {
-    leftSidebar.setEmptyPlaceholder(EMPTY_MESSAGES.ENTERED_USER_LIST);
-
+  const checkAndSetLeftSidebar = async () => {
     if (!(currentGame.gameRoomId && currentGame.gameRoomEntranceId)) {
       // 방 정보 조회
-      api
+      await api
         .get(game.getCurrentEnteredGameRoom)
         .then((response) => {
           currentGame.setEntranceInfo(response);
           utils.redirectTo(`${pages.gameRoom}/${response.gameRoomId}`);
-          return;
+          return false;
         })
         .catch((error) => {
           if (error.code === "R003") {
             // 로비로 이동
             alert(REDIRECT_MESSAGES.TO_LOBBY);
             utils.redirectTo(pages.lobby);
-            return;
+            return false;
           }
           alert("테스트 alert => 에러발생");
-          console.log(error);
+          return false;
         });
-    } else {
-      alert(`${currentGame.gameRoomId} 방에 입장했습니다.`);
     }
+    else {
+      alert(`${currentGame.gameRoomId} 방에 입장했습니다.`);
+      leftSidebar.setItems(currentGame.enteredUsers);
+      console.log(currentGame.enteredUsers);
+    }
+  };
 
+  /**
+   * =========================== 이벤트 핸들러 =============================
+   */
+  useEffect(() => {
+    leftSidebar.setEmptyPlaceholder(EMPTY_MESSAGES.ENTERED_USER_LIST);
+
+    checkAndSetLeftSidebar();
     /**
      * TODO canvas 팔레트 서비스 개발 및 조회 API 요청
      */
+
   }, [location.pathname]);
 
   return (
