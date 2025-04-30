@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -60,7 +61,7 @@ class AuthenticationControllerTest {
 
     @BeforeEach
     void setup() throws Exception {
-        securityProperties = new SecurityProperties(900000, 1209600000, 259200000);
+        securityProperties = new SecurityProperties(900000L, 1209600000L, 259200000L, new ArrayList<>());
     }
 
     @Test

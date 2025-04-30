@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -36,7 +37,7 @@ class AuthenticationServiceUnitTest {
     /**
      * Mock
      */
-    private SecurityProperties securityProperties = new SecurityProperties(900000, 1209600000, 259200000);
+    private SecurityProperties securityProperties = new SecurityProperties(900000L, 1209600000L, 259200000L, new ArrayList<>());
     private AuthenticationService authenticationService;
 
     @BeforeEach

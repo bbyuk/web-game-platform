@@ -225,7 +225,7 @@ class GameRoomServiceUnitTest {
         // then
         Assertions.assertThat(enteredGameRoomInfo.gameRoomEntranceId()).isEqualTo(testGameRoomEntrance0.getId());
         Assertions.assertThat(enteredGameRoomInfo.gameRoomId()).isEqualTo(testGameRoom.getId());
-        Assertions.assertThat(enteredGameRoomInfo.otherUsers()).hasSize(2);
+        Assertions.assertThat(enteredGameRoomInfo.otherUsers()).hasSize(3);
     }
 
     @Test

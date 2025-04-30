@@ -240,7 +240,7 @@ public class GameRoomService {
                 gameRoomEntranceRepository
                         .findGameRoomEntrancesByGameRoomId(userEntrance.getGameRoom().getId())
                         .stream()
-                        .filter(gameRoomEntrance -> !gameRoomEntrance.getUser().getId().equals(userId))
+//                        .filter(gameRoomEntrance -> !gameRoomEntrance.getUser().getId().equals(userId))
                         .map(gameRoomEntrance ->
                                 new GameRoomEntranceInfoResponse.EnteredUserSummary(gameRoomEntrance.getId()))
                         .collect(Collectors.toList())
