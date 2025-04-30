@@ -82,7 +82,7 @@
     "data": {
       "gameRoomId": 1,
       "joinCode": "UD22E3",
-      "otherUsers": [
+      "enteredUsers": [
         {
           "userId": 32
         }
@@ -158,7 +158,7 @@
     "data": {
       "gameRoomId": 11,
       "gameRoomEntranceId": 222,
-      "otherUsers": [
+      "enteredUsers": [
         {
           "userId": 1
         }
