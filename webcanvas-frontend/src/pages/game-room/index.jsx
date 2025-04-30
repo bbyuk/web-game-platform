@@ -1,7 +1,7 @@
 import Canvas from "@/components/canvas/index.jsx";
 import { useEffect, useState } from "react";
 import { useApplicationContext } from "@/contexts/index.jsx";
-import { EMPTY_MESSAGES } from "@/constants/message.js";
+import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import { game } from "@/api/index.js";
 import { useApiLock } from "@/api/lock/index.jsx";
@@ -15,7 +15,7 @@ export default function GameRoomPage() {
   const [reRenderingSignal, setReRenderingSignal] = useState(false);
 
   // 전역 컨텍스트
-  const { api, topTabs, leftSidebar, currentGame } = useApplicationContext();
+  const { api, topTabs, leftSidebar, currentGame, utils } = useApplicationContext();
 
   const { apiLock } = useApiLock();
 
@@ -55,9 +55,16 @@ export default function GameRoomPage() {
         .get(game.getCurrentEnteredGameRoom)
         .then((response) => {
           currentGame.setEntranceInfo(response);
-          navigate(`${pages.gameRoom}/${response.gameRoomId}`, { replace: true });
+          utils.redirectTo(`${pages.gameRoom}/${response.gameRoomId}`);
+          return;
         })
         .catch((error) => {
+          if (error.code === "R003") {
+            // 로비로 이동
+            alert(REDIRECT_MESSAGES.TO_LOBBY);
+            utils.redirectTo(pages.lobby);
+            return;
+          }
           alert("테스트 alert => 에러발생");
           console.log(error);
         });

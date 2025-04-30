@@ -56,10 +56,12 @@ export default function LobbyPage() {
       game.createGameRoom,
       async () => await api.post(game.createGameRoom)
     );
+
+    currentGame.setEntranceInfo(response);
+    moveToGameRoom(response.gameRoomId);
   };
 
   const moveToGameRoom = (gameRoomId = "temp") => {
-    console.log(gameRoomId);
     navigate(`${pages.gameRoom}/${gameRoomId}`, { replace: true });
   };
 

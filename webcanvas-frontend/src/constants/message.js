@@ -3,3 +3,7 @@ export const EMPTY_MESSAGES = {
   ROOM_LIST: "입장 가능한 방이 없습니다.",
   ENTERED_USER_LIST: "방에 입장한 유저가 없습니다.",
 };
+
+export const REDIRECT_MESSAGES = {
+  TO_LOBBY: "로비로 이동합니다.",
+};

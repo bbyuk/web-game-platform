@@ -2,6 +2,7 @@ import MainLayout from "@/components/layouts/index.jsx";
 import LandingPage from "@/pages/landing/index.jsx";
 import GameRoomPage from "@/pages/game-room/index.jsx";
 import LobbyPage from "@/pages/lobby/index.jsx";
+import { useNavigate } from "react-router-dom";
 
 export const pages = {
   landing: "/",

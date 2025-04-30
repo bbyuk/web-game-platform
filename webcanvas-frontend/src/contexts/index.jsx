@@ -265,16 +265,22 @@ export function ApplicationContextProvider({ children }) {
   const currentGame = {
     gameRoomId: currentGameRoomId,
     gameRoomEntranceId: currentGameRoomEntranceId,
-    otherUsers: currentGameRoomEnteredUsers,
-    setEntranceInfo: ({ gameRoomId, gameRoomEntranceId, otherUsers }) => {
+    enteredUsers: currentGameRoomEnteredUsers,
+    setEntranceInfo: ({ gameRoomId, gameRoomEntranceId, enteredUsers }) => {
       setCurrentGameRoomId(gameRoomEntranceId);
       setCurrentGameRoomEntranceId(gameRoomEntranceId);
-      setCurrentGameRoomEnteredUsers(otherUsers);
+      setCurrentGameRoomEnteredUsers(enteredUsers);
     },
     clearEntranceInfo: () => {
       setCurrentGameRoomId(null);
       setCurrentGameRoomEntranceId(null);
       setCurrentGameRoomEnteredUsers([]);
+    },
+  };
+
+  const utils = {
+    redirectTo: (url) => {
+      navigate(url, { replace: true });
     },
   };
 
@@ -318,6 +324,7 @@ export function ApplicationContextProvider({ children }) {
         topTabs,
         leftSidebar,
         currentGame,
+        utils,
       }}
     >
       {children}
