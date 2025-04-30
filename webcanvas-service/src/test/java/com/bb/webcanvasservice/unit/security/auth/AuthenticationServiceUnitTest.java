@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("인증 서비스 단위테스트")
+@DisplayName("[unit] [service] 인증 서비스 단위테스트")
 class AuthenticationServiceUnitTest {
 
     @Mock

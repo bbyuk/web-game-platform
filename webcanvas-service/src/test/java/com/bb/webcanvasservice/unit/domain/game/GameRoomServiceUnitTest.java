@@ -34,7 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("게임 방 서비스 단위테스트")
+@DisplayName("[unit] [service] 게임 방 서비스 단위테스트")
 class GameRoomServiceUnitTest {
 
     @Mock
@@ -225,7 +225,7 @@ class GameRoomServiceUnitTest {
         // then
         Assertions.assertThat(enteredGameRoomInfo.gameRoomEntranceId()).isEqualTo(testGameRoomEntrance0.getId());
         Assertions.assertThat(enteredGameRoomInfo.gameRoomId()).isEqualTo(testGameRoom.getId());
-        Assertions.assertThat(enteredGameRoomInfo.otherUsers()).hasSize(3);
+        Assertions.assertThat(enteredGameRoomInfo.enteredUsers()).hasSize(3);
     }
 
     @Test

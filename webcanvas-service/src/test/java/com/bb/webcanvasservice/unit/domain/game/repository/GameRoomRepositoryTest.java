@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 @Transactional
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DisplayName("[unit] [persistence] 게임 방 Repository 단위테스트")
 class GameRoomRepositoryTest {
 
     @Autowired

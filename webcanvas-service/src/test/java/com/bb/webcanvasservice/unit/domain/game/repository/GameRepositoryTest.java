@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 @Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest // JPA 관련 컴포넌트만 로드하여 테스트
-@DisplayName("게임 persistence layer 단위테스트")
+@DisplayName("[unit] [persistence] 게임 repository 단위테스트")
 class GameRepositoryTest {
 
     @Autowired

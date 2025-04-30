@@ -25,6 +25,7 @@ import java.util.UUID;
 @Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
+@DisplayName("[unit] [persistence] 게임 방 입장 Repository 단위테스트")
 class GameRoomEntranceRepositoryTest {
 
     @Autowired

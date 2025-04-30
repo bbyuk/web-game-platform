@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         controllers = {AuthenticationController.class},
         excludeAutoConfiguration = {SecurityAutoConfiguration.class}
 )
-@DisplayName("인증 API Controller WebMvcTest 단위테스트")
+@DisplayName("[unit] [presentation] 인증 API Controller WebMvcTest 단위테스트")
 class AuthenticationControllerTest {
 
     @Autowired

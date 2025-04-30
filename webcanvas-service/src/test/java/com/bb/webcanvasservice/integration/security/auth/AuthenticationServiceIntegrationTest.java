@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @SpringBootTest
-@DisplayName("인증 서비스 통합테스트")
+@DisplayName("[integration] [service] 인증 서비스 통합테스트")
 class AuthenticationServiceIntegrationTest {
 
     @Autowired

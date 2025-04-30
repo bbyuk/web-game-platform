@@ -25,7 +25,7 @@ public record GameRoomEntranceInfoResponse(
          * 현재 게임방에 접속해있는 다른 유저들의 정보
          */
         @Schema(description = "현재 게임방에 접속해있는 다른 유저들의 정보")
-        List<EnteredUserSummary> otherUsers
+        List<EnteredUserSummary> enteredUsers
 
 ) {
     /**

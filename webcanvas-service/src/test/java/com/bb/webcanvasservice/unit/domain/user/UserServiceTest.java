@@ -20,6 +20,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("[unit] [service] 유저 서비스 단위테스트")
 class UserServiceTest {
     @Mock
     private UserRepository userRepository;
