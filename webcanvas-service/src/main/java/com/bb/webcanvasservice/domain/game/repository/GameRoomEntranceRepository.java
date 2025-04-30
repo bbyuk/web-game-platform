@@ -49,6 +49,8 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
 
     /**
      * 게임 방 ID로 해당 게임 방에 입장한 정보 조회
+     *
+     * 250430 - 입장한 순서대로 정렬 추가
      * @param gameRoomId
      * @return gameRoomEntrances
      */
@@ -60,6 +62,7 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             join fetch  GameRoom gr on gre.gameRoom = gr
             where       gre.gameRoom.id = :gameRoomId
             and         gre.state = 'ACTIVE'
+            order by    gre.id asc
             """
     )
     List<GameRoomEntrance> findGameRoomEntrancesByGameRoomId(@Param("gameRoomId") Long gameRoomId);

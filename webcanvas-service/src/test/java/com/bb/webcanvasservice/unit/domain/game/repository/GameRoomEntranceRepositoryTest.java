@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -125,8 +126,16 @@ class GameRoomEntranceRepositoryTest {
 
         // then
         Assertions.assertThat(gameRoomEntrance).isPresent();
-        Assertions.assertThat(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoomEntrance.get().getGameRoom().getId()))
+        List<GameRoomEntrance> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoomEntrance.get().getGameRoom().getId());
+        Assertions.assertThat(entrances)
                 .hasSize(5);
+
+        // 250430 입장한 순서대로 enteredUsers sorting 추가
+        Assertions.assertThat(entrances.get(0).getUser()).isEqualTo(otherUser1);
+        Assertions.assertThat(entrances.get(1).getUser()).isEqualTo(testUser);
+        Assertions.assertThat(entrances.get(2).getUser()).isEqualTo(otherUser2);
+        Assertions.assertThat(entrances.get(3).getUser()).isEqualTo(otherUser3);
+        Assertions.assertThat(entrances.get(4).getUser()).isEqualTo(otherUser4);
     }
 
     @Test
