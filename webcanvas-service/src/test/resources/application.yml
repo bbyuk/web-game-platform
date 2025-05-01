@@ -19,3 +19,45 @@ logging:
   level:
     org.springframework.web.socket: DEBUG
     com.bb.webcanvasservice: DEBUG
+
+
+application:
+  domain:
+    game:
+      # 게임 방 입장 최대 정원
+      game-room-capacity: 8
+      # 게임 방 생성중 입장코드 충돌 발생 시 재생성 시도 최대 횟수
+      join-code-max-conflict-count: 10
+      # 게임 방의 입장 코드 길이
+      join-code-length: 10
+      game-room-user-colors:
+        - "#ff3c00"
+        - "#0042ff"
+        - "#1e9000"
+        - "#f2cb00"
+        - "#8400a8"
+        - "#00c8c8"
+        - "#ff68ff"
+        - "#969696"
+    dictionary:
+      data-url: https://github.com/bbyuk/web-game-platform/releases/download/v0.1.0/
+  security:
+    ## 단위 초 (s)
+    # 15분 (15 * 60)
+    access-token-expiration: 900
+    # 14일 (14 * 24 * 60 * 60)
+    refresh-token-expiration: 1209600
+    # 3일 (3 * 24 * 60 * 60)
+    refresh-token-reissue-threshold: 259200
+    white-list:
+      - /auth/**
+
+
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha

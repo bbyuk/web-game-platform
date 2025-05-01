@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "words")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Words {
+public class Word {
 
     @Id
     @GeneratedValue
@@ -21,6 +21,12 @@ public class Words {
      * 사전 ID
      */
     private Long id;
+
+    @Column(name = "value")
+    /**
+     * 단어 값
+     */
+    private String value;
 
     @Column(name = "category")
     /**
@@ -32,7 +38,13 @@ public class Words {
     /**
      * 문자 종류 (ex : 한자어, 혼합어 등)
      */
-    private String wordType;
+    private String type;
+
+    @Column(name = "word_unit")
+    /**
+     * 단어 유닛 -> (ex : 어휘, 구 등)
+     */
+    private String unit;
 
     @Column(name = "pos")
     @Enumerated(EnumType.STRING)

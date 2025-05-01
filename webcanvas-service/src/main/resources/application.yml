@@ -54,6 +54,8 @@ application:
         - "#00c8c8"
         - "#ff68ff"
         - "#969696"
+    dictionary:
+      data-url: https://github.com/bbyuk/web-game-platform/releases/download/v0.1.0/
   security:
     ## 단위 초 (s)
     # 15분 (15 * 60)
