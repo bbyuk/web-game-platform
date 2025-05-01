@@ -6,6 +6,8 @@ HELP.md
 !**/src/test/**/build/
 **/.DS_Store
 
+/words-json/
+
 ### STS ###
 .apt_generated
 .classpath
