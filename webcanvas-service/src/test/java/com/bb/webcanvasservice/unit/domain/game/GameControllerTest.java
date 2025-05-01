@@ -1,6 +1,7 @@
-package com.bb.webcanvasservice.domain.game;
+package com.bb.webcanvasservice.unit.domain.game;
 
-import com.bb.webcanvasservice.domain.game.dto.response.GameRoomCreateResponse;
+import com.bb.webcanvasservice.domain.game.GameController;
+import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.security.auth.JwtManager;

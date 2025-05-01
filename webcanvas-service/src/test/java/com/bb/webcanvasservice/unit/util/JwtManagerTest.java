@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.util;
+package com.bb.webcanvasservice.unit.util;
 
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import org.assertj.core.api.Assertions;

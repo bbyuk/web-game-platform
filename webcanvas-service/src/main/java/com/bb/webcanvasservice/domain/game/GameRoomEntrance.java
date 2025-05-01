@@ -38,11 +38,17 @@ public class GameRoomEntrance {
      */
     private User user;
 
+    @Column(name = "user_nickname")
+    /**
+     * 게임 방 내에서의 유저 닉네임 -> 사전에서 랜덤으로 찾아와 조합할 예정
+     */
+    private String nickname;
+
     /**
      * 게임 방 입장 기록 상태
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "gaem_room_entrance_state")
+    @Column(name = "game_room_entrance_state")
     private GameRoomEntranceState state;
 
     public GameRoomEntrance(GameRoom gameRoom, User user) {
