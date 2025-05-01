@@ -267,7 +267,7 @@ export function ApplicationContextProvider({ children }) {
     gameRoomEntranceId: currentGameRoomEntranceId,
     enteredUsers: currentGameRoomEnteredUsers,
     setEntranceInfo: ({ gameRoomId, gameRoomEntranceId, enteredUsers }) => {
-      setCurrentGameRoomId(gameRoomEntranceId);
+      setCurrentGameRoomId(gameRoomId);
       setCurrentGameRoomEntranceId(gameRoomEntranceId);
       setCurrentGameRoomEnteredUsers(enteredUsers);
     },

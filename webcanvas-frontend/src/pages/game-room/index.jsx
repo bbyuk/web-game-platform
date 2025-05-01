@@ -83,7 +83,6 @@ export default function GameRoomPage() {
      */
 
   }, [location.pathname]);
-
   return (
     <Canvas
       className="flex-1"

@@ -9,6 +9,6 @@ export default function LandingPage() {
     if (authentication.isAuthenticated) {
       navigate("/platform", { replace: true });
     }
-  }, []);
+  }, [authentication.isAuthenticated]);
   return <></>;
 }
