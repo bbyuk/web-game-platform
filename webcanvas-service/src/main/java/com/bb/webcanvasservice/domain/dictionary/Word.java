@@ -34,11 +34,17 @@ public class Word {
      */
     private String category;
 
-    @Column(name = "word_type")
+    @Column(name = "word_type1")
     /**
      * 문자 종류 (ex : 한자어, 혼합어 등)
      */
-    private String type;
+    private String type1;
+
+    @Column(name = "word_type2")
+    /**
+     * 워드 타입 2
+     */
+    private String type2;
 
     @Column(name = "word_unit")
     /**
@@ -47,11 +53,18 @@ public class Word {
     private String unit;
 
     @Column(name = "pos")
-    @Enumerated(EnumType.STRING)
     /**
      * 품사
      */
-    private PartOfSpeech partOfSpeech;
+    private String pos;
 
 
+    public Word(String value, String category, String type1, String type2, String unit, String pos) {
+        this.value = value;
+        this.category = category;
+        this.type1 = type1;
+        this.type2 = type2;
+        this.unit = unit;
+        this.pos = pos;
+    }
 }

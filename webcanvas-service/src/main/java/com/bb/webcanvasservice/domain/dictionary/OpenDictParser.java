@@ -15,7 +15,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,7 @@ public class OpenDictParser {
 
     private final ObjectMapper objectMapper;
     private final DictionaryProperties dictionaryProperties;
+    private final WordRepository wordRepository;
 
     private void downloadFile(String fileURL, Path savePath) throws IOException {
         URL url = new URL(fileURL);
@@ -70,6 +73,7 @@ public class OpenDictParser {
                         // 2. channel 필드를 찾음
                         if ("channel".equals(fieldName)) {
                             parser.nextToken(); // channel 객체 안으로
+                            List<Word> wordsToSave = new ArrayList<>();
 
                             while(parser.nextToken() != JsonToken.END_OBJECT) {
                                 String channelField = parser.currentName();
@@ -84,24 +88,34 @@ public class OpenDictParser {
 
                                         ParseItem parseItem = objectMapper.readValue(parser, ParseItem.class);
 
-                                        if (parseItem == null) {
-                                            log.debug("아이템이 없을수도 있나?");
-                                            continue;
-                                        }
+                                        Word word = new Word(
+                                                parseItem.wordinfo().word(),
+                                                parseItem.senseinfo().cat_info() != null ? parseItem.senseinfo().cat_info().get(0).cat() : null,
+                                                parseItem.wordinfo().word_type(),
+                                                parseItem.senseinfo().type(),
+                                                parseItem.wordinfo().word_unit(),
+                                                parseItem.senseinfo().pos()
+                                        );
+                                        wordsToSave.add(word);
 
-                                        if (parseItem.senseinfo() == null) {
-                                            log.debug("senseinfo가 없을수도 있나?");
-                                            continue;
-                                        }
-
-                                        if (parseItem.senseinfo().cat_info() == null) {
-                                            log.debug("{} = 카테고리 정보 없음", parseItem.wordinfo().word());
-                                            continue;
-                                        }
-                                        if (parseItem.senseinfo().cat_info().size() > 1) {
-                                            log.debug("{} = 복수 카테고리 보유",parseItem.wordinfo().word());
-                                            log.debug(parseItem.senseinfo().cat_info().stream().map(ParseItem.SenseInfo.Category::cat).collect(Collectors.joining(", ")));
-                                        }
+//                                        if (parseItem == null) {
+//                                            log.debug("아이템이 없을수도 있나?");
+//                                            continue;
+//                                        }
+//
+//                                        if (parseItem.senseinfo() == null) {
+//                                            log.debug("senseinfo가 없을수도 있나?");
+//                                            continue;
+//                                        }
+//
+//                                        if (parseItem.senseinfo().cat_info() == null) {
+////                                            log.debug("{} = 카테고리 정보 없음", parseItem.wordinfo().word());
+//                                            continue;
+//                                        }
+//                                        if (parseItem.senseinfo().cat_info().size() > 1) {
+//                                            log.debug("{} = 복수 카테고리 보유",parseItem.wordinfo().word());
+//                                            log.debug(parseItem.senseinfo().cat_info().stream().map(ParseItem.SenseInfo.Category::cat).collect(Collectors.joining(", ")));
+//                                        }
 
                                         /**
                                          * TODO
@@ -121,7 +135,7 @@ public class OpenDictParser {
 //
 //                                        System.out.println("sensinfo = " + sensinfo);
                                     }
-
+                                    wordRepository.saveAll(wordsToSave);
                                 }
                                 else {
                                     parser.skipChildren(); // item 필드 외의 필드는 무시한다.
