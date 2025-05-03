@@ -1,25 +1,23 @@
 package com.bb.webcanvasservice.unit.util;
 
-import com.bb.webcanvasservice.domain.dictionary.OpenDictParser;
+import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
-class OpenDictParserTest {
+class DictionaryServiceTest {
 
     @Autowired
-    private OpenDictParser openDictParser;
+    private DictionaryService dictionaryService;
 
     @Test
     void parseTest() throws IOException {
         // given
 
-        openDictParser.traverseFiles();
+        dictionaryService.traverseFiles();
 
         // when
 
