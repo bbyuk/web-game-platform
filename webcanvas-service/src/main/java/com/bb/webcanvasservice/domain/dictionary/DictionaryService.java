@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.domain.dictionary;
 
+import com.bb.webcanvasservice.common.sequence.SequenceRepository;
 import com.bb.webcanvasservice.domain.dictionary.dto.ParseItem;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileDownloadFailedException;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileParseFailedException;
@@ -20,7 +21,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * https://opendict.korean.go.kr/main
@@ -33,7 +37,10 @@ public class DictionaryService {
 
     private final ObjectMapper objectMapper;
     private final DictionaryProperties dictionaryProperties;
+
     private final WordRepository wordRepository;
+    private final SequenceRepository sequenceRepository;
+    private static final Pattern VALID_KOREAN = Pattern.compile("^[가-힣]+$");
 
     /**
      * 파일을 URL을 이용해 타겟 savePath에 파일을 다운로드한다.
@@ -74,6 +81,7 @@ public class DictionaryService {
 
 
         List<Word> parsedWords = new ArrayList<>();
+        Set<String> wordValues = new HashSet<>();
 
         try {
             log.debug("{}번 파일 다운로드 시작", index);
@@ -116,6 +124,42 @@ public class DictionaryService {
                                             parseItem.wordinfo().word_unit(),
                                             parseItem.senseinfo().pos()
                                     );
+
+                                    /**
+                                     * 명사 / 형용사만 저장
+                                     */
+                                    if ("명사".equals(word.getPos())) {
+                                        word.updateIndex(sequenceRepository.getNextValue("WORD_NOUN"));
+                                    }
+                                    else if ("형용사".equals(word.getPos())) {
+                                        word.updateIndex(sequenceRepository.getNextValue("WORD_ADJECTIVE"));
+                                    }
+                                    else {
+                                        continue;
+                                    }
+
+                                    /**
+                                     * 이미 포함된 동음이의어는 추가로 저장하지 않음.
+                                     */
+                                    if (wordValues.contains(word.getValue())) {
+                                        continue;
+                                    }
+
+                                    /**
+                                     * 정규식 기반 필터링
+                                     */
+                                    if (!VALID_KOREAN.matcher(word.getValue()).matches()) {
+                                        continue;
+                                    }
+
+                                    /**
+                                     * word_type2가 일반어인 경우만 저장
+                                     */
+                                    if (!"일반어".equals(word.getType2())) {
+                                        continue;
+                                    }
+
+                                    wordValues.add(word.getValue());
                                     parsedWords.add(word);
 
                                     /**

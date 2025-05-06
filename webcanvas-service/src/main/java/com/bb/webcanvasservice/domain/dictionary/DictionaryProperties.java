@@ -2,8 +2,6 @@ package com.bb.webcanvasservice.domain.dictionary;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.List;
-
 /**
  * 사전 관련 프로퍼티
  */

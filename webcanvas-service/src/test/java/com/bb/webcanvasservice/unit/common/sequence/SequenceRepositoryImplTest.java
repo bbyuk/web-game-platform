@@ -1,27 +1,43 @@
 package com.bb.webcanvasservice.unit.common.sequence;
 
-import com.bb.webcanvasservice.common.sequence.*;
+import com.bb.webcanvasservice.common.sequence.SequenceCreateFailedException;
+import com.bb.webcanvasservice.common.sequence.SequenceNotFoundException;
+import com.bb.webcanvasservice.common.sequence.SequenceProperties;
+import com.bb.webcanvasservice.common.sequence.SequenceRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @Transactional
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@DataJpaTest // JPA 관련 컴포넌트만 로드하여 테스트
-@Import(SequenceRepositoryImpl.class)
+@SpringBootTest
 @DisplayName("[unit] [persistence] 시퀀스 처리 단위테스트")
 class SequenceRepositoryImplTest {
 
     @Autowired
     private SequenceRepository sequenceRepository;
+
+    @Autowired
+    private SequenceProperties sequenceProperties;
+
+    @Test
+    @DisplayName("초기 시퀀스 자동생성 - 애플리케이션 실행시 property에 정의한 시퀀스들을 자동 생성한다.")
+    void setupSequence() {
+        // given
+        sequenceProperties.list()
+                .forEach(sequenceName -> {
+                    Assertions.assertThatThrownBy(() -> sequenceRepository.createSequence(sequenceName))
+                            .isInstanceOf(SequenceCreateFailedException.class);
+                });
+
+        // when
+
+        // then
+
+    }
 
     @Test
     @DisplayName("시퀀스 생성 - 시퀀스를 생성한다.")

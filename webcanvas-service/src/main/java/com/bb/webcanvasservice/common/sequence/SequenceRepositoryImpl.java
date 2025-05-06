@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.common.sequence;
 
 
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
@@ -13,15 +14,30 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class SequenceRepositoryImpl implements SequenceRepository{
+@Repository
+public class SequenceRepositoryImpl implements SequenceRepository {
 
     private final EntityManager entityManager;
+
+    private final SequenceProperties sequenceProperties;
 
     private final String SEQUENCE_SELECT_QUERY = """
                 select  s
                 from    Sequence s
                 where   s.name = :sequenceName
                 """;
+
+
+    @Transactional
+    void setupSequences() {
+        sequenceProperties.list().forEach(sequenceName -> {
+            if (isExistSequence(sequenceName)) {
+                return;
+            }
+            createSequence(sequenceName);
+        });
+    }
+
 
     /**
      * 시퀀스를 생성한다.
@@ -31,7 +47,20 @@ public class SequenceRepositoryImpl implements SequenceRepository{
     @Override
     @Transactional
     public void createSequence(String sequenceName) {
-        Boolean sequenceExists = entityManager.createQuery("""
+        Boolean sequenceExists = isExistSequence(sequenceName);
+
+        if (sequenceExists) {
+            log.error("{} 이미 존재하는 시퀀스 명입니다.", sequenceName);
+            throw new SequenceCreateFailedException();
+        }
+
+        Sequence sequence = new Sequence(sequenceName);
+        entityManager.persist(sequence);
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean isExistSequence(String sequenceName) {
+        return entityManager.createQuery("""
                         select  exists(
                           select  1
                           from    Sequence s
@@ -41,14 +70,6 @@ public class SequenceRepositoryImpl implements SequenceRepository{
                         """, boolean.class)
                 .setParameter("sequenceName", sequenceName)
                 .getSingleResult();
-
-        if (sequenceExists) {
-            log.error("{} 이미 존재하는 시퀀스 명입니다.", sequenceName);
-            throw new SequenceCreateFailedException();
-        }
-
-        Sequence sequence = new Sequence(sequenceName);
-        entityManager.persist(sequence);
     }
 
     /**

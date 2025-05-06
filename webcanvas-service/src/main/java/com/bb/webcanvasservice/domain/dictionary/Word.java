@@ -34,7 +34,7 @@ public class Word {
      */
     private String category;
 
-    @Column(name = "index")
+    @Column(name = "word_index")
     /**
      * 단어 인덱스
      */
@@ -72,5 +72,9 @@ public class Word {
         this.type2 = type2;
         this.unit = unit;
         this.pos = pos;
+    }
+
+    public void updateIndex(Long index) {
+        this.index = index;
     }
 }

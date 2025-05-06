@@ -19,7 +19,7 @@ spring:
       connection-test-query: "SELECT 1"
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         show_sql: true
@@ -37,6 +37,10 @@ logging:
         messaging: debug
 
 application:
+  sequence:
+      list:
+        - "WORD_NOUN"
+        - "WORD_ADJECTIVE"
   domain:
     game:
       # 게임 방 입장 최대 정원
