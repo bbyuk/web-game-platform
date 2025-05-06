@@ -34,6 +34,12 @@ public class Word {
      */
     private String category;
 
+    @Column(name = "index")
+    /**
+     * 단어 인덱스
+     */
+    private Long index;
+
     @Column(name = "word_type1")
     /**
      * 문자 종류 (ex : 한자어, 혼합어 등)
