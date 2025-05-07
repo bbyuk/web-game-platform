@@ -29,6 +29,8 @@ import java.util.regex.Pattern;
 /**
  * https://opendict.korean.go.kr/main
  * 우리말 샘에서 제공하는 사전을 파싱해 DB에 적재하기 위한 클래스
+ * TODO 배치 작업 처리 추가
+ * TODO 형용사 어미 ~한 ~된 등으로 변경 로직 구상
  */
 @Service
 @Slf4j
