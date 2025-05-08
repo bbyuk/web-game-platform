@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.domain.dictionary;
 
+import com.bb.webcanvasservice.common.lock.DistributedLock;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileDownloadFailedException;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileParseFailedException;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,6 @@ public class DictionaryBatchService {
     @Async("asyncBatchTaskExecutor")
     public CompletableFuture<Integer> batchInsertWordData() {
         AtomicInteger result = new AtomicInteger(0);
-
         /**
          * TODO 파일 전체 다운로드 및 unzip 로직 추가
          * 개발중엔 임시로 프로젝트 루트 경로에 파일 다운로드 후 테스트
@@ -40,8 +40,7 @@ public class DictionaryBatchService {
         try {
             classpathRoot = Paths.get(ClassLoader.getSystemResource("").toURI());
             parentOfProjectRoot = classpathRoot.getParent().getParent().getParent().getParent().getParent();
-        }
-        catch(URISyntaxException e) {
+        } catch (URISyntaxException e) {
             log.error("파일 경로를 찾지 못했습니다.");
             throw new DictionaryFileDownloadFailedException();
         }
@@ -50,8 +49,7 @@ public class DictionaryBatchService {
         try (Stream<Path> paths = Files.list(targetDirectory)) {
             paths.filter(Files::isRegularFile)
                     .forEach(path -> result.addAndGet(dictionaryService.parseFileAndSave(path)));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.error("데이터 파일 디렉터리 순회중 오류 발생", e);
             throw new DictionaryFileParseFailedException();
         }

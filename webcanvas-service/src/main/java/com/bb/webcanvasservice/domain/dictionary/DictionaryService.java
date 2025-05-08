@@ -5,6 +5,7 @@ import com.bb.webcanvasservice.domain.dictionary.dto.ParseItem;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileDownloadFailedException;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileParseFailedException;
 import com.bb.webcanvasservice.domain.dictionary.repository.WordRepository;
+import com.bb.webcanvasservice.domain.dictionary.util.KoreanAdjectiveConverter;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -102,56 +103,46 @@ public class DictionaryService {
 
                                 ParseItem parseItem = objectMapper.readValue(parser, ParseItem.class);
 
-                                Word word = new Word(
-                                        parseItem.wordinfo().word(),
-                                        parseItem.senseinfo().cat_info() != null ? parseItem.senseinfo().cat_info().get(0).cat() : null,
-                                        parseItem.wordinfo().word_type(),
-                                        parseItem.senseinfo().type(),
-                                        parseItem.wordinfo().word_unit(),
-                                        parseItem.senseinfo().pos()
-                                );
-
                                 /**
                                  * 명사 / 형용사만 저장
                                  */
-                                if ("명사".equals(word.getPos())) {
-                                    word.updateIndex(sequenceRepository.getNextValue("WORD_NOUN"));
-                                }
-                                else if ("형용사".equals(word.getPos())) {
-                                    word.updateIndex(sequenceRepository.getNextValue("WORD_ADJECTIVE"));
-                                }
-                                else {
+                                String pos = parseItem.senseinfo().pos();
+                                Long index = "명사".equals(pos)
+                                        ? sequenceRepository.getNextValue("WORD_NOUN")
+                                        : "형용사".equals(pos)
+                                        ? sequenceRepository.getNextValue("WORD_ADJECTIVE")
+                                        : -1;
+                                if (index == -1) {
                                     continue;
                                 }
-
+                                String value = parseItem.wordinfo().word();
                                 /**
                                  * 이미 포함된 동음이의어는 추가로 저장하지 않음.
+                                 * 정규식 기반 필터링
                                  */
-                                if (wordValues.contains(word.getValue())) {
+                                if (wordValues.contains(value) || !VALID_KOREAN.matcher(value).matches()) {
                                     continue;
                                 }
 
                                 /**
-                                 * 정규식 기반 필터링
+                                 * 형용사일 경우 value converting 작업 수행
                                  */
-                                if (!VALID_KOREAN.matcher(word.getValue()).matches()) {
-                                    continue;
+                                if ("형용사".equals(pos)) {
+                                    value = KoreanAdjectiveConverter.toModifierForm(value);
                                 }
+
+                                String category = parseItem.senseinfo().cat_info() != null ? parseItem.senseinfo().cat_info().get(0).cat() : null;
 
                                 /**
                                  * word_type2가 일반어인 경우만 저장
                                  */
-                                if (!"일반어".equals(word.getType2())) {
+                                String type1 = parseItem.wordinfo().word_type();
+                                String type2 = parseItem.senseinfo().type();
+                                if (!"일반어".equals(type2)) {
                                     continue;
                                 }
 
-                                wordValues.add(word.getValue());
-                                parsedWords.add(word);
-
                                 /**
-                                 * TODO
-                                 * 파싱 로직 구현
-                                 *
                                  * item.wordinfo.word_unit (어휘) -> Word.unit
                                  * item.wordinfo.word_type -> Word.type
                                  * item.wordinfo.word (target value)
@@ -161,6 +152,18 @@ public class DictionaryService {
                                  * item.senseinfo.pos (명사)
                                  */
 
+                                Word word = new Word(
+                                        value,
+                                        index,
+                                        category,
+                                        type1,
+                                        type2,
+                                        parseItem.wordinfo().word_unit(),
+                                        pos
+                                );
+
+                                wordValues.add(word.getValue());
+                                parsedWords.add(word);
                             }
                         }
                         else {
@@ -217,8 +220,6 @@ public class DictionaryService {
             log.debug("{}번 파일 다운로드 시작", index);
             downloadFile(targetUrl, downloadTempFilePath);
             log.debug("{}번 파일 다운로드 성공", index);
-
-            final JsonFactory factory = objectMapper.getFactory();
 
             return parseFile(downloadTempFilePath);
         } catch (DictionaryFileDownloadFailedException e) {

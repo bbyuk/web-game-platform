@@ -1,8 +1,11 @@
 package com.bb.webcanvasservice.domain.dictionary;
 
+import com.bb.webcanvasservice.common.lock.DistributedLock;
+import com.bb.webcanvasservice.common.lock.LockAlreadyOccupiedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * TODO ADMIN 계정으로만 접근 가능하도록 권한관리 필요
  */
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("dictionary")
@@ -20,6 +24,7 @@ public class DictionaryController {
 
     private final DictionaryService dictionaryService;
     private final DictionaryBatchService dictionaryBatchService;
+    private final DistributedLock distributedLock;
 
     @PostMapping("word/{fileIndex}")
     @Operation(summary = "파일 파싱 및 적용", description = "단일 파일을 파싱해 word 테이블에 저장한다.")
@@ -30,7 +35,17 @@ public class DictionaryController {
     @PostMapping("batch/word")
     @Operation(summary = "전체 파일 파싱 및 적용 배치 수행", description = "전체 파일을 순회하며 word 테이블에 저장하는 비동기 배치 실행")
     public ResponseEntity<Void> applyAllFileBatch() {
-        dictionaryBatchService.batchInsertWordData();
+        String batchId = "word-data-initial-insert";
+
+        try {
+            distributedLock.executeWithLock(batchId, dictionaryBatchService::batchInsertWordData);
+        }
+        catch(LockAlreadyOccupiedException e) {
+            log.error(e.getMessage());
+            log.error("이미 실행중인 배치입니다. ====== {}", batchId);
+            throw new LockAlreadyOccupiedException("이미 실행중인 배치입니다.");
+        }
+
         return ResponseEntity.ok(null);
     }
 

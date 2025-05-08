@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
     SYSTEM_ERROR("S000", "시스템 오류입니다. 관리자에게 문의해주세요.", HttpStatus.INTERNAL_SERVER_ERROR),
+    BAD_REQUEST("C000", "잘못된 접근입니다.", HttpStatus.BAD_REQUEST),
     UNAUTHORIZED("A000", "인증에 실패했습니다.", HttpStatus.UNAUTHORIZED),
     INVALID_TOKEN("A000", "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED),
     TOKEN_EXPIRED("A001", "토큰이 만료되었습니다.", HttpStatus.UNAUTHORIZED),

@@ -65,16 +65,13 @@ public class Word {
     private String pos;
 
 
-    public Word(String value, String category, String type1, String type2, String unit, String pos) {
+    public Word(String value, Long index, String category, String type1, String type2, String unit, String pos) {
         this.value = value;
+        this.index = index;
         this.category = category;
         this.type1 = type1;
         this.type2 = type2;
         this.unit = unit;
         this.pos = pos;
-    }
-
-    public void updateIndex(Long index) {
-        this.index = index;
     }
 }
