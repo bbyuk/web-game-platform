@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 비동기 분산 락
+ * 인메모리 동기 분산 락 구현체
  */
 @Slf4j
 @Component
