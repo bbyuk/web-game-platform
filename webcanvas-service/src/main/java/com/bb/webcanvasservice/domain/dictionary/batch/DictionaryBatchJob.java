@@ -1,5 +1,6 @@
-package com.bb.webcanvasservice.domain.dictionary;
+package com.bb.webcanvasservice.domain.dictionary.batch;
 
+import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileDownloadFailedException;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileParseFailedException;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +17,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+/**
+ * Dictionary 관련 배치 Job
+ * 이후에 배치 작업이 늘어나고 세밀한 트랜잭션 관리가 필요한 경우 Spring Batch 도입을 고려
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DictionaryBatchService {
+public class DictionaryBatchJob {
     private final DictionaryService dictionaryService;
+
 
     /**
      * 단일 file 단위 transaction 적용으로 BatchService에는 Transactional 붙이지 않는다.

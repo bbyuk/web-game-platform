@@ -1,16 +1,15 @@
 package com.bb.webcanvasservice.domain.dictionary;
 
-import com.bb.webcanvasservice.common.lock.async.AsyncDistributedLock;
-import com.bb.webcanvasservice.common.lock.sync.DistributedLock;
-import com.bb.webcanvasservice.common.lock.LockAlreadyOccupiedException;
+import com.bb.webcanvasservice.domain.dictionary.batch.DictionaryBatchExecutor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.concurrent.CompletableFuture;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Dictionary 관련 기능 API
@@ -26,9 +25,8 @@ import java.util.concurrent.CompletableFuture;
 public class DictionaryController {
 
     private final DictionaryService dictionaryService;
-    private final DictionaryBatchService dictionaryBatchService;
+    private final DictionaryBatchExecutor dictionaryBatchExecutor;
 
-    private final AsyncDistributedLock asyncDistributedLock;
 
     @PostMapping("word/{fileIndex}")
     @Operation(summary = "파일 파싱 및 적용", description = "단일 파일을 파싱해 word 테이블에 저장한다.")
@@ -39,20 +37,7 @@ public class DictionaryController {
     @PostMapping("batch/word")
     @Operation(summary = "전체 파일 파싱 및 적용 배치 수행", description = "전체 파일을 순회하며 word 테이블에 저장하는 비동기 배치 실행")
     public ResponseEntity<Void> applyAllFileBatch() {
-        String batchId = "word-data-initial-insert";
-
-        try {
-            asyncDistributedLock.executeWithLock(
-                    batchId,
-                    dictionaryBatchService::batchInsertWordData
-            );
-        }
-        catch(LockAlreadyOccupiedException e) {
-            log.error(e.getMessage());
-            log.error("이미 실행중인 배치입니다. ====== {}", batchId);
-            throw new LockAlreadyOccupiedException("이미 실행중인 배치입니다.");
-        }
-
+        dictionaryBatchExecutor.batchInsertWordDataWithLock();
         return ResponseEntity.ok(null);
     }
 
