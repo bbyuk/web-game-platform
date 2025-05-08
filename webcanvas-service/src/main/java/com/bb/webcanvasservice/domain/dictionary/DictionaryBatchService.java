@@ -1,6 +1,5 @@
 package com.bb.webcanvasservice.domain.dictionary;
 
-import com.bb.webcanvasservice.common.lock.DistributedLock;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileDownloadFailedException;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileParseFailedException;
 import lombok.RequiredArgsConstructor;

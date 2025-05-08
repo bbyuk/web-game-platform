@@ -1,12 +1,13 @@
-package com.bb.webcanvasservice.common.lock;
+package com.bb.webcanvasservice.common.lock.sync;
 
+import com.bb.webcanvasservice.common.lock.LockAlreadyOccupiedException;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 인메모리 분산 락 구현체
+ * 인메모리 동기 분산 락 구현체
  */
 @Component
 public class InMemoryDistributedLock implements DistributedLock {

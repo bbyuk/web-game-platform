@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.domain.dictionary;
 
-import com.bb.webcanvasservice.common.lock.DistributedLock;
+import com.bb.webcanvasservice.common.lock.async.AsyncDistributedLock;
+import com.bb.webcanvasservice.common.lock.sync.DistributedLock;
 import com.bb.webcanvasservice.common.lock.LockAlreadyOccupiedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Dictionary 관련 기능 API
@@ -24,7 +27,8 @@ public class DictionaryController {
 
     private final DictionaryService dictionaryService;
     private final DictionaryBatchService dictionaryBatchService;
-    private final DistributedLock distributedLock;
+
+    private final AsyncDistributedLock asyncDistributedLock;
 
     @PostMapping("word/{fileIndex}")
     @Operation(summary = "파일 파싱 및 적용", description = "단일 파일을 파싱해 word 테이블에 저장한다.")
@@ -38,7 +42,10 @@ public class DictionaryController {
         String batchId = "word-data-initial-insert";
 
         try {
-            distributedLock.executeWithLock(batchId, dictionaryBatchService::batchInsertWordData);
+            asyncDistributedLock.executeWithLock(
+                    batchId,
+                    dictionaryBatchService::batchInsertWordData
+            );
         }
         catch(LockAlreadyOccupiedException e) {
             log.error(e.getMessage());
