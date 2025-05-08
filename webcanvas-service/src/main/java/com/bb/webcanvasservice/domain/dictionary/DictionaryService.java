@@ -16,9 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -64,14 +66,144 @@ public class DictionaryService {
     }
 
     /**
-     * 단일 파일 파싱 처리
+     * 파라미터로 주어진 파일 경로에 있는 물리파일을 읽어 파싱한다.
+     * @param filePath
+     * @return
+     * @throws IOException
+     */
+    private List<Word> parseFile(Path filePath) {
+        JsonFactory factory = objectMapper.getFactory();
+        List<Word> parsedWords = new ArrayList<>();
+        Set<String> wordValues = new HashSet<>();
+
+        try (InputStream is = Files.newInputStream(filePath);
+             JsonParser parser = factory.createParser(is)) {
+
+            // 1. JSON 시작
+            while (parser.nextToken() != JsonToken.END_OBJECT) {
+                if (parser.currentToken() != JsonToken.FIELD_NAME) {
+                    continue;
+                }
+                String fieldName = parser.currentName();
+
+                // 2. channel 필드를 찾음
+                if ("channel".equals(fieldName)) {
+                    parser.nextToken(); // channel 객체 안으로
+
+                    while(parser.nextToken() != JsonToken.END_OBJECT) {
+                        String channelField = parser.currentName();
+
+                        // 3. item 배열을 찾는다.
+                        if ("item".equals(channelField)) {
+                            parser.nextToken(); // START_ARRAY 로 이동
+
+                            while (parser.nextToken() != JsonToken.END_ARRAY && parser.currentToken() != null) {
+                                // 4. 배열 요소 하나를 DTO로 파싱
+
+                                ParseItem parseItem = objectMapper.readValue(parser, ParseItem.class);
+
+                                Word word = new Word(
+                                        parseItem.wordinfo().word(),
+                                        parseItem.senseinfo().cat_info() != null ? parseItem.senseinfo().cat_info().get(0).cat() : null,
+                                        parseItem.wordinfo().word_type(),
+                                        parseItem.senseinfo().type(),
+                                        parseItem.wordinfo().word_unit(),
+                                        parseItem.senseinfo().pos()
+                                );
+
+                                /**
+                                 * 명사 / 형용사만 저장
+                                 */
+                                if ("명사".equals(word.getPos())) {
+                                    word.updateIndex(sequenceRepository.getNextValue("WORD_NOUN"));
+                                }
+                                else if ("형용사".equals(word.getPos())) {
+                                    word.updateIndex(sequenceRepository.getNextValue("WORD_ADJECTIVE"));
+                                }
+                                else {
+                                    continue;
+                                }
+
+                                /**
+                                 * 이미 포함된 동음이의어는 추가로 저장하지 않음.
+                                 */
+                                if (wordValues.contains(word.getValue())) {
+                                    continue;
+                                }
+
+                                /**
+                                 * 정규식 기반 필터링
+                                 */
+                                if (!VALID_KOREAN.matcher(word.getValue()).matches()) {
+                                    continue;
+                                }
+
+                                /**
+                                 * word_type2가 일반어인 경우만 저장
+                                 */
+                                if (!"일반어".equals(word.getType2())) {
+                                    continue;
+                                }
+
+                                wordValues.add(word.getValue());
+                                parsedWords.add(word);
+
+                                /**
+                                 * TODO
+                                 * 파싱 로직 구현
+                                 *
+                                 * item.wordinfo.word_unit (어휘) -> Word.unit
+                                 * item.wordinfo.word_type -> Word.type
+                                 * item.wordinfo.word (target value)
+                                 *
+                                 * item.senseinfo.cat_info[0]
+                                 * item.senseinfo.type (일반어)
+                                 * item.senseinfo.pos (명사)
+                                 */
+
+                            }
+                        }
+                        else {
+                            parser.skipChildren(); // item 필드 외의 필드는 무시한다.
+                        }
+                    }
+                }
+                else {
+                    parser.skipChildren(); // channel 필드 외의 필드는 무시한다.
+                }
+            }
+        }
+        catch(IOException e) {
+            log.error("{} 파일 파싱 실패", filePath);
+            log.error("파일을 파싱하는 도중 에러가 발생했습니다.", e);
+        }
+        return parsedWords;
+    }
+
+    /**
+     * index 기반 파일 파싱 처리
      * @param index
      * @return
      */
     @Transactional
-    public List<Word> parseSingleFile(int index) {
+    public List<Word> downloadIndexedFileAndParse(int index) {
+
+        Path classpathRoot = null;
+        Path parentOfProjectRoot = null;
+        try {
+            classpathRoot = Paths.get(ClassLoader.getSystemResource("").toURI());
+            parentOfProjectRoot = classpathRoot.getParent().getParent().getParent().getParent().getParent();
+        }
+        catch(URISyntaxException e) {
+            log.error("파일 경로를 찾지 못했습니다.");
+            throw new DictionaryFileDownloadFailedException();
+        }
+        Path targetFile = parentOfProjectRoot.resolve(Paths.get("words-json", "word_" + index + ".json"));
+        String targetUrl = targetFile.toUri().toString();  // file:///... 형태
+
+//        String targetUrl = "file:///Users/kanghyuk/Desktop/workspace/web-game-platform/words-json/word_" + index + ".json";
 //            String targetUrl = dictionaryProperties.dataUrl() + "word_" + index + ".json";
-        String targetUrl = "file:///Users/kanghyuk/Desktop/workspace/web-game-platform/words-json/word_" + index + ".json";
+
         Path downloadTempFilePath = null;
         try {
             downloadTempFilePath = Files.createTempFile("words_" + index, ".json");
@@ -81,10 +213,6 @@ public class DictionaryService {
             throw new DictionaryFileParseFailedException("임시 파일을 생성하는 도중 에러가 발생했습니다.");
         }
 
-
-        List<Word> parsedWords = new ArrayList<>();
-        Set<String> wordValues = new HashSet<>();
-
         try {
             log.debug("{}번 파일 다운로드 시작", index);
             downloadFile(targetUrl, downloadTempFilePath);
@@ -92,105 +220,8 @@ public class DictionaryService {
 
             final JsonFactory factory = objectMapper.getFactory();
 
-            try (InputStream is = Files.newInputStream(downloadTempFilePath);
-                 JsonParser parser = factory.createParser(is)) {
-
-                // 1. JSON 시작
-                while (parser.nextToken() != JsonToken.END_OBJECT) {
-                    if (parser.currentToken() != JsonToken.FIELD_NAME) {
-                        continue;
-                    }
-                    String fieldName = parser.currentName();
-
-                    // 2. channel 필드를 찾음
-                    if ("channel".equals(fieldName)) {
-                        parser.nextToken(); // channel 객체 안으로
-
-                        while(parser.nextToken() != JsonToken.END_OBJECT) {
-                            String channelField = parser.currentName();
-
-                            // 3. item 배열을 찾는다.
-                            if ("item".equals(channelField)) {
-                                parser.nextToken(); // START_ARRAY 로 이동
-
-                                while (parser.nextToken() != JsonToken.END_ARRAY && parser.currentToken() != null) {
-                                    // 4. 배열 요소 하나를 DTO로 파싱
-
-                                    ParseItem parseItem = objectMapper.readValue(parser, ParseItem.class);
-
-                                    Word word = new Word(
-                                            parseItem.wordinfo().word(),
-                                            parseItem.senseinfo().cat_info() != null ? parseItem.senseinfo().cat_info().get(0).cat() : null,
-                                            parseItem.wordinfo().word_type(),
-                                            parseItem.senseinfo().type(),
-                                            parseItem.wordinfo().word_unit(),
-                                            parseItem.senseinfo().pos()
-                                    );
-
-                                    /**
-                                     * 명사 / 형용사만 저장
-                                     */
-                                    if ("명사".equals(word.getPos())) {
-                                        word.updateIndex(sequenceRepository.getNextValue("WORD_NOUN"));
-                                    }
-                                    else if ("형용사".equals(word.getPos())) {
-                                        word.updateIndex(sequenceRepository.getNextValue("WORD_ADJECTIVE"));
-                                    }
-                                    else {
-                                        continue;
-                                    }
-
-                                    /**
-                                     * 이미 포함된 동음이의어는 추가로 저장하지 않음.
-                                     */
-                                    if (wordValues.contains(word.getValue())) {
-                                        continue;
-                                    }
-
-                                    /**
-                                     * 정규식 기반 필터링
-                                     */
-                                    if (!VALID_KOREAN.matcher(word.getValue()).matches()) {
-                                        continue;
-                                    }
-
-                                    /**
-                                     * word_type2가 일반어인 경우만 저장
-                                     */
-                                    if (!"일반어".equals(word.getType2())) {
-                                        continue;
-                                    }
-
-                                    wordValues.add(word.getValue());
-                                    parsedWords.add(word);
-
-                                    /**
-                                     * TODO
-                                     * 파싱 로직 구현
-                                     *
-                                     * item.wordinfo.word_unit (어휘) -> Word.unit
-                                     * item.wordinfo.word_type -> Word.type
-                                     * item.wordinfo.word (target value)
-                                     *
-                                     * item.senseinfo.cat_info[0]
-                                     * item.senseinfo.type (일반어)
-                                     * item.senseinfo.pos (명사)
-                                     */
-
-                                }
-                            }
-                            else {
-                                parser.skipChildren(); // item 필드 외의 필드는 무시한다.
-                            }
-                        }
-                    }
-                    else {
-                        parser.skipChildren(); // channel 필드 외의 필드는 무시한다.
-                    }
-                }
-            }
+            return parseFile(downloadTempFilePath);
         } catch (DictionaryFileDownloadFailedException e) {
-            // 다운로드 실패시까지 source 파일을 읽어온다.
             log.debug("{}번 파일 다운로드 요청 실패", index);
             throw e;
         } catch(Exception e) {
@@ -208,30 +239,26 @@ public class DictionaryService {
                 log.error(e.getMessage(), e);
             }
         }
-
-        return parsedWords;
     }
 
+
+    /**
+     * 파라미터로 주어진 인덱스에 해당하는 파일을 다운로드 받아 파싱 후 DB에 저장한다.
+     * @param index
+     * @return
+     */
     @Transactional
-    public int parseFileAndSave(int index) {
-        return wordRepository.saveInBatch(parseSingleFile(index));
+    public int parseFileAndSaveWithIndex(int index) {
+        return wordRepository.saveInBatch(downloadIndexedFileAndParse(index));
     }
 
     /**
-     * 순회하며 파일 파싱
+     * 파라미터로 주어진 파일 경로에 있는 파일을 파싱해 DB에 저장한다.
+     * @param path
+     * @return
      */
     @Transactional
-    public void traverseFiles() {
-        int index = 1;
-
-        while (true) {
-            try {
-                List<Word> parsedWords = parseSingleFile(index++);
-                wordRepository.saveInBatch(parsedWords);
-            }
-            catch(Exception e) {
-                break;
-            }
-        }
+    public int parseFileAndSave(Path path) {
+        return wordRepository.saveInBatch(parseFile(path));
     }
 }

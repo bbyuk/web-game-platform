@@ -1,6 +1,8 @@
+##### 서버 포트 설정 #####
 server:
   port: 9200
 
+##### 스프링 설정 #####
 spring:
   application:
     name: webcanvas-service
@@ -28,6 +30,8 @@ spring:
         jdbc:
           batch_size: 1000
 
+
+##### 로깅 레벨 관련 설정 #####
 logging:
   level:
     org:
@@ -36,6 +40,7 @@ logging:
         web: debug
         messaging: debug
 
+##### 애플리케이션 설정 #####
 application:
   sequence:
       list:
@@ -71,8 +76,19 @@ application:
     white-list:
       - /auth/**
 
+##### 비동기 관련 설정 #####
+async:
+  executor:
+    # 기본 스레드 개수
+    core-pool-size: 4
+    # 최대 스레드 개수
+    max-pool-size: 8
+    # 작업 큐 용량 (초과시 새로운 스레드 생성)
+    queue-capacity: 100
+    # 생성될 스레드 이름 접두어
+    thread-name-prefix: "async-task-executor-"
 
-
+##### Swagger API 문서 관련 설정 #####
 springdoc:
   api-docs:
     path: /api-docs
