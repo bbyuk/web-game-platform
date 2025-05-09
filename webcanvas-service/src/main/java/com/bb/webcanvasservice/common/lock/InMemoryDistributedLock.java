@@ -1,6 +1,5 @@
-package com.bb.webcanvasservice.common.lock.async;
+package com.bb.webcanvasservice.common.lock;
 
-import com.bb.webcanvasservice.common.lock.LockAlreadyOccupiedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -9,15 +8,31 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 인메모리 동기 분산 락 구현체
+ * 인메모리 분산 락 구현체
  */
 @Slf4j
 @Component
-public class InMemoryAsyncDistributedLock implements AsyncDistributedLock {
+public class InMemoryDistributedLock implements DistributedLock {
     private final ConcurrentHashMap<String, AtomicBoolean> lockMap = new ConcurrentHashMap<>();
 
     @Override
-    public <T> CompletableFuture<T> executeWithLock(String lockKey, AsyncLockCallback<T> asyncCallBack) {
+    public <T> T executeWithLock(String lockKey, LockCallback<T> callback) {
+        AtomicBoolean lock = lockMap.computeIfAbsent(lockKey, key -> new AtomicBoolean(false));
+
+        if (!lock.compareAndSet(false, true)) {
+            throw new LockAlreadyOccupiedException();
+        }
+
+        try {
+            return callback.doInLock();
+        }
+        finally {
+            lock.set(false);
+        }
+    }
+    
+    @Override
+    public <T> CompletableFuture<T> executeAsyncWithLock(String lockKey, AsyncLockCallback<T> asyncCallBack) {
         AtomicBoolean lock = lockMap.computeIfAbsent(lockKey, key -> new AtomicBoolean(false));
 
         if (!lock.compareAndSet(false, true)) {

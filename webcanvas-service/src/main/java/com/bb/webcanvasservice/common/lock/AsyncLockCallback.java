@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.common.lock.async;
+package com.bb.webcanvasservice.common.lock;
 
 import java.util.concurrent.CompletableFuture;
 

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * 닉네임, 게임 제시어 등에서 사용되는 한글 단어를 저장하는 사전
@@ -64,6 +65,12 @@ public class Word {
      */
     private String pos;
 
+    @Setter
+    @Column(name = "original_value")
+    /**
+     * 테스트용 컬럼
+     */
+    private String originalValue;
 
     public Word(String value, Long index, String category, String type1, String type2, String unit, String pos) {
         this.value = value;

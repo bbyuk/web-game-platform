@@ -116,19 +116,21 @@ public class DictionaryService {
                                     continue;
                                 }
                                 String value = parseItem.wordinfo().word();
-                                /**
-                                 * 이미 포함된 동음이의어는 추가로 저장하지 않음.
-                                 * 정규식 기반 필터링
-                                 */
-                                if (wordValues.contains(value) || !VALID_KOREAN.matcher(value).matches()) {
-                                    continue;
-                                }
 
                                 /**
                                  * 형용사일 경우 value converting 작업 수행
                                  */
                                 if ("형용사".equals(pos)) {
                                     value = KoreanAdjectiveConverter.toModifierForm(value);
+                                }
+
+
+                                /**
+                                 * 이미 포함된 동음이의어는 추가로 저장하지 않음.
+                                 * 정규식 기반 필터링
+                                 */
+                                if (wordValues.contains(value) || !VALID_KOREAN.matcher(value).matches()) {
+                                    continue;
                                 }
 
                                 String category = parseItem.senseinfo().cat_info() != null ? parseItem.senseinfo().cat_info().get(0).cat() : null;
@@ -161,6 +163,13 @@ public class DictionaryService {
                                         parseItem.wordinfo().word_unit(),
                                         pos
                                 );
+
+                                /**
+                                 * TODO 개발 및 테스트 후 삭제 필요
+                                 */
+                                if ("형용사".equals(word.getPos())) {
+                                    word.setOriginalValue(parseItem.wordinfo().word());
+                                }
 
                                 wordValues.add(word.getValue());
                                 parsedWords.add(word);
