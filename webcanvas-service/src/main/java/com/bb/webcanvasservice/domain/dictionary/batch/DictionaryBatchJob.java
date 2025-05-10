@@ -1,18 +1,17 @@
 package com.bb.webcanvasservice.domain.dictionary.batch;
 
+import com.bb.webcanvasservice.domain.dictionary.DictionaryProperties;
 import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
-import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileDownloadFailedException;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileParseFailedException;
+import com.bb.webcanvasservice.domain.dictionary.util.DictionaryDataFileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -25,8 +24,9 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class DictionaryBatchJob {
-    private final DictionaryService dictionaryService;
 
+    private final DictionaryProperties dictionaryProperties;
+    private final DictionaryService dictionaryService;
 
     /**
      * 단일 file 단위 transaction 적용으로 BatchService에는 Transactional 붙이지 않는다.
@@ -40,16 +40,7 @@ public class DictionaryBatchJob {
          * 개발중엔 임시로 프로젝트 루트 경로에 파일 다운로드 후 테스트
          */
 
-        Path classpathRoot = null;
-        Path parentOfProjectRoot = null;
-        try {
-            classpathRoot = Paths.get(ClassLoader.getSystemResource("").toURI());
-            parentOfProjectRoot = classpathRoot.getParent().getParent().getParent().getParent().getParent();
-        } catch (URISyntaxException e) {
-            log.error("파일 경로를 찾지 못했습니다.");
-            throw new DictionaryFileDownloadFailedException();
-        }
-        Path targetDirectory = parentOfProjectRoot.resolve(Paths.get("words-json"));
+        Path targetDirectory = DictionaryDataFileUtils.getLocalFilesDirectoryPath();
 
         try (Stream<Path> paths = Files.list(targetDirectory)) {
             paths.filter(Files::isRegularFile)
