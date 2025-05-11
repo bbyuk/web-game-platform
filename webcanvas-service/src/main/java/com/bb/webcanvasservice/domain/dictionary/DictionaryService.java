@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.domain.dictionary;
 
 import com.bb.webcanvasservice.domain.dictionary.parser.DictionaryParser;
-import com.bb.webcanvasservice.domain.dictionary.parser.DictionaryParserFactory;
+import com.bb.webcanvasservice.domain.dictionary.parser.ElementaryDictionaryParser;
 import com.bb.webcanvasservice.domain.dictionary.repository.WordRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,15 +14,15 @@ import java.nio.file.Path;
  * 사전을 파싱해 DB에 적재하기 위해 제공하는 서비스
  * TODO 형용사 어미 ~한 ~된 등으로 변경 로직 구상
  */
-@Service
 @Slf4j
+@Service
 public class DictionaryService {
 
     private final DictionaryParser dictionaryParser;
     private final WordRepository wordRepository;
 
-    public DictionaryService(DictionaryParserFactory dictionaryParserFactory, WordRepository wordRepository) {
-        this.dictionaryParser = dictionaryParserFactory.get();
+    public DictionaryService(ElementaryDictionaryParser dictionaryParser, WordRepository wordRepository) {
+        this.dictionaryParser = dictionaryParser;
         this.wordRepository = wordRepository;
     }
 

@@ -1,9 +1,8 @@
 package com.bb.webcanvasservice.domain.dictionary.batch;
 
-import com.bb.webcanvasservice.domain.dictionary.DictionaryProperties;
+import com.bb.webcanvasservice.domain.dictionary.DictionarySourceProperties;
 import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileParseFailedException;
-import com.bb.webcanvasservice.domain.dictionary.util.DictionaryDataFileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -16,6 +15,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import static com.bb.webcanvasservice.domain.dictionary.util.DictionaryDataFileUtils.*;
+
 /**
  * Dictionary 관련 배치 Job
  * 이후에 배치 작업이 늘어나고 세밀한 트랜잭션 관리가 필요한 경우 Spring Batch 도입을 고려
@@ -25,11 +26,12 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class DictionaryBatchJob {
 
-    private final DictionaryProperties dictionaryProperties;
+    private final DictionarySourceProperties dictionarySourceProperties;
     private final DictionaryService dictionaryService;
 
     /**
      * 단일 file 단위 transaction 적용으로 BatchService에는 Transactional 붙이지 않는다.
+     *
      * @return
      */
     @Async("asyncBatchTaskExecutor")
@@ -40,7 +42,15 @@ public class DictionaryBatchJob {
          * 개발중엔 임시로 프로젝트 루트 경로에 파일 다운로드 후 테스트
          */
 
-        Path targetDirectory = DictionaryDataFileUtils.getLocalFilesDirectoryPath();
+        Path targetDirectory = null;
+        Path downloadZipFilePath = null;
+
+        if (dictionarySourceProperties.location().equals("local")) {
+            targetDirectory = getLocalFilesDirectoryPath();
+        } else {
+            downloadZipFilePath = downloadFile(dictionarySourceProperties.dataUrl());
+            targetDirectory = unzipFile(downloadZipFilePath);
+        }
 
         try (Stream<Path> paths = Files.list(targetDirectory)) {
             paths.filter(Files::isRegularFile)
@@ -48,6 +58,20 @@ public class DictionaryBatchJob {
         } catch (IOException e) {
             log.error("데이터 파일 디렉터리 순회중 오류 발생", e);
             throw new DictionaryFileParseFailedException();
+        }
+        finally {
+            if (dictionarySourceProperties.location().equals("download")) {
+                try {
+                    Files.delete(targetDirectory);
+                    if (downloadZipFilePath != null) {
+                        Files.delete(downloadZipFilePath);
+                    }
+                }
+                catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                    log.error("다운로드 받은 임시 파일을 삭제하는 과정에서 문제가 발생했습니다.");
+                }
+            }
         }
 
         log.debug("배치 수행 완료");

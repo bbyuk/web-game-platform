@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,15 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Dictionary API", description = "랜덤 제시어 생성 및 랜덤 닉네임 생성 관련 API")
 public class DictionaryController {
 
-    private final DictionaryService dictionaryService;
     private final DictionaryBatchExecutor dictionaryBatchExecutor;
-
-
-    @PostMapping("word/{fileIndex}")
-    @Operation(summary = "파일 파싱 및 적용", description = "단일 파일을 파싱해 word 테이블에 저장한다.")
-    public ResponseEntity<Integer> applyFile(@PathVariable("fileIndex") int fileIndex) {
-        return ResponseEntity.ok(dictionaryService.parseFileAndSaveWithIndex(fileIndex));
-    }
 
     @PostMapping("batch/word")
     @Operation(summary = "전체 파일 파싱 및 적용 배치 수행", description = "전체 파일을 순회하며 word 테이블에 저장하는 비동기 배치 실행")
