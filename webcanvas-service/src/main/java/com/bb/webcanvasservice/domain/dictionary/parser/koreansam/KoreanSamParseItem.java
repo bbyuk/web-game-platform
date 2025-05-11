@@ -1,9 +1,14 @@
-package com.bb.webcanvasservice.domain.dictionary.dto;
+package com.bb.webcanvasservice.domain.dictionary.parser.koreansam;
 
 
 import java.util.List;
 
-public record ParseItem(
+/**
+ * 한국어샘 사전데이터 파싱 DTO
+ * @param wordinfo
+ * @param senseinfo
+ */
+public record KoreanSamParseItem(
         WordInfo wordinfo,
         SenseInfo senseinfo
 ) {

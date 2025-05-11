@@ -4,30 +4,45 @@ import java.util.*;
 
 public class KoreanAdjectiveConverter {
 
-    // 대표적인 ㅂ 불규칙 형용사
-    private static final Set<String> IRREGULAR_B_ADJECTIVES = Set.of(
-            "심, 어렵, 고맙", "아름답", "기쁨답", "슬픔답", "보드랍", "두렵", "가엾", "부드럽", "무섭", "반갑", "사랑스럽", "귀엽"
+    // 공통으로 사용할 종성 배열
+    private static final char[] JONGSEONGS = {
+            '\0', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ',
+            'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ',
+            'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ',
+            'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
+    };
+
+    private static final Map<Character, String> exceptionTable = Map.of(
+            'ㅅ', "으",
+            'ㅂ', "우",
+            'ㄹ', "으",
+            'ㅎ', "으"
     );
 
-    // ㄹ 탈락 불규칙: ㄹ로 끝나는 형용사 중 받침 ㄹ이 탈락하고 관형형 변화
-    private static final Set<String> IRREGULAR_L_ADJECTIVES = Set.of(
-            "길", "멀", "늘", "어릴", "다를", "어둡", "부드러울"
-    );
+    /**
+     * 받침이 있는지 확인
+     * @param expect
+     * @param value
+     * @return
+     */
+    public static boolean hasSpecificFinalConsonant(char expect, char value) {
+        Character jong = getFinalConsonant(value);
+        return jong != null && jong.equals(expect);
+    }
 
-    // ㅎ 탈락 불규칙
-    private static final Set<String> IRREGULAR_H_ADJECTIVES = Set.of(
-            "하얗", "빨갛", "노랗", "파랗", "까맣", "초록빛하얗"
-    );
+    /**
+     * ㅡ 중성인지 확인
+     * @param syllable
+     * @return
+     */
+    public static boolean hasEuVowel(char syllable) {
+        if (syllable < 0xAC00 || syllable > 0xD7A3) return false;
 
-    // ㅡ 탈락 불규칙 (중간 모음 ㅡ 탈락)
-    private static final Set<String> IRREGULAR_EU_ADJECTIVES = Set.of(
-            "크", "뜨"
-    );
+        int syllableIndex = syllable - 0xAC00;
+        int jungIdx = (syllableIndex / 28) % 21;
 
-    // ㅅ 불규칙 (예외적으로 ㅅ이 탈락하는 경우)
-    private static final Set<String> IRREGULAR_S_ADJECTIVES = Set.of(
-            "낫", "짓", "붓", "잇", "벗", "솟"
-    );
+        return jungIdx == 18;
+    }
 
     // 메인: 형용사 → 관형형 변환
     public static String toModifierForm(String adjective) {
@@ -36,39 +51,20 @@ public class KoreanAdjectiveConverter {
         String stem = adjective.substring(0, adjective.length() - 1); // '다' 제거
         char lastChar = stem.charAt(stem.length() - 1);
 
-        // ㅎ 불규칙
-        for (String ir : IRREGULAR_H_ADJECTIVES) {
-            if (stem.endsWith(ir)) {
-                return stem.substring(0, stem.length() - 1) + "은";
+        if (hasFinalConsonant(lastChar)) {
+            // 받침이 있고
+            for (Map.Entry<Character, String> entry : exceptionTable.entrySet()) {
+                if (hasSpecificFinalConsonant(entry.getKey(), lastChar)) {
+                    // 마지막 음절이 예외글자를 가진 경우
+                    String prefix = stem.substring(0, stem.length() - 1);
+                    return prefix + removeFinalConsonant(stem.charAt(stem.length() - 1)) + mergeWithFinalConsonant(entry.getValue().charAt(0), 'ㄴ', entry.getValue()).charAt(0);
+                }
             }
         }
-
-        // ㄹ 불규칙
-        for (String ir : IRREGULAR_L_ADJECTIVES) {
-            if (stem.endsWith(ir)) {
-                return stem.substring(0, stem.length() - 1) + "은";
-            }
-        }
-
-        // ㅂ 불규칙
-        for (String ir : IRREGULAR_B_ADJECTIVES) {
-            if (stem.endsWith(ir)) {
-                return stem.substring(0, stem.length() - 1) + "운";
-            }
-        }
-
-        // ㅡ 불규칙
-        for (String ir : IRREGULAR_EU_ADJECTIVES) {
-            if (stem.endsWith(ir)) {
-                return stem.substring(0, stem.length() - 1) + "은";
-            }
-        }
-
-        // ㅅ 불규칙
-        for (String ir : IRREGULAR_S_ADJECTIVES) {
-            if (stem.endsWith(ir)) {
-                return stem.substring(0, stem.length() - 1) + "은";
-            }
+        else if (hasEuVowel(lastChar)) {
+            // ㅡ 로 끝남
+            String prefix = stem.substring(0, stem.length() - 1);
+            return prefix + removeFinalConsonant(stem.charAt(stem.length() - 1)) + mergeWithFinalConsonant('으', 'ㄴ', "으").charAt(0);
         }
 
         // 일반 규칙 처리
@@ -96,18 +92,49 @@ public class KoreanAdjectiveConverter {
         return stem.substring(0, stem.length() - 1) + combined;
     }
 
-    // 종성 문자 → 인덱스
-    private static int getJongseongIndex(char jong) {
-        char[] jongseongs = {
-                0x0000, 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ',
-                'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ',
-                'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ',
-                'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
-        };
-
-        for (int i = 0; i < jongseongs.length; i++) {
-            if (jongseongs[i] == jong) return i;
+    /**
+     * 종성 인덱스 찾기
+     * @param jong
+     * @return
+     */
+    public static int getJongseongIndex(char jong) {
+        for (int i = 0; i < JONGSEONGS.length; i++) {
+            if (JONGSEONGS[i] == jong) return i;
         }
         return -1;
+    }
+
+    /**
+     * 종성 찾기
+     * @param syllable
+     * @return
+     */
+    public static Character getFinalConsonant(char syllable) {
+        if (syllable < 0xAC00 || syllable > 0xD7A3) return null;
+
+        int syllableIndex = syllable - 0xAC00;
+        int jongIndex = syllableIndex % 28;
+
+        return jongIndex == 0 ? null : JONGSEONGS[jongIndex];
+    }
+
+
+    /**
+     * 종성(받침) 제거
+     * @param targetChar
+     * @return
+     */
+    private static char removeFinalConsonant(char targetChar) {
+        if (!hasFinalConsonant(targetChar)) {
+            return targetChar; // 받침이 없다면 그대로 리턴
+        }
+
+        // 받침을 제거하고 새로 생성된 stem 리턴
+        int syllableIndex = targetChar - 0xAC00;
+        int choIndex = syllableIndex / (21 * 28);
+        int jungIndex = (syllableIndex % (21 * 28)) / 28;
+
+        // 받침 없애고, 새로운 음절로 만들어서 리턴
+        return (char) (0xAC00 + (choIndex * 21 * 28) + (jungIndex * 28));
     }
 }

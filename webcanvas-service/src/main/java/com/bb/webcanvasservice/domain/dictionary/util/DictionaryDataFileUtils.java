@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.domain.dictionary.util;
 
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileDownloadFailedException;
+import com.bb.webcanvasservice.domain.dictionary.parser.DictionaryParser;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -35,7 +36,8 @@ public class DictionaryDataFileUtils {
             log.error("파일 경로를 찾지 못했습니다.");
             throw new DictionaryFileDownloadFailedException();
         }
-        return parentOfProjectRoot.resolve(Paths.get("words-json"));
+
+        return parentOfProjectRoot.resolve(Paths.get("words-json", System.getProperty("dictionary.source.directory")));
     }
 
     /**

@@ -1,8 +1,8 @@
-package com.bb.webcanvasservice.domain.dictionary.parser;
+package com.bb.webcanvasservice.domain.dictionary.parser.koreansam;
 
 import com.bb.webcanvasservice.common.sequence.SequenceRepository;
 import com.bb.webcanvasservice.domain.dictionary.Word;
-import com.bb.webcanvasservice.domain.dictionary.dto.ParseItem;
+import com.bb.webcanvasservice.domain.dictionary.parser.DictionaryParser;
 import com.bb.webcanvasservice.domain.dictionary.util.KoreanAdjectiveConverter;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 한국어 기초사전파서
- * https://krdict.korean.go.kr/kor/mainAction
+ * 우리말샘의 사전을 파싱하는 파서
+ * https://opendict.korean.go.kr/main
  */
 @Slf4j
 @Component
-public class ElementaryDictionaryParser extends DictionaryParser {
+public class KoreanSamDictionaryParser extends DictionaryParser {
 
-    public ElementaryDictionaryParser(ObjectMapper objectMapper, SequenceRepository sequenceRepository) {
+    public KoreanSamDictionaryParser(ObjectMapper objectMapper, SequenceRepository sequenceRepository) {
         super(objectMapper, sequenceRepository);
     }
 
@@ -62,12 +62,12 @@ public class ElementaryDictionaryParser extends DictionaryParser {
                             while (parser.nextToken() != JsonToken.END_ARRAY && parser.currentToken() != null) {
                                 // 4. 배열 요소 하나를 DTO로 파싱
 
-                                ParseItem parseItem = objectMapper.readValue(parser, ParseItem.class);
+                                KoreanSamParseItem koreanSamParseItem = objectMapper.readValue(parser, KoreanSamParseItem.class);
 
                                 /**
                                  * 명사 / 형용사만 저장
                                  */
-                                String pos = parseItem.senseinfo().pos();
+                                String pos = koreanSamParseItem.senseinfo().pos();
                                 Long index = "명사".equals(pos)
                                         ? sequenceRepository.getNextValue("WORD_NOUN")
                                         : "형용사".equals(pos)
@@ -76,7 +76,7 @@ public class ElementaryDictionaryParser extends DictionaryParser {
                                 if (index == -1) {
                                     continue;
                                 }
-                                String value = parseItem.wordinfo().word();
+                                String value = koreanSamParseItem.wordinfo().word();
 
                                 /**
                                  * 형용사일 경우 value converting 작업 수행
@@ -94,13 +94,13 @@ public class ElementaryDictionaryParser extends DictionaryParser {
                                     continue;
                                 }
 
-                                String category = parseItem.senseinfo().cat_info() != null ? parseItem.senseinfo().cat_info().get(0).cat() : null;
+                                String category = koreanSamParseItem.senseinfo().cat_info() != null ? koreanSamParseItem.senseinfo().cat_info().get(0).cat() : null;
 
                                 /**
                                  * word_type2가 일반어인 경우만 저장
                                  */
-                                String type1 = parseItem.wordinfo().word_type();
-                                String type2 = parseItem.senseinfo().type();
+                                String type1 = koreanSamParseItem.wordinfo().word_type();
+                                String type2 = koreanSamParseItem.senseinfo().type();
                                 if (!"일반어".equals(type2)) {
                                     continue;
                                 }
@@ -118,10 +118,7 @@ public class ElementaryDictionaryParser extends DictionaryParser {
                                 Word word = new Word(
                                         value,
                                         index,
-                                        category,
-                                        type1,
-                                        type2,
-                                        parseItem.wordinfo().word_unit(),
+                                        koreanSamParseItem.wordinfo().word_unit(),
                                         pos
                                 );
 
@@ -129,7 +126,7 @@ public class ElementaryDictionaryParser extends DictionaryParser {
                                  * TODO 개발 및 테스트 후 삭제 필요
                                  */
                                 if ("형용사".equals(word.getPos())) {
-                                    word.setOriginalValue(parseItem.wordinfo().word());
+                                    word.setOriginalValue(koreanSamParseItem.wordinfo().word());
                                 }
 
                                 wordValues.add(word.getValue());

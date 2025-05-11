@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.domain.dictionary;
 
 import com.bb.webcanvasservice.domain.dictionary.parser.DictionaryParser;
-import com.bb.webcanvasservice.domain.dictionary.parser.ElementaryDictionaryParser;
+import com.bb.webcanvasservice.domain.dictionary.parser.elementary.ElementaryDictionaryParser;
 import com.bb.webcanvasservice.domain.dictionary.repository.WordRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
