@@ -1,5 +1,5 @@
 import Title from "@/components/layouts/side-panel/title/index.jsx";
-import { JSX } from "react";
+import { JSX, useEffect } from "react";
 import { useApplicationContext } from "@/contexts/index.jsx";
 import ItemList from "@/components/layouts/side-panel/item-list/index.jsx";
 

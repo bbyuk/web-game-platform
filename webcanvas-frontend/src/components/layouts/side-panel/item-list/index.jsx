@@ -33,7 +33,6 @@ const Item = ({ label, color, current = -1, capacity = -1, isButton = false }) =
 
 const ItemList = ({ value, emptyPlaceholder }) => {
   const hasData = value && value.length > 0;
-
   return (
     <Container>
       {hasData ? (

@@ -43,31 +43,24 @@ export default function GameRoomPage() {
     setReRenderingSignal(false);
   };
 
-  const checkAndSetLeftSidebar = async () => {
+  const checkCurrentGameRoom = async () => {
     if (!(currentGame.gameRoomId && currentGame.gameRoomEntranceId)) {
       // 방 정보 조회
       await api
         .get(game.getCurrentEnteredGameRoom)
         .then((response) => {
           currentGame.setEntranceInfo(response);
-          utils.redirectTo(`${pages.gameRoom}/${response.gameRoomId}`);
-          return false;
+          if (location.pathname !== `${pages.gameRoom}/${response.gameRoomId}`) {
+            utils.redirectTo(`${pages.gameRoom}/${response.gameRoomId}`);
+          }
         })
         .catch((error) => {
           if (error.code === "R003") {
             // 로비로 이동
             alert(REDIRECT_MESSAGES.TO_LOBBY);
             utils.redirectTo(pages.lobby);
-            return false;
           }
-          alert("테스트 alert => 에러발생");
-          return false;
         });
-    }
-    else {
-      alert(`${currentGame.gameRoomId} 방에 입장했습니다.`);
-      leftSidebar.setItems(currentGame.enteredUsers);
-      console.log(currentGame.enteredUsers);
     }
   };
 
@@ -75,14 +68,20 @@ export default function GameRoomPage() {
    * =========================== 이벤트 핸들러 =============================
    */
   useEffect(() => {
-    leftSidebar.setEmptyPlaceholder(EMPTY_MESSAGES.ENTERED_USER_LIST);
-
-    checkAndSetLeftSidebar();
-    /**
-     * TODO canvas 팔레트 서비스 개발 및 조회 API 요청
-     */
-
+    checkCurrentGameRoom();
+    //  * TODO canvas 팔레트 서비스 개발 및 조회 API 요청
+    //  */
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (currentGame.enteredUsers) {
+      leftSidebar.setItems(currentGame.enteredUsers);
+    } else {
+      leftSidebar.setItems(EMPTY_MESSAGES.ENTERED_USER_LIST);
+    }
+    console.log(leftSidebar);
+  }, [currentGame]);
+
   return (
     <Canvas
       className="flex-1"

@@ -35,7 +35,17 @@ export default function LobbyPage() {
     api
       .get(game.getEnterableRooms)
       .then((response) => {
-        leftSidebar.setItems(response);
+        leftSidebar.setItems(
+          response.roomList
+            ? response.roomList.map(({ joinCode, enterCount, capacity, ...rest }) => ({
+                label: joinCode,
+                current: enterCount,
+                isButton: enterCount < capacity,
+                capacity: capacity,
+                ...rest,
+              }))
+            : []
+        );
       })
       .catch(async (error) => {
         if (error.code === "U002") {
