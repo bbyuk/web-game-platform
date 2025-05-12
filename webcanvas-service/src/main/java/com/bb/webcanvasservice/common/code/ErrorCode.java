@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
  * U - 유저 관련 에러
  * R - 게임 방 및 게임 방 입장 관련 에러
  * G - 게임 관련 에러
+ * S - 시스템 관련 에러
+ * C - 클라이언트 요청 오류
  */
 @RequiredArgsConstructor
 public enum ErrorCode {
