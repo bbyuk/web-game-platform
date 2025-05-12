@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.unit.domain.game;
 
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
+import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
 import com.bb.webcanvasservice.domain.game.GameProperties;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
@@ -40,16 +41,27 @@ class GameRoomServiceUnitTest {
     private GameRoomEntranceRepository gameRoomEntranceRepository;
     @Mock
     private UserService userService;
+    @Mock
+    private DictionaryService dictionaryService;
 
     /**
      * mock
      */
-    private GameProperties gameProperties = new GameProperties(8, 10, 10, List.of("#ff3c00", "#0042ff", "#1e9000", "#f2cb00", "#8400a8", "#00c8c8", "#ff68ff", "#969696"));
+    private GameProperties gameProperties = new GameProperties(8, 10, 10, List.of("#ff3c00", "#0042ff", "#1e9000", "#f2cb00", "#8400a8", "#00c8c8", "#ff68ff", "#969696"), List.of(
+            "수달",
+            "늑대",
+            "고양이",
+            "부엉이",
+            "사막여우",
+            "호랑이",
+            "너구리",
+            "다람쥐"
+    ));
     private GameRoomService gameRoomService;
 
     @BeforeEach
     void setup() {
-        this.gameRoomService = new GameRoomService(userService, gameRoomRepository, gameRoomEntranceRepository, gameProperties);
+        this.gameRoomService = new GameRoomService(userService, dictionaryService, gameRoomRepository, gameRoomEntranceRepository, gameProperties);
     }
 
     private final Random random = new Random();
@@ -79,14 +91,14 @@ class GameRoomServiceUnitTest {
         long testGameRoomId = random.nextLong();
         setId(testGameRoom, testGameRoomId);
 
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser1));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser2));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser1, "테스트 늑대"));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser2, "테스트 수달"));
 
         when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
 
         // 테스트 게임 방 입장
-        GameRoomEntrance testGameRoomEntrance = new GameRoomEntrance(testGameRoom, testUser);
+        GameRoomEntrance testGameRoomEntrance = new GameRoomEntrance(testGameRoom, testUser, "테스트 여우");
         long testGameRoomEntranceId = random.nextLong();
         setId(testGameRoomEntrance, testGameRoomEntranceId);
 
@@ -148,14 +160,14 @@ class GameRoomServiceUnitTest {
         when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
                 .thenReturn(Boolean.FALSE);
         GameRoom testGameRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString())));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 여우"));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 수달"));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 늑대"));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 고양이"));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 부엉이"));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 다람쥐"));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 호랑이"));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 너구리"));
 
         when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
@@ -197,9 +209,9 @@ class GameRoomServiceUnitTest {
         var testUser0 = new User(UUID.randomUUID().toString());
         var testUser1 = new User(UUID.randomUUID().toString());
         var testUser2 = new User(UUID.randomUUID().toString());
-        var testGameRoomEntrance0 = new GameRoomEntrance(testGameRoom, testUser0);
-        var testGameRoomEntrance1 = new GameRoomEntrance(testGameRoom, testUser1);
-        var testGameRoomEntrance2 = new GameRoomEntrance(testGameRoom, testUser2);
+        var testGameRoomEntrance0 = new GameRoomEntrance(testGameRoom, testUser0, "테스트 부엉이");
+        var testGameRoomEntrance1 = new GameRoomEntrance(testGameRoom, testUser1, "테스트 고양이");
+        var testGameRoomEntrance2 = new GameRoomEntrance(testGameRoom, testUser2, "테스트 호랑이");
 
         setId(testGameRoom, random.nextLong());
         setId(testUser0, random.nextLong());
@@ -239,7 +251,7 @@ class GameRoomServiceUnitTest {
         // given
         var testRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6));
         var testUser = new User(UUID.randomUUID().toString());
-        var testGameRoomEntrance = new GameRoomEntrance(testRoom, testUser);
+        var testGameRoomEntrance = new GameRoomEntrance(testRoom, testUser, "테스트 여우");
 
         setId(testUser, random.nextLong());
         setId(testRoom, random.nextLong());

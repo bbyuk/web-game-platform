@@ -61,7 +61,7 @@ class GameRepositoryTest {
         gameRoomRepository.save(enteredRoom);
         gameRoomRepository.save(otherRoom);
 
-        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(enteredRoom, testUser);
+        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(enteredRoom, testUser, "테스트 호랑이");
         gameRoomEntranceRepository.save(gameRoomEntrance);
 
         enteredRoom.addEntrance(gameRoomEntrance);
@@ -162,7 +162,7 @@ class GameRepositoryTest {
         gameRoomRepository.save(waitingRoom);
         gameRoomRepository.save(playingRoom);
 
-        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(waitingRoom, testUser);
+        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(waitingRoom, testUser, "테스트 여우");
         gameRoomEntranceRepository.save(gameRoomEntrance);
 
         // when

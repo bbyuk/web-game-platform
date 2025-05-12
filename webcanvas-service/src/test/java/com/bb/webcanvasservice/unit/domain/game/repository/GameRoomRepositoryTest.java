@@ -38,7 +38,16 @@ class GameRoomRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    private GameProperties gameProperties = new GameProperties(8, 10, 10, new ArrayList<>());
+    private GameProperties gameProperties = new GameProperties(8, 10, 10, new ArrayList<>(), List.of(
+            "수달",
+            "늑대",
+            "고양이",
+            "부엉이",
+            "사막여우",
+            "호랑이",
+            "너구리",
+            "다람쥐"
+    ));
 
 
     @Test
@@ -47,14 +56,14 @@ class GameRoomRepositoryTest {
         // given
         User testUser = userRepository.save(new User(UUID.randomUUID().toString()));
         GameRoom savedGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser, "테스트 부엉이"));
 
 
         User testUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser1));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser1, "테스트 다람쥐"));
 
         User testUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser2));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser2, "테스트 고양이"));
 
 
         // when
@@ -111,7 +120,7 @@ class GameRoomRepositoryTest {
         GameRoom room5 = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
 
         gameRoomEntranceRepository.saveAll(
-                Stream.generate(() -> new GameRoomEntrance(room5, userRepository.save(new User(UUID.randomUUID().toString()))))
+                Stream.generate(() -> new GameRoomEntrance(room5, userRepository.save(new User(UUID.randomUUID().toString())), "테스트 호랑이"))
                         .limit(gameProperties.gameRoomCapacity())
                         .collect(Collectors.toList())
         );

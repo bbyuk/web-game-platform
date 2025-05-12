@@ -24,7 +24,10 @@ public record GameProperties(
         int joinCodeLength,
 
         // 게임 방에 입장한 유저들의 노출 컬러
-        List<String> gameRoomUserColors
+        List<String> gameRoomUserColors,
+
+        // 게임 방에 입장한 유저들의 랜덤 닉네임의 명사부분
+        List<String> gameRoomUserNicknameNouns
 ) {
     /**
      * default value setting을 위한 기본 생성자
@@ -37,5 +40,6 @@ public record GameProperties(
         if (joinCodeMaxConflictCount == 0) joinCodeMaxConflictCount = 10;
         if (joinCodeLength == 0) joinCodeLength = 10;
         if (gameRoomUserColors == null) gameRoomUserColors = new ArrayList<>();
+        if (gameRoomUserNicknameNouns == null) gameRoomUserNicknameNouns = new ArrayList<>();
     }
 }

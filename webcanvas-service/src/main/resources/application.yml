@@ -63,6 +63,15 @@ application:
         - "#00c8c8"
         - "#ff68ff"
         - "#969696"
+      game-room-user-nickname-nouns:
+        - "여우"
+        - "수달"
+        - "늑대"
+        - "고양이"
+        - "부엉이"
+        - "다람쥐"
+        - "호랑이"
+        - "너구리"
     dictionary:
       source:
         data-url: https://github.com/bbyuk/web-game-platform/releases/download/v0.1.3/elementary_korean.zip

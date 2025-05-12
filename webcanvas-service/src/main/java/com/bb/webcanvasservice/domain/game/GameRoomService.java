@@ -1,6 +1,9 @@
 package com.bb.webcanvasservice.domain.game;
 
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
+import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
+import com.bb.webcanvasservice.domain.dictionary.enums.Language;
+import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -31,6 +35,7 @@ public class GameRoomService {
      * 서비스
      */
     private final UserService userService;
+    private final DictionaryService dictionaryService;
 
     /**
      * 레포지토리
@@ -153,14 +158,18 @@ public class GameRoomService {
             throw new IllegalGameRoomStateException();
         }
 
-        if (targetGameRoom.getEntrances().size() >= gameProperties.gameRoomCapacity()) {
+        int enteredUserCounts = targetGameRoom.getEntrances().size();
+        if (enteredUserCounts >= gameProperties.gameRoomCapacity()) {
             throw new IllegalGameRoomStateException("방의 정원이 모두 찼습니다.");
         }
 
+        String koreanAdjective = dictionaryService.drawRandomWordValue(Language.KOREAN, PartOfSpeech.ADJECTIVE);
         GameRoomEntrance gameRoomEntrance =
                 new GameRoomEntrance(
                         targetGameRoom
-                        , userService.findUserByUserId(userId));
+                        , userService.findUserByUserId(userId)
+                        , String.format("%s %s", koreanAdjective, gameProperties.gameRoomUserNicknameNouns().get(enteredUserCounts)));
+
         GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
         targetGameRoom.addEntrance(newGameRoomEntrance);
 
@@ -248,7 +257,8 @@ public class GameRoomService {
                         .map(gameRoomEntrance ->
                                 new GameRoomEntranceInfoResponse.EnteredUserSummary(
                                         gameRoomEntrance.getId(),
-                                        gameProperties.gameRoomUserColors().get(index.getAndIncrement())
+                                        gameProperties.gameRoomUserColors().get(index.getAndIncrement()),
+                                        gameRoomEntrance.getNickname()
                                 )
                         )
                         .collect(Collectors.toList())

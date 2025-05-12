@@ -51,10 +51,11 @@ public class GameRoomEntrance {
     @Column(name = "game_room_entrance_state")
     private GameRoomEntranceState state;
 
-    public GameRoomEntrance(GameRoom gameRoom, User user) {
+    public GameRoomEntrance(GameRoom gameRoom, User user, String nickname) {
         this.gameRoom = gameRoom;
         this.user = user;
         this.state = GameRoomEntranceState.ACTIVE;
+        this.nickname = nickname;
     }
 
     public void exit() {

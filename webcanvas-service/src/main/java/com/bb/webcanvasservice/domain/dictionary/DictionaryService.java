@@ -64,6 +64,11 @@ public class DictionaryService {
         long lowerBound = 1L;
         long upperBound = sequenceRepository.getCurrentValue(sequenceName);
 
+        if (upperBound == lowerBound) {
+            log.error("사전에 단어가 존재하지 않습니다.");
+            throw new WordNotFoundException();
+        }
+
         RandomGenerator randomGenerator = RandomGenerator.getDefault();
         long randomWordIndex = randomGenerator.nextLong(lowerBound, upperBound);
 

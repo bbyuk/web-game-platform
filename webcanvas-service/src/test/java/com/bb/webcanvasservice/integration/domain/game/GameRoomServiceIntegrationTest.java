@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.integration.domain.game;
 
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
+import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
@@ -12,16 +13,21 @@ import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserRepository;
+import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationInnerResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 import java.util.concurrent.*;
+
+import static org.mockito.ArgumentMatchers.any;
 
 @Transactional
 @SpringBootTest
@@ -39,6 +45,9 @@ class GameRoomServiceIntegrationTest {
 
     @Autowired
     private GameRoomEntranceRepository gameRoomEntranceRepository;
+
+    @MockitoBean
+    private DictionaryService dictionaryService;
 
     private User testUser;
     private User waitingRoomHost;
@@ -58,14 +67,17 @@ class GameRoomServiceIntegrationTest {
         playingRoom = gameRoomRepository.save(new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(10)));
 
         // 테스트 공통 방 호스트 입장
-        gameRoomEntranceRepository.save(new GameRoomEntrance(waitingRoom, waitingRoomHost));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(playingRoom, playingRoomHost));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(waitingRoom, waitingRoomHost, "테스트 수달"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(playingRoom, playingRoomHost, "테스트 늑대"));
     }
 
     @Test
     @DisplayName("게임 방 입장 - 상태가 WAITING인 방에 입장 요청시 성공")
     public void enterGameRoom() {
         // given - 공통 Entity 사용
+        BDDMockito.given(dictionaryService.drawRandomWordValue(any(), any()))
+                .willReturn("테스트 여우");
+
 
         // when
         GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoom(waitingRoom.getId(), testUser.getId());
@@ -93,7 +105,7 @@ class GameRoomServiceIntegrationTest {
         // given - 다른 방에 이미 입장해 있는 경우
         GameRoom anotherGameRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
         gameRoomRepository.save(anotherGameRoom);
-        gameRoomEntranceRepository.save(new GameRoomEntrance(anotherGameRoom, testUser));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(anotherGameRoom, testUser, "테스트 호랑이"));
 
         // when
         Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(waitingRoom.getId(), testUser.getId()))

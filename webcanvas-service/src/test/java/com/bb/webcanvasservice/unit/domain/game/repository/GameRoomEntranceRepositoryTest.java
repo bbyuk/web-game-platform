@@ -150,7 +150,7 @@ class GameRoomEntranceRepositoryTest {
         User testUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
         User testUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
 
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1, "테스트 여우"));
 
         // when
         boolean isTestUser1EnteredTestGameRoom = gameRoomEntranceRepository.existsActiveEntrance(testGameRoom.getId(), testUser1.getId());
@@ -163,7 +163,7 @@ class GameRoomEntranceRepositoryTest {
 
     private void enterTestRoom(User... enteredUsers) {
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
-        Arrays.stream(enteredUsers).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, enteredUser)));
+        Arrays.stream(enteredUsers).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, enteredUser, "테스트 수달")));
     }
 
     public void exit(GameRoomEntrance entrance) {
