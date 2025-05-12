@@ -28,13 +28,27 @@ public class KoreanAdjectiveConverter {
      * @param syllable
      * @return
      */
-    public static boolean hasEuVowel(char syllable) {
+    private static boolean hasEuVowel(char syllable) {
         if (syllable < 0xAC00 || syllable > 0xD7A3) return false;
 
         int syllableIndex = syllable - 0xAC00;
         int jungIdx = (syllableIndex / 28) % 21;
 
         return jungIdx == 18;
+    }
+
+    /**
+     * ㅣ 중성인지 확인
+     * @param syllable
+     * @return
+     */
+    private static boolean hasIVowel(char syllable) {
+        if (syllable < 0xAC00 || syllable > 0xD7A3) return false;
+
+        int syllableIndex = syllable - 0xAC00;
+        int jungIdx = (syllableIndex / 28) % 21;
+
+        return jungIdx == 20;
     }
 
     // 메인: 형용사 → 관형형 변환
@@ -54,11 +68,10 @@ public class KoreanAdjectiveConverter {
             if (hasSpecificFinalConsonant('ㅂ', lastChar)) {
                 return prefix + removeFinalConsonant(lastChar) + '운';
             }
-            if (hasSpecificFinalConsonant('ㄹ', lastChar)) {
-                return prefix + removeFinalConsonant(lastChar) + '은';
-            }
-            if (hasSpecificFinalConsonant('ㅎ', lastChar)) {
-                // ㅎ 대신 ㄴ으로 종성 변경
+            if ((hasSpecificFinalConsonant('ㅎ', lastChar) && stem.length() > 1)
+                    || hasSpecificFinalConsonant('ㄹ', lastChar)) {
+                // 좋 - 다 -> 좋은 (은이 추가)
+                // 까맣 - 다 -> 까만 (맣 -> 만)
                 return prefix + addFinalConstant(removeFinalConsonant(lastChar), 'ㄴ');
             }
             if (hasSpecificFinalConsonant('ㅄ', lastChar)) {
@@ -66,7 +79,7 @@ public class KoreanAdjectiveConverter {
             }
 
         }
-        else if (hasEuVowel(lastChar)) {
+        else if (hasEuVowel(lastChar) || hasIVowel(lastChar)) {
             // ㅡ 로 끝남
             return prefix + addFinalConstant(lastChar, 'ㄴ');
         }
