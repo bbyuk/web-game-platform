@@ -75,7 +75,9 @@ export default function GameRoomPage() {
 
   useEffect(() => {
     if (currentGame.enteredUsers) {
-      leftSidebar.setItems(currentGame.enteredUsers);
+      leftSidebar.setItems(
+        currentGame.enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest }))
+      );
     } else {
       leftSidebar.setItems(EMPTY_MESSAGES.ENTERED_USER_LIST);
     }

@@ -5,10 +5,18 @@ const Container = ({ children }) => {
   return <ul className="space-y-2">{children}</ul>;
 };
 
-const Item = ({ label, color, current = -1, capacity = -1, isButton = false }) => {
+const Item = ({
+  label,
+  color,
+  current = -1,
+  capacity = -1,
+  isButton = false,
+  onClick = () => {},
+}) => {
   return (
     <li
       className={`flex items-start space-x-2 p-2 rounded ${isButton ? "hover:bg-gray-700 cursor-pointer" : ""}`}
+      onClick={isButton ? onClick : null}
     >
       <ChevronRight size={16} className="text-gray-400 shrink-0 mt-1" />
       <div className="flex flex-col">
@@ -44,6 +52,7 @@ const ItemList = ({ value, emptyPlaceholder }) => {
             current={el.current}
             capacity={el.capacity}
             isButton={el.isButton}
+            onClick={el.onClick}
           />
         ))
       ) : (

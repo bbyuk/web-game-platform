@@ -1,16 +1,8 @@
-import { mockAuthData } from "@/api/mocks/auth.js";
-
 const BASE = "/auth";
 
 export const auth = {
   // 로그인
-  login: {
-    url: `${BASE}/login`,
-    mock: mockAuthData.loginResult,
-  },
+  login: `${BASE}/login`,
   // 토큰 refresh
-  refresh: {
-    url: `${BASE}/refresh`,
-    mock: mockAuthData.tokenRefreshResult,
-  },
+  refresh: `${BASE}/refresh`,
 };

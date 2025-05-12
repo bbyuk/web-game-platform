@@ -4,28 +4,13 @@ const BASE = "/game/canvas";
 
 export const game = {
   // 입장 가능한 방 목록 조회
-  getEnterableRooms: {
-    url: `${BASE}/room`,
-    mock: mockGameRoomData.enterableRooms,
-  },
+  getEnterableRooms: `${BASE}/room`,
   // 게임 방 생성
-  createGameRoom: {
-    url: `${BASE}/room`,
-    mock: mockGameRoomData.createdRoom,
-  },
+  createGameRoom: `${BASE}/room`,
   // 게임 방 입장
-  enterGameRoom: {
-    url: (gameRoomId) => `${BASE}/room/${gameRoomId}/entrance`,
-    mock: mockGameRoomData.enteredRoom,
-  },
+  enterGameRoom: (gameRoomId) => `${BASE}/room/${gameRoomId}/entrance`,
   // 입장 코드로 게임 방 입장
-  enterGameRoomWithJoinCode: {
-    url: (joinCode) => `${BASE}/room/${joinCode}/entrance`,
-    mock: mockGameRoomData.enteredRoom,
-  },
+  enterGameRoomWithJoinCode: (joinCode) => `${BASE}/room/${joinCode}/entrance`,
   // 현재 입장한 게임 방 조회
-  getCurrentEnteredGameRoom: {
-    url: `${BASE}/room/entrance`,
-    mock: mockGameRoomData.enteredRoom,
-  },
+  getCurrentEnteredGameRoom: `${BASE}/room/entrance`,
 };

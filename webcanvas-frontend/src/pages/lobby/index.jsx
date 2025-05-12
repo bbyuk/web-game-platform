@@ -14,6 +14,16 @@ export default function LobbyPage() {
   const { apiLock } = useApiLock();
   const navigate = useNavigate();
 
+  /**
+   * ============== 유저 정의 함수 ===============
+   */
+  const enterRoom = async (gameRoomId) => {
+    await apiLock(
+      game.enterGameRoom(gameRoomId),
+      async () => await api.post(game.enterGameRoom(gameRoomId))
+    );
+  };
+
   useEffect(() => {
     if (currentGame.gameRoomId && currentGame.gameRoomEntranceId) {
       /**
@@ -31,18 +41,18 @@ export default function LobbyPage() {
      * 입장 가능한 방 목록 조회
      */
     leftSidebar.setEmptyPlaceholder(EMPTY_MESSAGES.ROOM_LIST);
-
     api
       .get(game.getEnterableRooms)
       .then((response) => {
         leftSidebar.setItems(
           response.roomList
-            ? response.roomList.map(({ joinCode, enterCount, capacity, ...rest }) => ({
+            ? response.roomList.map(({ joinCode, enterCount, capacity, gameRoomId }) => ({
                 label: joinCode,
                 current: enterCount,
                 isButton: enterCount < capacity,
                 capacity: capacity,
-                ...rest,
+                gameRoomId: gameRoomId,
+                onClick: enterRoom,
               }))
             : []
         );

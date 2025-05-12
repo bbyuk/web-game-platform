@@ -135,19 +135,13 @@ export function ApplicationContextProvider({ children }) {
    */
   const api = {
     get: async (target, params = {}, options = {}) => {
-      if (useMock) {
-        return Promise.resolve(target.mock);
-      }
-      return request("GET", target.url, params, options);
+      return request("GET", target, params, options);
     },
     post: async (target, data = {}, options = {}) => {
-      if (useMock) {
-        return Promise.resolve(target.mock);
-      }
-      return request("POST", target.url, data, options);
+      return request("POST", target, data, options);
     },
     tokenRefresh: async () => {
-      const processedUrl = `${api.constants.serverDomain}${auth.refresh.url}`;
+      const processedUrl = `${api.constants.serverDomain}${auth.refresh}`;
       const options = {
         credentials: "include",
       };
