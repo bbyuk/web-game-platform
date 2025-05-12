@@ -12,13 +12,6 @@ public class KoreanAdjectiveConverter {
             'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
     };
 
-    private static final Map<Character, String> exceptionTable = Map.of(
-            'ㅅ', "으",
-            'ㅂ', "우",
-            'ㄹ', "으",
-            'ㅎ', "으"
-    );
-
     /**
      * 받침이 있는지 확인
      * @param expect
@@ -50,28 +43,39 @@ public class KoreanAdjectiveConverter {
 
         String stem = adjective.substring(0, adjective.length() - 1); // '다' 제거
         char lastChar = stem.charAt(stem.length() - 1);
+        String prefix = stem.substring(0, stem.length() - 1);
 
+        // 받침이 있고
         if (hasFinalConsonant(lastChar)) {
-            // 받침이 있고
-            for (Map.Entry<Character, String> entry : exceptionTable.entrySet()) {
-                if (hasSpecificFinalConsonant(entry.getKey(), lastChar)) {
-                    // 마지막 음절이 예외글자를 가진 경우
-                    String prefix = stem.substring(0, stem.length() - 1);
-                    return prefix + removeFinalConsonant(stem.charAt(stem.length() - 1)) + mergeWithFinalConsonant(entry.getValue().charAt(0), 'ㄴ', entry.getValue()).charAt(0);
-                }
+            // 마지막 음절이 예외글자를 가진 경우
+            if (hasSpecificFinalConsonant('ㅅ', lastChar)) {
+                return prefix + removeFinalConsonant(lastChar) + '은';
             }
+            if (hasSpecificFinalConsonant('ㅂ', lastChar)) {
+                return prefix + removeFinalConsonant(lastChar) + '운';
+            }
+            if (hasSpecificFinalConsonant('ㄹ', lastChar)) {
+                return prefix + removeFinalConsonant(lastChar) + '은';
+            }
+            if (hasSpecificFinalConsonant('ㅎ', lastChar)) {
+                // ㅎ 대신 ㄴ으로 종성 변경
+                return prefix + addFinalConstant(removeFinalConsonant(lastChar), 'ㄴ');
+            }
+            if (hasSpecificFinalConsonant('ㅄ', lastChar)) {
+                return prefix + lastChar + '는';
+            }
+
         }
         else if (hasEuVowel(lastChar)) {
             // ㅡ 로 끝남
-            String prefix = stem.substring(0, stem.length() - 1);
-            return prefix + removeFinalConsonant(stem.charAt(stem.length() - 1)) + mergeWithFinalConsonant('으', 'ㄴ', "으").charAt(0);
+            return prefix + addFinalConstant(lastChar, 'ㄴ');
         }
 
         // 일반 규칙 처리
         if (hasFinalConsonant(lastChar)) {
             return stem + "은"; // 받침 O
         } else {
-            return mergeWithFinalConsonant(lastChar, 'ㄴ', stem); // 받침 X → 종성 ㄴ 결합
+            return prefix + addFinalConstant(lastChar, 'ㄴ'); // 받침 X → 종성 ㄴ 결합
         }
     }
 
@@ -82,14 +86,13 @@ public class KoreanAdjectiveConverter {
     }
 
     // 종성 결합 (받침 없는 음절 + 종성 결합 → 완성형 음절 생성)
-    private static String mergeWithFinalConsonant(char syllable, char jong, String stem) {
+    private static char addFinalConstant(char syllable, char jong) {
         int syllableIndex = syllable - 0xAC00;
         int cho = syllableIndex / (21 * 28);
         int jung = (syllableIndex % (21 * 28)) / 28;
         int jongIdx = getJongseongIndex(jong);
-        if (jongIdx == -1) return stem + jong;
-        char combined = (char) (0xAC00 + (cho * 21 * 28) + (jung * 28) + jongIdx);
-        return stem.substring(0, stem.length() - 1) + combined;
+        if (jongIdx == -1) return syllable; // 유효하지 않으면 원래 음절 그대로 리턴
+        return (char) (0xAC00 + (cho * 21 * 28) + (jung * 28) + jongIdx);
     }
 
     /**
