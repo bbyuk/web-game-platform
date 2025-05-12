@@ -115,26 +115,12 @@ public class ElementaryDictionaryParser extends DictionaryParser {
                                             continue;
                                         }
 
-                                        String unit = elementaryParseItem.feat()
-                                                .stream().filter(feat -> "lexicalUnit".equals(feat.att()))
-                                                .map(ElementaryParseItem.Feat::val)
-                                                .findFirst()
-                                                .orElseGet(() -> "");
-
                                         Word word = new Word(
                                                 Language.KOREAN,
                                                 value,
                                                 index,
-                                                unit,
                                                 pos
                                         );
-
-                                        /**
-                                         * TODO 개발 및 테스트 후 삭제 필요
-                                         */
-                                        if ("형용사".equals(word.getPos())) {
-                                            word.setOriginalValue(originalValue);
-                                        }
 
                                         wordValues.add(word.getValue());
                                         parsedWords.add(word);

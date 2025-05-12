@@ -41,7 +41,6 @@ class DictionaryServiceTest {
                 Language.KOREAN,
                 "행복한",
                 1234L,
-                "단어",
                 PartOfSpeech.ADJECTIVE
         )));
 

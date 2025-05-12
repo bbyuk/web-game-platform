@@ -41,7 +41,7 @@ public record GameRoomEntranceInfoResponse(
             @Schema(description = "방 노출 컬러", example = "#1e9000")
             String color,
 
-            @Schema(description = "자동 생성된 게임 방 내 유저 닉네임", example = "순수한 플레이어")
-            String label
+            @Schema(description = "자동 생성된 게임 방 내 유저 닉네임", example = "고매한 여우")
+            String nickname
     ) {};
 }

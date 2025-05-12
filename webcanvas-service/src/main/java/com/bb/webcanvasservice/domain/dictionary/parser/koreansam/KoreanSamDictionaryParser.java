@@ -128,16 +128,8 @@ public class KoreanSamDictionaryParser extends DictionaryParser {
                                         Language.KOREAN,
                                         value,
                                         index,
-                                        koreanSamParseItem.wordinfo().word_unit(),
                                         pos
                                 );
-
-                                /**
-                                 * TODO 개발 및 테스트 후 삭제 필요
-                                 */
-                                if ("형용사".equals(word.getPos())) {
-                                    word.setOriginalValue(koreanSamParseItem.wordinfo().word());
-                                }
 
                                 wordValues.add(word.getValue());
                                 parsedWords.add(word);
