@@ -94,7 +94,7 @@ class AuthenticationServiceUnitTest {
         when(jwtManager.getUserIdFromToken(any())).thenReturn(userId);
 
         // when
-        String anotherValidToken = realJwtManagerObject.generateToken(userId, user.getFingerprint(), 15 * 60 * 1001);
+        String anotherValidToken = realJwtManagerObject.generateToken(9999L, user.getFingerprint(), 15 * 60 * 1000);
 
         Assertions.assertThatThrownBy(() -> authenticationService.refreshToken(anotherValidToken))
                 .isInstanceOf(ApplicationAuthenticationException.class);
