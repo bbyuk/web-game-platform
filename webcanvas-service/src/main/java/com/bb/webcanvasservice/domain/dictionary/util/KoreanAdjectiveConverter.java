@@ -68,10 +68,7 @@ public class KoreanAdjectiveConverter {
             if (hasSpecificFinalConsonant('ㅂ', lastChar)) {
                 return prefix + removeFinalConsonant(lastChar) + '운';
             }
-            if ((hasSpecificFinalConsonant('ㅎ', lastChar) && stem.length() > 1)
-                    || hasSpecificFinalConsonant('ㄹ', lastChar)) {
-                // 좋 - 다 -> 좋은 (은이 추가)
-                // 까맣 - 다 -> 까만 (맣 -> 만)
+            if ((hasSpecificFinalConsonant('ㅎ', lastChar) || hasSpecificFinalConsonant('ㄹ', lastChar)) && lastChar != '좋') {
                 return prefix + addFinalConstant(removeFinalConsonant(lastChar), 'ㄴ');
             }
             if (hasSpecificFinalConsonant('ㅄ', lastChar)) {
