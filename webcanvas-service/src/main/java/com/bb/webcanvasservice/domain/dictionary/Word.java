@@ -1,5 +1,7 @@
 package com.bb.webcanvasservice.domain.dictionary;
 
+import com.bb.webcanvasservice.domain.dictionary.enums.Language;
+import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,6 +25,10 @@ public class Word {
      */
     private Long id;
 
+    @Column(name = "language")
+    @Enumerated(EnumType.STRING)
+    private Language language;
+
     @Column(name = "value")
     /**
      * 단어 값
@@ -42,10 +48,11 @@ public class Word {
     private String unit;
 
     @Column(name = "pos")
+    @Enumerated(EnumType.STRING)
     /**
      * 품사
      */
-    private String pos;
+    private PartOfSpeech pos;
 
     @Setter
     @Column(name = "original_value")
@@ -54,7 +61,8 @@ public class Word {
      */
     private String originalValue;
 
-    public Word(String value, Long index, String unit, String pos) {
+    public Word(Language language, String value, Long index, String unit, PartOfSpeech pos) {
+        this.language = language;
         this.value = value;
         this.index = index;
         this.unit = unit;

@@ -5,5 +5,6 @@ import org.springframework.stereotype.Repository;
 
 public interface SequenceRepository {
     long getNextValue(@Param("sequenceName") String sequenceName);
+    long getCurrentValue(@Param("sequenceName") String sequenceName);
     void createSequence(@Param("sequenceName") String sequenceName);
 }

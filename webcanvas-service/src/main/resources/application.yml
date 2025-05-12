@@ -44,8 +44,8 @@ logging:
 application:
   sequence:
       list:
-        - "WORD_NOUN"
-        - "WORD_ADJECTIVE"
+        - "KOREAN_NOUN"
+        - "KOREAN_ADJECTIVE"
   domain:
     game:
       # 게임 방 입장 최대 정원

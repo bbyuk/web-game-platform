@@ -2,6 +2,8 @@ package com.bb.webcanvasservice.domain.dictionary.parser.elementary;
 
 import com.bb.webcanvasservice.common.sequence.SequenceRepository;
 import com.bb.webcanvasservice.domain.dictionary.Word;
+import com.bb.webcanvasservice.domain.dictionary.enums.Language;
+import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileParseFailedException;
 import com.bb.webcanvasservice.domain.dictionary.parser.DictionaryParser;
 import com.bb.webcanvasservice.domain.dictionary.util.KoreanAdjectiveConverter;
@@ -72,18 +74,23 @@ public class ElementaryDictionaryParser extends DictionaryParser {
                                         /**
                                          * 명사 / 형용사만 저장
                                          */
-                                        String pos = elementaryParseItem.feat().stream()
+                                        String strPos = elementaryParseItem.feat().stream()
                                                 .filter(feat -> "partOfSpeech".equals(feat.att()))
                                                 .findFirst()
                                                 .map(ElementaryParseItem.Feat::val)
                                                 .orElseGet(() -> "없음");
 
-                                        Long index = "명사".equals(pos)
-                                                ? sequenceRepository.getNextValue("WORD_NOUN")
-                                                : "형용사".equals(pos)
-                                                ? sequenceRepository.getNextValue("WORD_ADJECTIVE")
+                                        Long index = "명사".equals(strPos)
+                                                ? sequenceRepository.getNextValue("KOREAN_NOUN")
+                                                : "형용사".equals(strPos)
+                                                ? sequenceRepository.getNextValue("KOREAN_ADJECTIVE")
                                                 : -1;
 
+                                        PartOfSpeech pos = strPos.equals("명사")
+                                                ? PartOfSpeech.NOUN
+                                                : strPos.equals("형용사")
+                                                ? PartOfSpeech.ADJECTIVE
+                                                : null;
                                         if (index == -1) {
                                             continue;
                                         }
@@ -96,7 +103,7 @@ public class ElementaryDictionaryParser extends DictionaryParser {
                                         /**
                                          * 형용사일 경우 value converting 작업 수행
                                          */
-                                        if ("형용사".equals(pos)) {
+                                        if ("형용사".equals(strPos)) {
                                             value = KoreanAdjectiveConverter.toModifierForm(originalValue);
                                         }
 
@@ -115,6 +122,7 @@ public class ElementaryDictionaryParser extends DictionaryParser {
                                                 .orElseGet(() -> "");
 
                                         Word word = new Word(
+                                                Language.KOREAN,
                                                 value,
                                                 index,
                                                 unit,

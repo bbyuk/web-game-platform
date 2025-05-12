@@ -29,7 +29,7 @@ public class SequenceRepositoryImpl implements SequenceRepository {
 
 
     @Transactional
-    void setupSequences() {
+    public void setupSequences() {
         sequenceProperties.list().forEach(sequenceName -> {
             if (isExistSequence(sequenceName)) {
                 return;
@@ -58,6 +58,11 @@ public class SequenceRepositoryImpl implements SequenceRepository {
         entityManager.persist(sequence);
     }
 
+    /**
+     * 시퀀스가 존재하는지 여부를 조회한다.
+     * @param sequenceName
+     * @return
+     */
     @Transactional(readOnly = true)
     public Boolean isExistSequence(String sequenceName) {
         return entityManager.createQuery("""
@@ -97,5 +102,29 @@ public class SequenceRepositoryImpl implements SequenceRepository {
         sequence.setValue(nextValue);
         return nextValue;
     }
+
+    /**
+     * 대상 시퀀스의 현재 value를 조회한다.
+     * @param sequenceName
+     * @return
+     */
+    @Override
+    @Transactional
+    public long getCurrentValue(String sequenceName) {
+        Sequence sequence = null;
+
+        try {
+            sequence = entityManager.createQuery(SEQUENCE_SELECT_QUERY, Sequence.class)
+                    .setParameter("sequenceName", sequenceName)
+                    .getSingleResult();
+        }
+        catch(Exception e) {
+            log.error("{} 시퀀스를 찾는 중 에러가 발생했습니다.", sequenceName, e);
+            throw new SequenceNotFoundException();
+        }
+
+        return sequence.getValue();
+    }
+
 
 }
