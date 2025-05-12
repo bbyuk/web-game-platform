@@ -26,7 +26,7 @@ public class Sequence {
     @Column(name = "value")
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PACKAGE)
-    private Long value = 1L;
+    private Long value = 0L;
 
     Sequence(String name) {
         this.name = name;
