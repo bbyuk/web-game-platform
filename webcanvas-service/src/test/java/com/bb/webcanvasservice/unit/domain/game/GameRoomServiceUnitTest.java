@@ -172,6 +172,8 @@ class GameRoomServiceUnitTest {
 
         when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
+        when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(anyLong()))
+                .thenReturn(testGameRoom.getEntrances());
 
         long gameRoomId = random.nextLong();
         long userId = random.nextLong();

@@ -159,7 +159,9 @@ public class GameRoomService {
             throw new IllegalGameRoomStateException();
         }
 
-        int enteredUserCounts = targetGameRoom.getEntrances().size();
+        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoomId);
+        int enteredUserCounts = gameRoomEntrances.size();
+
         if (enteredUserCounts >= gameProperties.gameRoomCapacity()) {
             throw new IllegalGameRoomStateException("방의 정원이 모두 찼습니다.");
         }
