@@ -53,18 +53,6 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
     boolean existsJoinCodeConflictOnActiveGameRoom(@Param("joinCode") String joinCode);
 
     /**
-     * GameRoom 상태로 게엠 방을 조회한다.
-     * @param state
-     * @return
-     */
-    @Query("""
-            select  gr
-            from    GameRoom gr
-            where   gr.state = :state
-            """)
-    List<GameRoom> findByState(@Param("state") GameRoomState state);
-
-    /**
      * 입장 가능한 게임 방의 목록을 가져온다.
      *
      * 조건 1. GameRoom과 연관된 GameRoomEntrance의 수가 게임 방의 수용 인원 수보다 작거나 같아야함
@@ -75,17 +63,33 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
      */
     @Query(
             """
-            select      gre.gameRoom
-            from        GameRoomEntrance gre
-            where       gre.state = :activeEntranceState
-            and         gre.gameRoom.state in :enterableStates
-            group by    gre.gameRoom
-            having      count(gre) < :gameRoomCapacity
+            select  gr
+            from    GameRoom gr
+            where   gr.state in :enterableStates
+            and     (
+                        select  count(gre)
+                        from    GameRoomEntrance gre
+                        where   gre.gameRoom = gr
+                        and     gre.state = :activeEntranceState
+                    ) < :gameRoomCapacity
             """
     )
+    @EntityGraph(attributePaths = "entrances")
     List<GameRoom> findGameRoomsByCapacityAndStateWithEntranceState(@Param("gameRoomCapacity") int gameRoomCapacity,
                                                                     @Param("enterableStates") List<GameRoomState> enterableStates,
                                                                     @Param("activeEntranceState")GameRoomEntranceState activeEntranceState);
+
+    /**
+     * GameRoom 상태로 게엠 방을 조회한다.
+     * @param state
+     * @return
+     */
+    @Query("""
+            select  gr
+            from    GameRoom gr
+            where   gr.state = :state
+            """)
+    List<GameRoom> findByState(@Param("state") GameRoomState state);
 
     /**
      * JoinCode로 입장할 방 조회

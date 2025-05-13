@@ -208,6 +208,8 @@ public class GameRoomService {
      * <p>
      * 이미 입장한 방이 있는 경우, AlreadyEnteredRoomException 을 throw한다.
      *
+     * TODO 메모리에서 ACTIVE GameRoomEntrance filtering 처리 -> batch size 및 페이징 처리 필요
+     * 
      * @param userId 유저 ID
      * @return GameRoomListResponse 게임 방 조회 응답 DTO
      */
@@ -225,7 +227,9 @@ public class GameRoomService {
                                 new GameRoomListResponse.GameRoomSummary(
                                         gameRoom.getId(),
                                         gameProperties.gameRoomCapacity(),
-                                        gameRoom.getEntrances().size(),
+                                        (int) gameRoom.getEntrances().stream()
+                                                .filter(entrance -> entrance.getState().equals(GameRoomEntranceState.ACTIVE))
+                                                .count(),
                                         gameRoom.getJoinCode()
                                 )
                         )

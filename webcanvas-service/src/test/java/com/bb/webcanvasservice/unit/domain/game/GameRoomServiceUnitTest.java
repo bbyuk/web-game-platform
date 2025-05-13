@@ -8,6 +8,7 @@ import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
@@ -28,7 +29,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 import static com.bb.webcanvasservice.common.code.ErrorCode.GAME_ROOM_HAS_ILLEGAL_STATUS;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -199,6 +200,57 @@ class GameRoomServiceUnitTest {
                 .isInstanceOf(AlreadyEnteredRoomException.class);
         // then
 
+    }
+
+    @Test
+    @DisplayName("입장 가능한 방 목록 조회 - 입장 가능한 방의 현재 인원, 최대 정원을 함꼐 리턴한다")
+    void findEnterableGameRoomsWithCounts() throws Exception {
+        // given
+        String joinCode = JoinCodeGenerator.generate(6);
+        GameRoom gameRoom = new GameRoom(GameRoomState.WAITING, joinCode);
+        setId(gameRoom, 1L);
+
+        User user1 = new User(UUID.randomUUID().toString());
+        User user2 = new User(UUID.randomUUID().toString());
+        User user3 = new User(UUID.randomUUID().toString());
+        User user4 = new User(UUID.randomUUID().toString());
+
+        setId(user1, 1L);
+        setId(user2, 2L);
+        setId(user3, 3L);
+        setId(user4, 4L);
+
+
+        GameRoomEntrance gameRoomEntrance1 = new GameRoomEntrance(gameRoom, user1, "유저1");
+        GameRoomEntrance gameRoomEntrance2 = new GameRoomEntrance(gameRoom, user2, "유저2");
+        GameRoomEntrance gameRoomEntrance3 = new GameRoomEntrance(gameRoom, user3, "유저3");
+        setId(gameRoomEntrance1, 1L);
+        setId(gameRoomEntrance2, 2L);
+        setId(gameRoomEntrance3, 3L);
+
+        gameRoom.addEntrance(gameRoomEntrance1);
+        gameRoom.addEntrance(gameRoomEntrance2);
+        gameRoom.addEntrance(gameRoomEntrance3);
+
+        // 이러면 gameRoom에 둘
+        // state만 변경하고 다시 add
+        gameRoomEntrance3.exit();
+        gameRoom.addEntrance(gameRoomEntrance3);
+
+        when(gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(anyInt(), any(), any()))
+                .thenReturn(List.of(gameRoom));
+        when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any()))
+                .thenReturn(false);
+//        when(gameProperties.gameRoomCapacity())
+//                .thenReturn(8);
+
+        // when
+        GameRoomListResponse enterableGameRooms = gameRoomService.findEnterableGameRooms(4L);
+
+        // then
+        Assertions.assertThat(enterableGameRooms).usingRecursiveComparison().isEqualTo(new GameRoomListResponse(
+                List.of(new GameRoomListResponse.GameRoomSummary(1L, 8, 2, joinCode))
+        ));
     }
 
     @Test

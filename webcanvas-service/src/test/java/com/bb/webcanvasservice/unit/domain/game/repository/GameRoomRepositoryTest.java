@@ -139,6 +139,7 @@ class GameRoomRepositoryTest {
         // when
         List<GameRoom> enterableGameRooms = gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), GameRoomState.enterable(), GameRoomEntranceState.ACTIVE);
 
+
         // then
         Assertions.assertThat(enterableGameRooms.size()).isEqualTo(3);
     }
