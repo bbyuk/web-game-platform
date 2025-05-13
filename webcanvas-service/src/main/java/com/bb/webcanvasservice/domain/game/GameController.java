@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.domain.game;
 
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameRoomExitResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.security.auth.Authenticated;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
@@ -61,6 +62,19 @@ public class GameController {
         return ResponseEntity.ok(gameRoomService.findEnteredGameRoomInfo(authentication.getUserId()));
     }
 
+    /**
+     * 현재 입장한 게임 방에서 퇴장한다.
+     * @param authentication
+     * @param gameRoomEntranceId
+     * @return
+     */
+    @Operation(summary = "현재 입장한 게임 방에서 퇴장", description = "요청을 보낸 유저가 입장한 게임 방에서 퇴장한다.")
+    @DeleteMapping("room/entrance/{gameRoomEntranceId}")
+    public ResponseEntity<GameRoomExitResponse> exitGameRoom(@Authenticated WebCanvasAuthentication authentication, @PathVariable("gameRoomEntranceId") Long gameRoomEntranceId) {
+        gameRoomService.exitFromRoom(gameRoomEntranceId, authentication.getUserId());
+        return ResponseEntity.ok(new GameRoomExitResponse(true));
+    }
+
 
     /**
      * 게임 방 입장
@@ -92,5 +106,6 @@ public class GameController {
                                                                               @Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(gameRoomService.enterGameRoomWithJoinCode(joinCode, authentication.getUserId()));
     }
+
 
 }
