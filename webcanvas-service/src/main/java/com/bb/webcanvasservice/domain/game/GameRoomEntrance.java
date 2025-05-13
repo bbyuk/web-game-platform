@@ -58,7 +58,12 @@ public class GameRoomEntrance {
         this.nickname = nickname;
     }
 
+    /**
+     * 게임 입장 Entity를 exit 처리한다.
+     */
     public void exit() {
         this.state = GameRoomEntranceState.INACTIVE;
+        this.gameRoom.getEntrances()
+                .removeIf(entrance -> entrance.id.equals(this.id));
     }
 }

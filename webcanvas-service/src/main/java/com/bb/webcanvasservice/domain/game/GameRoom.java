@@ -55,4 +55,8 @@ public class GameRoom {
         entrances.add(entrance);
     }
 
+    public void close() {
+        this.state = GameRoomState.CLOSED;
+    }
+
 }

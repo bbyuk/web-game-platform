@@ -1,8 +1,10 @@
 package com.bb.webcanvasservice.domain.game.repository;
 
 import com.bb.webcanvasservice.domain.game.GameRoom;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -73,17 +75,17 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
      */
     @Query(
             """
-            select      gr
-            from        GameRoom gr
-            left join   GameRoomEntrance gre
-            on          gre.gameRoom.id = gr.id
-            where       gr.state in :enterableStates
-            group by    gr
+            select      gre.gameRoom
+            from        GameRoomEntrance gre
+            where       gre.state = :activeEntranceState
+            and         gre.gameRoom.state in :enterableStates
+            group by    gre.gameRoom
             having      count(gre) < :gameRoomCapacity
             """
     )
-    List<GameRoom> findEnterableGameRooms(@Param("gameRoomCapacity") int gameRoomCapacity,
-                                          @Param("enterableStates") List<GameRoomState> enterableStates);
+    List<GameRoom> findGameRoomsByCapacityAndStateWithEntranceState(@Param("gameRoomCapacity") int gameRoomCapacity,
+                                                                    @Param("enterableStates") List<GameRoomState> enterableStates,
+                                                                    @Param("activeEntranceState")GameRoomEntranceState activeEntranceState);
 
     /**
      * JoinCode로 입장할 방 조회

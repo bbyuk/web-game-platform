@@ -1,12 +1,14 @@
 package com.bb.webcanvasservice.domain.game;
 
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
+import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
 import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
@@ -19,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -218,7 +219,7 @@ public class GameRoomService {
 
 
         return new GameRoomListResponse(
-                gameRoomRepository.findEnterableGameRooms(gameProperties.gameRoomCapacity(), GameRoomState.enterable())
+                gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), GameRoomState.enterable(), GameRoomEntranceState.ACTIVE)
                         .stream()
                         .map(gameRoom ->
                                 new GameRoomListResponse.GameRoomSummary(
@@ -275,5 +276,28 @@ public class GameRoomService {
     @Transactional(readOnly = true)
     public boolean canEnterWebSocketGameRoom(Long gameRoomId, Long userId) {
         return gameRoomEntranceRepository.existsActiveEntrance(gameRoomId, userId);
+    }
+
+    /**
+     * 게임 방에서 퇴장한다.
+     * @param gameRoomEntranceId
+     * @param userId
+     */
+    @Transactional
+    public void exitFromRoom(Long gameRoomEntranceId, Long userId) {
+        GameRoomEntrance gameRoomEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
+                .orElseThrow(GameRoomEntranceNotFoundException::new);
+
+        if (!gameRoomEntrance.getUser().getId().equals(userId)) {
+            log.error("대상 게임 방 입장 기록과 요청 유저가 다릅니다.");
+            throw new AbnormalAccessException();
+        }
+
+        gameRoomEntrance.exit();
+
+        GameRoom gameRoom = gameRoomEntrance.getGameRoom();
+        if (gameRoom.getEntrances().isEmpty()) {
+            gameRoom.close();
+        }
     }
 }

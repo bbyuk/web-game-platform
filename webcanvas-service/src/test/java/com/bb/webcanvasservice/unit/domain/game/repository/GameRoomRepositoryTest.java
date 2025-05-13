@@ -4,6 +4,7 @@ import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameProperties;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
@@ -106,13 +107,22 @@ class GameRoomRepositoryTest {
          * 입장가능 room1 ~ room3
          */
         GameRoom room1 = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, userRepository.save(new User(UUID.randomUUID().toString())), "여우"));
         GameRoom room2 = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room2, userRepository.save(new User(UUID.randomUUID().toString())), "여우"));
         GameRoom room3 = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room3, userRepository.save(new User(UUID.randomUUID().toString())), "여우"));
+
 
         /**
          * PLAYING room4
          */
         GameRoom room4 = gameRoomRepository.save(new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(6)));
+        gameRoomEntranceRepository.saveAll(
+                Stream.generate(() -> new GameRoomEntrance(room4, userRepository.save(new User(UUID.randomUUID().toString())), "테스트 호랑이"))
+                        .limit(gameProperties.gameRoomCapacity())
+                        .collect(Collectors.toList())
+        );
 
         /**
          * WAITING - 입장인원 MAX
@@ -127,31 +137,62 @@ class GameRoomRepositoryTest {
 
 
         // when
-        List<GameRoom> enterableGameRooms = gameRoomRepository.findEnterableGameRooms(gameProperties.gameRoomCapacity(), GameRoomState.enterable());
+        List<GameRoom> enterableGameRooms = gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), GameRoomState.enterable(), GameRoomEntranceState.ACTIVE);
 
         // then
         Assertions.assertThat(enterableGameRooms.size()).isEqualTo(3);
     }
 
     @Test
+    @DisplayName("입장 가능한 GameRoom 목록 조회 - 중간에 퇴장한 유저가 있다면 entrances에 조회되지 않아야 한다.")
+    void testFindGameRoomCanEnter() {
+        // given
+        /**
+         * 입장가능 room1 ~ room3
+         */
+        GameRoom room1 = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, userRepository.save(new User(UUID.randomUUID().toString())), "여우"));
+        User user2 = userRepository.save(new User(UUID.randomUUID().toString()));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, user2, "여우"));
+        User user3 = userRepository.save(new User(UUID.randomUUID().toString()));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, user3, "여우"));
+
+        // when
+
+        // then
+    }
+
+    @Test
     @DisplayName("JoinCode로 입장할 방 조회 - GameRoom.state = 'WAITING' 이어야 한다.")
     void testSelectEnterableGameRoomWithJoinCode() throws Exception {
         // given
+        GameRoom gameRoom1 = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength()));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom1, userRepository.save(new User(UUID.randomUUID().toString())),"nickname"));
+        GameRoom gameRoom2 = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength()));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom2, userRepository.save(new User(UUID.randomUUID().toString())), "nickname"));
+        GameRoom gameRoom3 = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength()));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom3, userRepository.save(new User(UUID.randomUUID().toString())), "nickname"));
+        GameRoom gameRoom4 = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength()));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom4, userRepository.save(new User(UUID.randomUUID().toString())), "nickname"));
+
         List<GameRoom> gameRooms = List.of(
-                new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
-                new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
-                new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
-                new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
+                gameRoom1,
+                gameRoom2,
+                gameRoom3,
+                gameRoom4,
                 new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
                 new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(gameProperties.joinCodeLength())),
                 new GameRoom(GameRoomState.CLOSED, JoinCodeGenerator.generate(gameProperties.joinCodeLength()))
         );
 
+
         gameRoomRepository.saveAll(gameRooms);
         // when
-        List<GameRoom> enterableGameRooms = gameRoomRepository.findEnterableGameRooms(gameProperties.gameRoomCapacity(), List.of(GameRoomState.WAITING));
+        List<GameRoom> enterableGameRooms = gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), List.of(GameRoomState.WAITING), GameRoomEntranceState.ACTIVE);
 
         // then
         Assertions.assertThat(enterableGameRooms).hasSize(4);
     }
+
+
 }

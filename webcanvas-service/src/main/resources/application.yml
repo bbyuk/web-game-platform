@@ -35,6 +35,9 @@ spring:
 logging:
   level:
     org:
+      hibernate:
+        SQL: debug
+        type: trace
       springframework:
         security: debug
         web: debug
