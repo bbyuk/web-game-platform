@@ -9,7 +9,7 @@ import { pages } from "@/router/index.jsx";
 
 export default function LobbyPage() {
   // 전역 context
-  const { leftSidebar, api, currentGame } = useApplicationContext();
+  const { leftSidebar, api } = useApplicationContext();
   // API 중복 요청을 block하기 위한 lock
   const { apiLock } = useApiLock();
   const navigate = useNavigate();
@@ -27,14 +27,6 @@ export default function LobbyPage() {
   };
 
   useEffect(() => {
-    if (currentGame.gameRoomId && currentGame.gameRoomEntranceId) {
-      /**
-       * 이미 방에 입장한 상태
-       * 게임 방 page로 이동
-       */
-      moveToGameRoom(currentGame.gameRoomId);
-    }
-
     /**
      * 초기 api 호출
      */
@@ -79,7 +71,6 @@ export default function LobbyPage() {
       async () => await api.post(game.createGameRoom)
     );
 
-    currentGame.setEntranceInfo(response);
     moveToGameRoom(response.gameRoomId);
   };
 

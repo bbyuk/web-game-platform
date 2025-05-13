@@ -2,48 +2,80 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "@/api/index.js";
 import { useNavigate } from "react-router-dom";
 import { EMPTY_MESSAGES } from "@/constants/message.js";
+import { GitCommit, MessageCircle } from "lucide-react";
 
 const ApplicationContext = createContext(null);
 
 export function ApplicationContextProvider({ children }) {
+  const navigate = useNavigate();
   /**
    * ========================= states ===========================
    */
+  const init = {
+    savedAccessToken: localStorage.getItem("accessToken"),
+    selectedTopTabIndex: -1,
+    topTabItems: [],
+    leftSidebarItems: [],
+    leftSidebarEmptyPlaceholder: EMPTY_MESSAGES.GENERIC,
+    leftSidebarTitle: {
+      label: "main",
+      icon: <GitCommit size={20} className="text-gray-400" />,
+      button: false,
+      onClick: () => {},
+    },
+    rightSidebarTitle: {
+      label: "chat",
+      icon: <MessageCircle size={20} className="text-gray-400" />,
+      button: false,
+      onClick: () => {},
+    },
+    currentGameRoomId: null,
+    currentGameRoomEntranceId: null,
+    currentGameRoomEnteredUsers: [],
+  };
 
-  const navigate = useNavigate();
   /**
    * api authentication 관련 토큰 state
    */
-  const [savedAccessToken, setSavedAccessToken] = useState(localStorage.getItem("accessToken"));
+  const [savedAccessToken, setSavedAccessToken] = useState(init.savedAccessToken);
 
   /**
    * 상단 바 관련 state
    */
-  const [selectedTopTabIndex, setSelectedTopTabIndex] = useState(-1);
-  const [topTabItems, setTopTabItems] = useState([]);
+  const [selectedTopTabIndex, setSelectedTopTabIndex] = useState(init.selectedTopTabIndex);
+  const [topTabItems, setTopTabItems] = useState(init.topTabItems);
 
   /**
    * 좌측 sidebar 관련 state
    */
-  const [leftSidebarItems, setLeftSidebarItems] = useState([]);
+  const [leftSidebarItems, setLeftSidebarItems] = useState(init.leftSidebarItems);
   const [leftSidebarEmptyPlaceholder, setLeftSidebarEmptyPlaceholder] = useState(
-    EMPTY_MESSAGES.GENERIC
+    init.leftSidebarEmptyPlaceholder
   );
+
+  const [leftSidebarTitle, setLeftSidebarTitle] = useState(init.leftSidebarTitle);
+
+  /**
+   * 우측 sidebar 관련 state
+   */
+  const [rightSidebarTitle, setRightSidebarTitle] = useState(init.rightSidebarTitle);
 
   /**
    * 현재 입장한 게임 방 관련 state
    */
   // 현재 입장한 방의 ID
-  const [currentGameRoomId, setCurrentGameRoomId] = useState(null);
+  const [currentGameRoomId, setCurrentGameRoomId] = useState(init.currentGameRoomId);
   // 현재 입장 ID
-  const [currentGameRoomEntranceId, setCurrentGameRoomEntranceId] = useState(null);
-  const [currentGameRoomEnteredUsers, setCurrentGameRoomEnteredUsers] = useState([]);
+  const [currentGameRoomEntranceId, setCurrentGameRoomEntranceId] = useState(
+    init.currentGameRoomEntranceId
+  );
+  const [currentGameRoomEnteredUsers, setCurrentGameRoomEnteredUsers] = useState(
+    init.currentGameRoomEnteredUsers
+  );
 
   /**
    * ========================= states ===========================
    */
-
-  const useMock = import.meta.env.VITE_USE_MOCK === "true";
 
   /**
    * constant with hook
@@ -66,12 +98,12 @@ export function ApplicationContextProvider({ children }) {
       ...options.headers,
     };
 
-    const processedUrl = `${api.constants.serverDomain}${method === "GET" ? api.utils.buildUrlWithParams(url, data) : url}`;
+    const processedUrl = `${api.constants.serverDomain}${method === "GET" || method === "DELETE" ? api.utils.buildUrlWithParams(url, data) : url}`;
     const fetchOption = {
       method,
       headers,
       ...options,
-      ...(method !== "GET" && { body: JSON.stringify(data) }),
+      ...(method !== "GET" && method !== "DELETE" && { body: JSON.stringify(data) }),
     };
 
     return fetch(processedUrl, fetchOption)
@@ -139,6 +171,12 @@ export function ApplicationContextProvider({ children }) {
     },
     post: async (target, data = {}, options = {}) => {
       return request("POST", target, data, options);
+    },
+    put: (target, data = {}, options = {}) => {
+      return request("PUT", target, data, options);
+    },
+    delete: (target, params = {}, options = {}) => {
+      return request("DELETE", target, params, options);
     },
     tokenRefresh: async () => {
       const processedUrl = `${api.constants.serverDomain}${auth.refresh}`;
@@ -225,8 +263,8 @@ export function ApplicationContextProvider({ children }) {
     onSelected: (index) => setSelectedTopTabIndex(index),
     items: topTabItems,
     clear: () => {
-      setTopTabItems([]);
-      setSelectedTopTabIndex(-1);
+      setTopTabItems(init.topTabItems);
+      setSelectedTopTabIndex(init.selectedTopTabIndex);
     },
     setItems: (value) => {
       setTopTabItems(value);
@@ -241,15 +279,31 @@ export function ApplicationContextProvider({ children }) {
   const leftSidebar = {
     items: leftSidebarItems,
     emptyPlaceholder: leftSidebarEmptyPlaceholder,
+    title: leftSidebarTitle,
     setItems: (value) => {
       setLeftSidebarItems(value);
     },
     setEmptyPlaceholder: (value) => {
       setLeftSidebarEmptyPlaceholder(value);
     },
+    setLeftSidebarTitle: (value) => {
+      setLeftSidebarTitle(value);
+    },
     clear: () => {
-      setLeftSidebarItems([]);
-      setLeftSidebarEmptyPlaceholder(EMPTY_MESSAGES.GENERIC);
+      setLeftSidebarItems(init.leftSidebarItems);
+      setLeftSidebarEmptyPlaceholder(init.leftSidebarEmptyPlaceholder);
+      setLeftSidebarTitle(init.leftSidebarTitle);
+    },
+  };
+
+  /**
+   * 우측 sidebar 관련 context
+   * @type {{}}
+   */
+  const rightSidebar = {
+    title: rightSidebarTitle,
+    clear: () => {
+      setRightSidebarTitle(init.rightSidebarTitle);
     },
   };
 
@@ -260,15 +314,15 @@ export function ApplicationContextProvider({ children }) {
     gameRoomId: currentGameRoomId,
     gameRoomEntranceId: currentGameRoomEntranceId,
     enteredUsers: currentGameRoomEnteredUsers,
-    setEntranceInfo: ({ gameRoomId, gameRoomEntranceId, enteredUsers }) => {
+    setGameRoomInfo: ({ gameRoomId, gameRoomEntranceId, enteredUsers }) => {
       setCurrentGameRoomId(gameRoomId);
       setCurrentGameRoomEntranceId(gameRoomEntranceId);
       setCurrentGameRoomEnteredUsers(enteredUsers);
     },
-    clearEntranceInfo: () => {
-      setCurrentGameRoomId(null);
-      setCurrentGameRoomEntranceId(null);
-      setCurrentGameRoomEnteredUsers([]);
+    clear: () => {
+      setCurrentGameRoomId(init.currentGameRoomId);
+      setCurrentGameRoomEntranceId(init.currentGameRoomEntranceId);
+      setCurrentGameRoomEnteredUsers(init.currentGameRoomEnteredUsers);
     },
   };
 
@@ -317,6 +371,7 @@ export function ApplicationContextProvider({ children }) {
         authentication,
         topTabs,
         leftSidebar,
+        rightSidebar,
         currentGame,
         utils,
       }}
