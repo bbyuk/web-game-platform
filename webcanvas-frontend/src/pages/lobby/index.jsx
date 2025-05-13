@@ -17,11 +17,13 @@ export default function LobbyPage() {
   /**
    * ============== 유저 정의 함수 ===============
    */
-  const enterRoom = async (gameRoomId) => {
-    await apiLock(
-      game.enterGameRoom(gameRoomId),
-      async () => await api.post(game.enterGameRoom(gameRoomId))
+  const enterRoom = async (targetRoomId) => {
+    const { gameRoomId, gameRoomEntranceId } = await apiLock(
+      game.enterGameRoom(targetRoomId),
+      async () => await api.post(game.enterGameRoom(targetRoomId))
     );
+
+    moveToGameRoom(gameRoomId);
   };
 
   useEffect(() => {
@@ -52,7 +54,7 @@ export default function LobbyPage() {
                 isButton: enterCount < capacity,
                 capacity: capacity,
                 gameRoomId: gameRoomId,
-                onClick: enterRoom,
+                onClick: () => enterRoom(gameRoomId),
               }))
             : []
         );

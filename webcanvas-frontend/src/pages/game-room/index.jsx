@@ -43,46 +43,58 @@ export default function GameRoomPage() {
     setReRenderingSignal(false);
   };
 
-  const checkCurrentGameRoom = async () => {
-    if (!(currentGame.gameRoomId && currentGame.gameRoomEntranceId)) {
-      // 방 정보 조회
-      await api
-        .get(game.getCurrentEnteredGameRoom)
-        .then((response) => {
-          currentGame.setEntranceInfo(response);
-          if (location.pathname !== `${pages.gameRoom}/${response.gameRoomId}`) {
-            utils.redirectTo(`${pages.gameRoom}/${response.gameRoomId}`);
-          }
-        })
-        .catch((error) => {
-          if (error.code === "R003") {
-            // 로비로 이동
-            alert(REDIRECT_MESSAGES.TO_LOBBY);
-            utils.redirectTo(pages.lobby);
-          }
-        });
-    }
+  const findCurrentGameInfo = async () => {
+    // 방 정보 조회
+    return await api
+      .get(game.getCurrentEnteredGameRoom)
+      .then((response) => {
+        currentGame.setEntranceInfo(response);
+        if (location.pathname !== `${pages.gameRoom}/${response.gameRoomId}`) {
+          utils.redirectTo(`${pages.gameRoom}/${response.gameRoomId}`);
+        }
+        return response;
+      })
+      .catch((error) => {
+        if (error.code === "R003") {
+          // 로비로 이동
+          alert(REDIRECT_MESSAGES.TO_LOBBY);
+          utils.redirectTo(pages.lobby);
+        }
+      });
   };
 
   /**
    * =========================== 이벤트 핸들러 =============================
    */
   useEffect(() => {
-    checkCurrentGameRoom();
-    //  * TODO canvas 팔레트 서비스 개발 및 조회 API 요청
-    //  */
+    // redirect에 의한 set
+    if (currentGame.gameRoomId && currentGame.gameRoomEntranceId) {
+      if (currentGame.enteredUsers) {
+        leftSidebar.setItems(
+          currentGame.enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest }))
+        );
+      } else {
+        leftSidebar.setItems(EMPTY_MESSAGES.ENTERED_USER_LIST);
+      }
+    }
+    console.log(currentGame);
   }, [location.pathname]);
 
   useEffect(() => {
-    if (currentGame.enteredUsers) {
-      leftSidebar.setItems(
-        currentGame.enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest }))
-      );
-    } else {
-      leftSidebar.setItems(EMPTY_MESSAGES.ENTERED_USER_LIST);
-    }
-    console.log(leftSidebar);
-  }, [currentGame]);
+    findCurrentGameInfo().then((response) => {
+      if (response.enteredUsers) {
+        leftSidebar.setItems(
+          response.enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest }))
+        );
+      } else {
+        leftSidebar.setItems(EMPTY_MESSAGES.ENTERED_USER_LIST);
+      }
+    });
+
+    /*
+     * TODO canvas 팔레트 서비스 개발 및 조회 API 요청
+     */
+  }, []);
 
   return (
     <Canvas
