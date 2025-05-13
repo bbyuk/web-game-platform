@@ -1,7 +1,5 @@
-import Title from "@/components/layouts/side-panel/title/index.jsx";
-import { JSX } from "react";
-import ItemList from "@/components/layouts/side-panel/item-list/index.jsx";
-import { EMPTY_MESSAGES } from "@/constants/message.js";
+import Title from '@/components/layouts/side-panel/title/index.jsx';
+import { JSX } from 'react';
 
 export default function SidePanel({
   title = { label: String(), icon: JSX.Element, button: false, onClick: () => {} },

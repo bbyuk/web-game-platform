@@ -75,7 +75,7 @@ export default function GameRoomPage() {
       leftSidebar.setItems(EMPTY_MESSAGES.ENTERED_USER_LIST);
     }
 
-    leftSidebar.setLeftSidebarTitle({
+    leftSidebar.setTitle({
       label: "exit",
       icon: <ArrowLeft size={20} className="text-gray-400" />,
       button: true,

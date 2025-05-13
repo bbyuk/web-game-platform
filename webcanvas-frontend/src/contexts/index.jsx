@@ -286,7 +286,7 @@ export function ApplicationContextProvider({ children }) {
     setEmptyPlaceholder: (value) => {
       setLeftSidebarEmptyPlaceholder(value);
     },
-    setLeftSidebarTitle: (value) => {
+    setTitle: (value) => {
       setLeftSidebarTitle(value);
     },
     clear: () => {
