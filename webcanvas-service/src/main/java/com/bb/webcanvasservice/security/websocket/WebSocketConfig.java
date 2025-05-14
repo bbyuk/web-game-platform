@@ -36,14 +36,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // 메시지 브로커 활성화: "/canvas"과 "/chat"로 시작하는 경로에 대해 브로커를 활성화
-        registry.enableSimpleBroker("/ws/canvas", "/chat");
+        registry.enableSimpleBroker("/canvas", "/chat");
 
         // 클라이언트로 메시지를 보낼 때 사용할 prefix 설정 (필요시)
-        registry.setApplicationDestinationPrefixes("/ws/canvas");
+        // registry.setApplicationDestinationPrefixes("canvas");
     }
 
     /**
-     * WebSocket 엔드포인드 설정
+     * WebSocket connect 엔드포인드 설정
      * @param registry
      */
     @Override

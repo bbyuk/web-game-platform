@@ -27,10 +27,12 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 @Transactional
 @ActiveProfiles("canvas-integration-test")
@@ -62,7 +64,14 @@ class CanvasWebSocketControllerTest {
     private int port;
     private String WEBSOCKET_URL;
     private final String CANVAS_SUBSCRIBE_TOPIC = "/canvas";
-    private final String SEND_DESTINATION = "/draw/stroke";
+    private final String SEND_DESTINATION = "/canvas/draw/stroke";
+
+    private final String STROKE_SEND_DOMAIN = "/canvas";
+    private final String STROKE_SEND_API = "draw/stroke";
+
+    private String getStrokeSendDestination(Long gameRoomId) {
+        return List.of(STROKE_SEND_DOMAIN, String.valueOf(gameRoomId), STROKE_SEND_API).stream().collect(Collectors.joining("/"));
+    }
 
     /**
      * WebSocket 연결 client
@@ -96,7 +105,7 @@ class CanvasWebSocketControllerTest {
      */
     private CompletableFuture<Stroke> subscribeRoomCanvas(StompSession session, Long gameRoomId) {
         CompletableFuture<Stroke> subscribeFuture = new CompletableFuture<>();
-        session.subscribe(String.format("/ws/%s/%d", CANVAS_SUBSCRIBE_TOPIC, gameRoomId), new StompFrameHandler() {
+        session.subscribe(String.format("%s/%d", CANVAS_SUBSCRIBE_TOPIC, gameRoomId), new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
                 return Object.class;
@@ -200,7 +209,7 @@ class CanvasWebSocketControllerTest {
         // when
         Stroke testStroke = testDataLoader.testStroke;
 
-        testUserSession.send(SEND_DESTINATION, testStroke);
+        testUserSession.send(getStrokeSendDestination(testDataLoader.testGameRoom.getId()), testStroke);
 
         // then
         Stroke result = subscribeFuture.get(BROADCASTING_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -237,7 +246,7 @@ class CanvasWebSocketControllerTest {
         // when
         StompHeaders messageHeader = new StompHeaders();
         messageHeader.add(JwtManager.BEARER_TOKEN, String.format("%s %s", JwtManager.TOKEN_PREFIX, testUserJwt));
-        messageHeader.setDestination(SEND_DESTINATION);
+        messageHeader.setDestination(getStrokeSendDestination(testDataLoader.testGameRoom.getId()));
 
         testUserSession.send(messageHeader, testDataLoader.testStroke);
 

@@ -53,9 +53,7 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
     }
 
     private Long extractGameRoomId(String destination) {
-
-
         String[] parts = destination.split("/");
-        return Long.parseLong(parts[2]);
+        return Long.parseLong(parts[parts.length - 1]);
     }
 }
