@@ -1,7 +1,10 @@
-package com.bb.webcanvasservice.security.websocket;
+package com.bb.webcanvasservice.config;
 
 import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
+import com.bb.webcanvasservice.security.websocket.JwtAuthenticationChannelInterceptor;
+import com.bb.webcanvasservice.security.websocket.SubscribeChannelInterceptor;
+import com.bb.webcanvasservice.security.websocket.WebSocketAuthenticationArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
