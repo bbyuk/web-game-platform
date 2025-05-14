@@ -72,6 +72,7 @@ application:
     refresh-token-reissue-threshold: 259200
     white-list:
       - /auth/**
+      - /ws/**
 
 ##### 비동기 관련 설정 #####
 async:

@@ -4,7 +4,6 @@ import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
 import com.bb.webcanvasservice.security.SecurityProperties;
-import com.bb.webcanvasservice.security.auth.AuthenticationController;
 import com.bb.webcanvasservice.security.auth.AuthenticationService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.bb.webcanvasservice.security.auth.dto.request.LoginRequest;
@@ -17,13 +16,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -34,10 +32,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(
-        controllers = {AuthenticationController.class},
-        excludeAutoConfiguration = {SecurityAutoConfiguration.class}
-)
+@SpringBootTest
+@AutoConfigureMockMvc
 @DisplayName("[unit] [presentation] 인증 API Controller WebMvcTest 단위테스트")
 class AuthenticationControllerTest {
 

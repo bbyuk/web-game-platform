@@ -34,7 +34,7 @@ import java.util.concurrent.TimeoutException;
 
 @Transactional
 @ActiveProfiles("canvas-integration-test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("[unit] [presentation] canvas 웹소켓 컨트롤러 단위 테스트")
 class CanvasWebSocketControllerTest {
@@ -96,7 +96,7 @@ class CanvasWebSocketControllerTest {
      */
     private CompletableFuture<Stroke> subscribeRoomCanvas(StompSession session, Long gameRoomId) {
         CompletableFuture<Stroke> subscribeFuture = new CompletableFuture<>();
-        session.subscribe(String.format("%s/%d", CANVAS_SUBSCRIBE_TOPIC, gameRoomId), new StompFrameHandler() {
+        session.subscribe(String.format("/ws/%s/%d", CANVAS_SUBSCRIBE_TOPIC, gameRoomId), new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
                 return Object.class;
@@ -145,7 +145,7 @@ class CanvasWebSocketControllerTest {
 
     @BeforeEach
     void setup() throws Exception {
-        WEBSOCKET_URL = String.format("ws://localhost:%s/canvas", port);
+        WEBSOCKET_URL = String.format("ws://localhost:%s/ws/canvas", port);
 
         /**
          * test 유저 생성

@@ -19,7 +19,7 @@ public class CanvasService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final GameRoomService gameRoomService;
-    public static final String CANVAS_DESTINATION_PREFIX = "/canvas/";
+    public static final String CANVAS_DESTINATION_PREFIX = "/ws/canvas/";
 
     /**
      * 웹 소켓 컨트롤러를 통해 들어온 Stroke 이벤트를 같은 방에 있는 유저들에게 브로드캐스팅한다.
