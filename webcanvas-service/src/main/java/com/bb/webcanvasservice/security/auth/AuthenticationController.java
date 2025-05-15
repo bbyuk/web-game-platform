@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +42,15 @@ public class AuthenticationController {
     }
 
     /**
+     * accessToken으로 인증 처리
+     */
+    @Operation(summary = "토큰 인증", description = "클라이언트의 토큰을 받아 인증 체크한다.")
+    @GetMapping("authentication")
+    public ResponseEntity<Boolean> authenticateWithAccessToken() {
+        return ResponseEntity.ok(true);
+    }
+
+    /**
      * 로그인
      * <p>
      * 로그인 처리 후 발급된 토큰을 리턴한다.
@@ -61,7 +67,7 @@ public class AuthenticationController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenResponseCookie.toString(), accessTokenResponseCookie.toString())
-                .body(new AuthenticationApiResponse(authenticationInnerResponse.fingerprint()));
+                .body(new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), true));
     }
 
 
@@ -82,7 +88,7 @@ public class AuthenticationController {
                 .orElseThrow(() -> new ApplicationAuthenticationException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         AuthenticationInnerResponse authenticationInnerResponse = authenticationService.refreshToken(refreshTokenRequestCookie.getValue());
-        AuthenticationApiResponse responseBody = new AuthenticationApiResponse(authenticationInnerResponse.fingerprint());
+        AuthenticationApiResponse responseBody = new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), true);
 
         ResponseCookie accessTokenResponseCookie = getResponseCookie(securityProperties.cookie().accessToken(), authenticationInnerResponse.accessToken(), securityProperties.accessTokenExpiration());
         ResponseCookie refreshTokenResponseCookie = getResponseCookie(securityProperties.cookie().refreshToken(), authenticationInnerResponse.refreshToken(), securityProperties.refreshTokenExpiration());

@@ -56,7 +56,7 @@ class AuthenticationControllerTest {
 
     @BeforeEach
     void setup() throws Exception {
-        securityProperties = new SecurityProperties(900000L, 1209600000L, 259200000L, new ArrayList<>(), new SecurityProperties.AuthenticationCookies("access-token", "refresh-token"));
+        securityProperties = new SecurityProperties("dsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoi", 900000L, 1209600000L, 259200000L, new ArrayList<>(), new SecurityProperties.AuthenticationCookies("access-token", "refresh-token"));
     }
 
     @Test
@@ -65,7 +65,7 @@ class AuthenticationControllerTest {
         // given
         String fingerprint = FingerprintGenerator.generate();
         long userId = 1L;
-        JwtManager realJwtManager = new JwtManager();
+        JwtManager realJwtManager = new JwtManager(securityProperties);
         long expiration = 3600000; // 1시간 (ms)
         String token = realJwtManager.generateToken(userId, fingerprint, expiration);
 
@@ -94,7 +94,7 @@ class AuthenticationControllerTest {
         // given
         String fingerprint = FingerprintGenerator.generate();
         long userId = 1L;
-        JwtManager realJwtManager = new JwtManager();
+        JwtManager realJwtManager = new JwtManager(securityProperties);
         long expiration = 3600000; // 1시간 (ms)
         String token = realJwtManager.generateToken(userId, fingerprint, expiration);
 
@@ -127,7 +127,7 @@ class AuthenticationControllerTest {
         // given
         String fingerprint = FingerprintGenerator.generate();
         long userId = 1L;
-        JwtManager realJwtManager = new JwtManager();
+        JwtManager realJwtManager = new JwtManager(securityProperties);
         long refreshTokenExpiration = 24 * 3600000; // 1시간 (ms)
         String token = realJwtManager.generateToken(userId, fingerprint, refreshTokenExpiration);
         User user = new User(fingerprint);
@@ -167,7 +167,7 @@ class AuthenticationControllerTest {
         // given
         String fingerprint = FingerprintGenerator.generate();
         long userId = 1L;
-        JwtManager realJwtManager = new JwtManager();
+        JwtManager realJwtManager = new JwtManager(securityProperties);
         long accessTokenExpiration = 24 * 3600000; // 1시간 (ms)
         String token = realJwtManager.generateToken(userId, fingerprint, accessTokenExpiration);
         User user = new User(fingerprint);

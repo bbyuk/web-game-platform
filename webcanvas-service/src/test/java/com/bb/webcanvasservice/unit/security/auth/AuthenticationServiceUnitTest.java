@@ -37,7 +37,7 @@ class AuthenticationServiceUnitTest {
     /**
      * Mock
      */
-    private SecurityProperties securityProperties = new SecurityProperties(900000L, 1209600000L, 259200000L, new ArrayList<>(), new SecurityProperties.AuthenticationCookies("access-token", "refresh-token"));
+    private SecurityProperties securityProperties = new SecurityProperties("dsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoi", 900000L, 1209600000L, 259200000L, new ArrayList<>(), new SecurityProperties.AuthenticationCookies("access-token", "refresh-token"));
     private AuthenticationService authenticationService;
 
     @BeforeEach

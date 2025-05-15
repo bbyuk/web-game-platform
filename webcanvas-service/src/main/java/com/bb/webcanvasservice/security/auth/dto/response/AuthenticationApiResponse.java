@@ -8,10 +8,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "인증 API 응답 DTO")
 public record AuthenticationApiResponse(
 
-        /**
-         * 서버에서 생성된 유저의 fingerprint
-         */
         @Schema(description = "서버에서 생성된 유저의 fingerprint")
-        String fingerprint
+        String fingerprint,
+
+        @Schema(description = "인증 여부")
+        boolean isAuthenticated
 ) {
 }

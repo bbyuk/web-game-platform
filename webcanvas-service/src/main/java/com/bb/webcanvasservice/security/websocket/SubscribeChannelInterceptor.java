@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * 게임 방 이벤트 브로커 구독 등 웹 소켓 이벤트 구독 요청 시 적절한 요청인지를 확인하는 ChannelInterceptor
+ * TODO - 이후에 SubscribeMapping으로 이동 고려 비즈니스 로직과 구독 보안 인터셉터 로직이 결합되어 버림
  */
 @Slf4j
 @RequiredArgsConstructor

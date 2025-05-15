@@ -1,15 +1,19 @@
 package com.bb.webcanvasservice.security.auth;
 
 import com.bb.webcanvasservice.common.code.ErrorCode;
+import com.bb.webcanvasservice.security.SecurityProperties;
 import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -20,15 +24,15 @@ import java.util.Date;
 @Component
 public class JwtManager {
 
-    private final String secretKey = "E2fhmOQToTXJCtVmyCc8AzwQK2bNC9VJBMlBXi/bNEQ=";
-
     public static final String BEARER_TOKEN = "Authorization";
     public static final String TOKEN_PREFIX = "Bearer ";
 
+    private final SecurityProperties securityProperties;
     private final SecretKey key;
 
-    public JwtManager() {
-        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+    public JwtManager(SecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(securityProperties.secretKey()));
     }
 
     /**
@@ -109,12 +113,11 @@ public class JwtManager {
      * @return
      */
     public String resolveToken(HttpServletRequest request) {
-        final String bearerToken = request.getHeader(BEARER_TOKEN);
-        if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
-            return bearerToken.substring(TOKEN_PREFIX.length());
-        }
-
-        return null;
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> cookie.getName().equals(securityProperties.cookie().accessToken()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .get();
     }
 
     /**

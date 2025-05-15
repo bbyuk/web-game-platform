@@ -4,6 +4,7 @@ import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
 import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -25,7 +26,7 @@ public class JwtAuthenticationChannelInterceptor implements ChannelInterceptor {
     private final JwtManager jwtManager;
 
     /**
-     * 웹소켓 연결 및 웹소켓 메시지에 대한 인증 처리
+     * 웹소켓 연결 시 인증 처리
      * 인증후 Authentication 객체를 SecurityContextHolder에 저장
      * @param message
      * @param channel
@@ -34,30 +35,16 @@ public class JwtAuthenticationChannelInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         log.info("JwtChannelInterceptor preSend ====== {}", message);
-
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-        if (!StompCommand.CONNECT.equals(accessor.getCommand())) {
-            return message;
+        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+            // 1. NativeHeaders에서 HttpServletRequest 꺼내기
+            HttpServletRequest request = (HttpServletRequest) accessor.getSessionAttributes().get("HTTP_REQUEST");
+            String accessToken = jwtManager.resolveToken(request);
+
+            accessor.setUser(new WebCanvasAuthentication(jwtManager.getUserIdFromToken(accessToken)));
         }
 
-        Optional<String> optionalJwt = Optional.ofNullable(accessor.getFirstNativeHeader(JwtManager.BEARER_TOKEN));
-        String validatedToken = optionalJwt.filter(header -> header.startsWith(JwtManager.TOKEN_PREFIX))
-                .map(header -> header.substring(JwtManager.TOKEN_PREFIX.length() + 1))
-                .filter(token -> {
-                    try {
-                        jwtManager.validateToken(token);
-                        return true;
-                    }
-                    catch (Exception e) {
-                        return false;
-                    }
-                })
-                .orElseThrow(() -> new ApplicationAuthenticationException(ErrorCode.INVALID_TOKEN));
-
-        Long userId = jwtManager.getUserIdFromToken(validatedToken);
-        WebCanvasAuthentication webCanvasAuthentication = new WebCanvasAuthentication(userId);
-        accessor.setUser(webCanvasAuthentication);
 
         return message;
     }

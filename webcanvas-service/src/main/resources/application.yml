@@ -81,6 +81,7 @@ application:
         # download / local
         location: local
   security:
+    secret-key: E2fhmOQToTXJCtVmyCc8AzwQK2bNC9VJBMlBXi/bNEQ=
     ## 단위 초 (s)
     # 15분 (15 * 60)
     access-token-expiration: 900
@@ -89,7 +90,10 @@ application:
     # 3일 (3 * 24 * 60 * 60)
     refresh-token-reissue-threshold: 259200
     white-list:
-      - /auth/**
+      - /swagger-ui/**
+      - /api-docs/**
+      - /auth/login
+      - /auth/refresh
       - /ws/**
     cookie:
       access-token: access-token

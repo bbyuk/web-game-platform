@@ -71,7 +71,8 @@ application:
     # 3일 (3 * 24 * 60 * 60)
     refresh-token-reissue-threshold: 259200
     white-list:
-      - /auth/**
+      - /auth/login
+      - /auth/refresh
       - /ws/**
     cookie:
       access-token: access-token
