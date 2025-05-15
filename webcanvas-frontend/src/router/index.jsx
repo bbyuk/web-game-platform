@@ -10,7 +10,10 @@ export const pages = {
   gameRoom: "/platform/game/room",
 };
 
-export const publicRoutes = [{ path: pages.landing, element: <LandingPage /> }];
+export const publicRoutes = [
+  { path: pages.landing, element: <LandingPage /> },
+  { path: "*", element: <LandingPage /> }
+];
 
 export const privateRoutes = [
   {

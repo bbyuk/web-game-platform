@@ -12,7 +12,6 @@ export function ApplicationContextProvider({ children }) {
    * ========================= states ===========================
    */
   const init = {
-    savedAccessToken: localStorage.getItem("accessToken"),
     selectedTopTabIndex: -1,
     topTabItems: [],
     leftSidebarItems: [],
@@ -33,11 +32,6 @@ export function ApplicationContextProvider({ children }) {
     currentGameRoomEntranceId: null,
     currentGameRoomEnteredUsers: [],
   };
-
-  /**
-   * api authentication 관련 토큰 state
-   */
-  const [savedAccessToken, setSavedAccessToken] = useState(init.savedAccessToken);
 
   /**
    * 상단 바 관련 state
@@ -86,15 +80,11 @@ export function ApplicationContextProvider({ children }) {
    * @param url
    * @param data
    * @param options
-   * @param refreshedAccessToken
    * @returns {Promise<any>}
    */
-  const request = async (method, url, data = {}, options = {}, refreshedAccessToken) => {
+  const request = async (method, url, data = {}, options = {}) => {
     const headers = {
       ...api.constants.defaultHeaders,
-      ...(refreshedAccessToken
-        ? { Authorization: `Bearer ${refreshedAccessToken}` }
-        : savedAccessToken && { Authorization: `Bearer ${savedAccessToken}` }),
       ...options.headers,
     };
 
@@ -102,6 +92,7 @@ export function ApplicationContextProvider({ children }) {
     const fetchOption = {
       method,
       headers,
+      credentials: "include",
       ...options,
       ...(method !== "GET" && method !== "DELETE" && { body: JSON.stringify(data) }),
     };
@@ -125,7 +116,7 @@ export function ApplicationContextProvider({ children }) {
             /**
              * 토큰 만료가 아닐 경우 unauthorized handler 호출
              */
-            authentication.handleUnauthorized();
+            navigate("/", { replace: true });
             return;
           }
           /**
@@ -137,20 +128,20 @@ export function ApplicationContextProvider({ children }) {
           /**
            * 토큰 refresh
            */
-          const accessToken = await api.tokenRefresh();
+          const { isAuthenticated } = await api.tokenRefresh();
 
-          if (!accessToken) {
+          if (!isAuthenticated) {
             /**
              * 인증 실패 -> 토큰 만료시 refresh 시도 -> refresh마저 실패시 unauthorized handling
              */
-            authentication.handleUnauthorized();
+            navigate("/", { replace: true });
             return;
           }
 
           /**
            * API 재요청
            */
-          return request(method, url, data, options, accessToken);
+          return request(method, url, data, options);
         } else {
           /**
            * TODO alert modal로 변경
@@ -202,10 +193,9 @@ export function ApplicationContextProvider({ children }) {
           /**
            * refresh 성공
            */
-          const { accessToken, fingerprint } = await response.json();
-          authentication.saveAuthentication({ accessToken, fingerprint });
+          const { fingerprint, isAuthenticated } = await response.json();
+          localStorage.setItem("fingerprint", fingerprint);
 
-          return accessToken;
         })
         .catch((error) => {
           alert(error.message);
@@ -224,34 +214,6 @@ export function ApplicationContextProvider({ children }) {
         return query ? `${url}?${query}` : url;
       },
     },
-  };
-
-  /**
-   * 인증에 관련된 전역 상태 context
-   * @type {{saveAuthentication: authentication.saveAuthentication, handleUnauthorized: authentication.handleUnauthorized, isAuthenticated: boolean}}
-   */
-  const authentication = {
-    /**
-     * 로그인 API 응답 받은 후 클라이언트 localStorage Authentication token과 유저 등록시 생성된 fingerprint를 저장한다.
-     * @param accessToken
-     * @param fingerprint
-     */
-    saveAuthentication: ({ accessToken, fingerprint }) => {
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("fingerprint", fingerprint);
-
-      setSavedAccessToken(accessToken);
-    },
-    /**
-     * 로그아웃 API 응답 받은 후 클라이언트 localStorage Authentication token을 삭제한다
-     */
-    handleUnauthorized: () => {
-      localStorage.removeItem("accessToken");
-      setSavedAccessToken(null);
-
-      navigate("/", { replace: true });
-    },
-    isAuthenticated: !!savedAccessToken,
   };
 
   /**
@@ -333,42 +295,48 @@ export function ApplicationContextProvider({ children }) {
   };
 
   useEffect(() => {
-    if (!savedAccessToken) {
-      /**
-       * 앱 진입 후 authenticated 상태가 아니면 자동 로그인 요청
-       */
-      const fingerprint = localStorage.getItem("fingerprint");
-      api
-        .post(
-          auth.login,
-          {
-            fingerprint: fingerprint,
-          },
-          {
-            credentials: "include",
-          }
-        )
-        .then(
-          (
-            response = {
-              accessToken: String,
-              fingerprint: String,
+    /**
+     * authentication 먼저 체크
+     */
+    api.get(auth.authentication)
+      .then(success => {
+
+      })
+      .catch((error) => {
+        /**
+         * 앱 진입 후 authenticated 상태가 아니면 자동 로그인 요청
+         */
+        const fingerprint = localStorage.getItem("fingerprint");
+        api
+          .post(
+            auth.login,
+            {
+              fingerprint: fingerprint,
+            },
+            {
+              credentials: "include",
             }
-          ) => {
-            authentication.saveAuthentication(response);
-          }
-        )
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  }, [savedAccessToken]);
+          )
+          .then(
+            (
+              response = {
+                isAuthenticated: Boolean,
+                fingerprint: String,
+              }
+            ) => {
+              localStorage.setItem("fingerprint", response.fingerprint);
+            }
+          )
+          .catch((error) => {
+            console.log(error);
+          });
+      });
+  }, []);
 
   return (
     <ApplicationContext.Provider
       value={{
         api,
-        authentication,
         topTabs,
         leftSidebar,
         rightSidebar,
