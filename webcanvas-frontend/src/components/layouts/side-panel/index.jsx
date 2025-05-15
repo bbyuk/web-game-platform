@@ -1,5 +1,5 @@
-import Title from '@/components/layouts/side-panel/title/index.jsx';
-import { JSX } from 'react';
+import Title from "@/components/layouts/side-panel/title/index.jsx";
+import { JSX } from "react";
 
 export default function SidePanel({
   title = { label: String(), icon: JSX.Element, button: false, onClick: () => {} },

@@ -6,7 +6,7 @@ import { useApiLock } from "@/api/lock/index.jsx";
 import { EMPTY_MESSAGES } from "@/constants/message.js";
 import { useNavigate } from "react-router-dom";
 import { pages } from "@/router/index.jsx";
-import { GitCommit } from 'lucide-react';
+import { GitCommit } from "lucide-react";
 
 export default function LobbyPage() {
   // 전역 context
@@ -30,9 +30,8 @@ export default function LobbyPage() {
   const findEnterableGameRooms = async () => {
     const response = await apiLock(
       game.getEnterableRooms,
-      async () => await api
-        .get(game.getEnterableRooms)
-        .catch(async (error) => {
+      async () =>
+        await api.get(game.getEnterableRooms).catch(async (error) => {
           if (error.code === "U002") {
             /**
              * 이미 방에 입장한 상태
@@ -46,13 +45,13 @@ export default function LobbyPage() {
     leftSidebar.setItems(
       response.roomList
         ? response.roomList.map(({ joinCode, enterCount, capacity, gameRoomId }) => ({
-          label: "입장 가능",
-          current: enterCount,
-          isButton: enterCount < capacity,
-          capacity: capacity,
-          gameRoomId: gameRoomId,
-          onClick: () => enterRoom(gameRoomId),
-        }))
+            label: "입장 가능",
+            current: enterCount,
+            isButton: enterCount < capacity,
+            capacity: capacity,
+            gameRoomId: gameRoomId,
+            onClick: () => enterRoom(gameRoomId),
+          }))
         : []
     );
   };
@@ -61,21 +60,15 @@ export default function LobbyPage() {
     /**
      * 입장 가능한 방 목록 조회
      */
-    findEnterableGameRooms()
-      .finally(() => {
-        leftSidebar.setTitle({
-          label: "main",
-          icon: <GitCommit size={20} className="text-gray-400" />,
-          button: true,
-          onClick: findEnterableGameRooms,
-        });
-        leftSidebar.setEmptyPlaceholder(EMPTY_MESSAGES.ROOM_LIST);
+    findEnterableGameRooms().finally(() => {
+      leftSidebar.setTitle({
+        label: "main",
+        icon: <GitCommit size={20} className="text-gray-400" />,
+        button: true,
+        onClick: findEnterableGameRooms,
       });
-
-
-
-
-
+      leftSidebar.setEmptyPlaceholder(EMPTY_MESSAGES.ROOM_LIST);
+    });
   }, []);
 
   /**
