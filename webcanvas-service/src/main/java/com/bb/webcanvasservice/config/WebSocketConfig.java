@@ -1,11 +1,13 @@
 package com.bb.webcanvasservice.config;
 
+import com.bb.webcanvasservice.config.properties.WebSocketProperties;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.bb.webcanvasservice.security.websocket.JwtAuthenticationChannelInterceptor;
 import com.bb.webcanvasservice.security.websocket.SubscribeChannelInterceptor;
 import com.bb.webcanvasservice.security.websocket.WebSocketAuthenticationArgumentResolver;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -25,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final WebSocketProperties webSocketProperties;
     private final JwtManager jwtManager;
     private final WebSocketAuthenticationArgumentResolver webSocketAuthenticationArgumentResolver;
     /**
@@ -38,11 +41,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
      */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // 메시지 브로커 활성화: "/canvas"과 "/chat"로 시작하는 경로에 대해 브로커를 활성화
-        registry.enableSimpleBroker("/canvas", "/chat");
+        // 메시지 브로커 활성화
+        registry.enableSimpleBroker(webSocketProperties.enabledBrokers().toArray(String[]::new));
 
         // 클라이언트로 메시지를 보낼 때 사용할 prefix 설정 (필요시)
-        // registry.setApplicationDestinationPrefixes("canvas");
+        // registry.setApplicationDestinationPrefixes("");
     }
 
     /**
@@ -53,9 +56,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         /**
          * canvas 웹 소켓 서버 엔드포인트 지정
+         * canvas와 chat 모두 연결은 단일 엔드포인트로
+         * 방 구분은 논리적으로 분리된 각각의 브로커 구독으로 구분
          */
-        registry.addEndpoint("/ws/canvas")
-                .setAllowedOriginPatterns("*");
+        registry.addEndpoint(webSocketProperties.endpoint())
+                .setAllowedOriginPatterns(webSocketProperties.allowedOriginPatterns().toArray(String[]::new));
 //                .withSockJS();
     }
 
