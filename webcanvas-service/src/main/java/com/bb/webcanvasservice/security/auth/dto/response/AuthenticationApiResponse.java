@@ -12,12 +12,6 @@ public record AuthenticationApiResponse(
          * 서버에서 생성된 유저의 fingerprint
          */
         @Schema(description = "서버에서 생성된 유저의 fingerprint")
-        String fingerprint,
-
-        /**
-         * 인증에 사용되는 access token
-         */
-        @Schema(description = "인증에 사용되는 access token")
-        String accessToken
+        String fingerprint
 ) {
 }

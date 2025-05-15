@@ -52,12 +52,11 @@ class AuthenticationControllerTest {
     @MockitoBean
     private UserService userService;
 
-    @MockitoBean
     private SecurityProperties securityProperties;
 
     @BeforeEach
     void setup() throws Exception {
-        securityProperties = new SecurityProperties(900000L, 1209600000L, 259200000L, new ArrayList<>());
+        securityProperties = new SecurityProperties(900000L, 1209600000L, 259200000L, new ArrayList<>(), new SecurityProperties.AuthenticationCookies("access-token", "refresh-token"));
     }
 
     @Test
@@ -113,9 +112,11 @@ class AuthenticationControllerTest {
                         .with(csrf())
         )
                 .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.SET_COOKIE, Matchers.containsString("refresh-token")))
-                .andExpect(header().string(HttpHeaders.SET_COOKIE, Matchers.containsString("HttpOnly")))
-                .andExpect(header().string(HttpHeaders.SET_COOKIE, Matchers.containsString("Path=/")));
+                .andExpect(header().stringValues(HttpHeaders.SET_COOKIE, Matchers.hasItems(
+                                Matchers.containsString("refresh-token"),
+                                Matchers.containsString("access-token"),
+                                Matchers.containsString("HttpOnly"),
+                                Matchers.containsString("Path=/"))));
 
         // then
     }
@@ -127,8 +128,8 @@ class AuthenticationControllerTest {
         String fingerprint = FingerprintGenerator.generate();
         long userId = 1L;
         JwtManager realJwtManager = new JwtManager();
-        long accessTokenExpiration = 24 * 3600000; // 1시간 (ms)
-        String token = realJwtManager.generateToken(userId, fingerprint, accessTokenExpiration);
+        long refreshTokenExpiration = 24 * 3600000; // 1시간 (ms)
+        String token = realJwtManager.generateToken(userId, fingerprint, refreshTokenExpiration);
         User user = new User(fingerprint);
         user.updateRefreshToken(token);
         Field userIdField = User.class.getDeclaredField("id");
@@ -139,8 +140,8 @@ class AuthenticationControllerTest {
         BDDMockito.given(authenticationService.refreshToken(any()))
                 .willReturn(new AuthenticationInnerResponse(
                         fingerprint,
-                        realJwtManager.generateToken(userId, fingerprint, accessTokenExpiration),
-                        realJwtManager.generateToken(userId, fingerprint, accessTokenExpiration),
+                        realJwtManager.generateToken(userId, fingerprint, refreshTokenExpiration),
+                        realJwtManager.generateToken(userId, fingerprint, refreshTokenExpiration),
                         true)
                 );
 
@@ -149,9 +150,12 @@ class AuthenticationControllerTest {
                         .cookie(new Cookie("refresh-token", token))
                 .contentType(MediaType.APPLICATION_JSON).with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.SET_COOKIE, Matchers.containsString("refresh-token")))
-                .andExpect(header().string(HttpHeaders.SET_COOKIE, Matchers.containsString("HttpOnly")))
-                .andExpect(header().string(HttpHeaders.SET_COOKIE, Matchers.containsString("Path=/")));
+                .andExpect(header().stringValues(HttpHeaders.SET_COOKIE, Matchers.hasItems(
+                        Matchers.containsString("access-token"),
+                        Matchers.containsString("refresh-token"),
+                        Matchers.containsString("HttpOnly"),
+                        Matchers.containsString("Path=/")
+                )));
 
         // then
     }

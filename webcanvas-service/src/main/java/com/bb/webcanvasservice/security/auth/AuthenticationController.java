@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 로그인 및 인증 처리 API의 엔드포인트
@@ -33,12 +34,12 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final SecurityProperties securityProperties;
 
-    private ResponseCookie getResponseCookie(String token) {
-        return ResponseCookie.from("refresh-token", token)
+    private ResponseCookie getResponseCookie(String cookieName, String value, Long maxAge) {
+        return ResponseCookie.from(cookieName, value)
                 .secure(true)
                 .httpOnly(true)
                 .path("/")
-                .maxAge(securityProperties.refreshTokenExpirationSeconds())
+                .maxAge(maxAge)
                 .sameSite("Lax")
                 .build();
     }
@@ -55,11 +56,12 @@ public class AuthenticationController {
     @PostMapping("login")
     public ResponseEntity<AuthenticationApiResponse> login(@RequestBody LoginRequest loginRequest) {
         AuthenticationInnerResponse authenticationInnerResponse = authenticationService.login(loginRequest.fingerprint());
-        ResponseCookie refreshTokenResponseCookie = getResponseCookie(authenticationInnerResponse.refreshToken());
+        ResponseCookie accessTokenResponseCookie = getResponseCookie(securityProperties.cookie().accessToken(), authenticationInnerResponse.accessToken(), securityProperties.accessTokenExpiration());
+        ResponseCookie refreshTokenResponseCookie = getResponseCookie(securityProperties.cookie().refreshToken(), authenticationInnerResponse.refreshToken(), securityProperties.refreshTokenExpiration());
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, refreshTokenResponseCookie.toString())
-                .body(new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), authenticationInnerResponse.accessToken()));
+                .header(HttpHeaders.SET_COOKIE, refreshTokenResponseCookie.toString(), accessTokenResponseCookie.toString())
+                .body(new AuthenticationApiResponse(authenticationInnerResponse.fingerprint()));
     }
 
 
@@ -75,17 +77,24 @@ public class AuthenticationController {
     @PostMapping("refresh")
     public ResponseEntity<AuthenticationApiResponse> refreshToken(HttpServletRequest request) {
         Cookie refreshTokenRequestCookie = Arrays.stream(request.getCookies())
-                .filter(cookie -> cookie.getName().equals("refresh-token"))
+                .filter(cookie -> cookie.getName().equals(securityProperties.cookie().refreshToken()))
                 .findFirst()
                 .orElseThrow(() -> new ApplicationAuthenticationException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         AuthenticationInnerResponse authenticationInnerResponse = authenticationService.refreshToken(refreshTokenRequestCookie.getValue());
+        AuthenticationApiResponse responseBody = new AuthenticationApiResponse(authenticationInnerResponse.fingerprint());
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, authenticationInnerResponse.refreshTokenReissued()
-                        ? getResponseCookie(authenticationInnerResponse.refreshToken()).toString()
-                        : null
-                )
-                .body(new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), authenticationInnerResponse.accessToken()));
+        ResponseCookie accessTokenResponseCookie = getResponseCookie(securityProperties.cookie().accessToken(), authenticationInnerResponse.accessToken(), securityProperties.accessTokenExpiration());
+        ResponseCookie refreshTokenResponseCookie = getResponseCookie(securityProperties.cookie().refreshToken(), authenticationInnerResponse.refreshToken(), securityProperties.refreshTokenExpiration());
+
+        return authenticationInnerResponse.refreshTokenReissued()
+                ?
+                ResponseEntity.ok()
+                        .header(HttpHeaders.SET_COOKIE, accessTokenResponseCookie.toString(), refreshTokenResponseCookie.toString())
+                        .body(responseBody)
+                :
+                ResponseEntity.ok()
+                        .body(responseBody);
+
     }
 }

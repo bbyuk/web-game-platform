@@ -30,7 +30,16 @@ public record SecurityProperties(
          * 3일 (72시간) (ms)
          */
         long refreshTokenReissueThreshold,
-        List<String> whiteList
+
+        /**
+         * Security 예외 목록
+         */
+        List<String> whiteList,
+        /**
+         * 인증 관련 쿠키 name
+         */
+        AuthenticationCookies cookie
+
 ) {
     public SecurityProperties {
         if (accessTokenExpiration == 0) accessTokenExpiration = 900;
@@ -47,11 +56,9 @@ public record SecurityProperties(
         return refreshTokenExpiration * 1000;
     }
 
-    public long refreshTokenExpirationSeconds() {
-        return refreshTokenExpiration;
-    }
-
     public long refreshTokenReissueThreshold() {
         return refreshTokenReissueThreshold * 1000;
     }
+
+    public record AuthenticationCookies(String accessToken, String refreshToken) {}
 }
