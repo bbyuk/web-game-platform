@@ -5,4 +5,4 @@
 export const serverDomain = import.meta.env.VITE_WEB_CANVAS_SERVICE;
 export const defaultHeaders = {
   "Content-Type": "application/json",
-}
+};

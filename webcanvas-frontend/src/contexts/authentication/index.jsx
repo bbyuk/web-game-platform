@@ -1,6 +1,6 @@
-import {createContext, useContext, useEffect, useState} from 'react';
-import {auth} from '@/api/index.js';
-import {defaultHeaders, serverDomain} from "@/contexts/api-client/constnats.js";
+import { createContext, useContext, useEffect, useState } from "react";
+import { auth } from "@/api/index.js";
+import { defaultHeaders, serverDomain } from "@/contexts/api-client/constnats.js";
 
 const AuthenticationContext = createContext(null);
 export const useAuthentication = () => useContext(AuthenticationContext);
@@ -23,11 +23,10 @@ export const AuthenticationProvider = ({ children }) => {
       headers: defaultHeaders,
       credentials: "include",
     })
-      .then(response => {
+      .then((response) => {
         if (response.ok) {
           login();
-        }
-        else {
+        } else {
           throw new Error();
         }
       })
@@ -40,16 +39,17 @@ export const AuthenticationProvider = ({ children }) => {
           method: "POST",
           headers: defaultHeaders,
           body: JSON.stringify({ fingerprint: fingerprint }),
-          credentials: "include"
-        }).then(async response => {
-          const { fingerprint, isAuthenticated } = await response.json();
-          localStorage.setItem("fingerprint", fingerprint);
+          credentials: "include",
+        })
+          .then(async (response) => {
+            const { fingerprint, isAuthenticated } = await response.json();
+            localStorage.setItem("fingerprint", fingerprint);
 
-          if (isAuthenticated) {
-            login();
-          }
-
-        }).catch((error) => (console.log(error)));
+            if (isAuthenticated) {
+              login();
+            }
+          })
+          .catch((error) => console.log(error));
       });
 
     return () => {
@@ -65,10 +65,15 @@ export const AuthenticationProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  return <AuthenticationContext.Provider
-    value={{
-      isAuthenticated,
-      login,
-      logout
-    }}>{children}</AuthenticationContext.Provider>;
+  return (
+    <AuthenticationContext.Provider
+      value={{
+        isAuthenticated,
+        login,
+        logout,
+      }}
+    >
+      {children}
+    </AuthenticationContext.Provider>
+  );
 };

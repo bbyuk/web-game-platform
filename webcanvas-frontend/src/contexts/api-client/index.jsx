@@ -1,7 +1,8 @@
-import {createContext, useContext} from "react";
-import {auth} from "@/api/index.js";
-import {defaultHeaders, serverDomain} from "@/contexts/api-client/constnats.js";
-import {buildUrlWithParams} from "@/contexts/api-client/utils.js";
+import { createContext, useContext } from "react";
+import { auth } from "@/api/index.js";
+import { defaultHeaders, serverDomain } from "@/contexts/api-client/constnats.js";
+import { buildUrlWithParams } from "@/contexts/api-client/utils.js";
+import { ERROR_CODE_MAPPING } from "@/constants/server-code.js";
 
 const ApiClientContext = createContext(null);
 
@@ -14,7 +15,6 @@ export const useApiClient = () => {
 };
 
 export const ApiClientProvider = ({ children }) => {
-
   /**
    * apiClient 내부 요청 함수
    */
@@ -87,13 +87,36 @@ export const ApiClientProvider = ({ children }) => {
            */
           return request(method, url, data, options);
         } else {
-          /**
-           * TODO alert modal로 변경
-           */
-          alert(error.message);
+          handleErrorMessage(error);
           throw error;
         }
       });
+  };
+
+  /**
+   * API 요청 후 에러 발생 시 클라이언트에 노출되는 메세지를 처리한다.
+   *
+   * TODO alert modal로 변경
+   * TODO 코드별로 toast 노출할지, modal alert 노출할지 매핑 처리 필요
+   */
+  const handleErrorMessage = (error) => {
+    // 매핑 등록하지 않을 시 서버에서 응답해주는 메세지 alert를 기본으로 한다.
+    const errorCodeMapping = ERROR_CODE_MAPPING[error.code];
+
+    if (!errorCodeMapping) {
+      alert(error.message);
+      return;
+    }
+
+    const message = errorCodeMapping.message.override
+      ? errorCodeMapping.message.value
+      : error.message;
+
+    if (errorCodeMapping.alert) {
+      alert(message);
+    } else if (errorCodeMapping.toast) {
+      console.log("토스트 작업 TODO ====== ", message);
+    }
   };
 
   /**
@@ -126,14 +149,12 @@ export const ApiClientProvider = ({ children }) => {
          */
         const { fingerprint, isAuthenticated } = await response.json();
         localStorage.setItem("fingerprint", fingerprint);
-
       })
       .catch((error) => {
         alert(error.message);
         return null;
       });
   };
-
 
   /**
    * api 요청 클라이언트
@@ -154,9 +175,5 @@ export const ApiClientProvider = ({ children }) => {
     },
   };
 
-  return (
-    <ApiClientContext.Provider value={{apiClient}}>
-      {children}
-    </ApiClientContext.Provider>
-  );
-}
+  return <ApiClientContext.Provider value={{ apiClient }}>{children}</ApiClientContext.Provider>;
+};

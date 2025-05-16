@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useAuthentication } from '@/contexts/authentication/index.jsx';
+import { useAuthentication } from "@/contexts/authentication/index.jsx";
 
 export default function LandingPage() {
   const navigate = useNavigate();

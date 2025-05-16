@@ -2,12 +2,12 @@ import Canvas from "@/components/canvas/index.jsx";
 import { useEffect, useState } from "react";
 import { useApplicationContext } from "@/contexts/index.jsx";
 import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { game } from "@/api/index.js";
 import { useApiLock } from "@/api/lock/index.jsx";
 import { pages } from "@/router/index.jsx";
 import { ArrowLeft } from "lucide-react";
-import {useApiClient} from "@/contexts/api-client/index.jsx";
+import { useApiClient } from "@/contexts/api-client/index.jsx";
 
 export default function GameRoomPage() {
   // 현재 캔버스의 획 모음
@@ -105,7 +105,7 @@ export default function GameRoomPage() {
     );
 
     if (response.success) {
-      navigate(pages.lobby, {replace: true});
+      navigate(pages.lobby, { replace: true });
     }
   };
 

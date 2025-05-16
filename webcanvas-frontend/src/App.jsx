@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { privateRoutes, publicRoutes } from "@/router";
 import ProtectedRoute from "@/router/protected/index.jsx";
-import {useEffect} from "react";
+import { useEffect } from "react";
 
 function App() {
   const routeMapping = (route) => {

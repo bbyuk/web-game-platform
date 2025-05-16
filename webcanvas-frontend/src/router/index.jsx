@@ -12,7 +12,7 @@ export const pages = {
 
 export const publicRoutes = [
   { path: pages.landing, element: <LandingPage /> },
-  { path: "*", element: <LandingPage /> }
+  { path: "*", element: <LandingPage /> },
 ];
 
 export const privateRoutes = [
