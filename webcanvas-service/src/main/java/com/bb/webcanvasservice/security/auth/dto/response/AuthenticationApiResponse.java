@@ -12,6 +12,6 @@ public record AuthenticationApiResponse(
         String fingerprint,
 
         @Schema(description = "인증 여부")
-        boolean isAuthenticated
+        boolean success
 ) {
 }
