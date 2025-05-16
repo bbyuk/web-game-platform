@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { useApplicationContext } from '@/contexts/index.jsx';
-import { auth } from '@/api/index.js';
+import {createContext, useContext, useEffect, useState} from 'react';
+import {auth} from '@/api/index.js';
+import {defaultHeaders, serverDomain} from "@/contexts/api-client/constnats.js";
 
 const AuthenticationContext = createContext(null);
 export const useAuthentication = () => useContext(AuthenticationContext);
@@ -12,30 +12,56 @@ export const useAuthentication = () => useContext(AuthenticationContext);
  * @constructor
  */
 export const AuthenticationProvider = ({ children }) => {
-  const authenticationRef = useRef(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const { api } = useApplicationContext();
-
-  /**
-   * TODO 상위 ApplicationContext에서 authentication 체크 하는 부분과 중복 호출 되는 문제 해결 필요
-   */
   useEffect(() => {
+    /**
+     * authentication 먼저 체크
+     */
+    fetch(`${serverDomain}${auth.authentication}`, {
+      method: "GET",
+      headers: defaultHeaders,
+      credentials: "include",
+    })
+      .then(response => {
+        login();
+      })
+      .catch((error) => {
+        /**
+         * 앱 진입 후 authenticated 상태가 아니면 자동 로그인 요청
+         */
+        const fingerprint = localStorage.getItem("fingerprint");
 
-    api.get(auth.authentication)
-      .then(success => {
-        setIsAuthenticated(success);
+        fetch(`${serverDomain}${auth.login}`, {
+          method: "POST",
+          headers: defaultHeaders,
+          body: JSON.stringify({ fingerprint: fingerprint }),
+          credentials: "include"
+        }).then((response = {
+          isAuthenticated: Boolean,
+          fingerprint: String,
+        }) => {
+          localStorage.setItem("fingerprint", response.fingerprint);
+        }).catch((error) => (console.log(error)));
       });
 
-
     return () => {
-      setIsAuthenticated(false);
+      logout();
     };
   }, []);
 
+  const login = () => {
+    setIsAuthenticated(true);
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+  };
+
   return <AuthenticationContext.Provider
-    isAuthenticated={isAuthenticated}
     value={{
-      isAuthenticated
+      isAuthenticated,
+      login,
+      logout
     }}>{children}</AuthenticationContext.Provider>;
 };

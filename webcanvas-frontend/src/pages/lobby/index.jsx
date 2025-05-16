@@ -7,10 +7,12 @@ import { EMPTY_MESSAGES } from "@/constants/message.js";
 import { useNavigate } from "react-router-dom";
 import { pages } from "@/router/index.jsx";
 import { GitCommit } from "lucide-react";
+import {useApiClient} from "@/contexts/api-client/index.jsx";
 
 export default function LobbyPage() {
   // 전역 context
-  const { leftSidebar, api } = useApplicationContext();
+  const { leftSidebar } = useApplicationContext();
+  const { apiClient } = useApiClient();
   // API 중복 요청을 block하기 위한 lock
   const { apiLock } = useApiLock();
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ export default function LobbyPage() {
   const enterRoom = async (targetRoomId) => {
     const { gameRoomId, gameRoomEntranceId } = await apiLock(
       game.enterGameRoom(targetRoomId),
-      async () => await api.post(game.enterGameRoom(targetRoomId))
+      async () => await apiClient.post(game.enterGameRoom(targetRoomId))
     );
 
     moveToGameRoom(gameRoomId);
@@ -31,7 +33,7 @@ export default function LobbyPage() {
     const response = await apiLock(
       game.getEnterableRooms,
       async () =>
-        await api.get(game.getEnterableRooms).catch(async (error) => {
+        await apiClient.get(game.getEnterableRooms).catch(async (error) => {
           if (error.code === "U002") {
             /**
              * 이미 방에 입장한 상태
@@ -77,7 +79,7 @@ export default function LobbyPage() {
   const makeRoom = async () => {
     const response = await apiLock(
       game.createGameRoom,
-      async () => await api.post(game.createGameRoom)
+      async () => await apiClient.post(game.createGameRoom)
     );
 
     moveToGameRoom(response.gameRoomId);

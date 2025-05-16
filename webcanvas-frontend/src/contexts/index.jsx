@@ -153,70 +153,6 @@ export function ApplicationContextProvider({ children }) {
   };
 
   /**
-   * api 요청 클라이언트
-   * @type {{get: (function(*, {}=, {}=): Promise<*>), post: (function(*, {}=, {}=): Promise<*>), tokenRefresh: (function(): Promise<*>), constants: {serverDomain: any, defaultHeaders: {'Content-Type': string}}, utils: {buildUrlWithParams: (function(*, {}=): string|*)}}}
-   */
-  const api = {
-    get: async (target, params = {}, options = {}) => {
-      return request("GET", target, params, options);
-    },
-    post: async (target, data = {}, options = {}) => {
-      return request("POST", target, data, options);
-    },
-    put: (target, data = {}, options = {}) => {
-      return request("PUT", target, data, options);
-    },
-    delete: (target, params = {}, options = {}) => {
-      return request("DELETE", target, params, options);
-    },
-    tokenRefresh: async () => {
-      const processedUrl = `${api.constants.serverDomain}${auth.refresh}`;
-      const options = {
-        credentials: "include",
-      };
-      const fetchOption = {
-        method: "POST",
-        ...options,
-        headers: api.constants.defaultHeaders,
-      };
-
-      return fetch(processedUrl, fetchOption)
-        .then(async (response) => {
-          if (!response.ok) {
-            const error = await response.json();
-
-            throw {
-              status: response.status,
-              ...error,
-            };
-          }
-          /**
-           * refresh 성공
-           */
-          const { fingerprint, isAuthenticated } = await response.json();
-          localStorage.setItem("fingerprint", fingerprint);
-
-        })
-        .catch((error) => {
-          alert(error.message);
-          return null;
-        });
-    },
-    constants: {
-      serverDomain: import.meta.env.VITE_WEB_CANVAS_SERVICE,
-      defaultHeaders: {
-        "Content-Type": "application/json",
-      },
-    },
-    utils: {
-      buildUrlWithParams: (url, params = {}) => {
-        const query = new URLSearchParams(params).toString();
-        return query ? `${url}?${query}` : url;
-      },
-    },
-  };
-
-  /**
    * 상단 탭 관련 context
    * @type {{selectedIndex: number, onSelected: (function(*): void), items: *[], clear: topTabs.clear, setValue: topTabs.setValue}}
    */
@@ -288,60 +224,13 @@ export function ApplicationContextProvider({ children }) {
     },
   };
 
-  const utils = {
-    redirectTo: (url) => {
-      navigate(url, { replace: true });
-    },
-  };
-
-  useEffect(() => {
-    /**
-     * authentication 먼저 체크
-     */
-    api.get(auth.authentication)
-      .then(success => {
-
-      })
-      .catch((error) => {
-        /**
-         * 앱 진입 후 authenticated 상태가 아니면 자동 로그인 요청
-         */
-        const fingerprint = localStorage.getItem("fingerprint");
-        api
-          .post(
-            auth.login,
-            {
-              fingerprint: fingerprint,
-            },
-            {
-              credentials: "include",
-            }
-          )
-          .then(
-            (
-              response = {
-                isAuthenticated: Boolean,
-                fingerprint: String,
-              }
-            ) => {
-              localStorage.setItem("fingerprint", response.fingerprint);
-            }
-          )
-          .catch((error) => {
-            console.log(error);
-          });
-      });
-  }, []);
-
   return (
     <ApplicationContext.Provider
       value={{
-        api,
         topTabs,
         leftSidebar,
         rightSidebar,
         currentGame,
-        utils,
       }}
     >
       {children}

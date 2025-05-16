@@ -2,11 +2,12 @@ import Canvas from "@/components/canvas/index.jsx";
 import { useEffect, useState } from "react";
 import { useApplicationContext } from "@/contexts/index.jsx";
 import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
-import { useLocation } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import { game } from "@/api/index.js";
 import { useApiLock } from "@/api/lock/index.jsx";
 import { pages } from "@/router/index.jsx";
 import { ArrowLeft } from "lucide-react";
+import {useApiClient} from "@/contexts/api-client/index.jsx";
 
 export default function GameRoomPage() {
   // 현재 캔버스의 획 모음
@@ -16,11 +17,15 @@ export default function GameRoomPage() {
   const [reRenderingSignal, setReRenderingSignal] = useState(false);
 
   // 전역 컨텍스트
-  const { api, topTabs, leftSidebar, rightSidebar, currentGame, utils } = useApplicationContext();
+  const { topTabs, leftSidebar, rightSidebar, currentGame, utils } = useApplicationContext();
+
+  const { apiClient } = useApiClient();
 
   const { apiLock } = useApiLock();
 
   const location = useLocation();
+
+  const navigate = useNavigate();
 
   /**
    * =========================== 이벤트 핸들러 =============================
@@ -49,11 +54,11 @@ export default function GameRoomPage() {
    */
   const findCurrentGameRoomInfo = async () => {
     // 방 정보 조회
-    return await api
+    return await apiClient
       .get(game.getCurrentEnteredGameRoom)
       .then((response) => {
         if (location.pathname !== `${pages.gameRoom}/${response.gameRoomId}`) {
-          utils.redirectTo(`${pages.gameRoom}/${response.gameRoomId}`);
+          navigate(`${pages.gameRoom}/${response.gameRoomId}`, { replace: true });
         }
         return response;
       })
@@ -61,7 +66,7 @@ export default function GameRoomPage() {
         if (error.code === "R003") {
           // 로비로 이동
           alert(REDIRECT_MESSAGES.TO_LOBBY);
-          utils.redirectTo(pages.lobby);
+          navigate(pages.lobby, { replace: true });
         }
       });
   };
@@ -96,11 +101,11 @@ export default function GameRoomPage() {
 
     const response = await apiLock(
       game.exitFromGameRoom(gameRoomEntranceId),
-      async () => await api.delete(game.exitFromGameRoom(gameRoomEntranceId))
+      async () => await apiClient.delete(game.exitFromGameRoom(gameRoomEntranceId))
     );
 
     if (response.success) {
-      utils.redirectTo(pages.lobby);
+      navigate(pages.lobby, {replace: true});
     }
   };
 
