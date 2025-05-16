@@ -5,6 +5,7 @@ import {ERROR_CODE_MAPPING} from "@/constants/server-code.js";
 import {toast} from "react-toastify";
 
 export const useApiClient = () => {
+
   /**
    * apiClient 내부 요청 함수
    */
@@ -50,8 +51,7 @@ export const useApiClient = () => {
             /**
              * 토큰 만료가 아닐 경우 unauthorized handler 호출
              */
-            navigate("/", { replace: true });
-            return;
+            throw new Error(error.code);
           }
           /**
            * 토큰 만료시
@@ -68,8 +68,7 @@ export const useApiClient = () => {
             /**
              * 인증 실패 -> 토큰 만료시 refresh 시도 -> refresh마저 실패시 unauthorized handling
              */
-            navigate("/", { replace: true });
-            return;
+            throw new Error(error.code);
           }
 
           /**
