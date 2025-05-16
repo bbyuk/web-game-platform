@@ -3,6 +3,7 @@ import { auth } from "@/api/index.js";
 import { useNavigate } from "react-router-dom";
 import { EMPTY_MESSAGES } from "@/constants/message.js";
 import { GitCommit, MessageCircle } from "lucide-react";
+import {Slide, ToastContainer} from "react-toastify";
 
 const ApplicationContext = createContext(null);
 
@@ -233,6 +234,16 @@ export function ApplicationContextProvider({ children }) {
         currentGame,
       }}
     >
+      <ToastContainer
+        position={"top-center"}
+        limit={1}
+        closeButton={false}
+        autoClose={1500}
+        hideProgressBar
+        closeOnClick
+        theme={"dark"}
+        transition={Slide}
+      />
       {children}
     </ApplicationContext.Provider>
   );

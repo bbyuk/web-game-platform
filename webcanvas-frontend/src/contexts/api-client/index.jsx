@@ -3,6 +3,7 @@ import { auth } from "@/api/index.js";
 import { defaultHeaders, serverDomain } from "@/contexts/api-client/constnats.js";
 import { buildUrlWithParams } from "@/contexts/api-client/utils.js";
 import { ERROR_CODE_MAPPING } from "@/constants/server-code.js";
+import {toast} from "react-toastify";
 
 const ApiClientContext = createContext(null);
 
@@ -115,7 +116,8 @@ export const ApiClientProvider = ({ children }) => {
     if (errorCodeMapping.alert) {
       alert(message);
     } else if (errorCodeMapping.toast) {
-      console.log("토스트 작업 TODO ====== ", message);
+      // console.log("토스트 작업 TODO ====== ", message);
+      toast.error(message);
     }
   };
 
