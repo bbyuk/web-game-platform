@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { privateRoutes, publicRoutes } from "@/router";
 import ProtectedRoute from "@/router/protected/index.jsx";
+import {useEffect} from "react";
 
 function App() {
   const routeMapping = (route) => {
@@ -15,6 +16,19 @@ function App() {
     }
     return <Route key={route.path} path={route.path} element={route.element} />;
   };
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   return (
     <Routes>
