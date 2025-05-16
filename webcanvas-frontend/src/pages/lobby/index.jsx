@@ -7,12 +7,12 @@ import { EMPTY_MESSAGES } from "@/constants/message.js";
 import { useNavigate } from "react-router-dom";
 import { pages } from "@/router/index.jsx";
 import { GitCommit } from "lucide-react";
-import { useApiClient } from "@/contexts/api-client/index.jsx";
+import { useApiClient } from "@/hooks/api-client/index.jsx";
 
 export default function LobbyPage() {
   // 전역 context
   const { leftSidebar } = useApplicationContext();
-  const { apiClient } = useApiClient();
+  const apiClient = useApiClient();
   // API 중복 요청을 block하기 위한 lock
   const { apiLock } = useApiLock();
   const navigate = useNavigate();

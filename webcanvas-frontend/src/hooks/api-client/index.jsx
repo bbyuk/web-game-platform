@@ -1,21 +1,10 @@
-import { createContext, useContext } from "react";
-import { auth } from "@/api/index.js";
-import { defaultHeaders, serverDomain } from "@/contexts/api-client/constnats.js";
-import { buildUrlWithParams } from "@/contexts/api-client/utils.js";
-import { ERROR_CODE_MAPPING } from "@/constants/server-code.js";
+import {auth} from "@/api/index.js";
+import {defaultHeaders, serverDomain} from "@/hooks/api-client/constnats.js";
+import {buildUrlWithParams} from "@/hooks/api-client/utils.js";
+import {ERROR_CODE_MAPPING} from "@/constants/server-code.js";
 import {toast} from "react-toastify";
 
-const ApiClientContext = createContext(null);
-
 export const useApiClient = () => {
-  const context = useContext(ApiClientContext);
-  if (!context) {
-    throw Error("useApiClient must be used within an ApiClientProvider");
-  }
-  return context;
-};
-
-export const ApiClientProvider = ({ children }) => {
   /**
    * apiClient 내부 요청 함수
    */
@@ -177,5 +166,5 @@ export const ApiClientProvider = ({ children }) => {
     },
   };
 
-  return <ApiClientContext.Provider value={{ apiClient }}>{children}</ApiClientContext.Provider>;
+  return apiClient;
 };

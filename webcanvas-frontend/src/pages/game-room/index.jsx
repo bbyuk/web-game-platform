@@ -7,7 +7,7 @@ import { game } from "@/api/index.js";
 import { useApiLock } from "@/api/lock/index.jsx";
 import { pages } from "@/router/index.jsx";
 import { ArrowLeft } from "lucide-react";
-import { useApiClient } from "@/contexts/api-client/index.jsx";
+import { useApiClient } from "@/hooks/api-client/index.jsx";
 
 export default function GameRoomPage() {
   // 현재 캔버스의 획 모음
@@ -19,7 +19,7 @@ export default function GameRoomPage() {
   // 전역 컨텍스트
   const { topTabs, leftSidebar, rightSidebar, currentGame, utils } = useApplicationContext();
 
-  const { apiClient } = useApiClient();
+  const apiClient = useApiClient();
 
   const { apiLock } = useApiLock();
 
