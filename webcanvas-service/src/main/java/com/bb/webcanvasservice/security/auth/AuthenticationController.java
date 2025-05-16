@@ -62,8 +62,8 @@ public class AuthenticationController {
     @PostMapping("login")
     public ResponseEntity<AuthenticationApiResponse> login(@RequestBody LoginRequest loginRequest) {
         AuthenticationInnerResponse authenticationInnerResponse = authenticationService.login(loginRequest.fingerprint());
-        ResponseCookie accessTokenResponseCookie = getResponseCookie(securityProperties.cookie().accessToken(), authenticationInnerResponse.accessToken(), securityProperties.accessTokenExpiration());
-        ResponseCookie refreshTokenResponseCookie = getResponseCookie(securityProperties.cookie().refreshToken(), authenticationInnerResponse.refreshToken(), securityProperties.refreshTokenExpiration());
+        ResponseCookie accessTokenResponseCookie = getResponseCookie(securityProperties.cookie().accessToken(), authenticationInnerResponse.accessToken(), securityProperties.accessTokenExpirationSeconds());
+        ResponseCookie refreshTokenResponseCookie = getResponseCookie(securityProperties.cookie().refreshToken(), authenticationInnerResponse.refreshToken(), securityProperties.refreshTokenExpirationSeconds());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenResponseCookie.toString(), accessTokenResponseCookie.toString())
@@ -90,8 +90,8 @@ public class AuthenticationController {
         AuthenticationInnerResponse authenticationInnerResponse = authenticationService.refreshToken(refreshTokenRequestCookie.getValue());
         AuthenticationApiResponse responseBody = new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), true);
 
-        ResponseCookie accessTokenResponseCookie = getResponseCookie(securityProperties.cookie().accessToken(), authenticationInnerResponse.accessToken(), securityProperties.accessTokenExpiration());
-        ResponseCookie refreshTokenResponseCookie = getResponseCookie(securityProperties.cookie().refreshToken(), authenticationInnerResponse.refreshToken(), securityProperties.refreshTokenExpiration());
+        ResponseCookie accessTokenResponseCookie = getResponseCookie(securityProperties.cookie().accessToken(), authenticationInnerResponse.accessToken(), securityProperties.accessTokenExpirationSeconds());
+        ResponseCookie refreshTokenResponseCookie = getResponseCookie(securityProperties.cookie().refreshToken(), authenticationInnerResponse.refreshToken(), securityProperties.refreshTokenExpirationSeconds());
 
         return authenticationInnerResponse.refreshTokenReissued()
                 ?
