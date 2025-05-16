@@ -6,7 +6,6 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthentication();
   useEffect(() => {
-    console.log(isAuthenticated);
     if (isAuthenticated) {
       navigate("/platform", { replace: true });
     }

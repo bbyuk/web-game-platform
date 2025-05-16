@@ -24,24 +24,31 @@ export const AuthenticationProvider = ({ children }) => {
       credentials: "include",
     })
       .then(response => {
-        login();
+        if (response.ok) {
+          login();
+        }
+        else {
+          throw new Error();
+        }
       })
       .catch((error) => {
         /**
          * 앱 진입 후 authenticated 상태가 아니면 자동 로그인 요청
          */
         const fingerprint = localStorage.getItem("fingerprint");
-
         fetch(`${serverDomain}${auth.login}`, {
           method: "POST",
           headers: defaultHeaders,
           body: JSON.stringify({ fingerprint: fingerprint }),
           credentials: "include"
-        }).then((response = {
-          isAuthenticated: Boolean,
-          fingerprint: String,
-        }) => {
-          localStorage.setItem("fingerprint", response.fingerprint);
+        }).then(async response => {
+          const { fingerprint, isAuthenticated } = await response.json();
+          localStorage.setItem("fingerprint", fingerprint);
+
+          if (isAuthenticated) {
+            login();
+          }
+
         }).catch((error) => (console.log(error)));
       });
 
