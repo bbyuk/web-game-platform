@@ -1,9 +1,7 @@
 package com.bb.webcanvasservice.security.websocket;
 
-import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.bb.webcanvasservice.security.auth.WebCanvasAuthentication;
-import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +11,6 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-
-import java.util.Optional;
 
 /**
  * 웹소켓 연결 및 웹소켓 메시지 처리에 대한 인증 처리를 할 수 있는 ChannelInterceptor 구현체 클래스
@@ -38,11 +34,11 @@ public class JwtAuthenticationChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            // 1. NativeHeaders에서 HttpServletRequest 꺼내기
-            HttpServletRequest request = (HttpServletRequest) accessor.getSessionAttributes().get("HTTP_REQUEST");
-            String accessToken = jwtManager.resolveToken(request);
+            String accessToken = jwtManager.resolveBearerTokenValue(accessor.getFirstNativeHeader(JwtManager.BEARER_TOKEN));
+            jwtManager.validateToken(accessToken);
 
-            accessor.setUser(new WebCanvasAuthentication(jwtManager.getUserIdFromToken(accessToken)));
+            Long userId = jwtManager.getUserIdFromToken(accessToken);
+            accessor.setUser(new WebCanvasAuthentication(userId));
         }
 
 

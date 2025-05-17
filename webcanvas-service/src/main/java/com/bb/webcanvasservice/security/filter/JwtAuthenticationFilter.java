@@ -14,7 +14,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
 
 /**
  * Http 요청에 대해 JWT 토큰 검증을 수행하는 필터
@@ -28,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = jwtManager.resolveToken(request);
+        String token = jwtManager.resolveBearerTokenValue(request.getHeader(JwtManager.BEARER_TOKEN));
 
         jwtManager.validateToken(token);
         Long userId = jwtManager.getUserIdFromToken(token);

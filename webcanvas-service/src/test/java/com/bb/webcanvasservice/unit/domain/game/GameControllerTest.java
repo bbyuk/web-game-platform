@@ -1,6 +1,5 @@
 package com.bb.webcanvasservice.unit.domain.game;
 
-import com.bb.webcanvasservice.domain.game.GameController;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -74,14 +72,14 @@ class GameControllerTest {
 
         BDDMockito.given(jwtManager.generateToken(any(), any(), anyLong()))
                 .willReturn(token);
-        BDDMockito.given(jwtManager.resolveToken(any()))
+        BDDMockito.given(jwtManager.resolveBearerTokenValue(any()))
                 .willReturn(token);
 
 
         // when
         mockMvc.perform(MockMvcRequestBuilders.post("/game/canvas/room")
                 .contentType(MediaType.APPLICATION_JSON)
-                        .header(JwtManager.BEARER_TOKEN, String.format("%s %s", JwtManager.TOKEN_PREFIX
+                        .header(JwtManager.BEARER_TOKEN, String.format("%s %s", JwtManager.BEARER_TOKEN_PREFIX
                                 , jwtManager.generateToken(userId, fingerprint, expiration)))
                 .with(csrf())
         )

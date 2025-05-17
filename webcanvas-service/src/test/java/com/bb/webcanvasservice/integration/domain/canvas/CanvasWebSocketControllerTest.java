@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -148,7 +147,7 @@ class CanvasWebSocketControllerTest {
         // 소켓 connect 헤더
         // 웹소켓 연결 이전에 platform-service 로부터 토큰 발급받음.
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.add(JwtManager.BEARER_TOKEN, String.format("%s %s", JwtManager.TOKEN_PREFIX, jwt));
+        stompHeaders.add(JwtManager.BEARER_TOKEN, String.format("%s%s", JwtManager.BEARER_TOKEN_PREFIX, jwt));
         return client.connectAsync(WEBSOCKET_URL, new WebSocketHttpHeaders(), stompHeaders, new StompSessionHandlerAdapter() {}).get();
     }
 
@@ -245,7 +244,7 @@ class CanvasWebSocketControllerTest {
 
         // when
         StompHeaders messageHeader = new StompHeaders();
-        messageHeader.add(JwtManager.BEARER_TOKEN, String.format("%s %s", JwtManager.TOKEN_PREFIX, testUserJwt));
+        messageHeader.add(JwtManager.BEARER_TOKEN, String.format("%s %s", JwtManager.BEARER_TOKEN_PREFIX, testUserJwt));
         messageHeader.setDestination(getStrokeSendDestination(testDataLoader.testGameRoom.getId()));
 
         testUserSession.send(messageHeader, testDataLoader.testStroke);

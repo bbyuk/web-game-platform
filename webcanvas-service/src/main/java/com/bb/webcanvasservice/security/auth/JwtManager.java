@@ -7,13 +7,9 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
-import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -25,7 +21,7 @@ import java.util.Date;
 public class JwtManager {
 
     public static final String BEARER_TOKEN = "Authorization";
-    public static final String TOKEN_PREFIX = "Bearer ";
+    public static final String BEARER_TOKEN_PREFIX = "Bearer ";
 
     private final SecurityProperties securityProperties;
     private final SecretKey key;
@@ -107,15 +103,11 @@ public class JwtManager {
     }
 
     /**
-     * HttpServletRequest의 request header로부터 bearer 토큰 값을 읽어온다.
-     *
-     * @param request
-     * @return
+     * HttpServletRequest, StompHeaders로 부터 bearer 토큰 값을 읽어온다.
      */
-    public String resolveToken(HttpServletRequest request) {
-        final String bearerToken = request.getHeader(BEARER_TOKEN);
-        if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
-            return bearerToken.substring(TOKEN_PREFIX.length());
+    public String resolveBearerTokenValue(String token) {
+        if (token != null && token.startsWith(BEARER_TOKEN_PREFIX)) {
+            return token.substring(BEARER_TOKEN_PREFIX.length());
         }
 
         return null;
@@ -130,5 +122,6 @@ public class JwtManager {
                 .getExpiration()
                 .getTime() - System.currentTimeMillis();
     }
+
 
 }
