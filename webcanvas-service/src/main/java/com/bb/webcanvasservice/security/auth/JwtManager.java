@@ -113,16 +113,12 @@ public class JwtManager {
      * @return
      */
     public String resolveToken(HttpServletRequest request) {
-        try {
-            return Arrays.stream(request.getCookies())
-                    .filter(cookie -> cookie.getName().equals(securityProperties.cookie().accessToken()))
-                    .findFirst()
-                    .map(Cookie::getValue)
-                    .get();
+        final String bearerToken = request.getHeader(BEARER_TOKEN);
+        if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
+            return bearerToken.substring(TOKEN_PREFIX.length());
         }
-        catch(Exception e) {
-            return null;
-        }
+
+        return null;
     }
 
     /**

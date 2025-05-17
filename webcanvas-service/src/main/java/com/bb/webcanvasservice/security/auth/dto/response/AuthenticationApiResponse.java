@@ -11,6 +11,9 @@ public record AuthenticationApiResponse(
         @Schema(description = "서버에서 생성된 유저의 fingerprint")
         String fingerprint,
 
+        @Schema(description = "access token")
+        String accessToken,
+
         @Schema(description = "인증 여부")
         boolean success
 ) {

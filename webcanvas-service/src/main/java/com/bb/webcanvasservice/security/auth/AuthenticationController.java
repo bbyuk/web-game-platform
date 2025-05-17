@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * 로그인 및 인증 처리 API의 엔드포인트
@@ -62,12 +61,11 @@ public class AuthenticationController {
     @PostMapping("login")
     public ResponseEntity<AuthenticationApiResponse> login(@RequestBody LoginRequest loginRequest) {
         AuthenticationInnerResponse authenticationInnerResponse = authenticationService.login(loginRequest.fingerprint());
-        ResponseCookie accessTokenResponseCookie = getResponseCookie(securityProperties.cookie().accessToken(), authenticationInnerResponse.accessToken(), securityProperties.accessTokenExpirationSeconds());
         ResponseCookie refreshTokenResponseCookie = getResponseCookie(securityProperties.cookie().refreshToken(), authenticationInnerResponse.refreshToken(), securityProperties.refreshTokenExpirationSeconds());
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, refreshTokenResponseCookie.toString(), accessTokenResponseCookie.toString())
-                .body(new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), true));
+                .header(HttpHeaders.SET_COOKIE, refreshTokenResponseCookie.toString())
+                .body(new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), authenticationInnerResponse.accessToken(), true));
     }
 
 
@@ -88,15 +86,13 @@ public class AuthenticationController {
                 .orElseThrow(() -> new ApplicationAuthenticationException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         AuthenticationInnerResponse authenticationInnerResponse = authenticationService.refreshToken(refreshTokenRequestCookie.getValue());
-        AuthenticationApiResponse responseBody = new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), true);
-
-        ResponseCookie accessTokenResponseCookie = getResponseCookie(securityProperties.cookie().accessToken(), authenticationInnerResponse.accessToken(), securityProperties.accessTokenExpirationSeconds());
+        AuthenticationApiResponse responseBody = new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), authenticationInnerResponse.accessToken(), true);
         ResponseCookie refreshTokenResponseCookie = getResponseCookie(securityProperties.cookie().refreshToken(), authenticationInnerResponse.refreshToken(), securityProperties.refreshTokenExpirationSeconds());
 
         return authenticationInnerResponse.refreshTokenReissued()
                 ?
                 ResponseEntity.ok()
-                        .header(HttpHeaders.SET_COOKIE, accessTokenResponseCookie.toString(), refreshTokenResponseCookie.toString())
+                        .header(HttpHeaders.SET_COOKIE, refreshTokenResponseCookie.toString())
                         .body(responseBody)
                 :
                 ResponseEntity.ok()

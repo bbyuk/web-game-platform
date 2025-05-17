@@ -57,5 +57,5 @@ public record SecurityProperties(
         return refreshTokenReissueThreshold * 1000;
     }
 
-    public record AuthenticationCookies(String accessToken, String refreshToken) {}
+    public record AuthenticationCookies(String refreshToken) {}
 }

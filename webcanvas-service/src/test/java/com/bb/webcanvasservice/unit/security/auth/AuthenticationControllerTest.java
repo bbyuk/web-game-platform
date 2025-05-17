@@ -56,7 +56,7 @@ class AuthenticationControllerTest {
 
     @BeforeEach
     void setup() throws Exception {
-        securityProperties = new SecurityProperties("dsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoi", 900000L, 1209600000L, 259200000L, new ArrayList<>(), new SecurityProperties.AuthenticationCookies("access-token", "refresh-token"));
+        securityProperties = new SecurityProperties("dsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoi", 900000L, 1209600000L, 259200000L, new ArrayList<>(), new SecurityProperties.AuthenticationCookies("refresh-token"));
     }
 
     @Test
@@ -114,7 +114,6 @@ class AuthenticationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(header().stringValues(HttpHeaders.SET_COOKIE, Matchers.hasItems(
                                 Matchers.containsString("refresh-token"),
-                                Matchers.containsString("access-token"),
                                 Matchers.containsString("HttpOnly"),
                                 Matchers.containsString("Path=/"))));
 
@@ -151,7 +150,6 @@ class AuthenticationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(header().stringValues(HttpHeaders.SET_COOKIE, Matchers.hasItems(
-                        Matchers.containsString("access-token"),
                         Matchers.containsString("refresh-token"),
                         Matchers.containsString("HttpOnly"),
                         Matchers.containsString("Path=/")

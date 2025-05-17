@@ -8,6 +8,9 @@ import com.bb.webcanvasservice.security.auth.AuthenticationService;
 import com.bb.webcanvasservice.security.auth.JwtManager;
 import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationInnerResponse;
 import com.bb.webcanvasservice.security.exception.ApplicationAuthenticationException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,8 +20,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.crypto.SecretKey;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -34,10 +39,13 @@ class AuthenticationServiceUnitTest {
     @Mock
     private JwtManager jwtManager;
 
+    private SecretKey testKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode("dwqoijsdkfjsdoifjdskfjosdifjdsoifjifewofijqe"));
+
+
     /**
      * Mock
      */
-    private SecurityProperties securityProperties = new SecurityProperties("dsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoi", 900000L, 1209600000L, 259200000L, new ArrayList<>(), new SecurityProperties.AuthenticationCookies("access-token", "refresh-token"));
+    private SecurityProperties securityProperties = new SecurityProperties("dsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoidsnadsnaodnsaoi", 900000L, 1209600000L, 259200000L, new ArrayList<>(), new SecurityProperties.AuthenticationCookies("refresh-token"));
     private AuthenticationService authenticationService;
 
     @BeforeEach
@@ -50,7 +58,6 @@ class AuthenticationServiceUnitTest {
     void testLogin() throws Exception {
         // given
         String fingerprint = "asdwqujdqwi12j3b1jbsd";
-        JwtManager realJwtManagerObject = new JwtManager();
 
         User user = new User(fingerprint);
         Field idField = User.class.getDeclaredField("id");
@@ -59,11 +66,18 @@ class AuthenticationServiceUnitTest {
         idField.set(user, userId);
 
         long expiration = 3600000; // 1시간 (m)
+        String token = Jwts.builder()
+                .subject(String.valueOf(userId))
+                .claim("fingerprint", fingerprint)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(testKey, Jwts.SIG.HS256)
+                .compact();
 
         when(userService.findOrCreateUser(any()))
                 .thenReturn(user);
         when(jwtManager.generateToken(any(), any(), anyLong()))
-                .thenReturn(realJwtManagerObject.generateToken(userId, fingerprint, expiration));
+                .thenReturn(token);
 
         // when
         AuthenticationInnerResponse authenticationInnerResponse = authenticationService.login(fingerprint);
@@ -81,20 +95,33 @@ class AuthenticationServiceUnitTest {
     @DisplayName("토큰 리프레시 - 유저에게 할당되지 않은 refreshToken으로 refresh 요청시 ApplicationAuthenticationException 발생")
     void testRefreshTokenFailedWhenNotUserOwnToken() throws Exception{
         // given
-        JwtManager realJwtManagerObject = new JwtManager();
         Long userId = 1L;
-        User user = new User(FingerprintGenerator.generate());
+        String fingerprint = FingerprintGenerator.generate();
+        User user = new User(fingerprint);
         Field idField = User.class.getDeclaredField("id");
         idField.setAccessible(true);
+        long expiration = 3600000; // 1시간 (m)
         idField.set(user, userId);
-        String userRefreshToken = realJwtManagerObject.generateToken(userId, user.getFingerprint(), 15 * 60 * 1000);
+        String userRefreshToken = Jwts.builder()
+                .subject(String.valueOf(userId))
+                .claim("fingerprint", fingerprint)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(testKey, Jwts.SIG.HS256)
+                .compact();
         user.updateRefreshToken(userRefreshToken);
 
         when(userService.findUserByUserId(any(Long.class))).thenReturn(user);
         when(jwtManager.getUserIdFromToken(any())).thenReturn(userId);
 
         // when
-        String anotherValidToken = realJwtManagerObject.generateToken(9999L, user.getFingerprint(), 15 * 60 * 1000);
+        String anotherValidToken = Jwts.builder()
+                .subject(String.valueOf(userId))
+                .claim("fingerprint", fingerprint)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 7200000))
+                .signWith(testKey, Jwts.SIG.HS256)
+                .compact();
 
         Assertions.assertThatThrownBy(() -> authenticationService.refreshToken(anotherValidToken))
                 .isInstanceOf(ApplicationAuthenticationException.class);
@@ -106,7 +133,7 @@ class AuthenticationServiceUnitTest {
     @DisplayName("토큰 리프레시 - refreshToken의 expiration까지 3일 이내로 남았을 경우 refreshToken도 재발급 및 rotate")
     void refreshTokenRefreshedEitherWhenExpirationLessThanThreshold() throws Exception {
         // given
-        JwtManager realJwtManagerObject = new JwtManager();
+        JwtManager realJwtManagerObject = new JwtManager(securityProperties);
         Long userId = 1L;
         User user = new User(FingerprintGenerator.generate());
         String userRefreshToken = realJwtManagerObject.generateToken(userId, FingerprintGenerator.generate(), 20000);

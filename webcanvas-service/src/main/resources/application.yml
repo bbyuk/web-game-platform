@@ -96,7 +96,6 @@ application:
       - /auth/refresh
       - /ws/**
     cookie:
-      access-token: access-token
       refresh-token: refresh-token
 
 ##### WebSocket 관련 설정 #####
