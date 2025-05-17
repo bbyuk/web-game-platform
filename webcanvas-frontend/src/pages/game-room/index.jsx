@@ -1,13 +1,14 @@
-import Canvas from "@/components/canvas/index.jsx";
-import { useEffect, useState } from "react";
-import { useApplicationContext } from "@/contexts/index.jsx";
-import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
-import { useLocation, useNavigate } from "react-router-dom";
-import { game } from "@/api/index.js";
-import { useApiLock } from "@/api/lock/index.jsx";
-import { pages } from "@/router/index.jsx";
-import { ArrowLeft } from "lucide-react";
-import { useApiClient } from "@/hooks/api-client/index.jsx";
+import Canvas from '@/components/canvas/index.jsx';
+import { useEffect, useRef, useState } from 'react';
+import { useApplicationContext } from '@/contexts/index.jsx';
+import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from '@/constants/message.js';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { game } from '@/api/index.js';
+import { useApiLock } from '@/api/lock/index.jsx';
+import { pages } from '@/router/index.jsx';
+import { ArrowLeft } from 'lucide-react';
+import { getApiClient } from '@/client/http/index.jsx';
+import { getStompClient } from '@/client/stomp/index.jsx';
 
 export default function GameRoomPage() {
   // 현재 캔버스의 획 모음
@@ -17,15 +18,20 @@ export default function GameRoomPage() {
   const [reRenderingSignal, setReRenderingSignal] = useState(false);
 
   // 전역 컨텍스트
-  const { topTabs, leftSidebar, rightSidebar, currentGame, utils } = useApplicationContext();
-
-  const apiClient = useApiClient();
+  const { topTabs, leftSidebar, rightSidebar } = useApplicationContext();
 
   const { apiLock } = useApiLock();
+
+  const apiClient = getApiClient();
 
   const location = useLocation();
 
   const navigate = useNavigate();
+
+  const [gameRoomId, setGameRoomId] = useState(null);
+
+  const stompClientRef = useRef(null);
+
 
   /**
    * =========================== 이벤트 핸들러 =============================
@@ -59,19 +65,21 @@ export default function GameRoomPage() {
       .then((response) => {
         if (location.pathname !== `${pages.gameRoom}/${response.gameRoomId}`) {
           navigate(`${pages.gameRoom}/${response.gameRoomId}`, { replace: true });
+          return null;
         }
         return response;
       })
       .catch((error) => {
-        if (error.code === "R003") {
+        if (error.code === 'R003') {
           // 로비로 이동
           alert(REDIRECT_MESSAGES.TO_LOBBY);
           navigate(pages.lobby, { replace: true });
+          return null;
         }
       });
   };
 
-  const setLeftbar = (response) => {
+  const setLeftSidebar = (response) => {
     if (response.enteredUsers) {
       leftSidebar.setItems(
         response.enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest }))
@@ -81,12 +89,12 @@ export default function GameRoomPage() {
     }
 
     leftSidebar.setTitle({
-      label: "exit",
+      label: 'exit',
       icon: <ArrowLeft size={20} className="text-gray-400" />,
       button: true,
       onClick: () => {
         exitGameRoom(response.gameRoomEntranceId);
-      },
+      }
     });
   };
 
@@ -95,7 +103,7 @@ export default function GameRoomPage() {
    * @returns {Promise<void>}
    */
   const exitGameRoom = async (gameRoomEntranceId) => {
-    if (!confirm("방에서 나가시겠습니까?")) {
+    if (!confirm('방에서 나가시겠습니까?')) {
       return;
     }
 
@@ -109,17 +117,53 @@ export default function GameRoomPage() {
     }
   };
 
+  const openChannel = (gameRoomId) => {
+    if (stompClientRef.current) {
+      // 이전 client 존재시 deactivate
+      stompClientRef.current.deactivate();
+    }
+
+    /*
+     * TODO 웹소켓 접속 - 구독 - 메세지 전송 ( 방입장 브로드캐스팅 )
+     */
+    const options = {
+      onConnect: frame => {
+        console.log(frame);
+      },
+      onMessage: frame => {
+        console.log(frame);
+      },
+      onError: frame => {
+        console.log(frame);
+      },
+      topic: `canvas/${gameRoomId}`
+    };
+
+    stompClientRef.current = getStompClient(options);
+  };
+
   /**
    * =========================== 이벤트 핸들러 =============================
    */
   useEffect(() => {
     findCurrentGameRoomInfo()
-      .then(setLeftbar)
+      .then(response => {
+        if (!response) {
+          return;
+        }
+        // 정상적인 방 경로로 입장.
+        setLeftSidebar(response);
+        setGameRoomId(response.gameRoomId);
+
+        // stomp 연결
+        openChannel(response.gameRoomId);
+
+      })
       .catch((error) => alert(error));
   }, [location.pathname]);
 
   useEffect(() => {
-    /*
+    /**
      * TODO canvas 팔레트 서비스 개발 및 조회 API 요청
      */
 
@@ -137,7 +181,7 @@ export default function GameRoomPage() {
       reRenderingSignal={reRenderingSignal}
       afterReRendering={onReRenderingHandler}
       color={
-        topTabs.items[topTabs.selectedIndex] ? topTabs.items[topTabs.selectedIndex].label : "black"
+        topTabs.items[topTabs.selectedIndex] ? topTabs.items[topTabs.selectedIndex].label : 'black'
       }
     />
   );

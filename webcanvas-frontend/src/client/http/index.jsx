@@ -1,10 +1,10 @@
-import {auth} from "@/api/index.js";
-import {defaultHeaders, serverDomain} from "@/hooks/api-client/constnats.js";
-import {buildUrlWithParams} from "@/hooks/api-client/utils.js";
-import {ERROR_CODE_MAPPING} from "@/constants/server-code.js";
-import {toast} from "react-toastify";
+import { auth } from '@/api/index.js';
+import { defaultHeaders, serverDomain } from '@/client/http/constnats.js';
+import { buildUrlWithParams } from '@/client/http/utils.js';
+import { ERROR_CODE_MAPPING } from '@/constants/server-code.js';
+import { toast } from 'react-toastify';
 
-export const useApiClient = () => {
+export const getApiClient = () => {
 
   /**
    * apiClient 내부 요청 함수
@@ -146,11 +146,7 @@ export const useApiClient = () => {
       });
   };
 
-  /**
-   * api 요청 클라이언트
-   * @type {{get: (function(*, {}=, {}=): Promise<*>), post: (function(*, {}=, {}=): Promise<*>), tokenRefresh: (function(): Promise<*>), constants: {serverDomain: any, defaultHeaders: {'Content-Type': string}}, utils.js: {buildUrlWithParams: (function(*, {}=): string|*)}}}
-   */
-  const apiClient = {
+  return {
     get: async (target, params = {}, options = {}) => {
       return request("GET", target, params, options);
     },
@@ -164,6 +160,4 @@ export const useApiClient = () => {
       return request("DELETE", target, params, options);
     },
   };
-
-  return apiClient;
 };

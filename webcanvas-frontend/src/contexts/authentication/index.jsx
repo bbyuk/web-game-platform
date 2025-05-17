@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "@/api/index.js";
-import {useApiClient} from "@/hooks/api-client/index.jsx";
+import {getApiClient} from "@/client/http/index.jsx";
 import {useNavigate} from "react-router-dom";
 import {pages} from "@/router/index.jsx";
 
@@ -15,7 +15,7 @@ export const useAuthentication = () => useContext(AuthenticationContext);
  */
 export const AuthenticationProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const apiClient = useApiClient();
+  const apiClient = getApiClient();
   const navigate = useNavigate();
 
 
