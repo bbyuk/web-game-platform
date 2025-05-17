@@ -3,6 +3,7 @@ import { auth } from "@/api/index.js";
 import {getApiClient} from "@/client/http/index.jsx";
 import {useNavigate} from "react-router-dom";
 import {pages} from "@/router/index.jsx";
+import { STORAGE_KEY } from '@/constants/storage-key.js';
 
 const AuthenticationContext = createContext(null);
 export const useAuthentication = () => useContext(AuthenticationContext);
@@ -19,34 +20,24 @@ export const AuthenticationProvider = ({ children }) => {
   const navigate = useNavigate();
 
 
-  const login = () => {
+  const onAuthenticationSuccess = () => {
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
+  const onLoginSuccess = (fingerprint, accessToken) => {
+    localStorage.setItem(STORAGE_KEY.FINGERPRINT, fingerprint);
+    localStorage.setItem(STORAGE_KEY.ACCESS_TOKEN, accessToken);
+
+    onAuthenticationSuccess();
+  }
+
+  const onAuthenticationFailed = () => {
+    localStorage.removeItem(STORAGE_KEY.ACCESS_TOKEN);
     setIsAuthenticated(false);
   };
 
 
   useEffect(() => {
-    /**
-     * 앱 진입 인증 요청에 실패시 핸들링
-     */
-    const onAuthenticationFailedHandler = () => {
-      const fingerprint = localStorage.getItem("fingerprint");
-      apiClient
-        .post(auth.login, {fingerprint: fingerprint})
-        .then(async (response) => {
-          const {fingerprint, success} = await response.json();
-          localStorage.setItem("fingerprint", fingerprint);
-          if (success) {
-            login();
-          }
-        })
-        .catch(error => {
-          logout();
-        });
-    }
     /**
      * authentication 먼저 체크
      */
@@ -54,17 +45,32 @@ export const AuthenticationProvider = ({ children }) => {
       .get(auth.authentication)
       .then(success => {
         if (success) {
-          login();
+          onAuthenticationSuccess();
         } else {
-          logout();
+          onAuthenticationFailed();
         }
       })
       .catch((error) => {
-        onAuthenticationFailedHandler();
+        /**
+         * 앱 진입 인증 요청에 실패시 핸들링
+         * 자동 로그인 요청
+         */
+
+        const fingerprint = localStorage.getItem(STORAGE_KEY.FINGERPRINT);
+        apiClient
+          .post(auth.login, {fingerprint: fingerprint})
+          .then(async ({fingerprint, accessToken, success}) => {
+            if (success) {
+              onLoginSuccess(fingerprint, accessToken);
+            }
+          })
+          .catch(error => {
+            onAuthenticationFailed();
+          });
       });
 
     return () => {
-      logout();
+      onAuthenticationFailed();
     };
   }, []);
 

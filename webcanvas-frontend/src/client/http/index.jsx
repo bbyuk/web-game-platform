@@ -3,6 +3,7 @@ import { defaultHeaders, serverDomain } from '@/client/http/constnats.js';
 import { buildUrlWithParams } from '@/client/http/utils.js';
 import { ERROR_CODE_MAPPING } from '@/constants/server-code.js';
 import { toast } from 'react-toastify';
+import { STORAGE_KEY } from '@/constants/storage-key.js';
 
 export const getApiClient = () => {
 
@@ -18,9 +19,12 @@ export const getApiClient = () => {
    * @returns {Promise<any>}
    */
   const request = async (method, url, data = {}, options = {}) => {
+    const accessToken = localStorage.getItem(STORAGE_KEY.ACCESS_TOKEN);
+
     const headers = {
       ...defaultHeaders,
       ...options.headers,
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
     };
 
     const processedUrl = `${serverDomain}${method === "GET" || method === "DELETE" ? buildUrlWithParams(url, data) : url}`;
@@ -137,8 +141,9 @@ export const getApiClient = () => {
         /**
          * refresh 성공
          */
-        const { fingerprint, isAuthenticated } = await response.json();
-        localStorage.setItem("fingerprint", fingerprint);
+        const { fingerprint, accessToken, success } = await response.json();
+        localStorage.setItem(STORAGE_KEY.FINGERPRINT, fingerprint);
+        localStorage.setItem(STORAGE_KEY.ACCESS_TOKEN, accessToken);
       })
       .catch((error) => {
         alert(error.message);

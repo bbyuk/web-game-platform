@@ -1,10 +1,11 @@
 import { Client } from '@stomp/stompjs';
+import { STORAGE_KEY } from '@/constants/storage-key.js';
 
 export const getStompClient = ({ topic, onConnect, onMessage, onError }) => {
   const client = new Client({
     webSocketFactory: () => new WebSocket("ws://localhost:9200/ws/canvas"),
     connectHeaders: {
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMDIiLCJmaW5nZXJwcmludCI6IjFiNWFkMTM5ZTZmMzRhMTZhMDI4OTY1YTg1MDNkYTVlIiwiaWF0IjoxNzQ3NDQ5NjY3LCJleHAiOjE3NDc0NTA1Njd9.KTY3HnCC1oVQodws7QeC_CUuYug5D_TVxieOV2f8yAg`
+      Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY.ACCESS_TOKEN)}`
     },
     reconnectDelay: 5000,
     debug: (msg) => console.log("[STOMP]", msg),
