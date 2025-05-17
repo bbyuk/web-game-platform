@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.unit.domain.game;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.security.auth.JwtManager;
+import com.bb.webcanvasservice.common.JwtManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

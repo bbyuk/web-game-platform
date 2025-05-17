@@ -2,10 +2,9 @@ package com.bb.webcanvasservice.integration.security.auth;
 
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserRepository;
-import com.bb.webcanvasservice.security.auth.AuthenticationService;
-import com.bb.webcanvasservice.security.auth.JwtManager;
-import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationApiResponse;
-import com.bb.webcanvasservice.security.auth.dto.response.AuthenticationInnerResponse;
+import com.bb.webcanvasservice.domain.auth.AuthenticationService;
+import com.bb.webcanvasservice.common.JwtManager;
+import com.bb.webcanvasservice.domain.auth.dto.response.AuthenticationInnerResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

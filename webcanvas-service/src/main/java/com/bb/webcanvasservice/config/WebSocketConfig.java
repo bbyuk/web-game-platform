@@ -2,12 +2,12 @@ package com.bb.webcanvasservice.config;
 
 import com.bb.webcanvasservice.config.properties.WebSocketProperties;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
-import com.bb.webcanvasservice.security.auth.JwtManager;
-import com.bb.webcanvasservice.security.websocket.JwtAuthenticationChannelInterceptor;
-import com.bb.webcanvasservice.security.websocket.SubscribeChannelInterceptor;
-import com.bb.webcanvasservice.security.websocket.WebSocketAuthenticationArgumentResolver;
+import com.bb.webcanvasservice.common.JwtManager;
+import com.bb.webcanvasservice.websocket.interceptor.JwtAuthenticationChannelInterceptor;
+import com.bb.webcanvasservice.websocket.interceptor.SubscribeChannelInterceptor;
+import com.bb.webcanvasservice.websocket.registry.SessionRegistry;
+import com.bb.webcanvasservice.websocket.security.WebSocketAuthenticationArgumentResolver;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -30,6 +30,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final WebSocketProperties webSocketProperties;
     private final JwtManager jwtManager;
     private final WebSocketAuthenticationArgumentResolver webSocketAuthenticationArgumentResolver;
+    private final SessionRegistry sessionRegistry;
+
     /**
      * 게임 방과 연관되어 있는 웹소켓 이벤트 브로커 구독 요청의 validation 처리를 위한 서비스 주입
      */
@@ -71,7 +73,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(
-                new JwtAuthenticationChannelInterceptor(jwtManager),
+                new JwtAuthenticationChannelInterceptor(jwtManager, sessionRegistry),
                 new SubscribeChannelInterceptor(gameRoomService)
         );
     }

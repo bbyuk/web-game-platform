@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.unit.util;
 
-import com.bb.webcanvasservice.security.SecurityProperties;
-import com.bb.webcanvasservice.security.auth.JwtManager;
+import com.bb.webcanvasservice.web.security.SecurityProperties;
+import com.bb.webcanvasservice.common.JwtManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

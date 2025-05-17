@@ -4,9 +4,11 @@ import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserRepository;
-import com.bb.webcanvasservice.security.auth.JwtManager;
+import com.bb.webcanvasservice.common.JwtManager;
+import com.bb.webcanvasservice.websocket.registry.SessionRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -95,6 +97,8 @@ class CanvasWebSocketControllerTest {
     private UserRepository userRepository;
     @Autowired
     private CanvasTestDataLoader testDataLoader;
+    @Autowired
+    private SessionRegistry sessionRegistry;
 
 
     /**
@@ -170,6 +174,11 @@ class CanvasWebSocketControllerTest {
          */
         testUserJwt = jwtManager.generateToken(testDataLoader.testUser1.getId(), testDataLoader.testUser1.getFingerprint(), tokenExpiration);
         testUserSession = connect(testUserClient, testUserJwt);
+    }
+
+    @AfterEach
+    void clearSession() {
+        sessionRegistry.clear();
     }
 
     @Test
