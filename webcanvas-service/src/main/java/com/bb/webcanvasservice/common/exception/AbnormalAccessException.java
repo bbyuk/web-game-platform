@@ -7,6 +7,7 @@ import com.bb.webcanvasservice.common.code.ErrorCode;
  * TODO 로깅처리 추가
  */
 public class AbnormalAccessException extends BusinessException {
+
     public AbnormalAccessException() {
         super(ErrorCode.ABNORMAL_ACCESS, ErrorCode.ABNORMAL_ACCESS.getDefaultMessage());
     }

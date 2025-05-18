@@ -8,5 +8,6 @@ import java.util.List;
 public record WebSocketProperties(
         String endpoint,
         List<String> allowedOriginPatterns,
-        List<String> enabledBrokers
+        List<String> enabledBrokers,
+        int abnormalAccessLimit
 ) {}

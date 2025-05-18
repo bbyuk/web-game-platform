@@ -1,8 +1,8 @@
-package com.bb.webcanvasservice.config;
+package com.bb.webcanvasservice.websocket.config;
 
 import com.bb.webcanvasservice.config.properties.WebSocketProperties;
-import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.common.JwtManager;
+import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.websocket.interceptor.JwtAuthenticationChannelInterceptor;
 import com.bb.webcanvasservice.websocket.interceptor.SubscribeChannelInterceptor;
 import com.bb.webcanvasservice.websocket.registry.SessionRegistry;
@@ -74,7 +74,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(
                 new JwtAuthenticationChannelInterceptor(jwtManager, sessionRegistry),
-                new SubscribeChannelInterceptor(gameRoomService)
+                new SubscribeChannelInterceptor(gameRoomService, webSocketProperties)
         );
     }
 

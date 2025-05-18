@@ -10,6 +10,7 @@ import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
+import com.bb.webcanvasservice.domain.game.event.GameRoomEntranceEvent;
 import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
@@ -17,6 +18,7 @@ import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +50,11 @@ public class GameRoomService {
      * 설정 변수
      */
     private final GameProperties gameProperties;
+
+    /**
+     * 이벤트 퍼블리셔
+     */
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 요청자가 입장한 게임 방을 리턴한다.
@@ -176,6 +183,12 @@ public class GameRoomService {
         GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
         targetGameRoom.addEntrance(newGameRoomEntrance);
 
+        /**
+         * 게임 방 입장 이벤트 pub ->
+         * 게임 방 broker에 입장 send 위임
+         */
+        applicationEventPublisher.publishEvent(new GameRoomEntranceEvent(gameRoomId, userId));
+
         return new GameRoomEntranceResponse(targetGameRoom.getId(), newGameRoomEntrance.getId());
     }
 
@@ -273,18 +286,6 @@ public class GameRoomService {
     }
 
     /**
-     * 게임 방 입장 여부를 확인 해 웹소켓 서버의 게임 방 단위 이벤트 브로커 구독 여부를 체크한다.
-     *
-     * @param gameRoomId
-     * @param userId
-     * @return
-     */
-    @Transactional(readOnly = true)
-    public boolean canEnterWebSocketGameRoom(Long gameRoomId, Long userId) {
-        return gameRoomEntranceRepository.existsActiveEntrance(gameRoomId, userId);
-    }
-
-    /**
      * 게임 방에서 퇴장한다.
      * @param gameRoomEntranceId
      * @param userId
@@ -305,5 +306,17 @@ public class GameRoomService {
         if (gameRoom.getEntrances().isEmpty()) {
             gameRoom.close();
         }
+    }
+
+    /**
+     * 게임 방 입장 여부를 확인 해 웹소켓 서버의 게임 방 단위 이벤트 브로커 구독 여부를 체크한다.
+     *
+     * @param gameRoomId
+     * @param userId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public boolean canEnterWebSocketGameRoom(Long gameRoomId, Long userId) {
+        return gameRoomEntranceRepository.existsActiveEntrance(gameRoomId, userId);
     }
 }

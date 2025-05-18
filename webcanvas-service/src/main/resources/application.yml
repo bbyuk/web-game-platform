@@ -107,8 +107,9 @@ websocket:
     - "*"
   # 활성화 브로커 목록 (message destination)
   enabled-brokers:
-    - "/canvas"
-    - "/chat"
+    - "/session"
+  # 비정상 접근 제한 횟수
+  abnormal-access-limit: 5
 
 ##### 비동기 관련 설정 #####
 async:

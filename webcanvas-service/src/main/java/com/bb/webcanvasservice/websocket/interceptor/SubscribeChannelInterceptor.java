@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.websocket.interceptor;
 
-import com.bb.webcanvasservice.domain.canvas.CanvasService;
-import com.bb.webcanvasservice.domain.game.GameRoomService;
+import com.bb.webcanvasservice.config.properties.WebSocketProperties;
 import com.bb.webcanvasservice.domain.auth.WebCanvasAuthentication;
+import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.web.security.exception.BadAccessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +25,8 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
 
     private final GameRoomService gameRoomService;
 
+    private final WebSocketProperties webSocketProperties;
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         var accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
@@ -32,8 +34,13 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
         if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
             WebCanvasAuthentication authentication = (WebCanvasAuthentication) SecurityContextHolder.getContext().getAuthentication();
             String destination = accessor.getDestination();
+            String ipAddress = accessor.getSessionAttributes() != null
+                    ? (String) accessor.getSessionAttributes().get("IP_ADDRESS") : "";
 
-            if (StringUtils.hasText(destination) && destination.startsWith(CanvasService.CANVAS_DESTINATION_PREFIX)) {
+            log.info("WebSocket CONNECT from IP: {}", ipAddress);
+
+
+            if (StringUtils.hasText(destination) && webSocketProperties.enabledBrokers().stream().anyMatch(destination::startsWith) ) {
                 /**
                  * 입장한 게임 방의 Canvas websocket 서버에 구독 요청 시 구독 요청이 유효한지 검증
                  */
