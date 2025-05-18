@@ -136,7 +136,7 @@ export default function GameRoomPage() {
       onError: frame => {
         console.log(frame);
       },
-      topic: `canvas/${gameRoomId}`
+      topic: `/session/${gameRoomId}`
     };
 
     stompClientRef.current = getStompClient(options);
@@ -170,6 +170,7 @@ export default function GameRoomPage() {
     return () => {
       leftSidebar.clear();
       rightSidebar.clear();
+      stompClientRef.current.deactivate();
     };
   }, []);
 
