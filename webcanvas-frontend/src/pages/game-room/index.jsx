@@ -9,6 +9,7 @@ import { pages } from '@/router/index.jsx';
 import { ArrowLeft } from 'lucide-react';
 import { getApiClient } from '@/client/http/index.jsx';
 import { getWebSocketClient } from '@/client/stomp/index.jsx';
+import {useAuthentication} from "@/contexts/authentication/index.jsx";
 
 export default function GameRoomPage() {
   // 현재 캔버스의 획 모음
@@ -19,6 +20,8 @@ export default function GameRoomPage() {
 
   // 전역 컨텍스트
   const { topTabs, leftSidebar, rightSidebar } = useApplicationContext();
+
+  const { authenticatedUserId } = useAuthentication();
 
   const { apiLock } = useApiLock();
 
@@ -135,8 +138,8 @@ export default function GameRoomPage() {
           // 서버로부터 받은 이벤트가 없음
           return;
         }
-        const { event } = frame;
-        if (event === "ROOM/ENTRANCE" || event === "ROOM/EXIT") {
+        const { event, userId } = frame;
+        if ((event === "ROOM/ENTRANCE" || event === "ROOM/EXIT") && authenticatedUserId !== userId) {
           /**
            * 다른 사람 입장 OR 퇴장 이벤트 발생시
            */

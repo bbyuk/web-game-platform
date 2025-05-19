@@ -16,19 +16,21 @@ export const useAuthentication = () => useContext(AuthenticationContext);
  */
 export const AuthenticationProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authenticatedUserId, setAuthenticatedUserId] = useState(null);
   const apiClient = getApiClient();
   const navigate = useNavigate();
 
 
-  const onAuthenticationSuccess = () => {
+  const onAuthenticationSuccess = (userId) => {
+    setAuthenticatedUserId(userId);
     setIsAuthenticated(true);
   };
 
-  const onLoginSuccess = (fingerprint, accessToken) => {
+  const onLoginSuccess = (userId, fingerprint, accessToken) => {
     localStorage.setItem(STORAGE_KEY.FINGERPRINT, fingerprint);
     localStorage.setItem(STORAGE_KEY.ACCESS_TOKEN, accessToken);
 
-    onAuthenticationSuccess();
+    onAuthenticationSuccess(userId);
   }
 
   const onAuthenticationFailed = () => {
@@ -43,9 +45,9 @@ export const AuthenticationProvider = ({ children }) => {
      */
     apiClient
       .get(auth.authentication)
-      .then(success => {
-        if (success) {
-          onAuthenticationSuccess();
+      .then(userId => {
+        if (userId) {
+          onAuthenticationSuccess(userId);
         } else {
           onAuthenticationFailed();
         }
@@ -59,9 +61,9 @@ export const AuthenticationProvider = ({ children }) => {
         const fingerprint = localStorage.getItem(STORAGE_KEY.FINGERPRINT);
         apiClient
           .post(auth.login, {fingerprint: fingerprint})
-          .then(async ({fingerprint, accessToken, success}) => {
+          .then(async ({userId, fingerprint, accessToken, success}) => {
             if (success) {
-              onLoginSuccess(fingerprint, accessToken);
+              onLoginSuccess(userId, fingerprint, accessToken);
             }
           })
           .catch(error => {
@@ -83,7 +85,8 @@ export const AuthenticationProvider = ({ children }) => {
   return (
     <AuthenticationContext.Provider
       value={{
-        isAuthenticated
+        isAuthenticated,
+        authenticatedUserId
       }}
     >
       {children}
