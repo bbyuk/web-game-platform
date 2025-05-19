@@ -10,6 +10,7 @@ import { ArrowLeft } from 'lucide-react';
 import { getApiClient } from '@/client/http/index.jsx';
 import { getWebSocketClient } from '@/client/stomp/index.jsx';
 import {useAuthentication} from "@/contexts/authentication/index.jsx";
+import SidePanelFooterButton from "@/components/layouts/side-panel/footer-button/index.jsx";
 
 export default function GameRoomPage() {
   // 현재 캔버스의 획 모음
@@ -87,6 +88,13 @@ export default function GameRoomPage() {
   };
 
   /**
+   * 게임을 시작한다.
+   */
+  const startGame = () => {
+    alert("게임 시작");
+  };
+
+  /**
    * left sidebar set
    * @param response
    */
@@ -107,6 +115,8 @@ export default function GameRoomPage() {
         exitGameRoom(response.gameRoomEntranceId);
       }
     });
+
+    leftSidebar.setFooter(<SidePanelFooterButton label={"게임 시작"} onClick={startGame} disabled={response.enteredUsers.length === 1}/>);
   };
 
   /**
@@ -192,9 +202,7 @@ export default function GameRoomPage() {
       }
     ];
 
-    /*
-     * TODO 웹소켓 접속 - 구독 - 메세지 전송 ( 방입장 브로드캐스팅 )
-     */
+
     const options = {
       onConnect: frame => {
         console.log(`connected At GameRoom ${frame}`);

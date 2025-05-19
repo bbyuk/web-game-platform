@@ -23,12 +23,14 @@ export function ApplicationContextProvider({ children }) {
       button: false,
       onClick: () => {},
     },
+    leftSidebarFooter: (<></>),
     rightSidebarTitle: {
       label: "chat",
       icon: <MessageCircle size={20} className="text-gray-400" />,
       button: false,
       onClick: () => {},
     },
+    rightSidebarFooter: (<></>),
     currentGameRoomId: null,
     currentGameRoomEntranceId: null,
     currentGameRoomEnteredUsers: [],
@@ -47,13 +49,14 @@ export function ApplicationContextProvider({ children }) {
   const [leftSidebarEmptyPlaceholder, setLeftSidebarEmptyPlaceholder] = useState(
     init.leftSidebarEmptyPlaceholder
   );
-
   const [leftSidebarTitle, setLeftSidebarTitle] = useState(init.leftSidebarTitle);
+  const [leftSidebarFooter, setLeftSidebarFooter] = useState(init.leftSidebarFooter);
 
   /**
    * 우측 sidebar 관련 state
    */
   const [rightSidebarTitle, setRightSidebarTitle] = useState(init.rightSidebarTitle);
+  const [rightSidebarFooter, setRightSidebarFooter] = useState(init.rightSidebarFooter);
 
   /**
    * 현재 입장한 게임 방 관련 state
@@ -179,6 +182,7 @@ export function ApplicationContextProvider({ children }) {
     items: leftSidebarItems,
     emptyPlaceholder: leftSidebarEmptyPlaceholder,
     title: leftSidebarTitle,
+    footer: leftSidebarFooter,
     setItems: (value) => {
       setLeftSidebarItems(value);
     },
@@ -188,10 +192,14 @@ export function ApplicationContextProvider({ children }) {
     setTitle: (value) => {
       setLeftSidebarTitle(value);
     },
+    setFooter: (value) => {
+      setLeftSidebarFooter(value);
+    },
     clear: () => {
       setLeftSidebarItems(init.leftSidebarItems);
       setLeftSidebarEmptyPlaceholder(init.leftSidebarEmptyPlaceholder);
       setLeftSidebarTitle(init.leftSidebarTitle);
+      setLeftSidebarFooter(init.leftSidebarFooter);
     },
   };
 
@@ -201,8 +209,10 @@ export function ApplicationContextProvider({ children }) {
    */
   const rightSidebar = {
     title: rightSidebarTitle,
+    footer: rightSidebarFooter,
     clear: () => {
       setRightSidebarTitle(init.rightSidebarTitle);
+      setRightSidebarFooter(init.rightSidebarFooter);
     },
   };
 

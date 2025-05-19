@@ -19,7 +19,7 @@ export default function MainLayout() {
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-gray-200">
       <div className="flex flex-1 overflow-hidden">
-        <SidePanel left title={leftSidebar.title}>
+        <SidePanel left title={leftSidebar.title} footer={leftSidebar.footer}>
           <ItemList value={leftSidebar.items} emptyPlaceholder={leftSidebar.emptyPlaceholder} />
         </SidePanel>
 
