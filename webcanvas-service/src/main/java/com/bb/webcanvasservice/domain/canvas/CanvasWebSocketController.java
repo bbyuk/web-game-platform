@@ -24,7 +24,7 @@ public class CanvasWebSocketController {
      * @param stroke
      * @param authentication
      */
-    @MessageMapping("canvas/{gameRoomId}/draw/stroke")
+    @MessageMapping("session/{gameRoomId}/canvas/stroke")
     public void broadcastStrokeOnRoom(@DestinationVariable("gameRoomId") Long gameRoomId, Stroke stroke, @Authenticated WebCanvasAuthentication authentication) {
         log.info("클라이언트로부터 메세지 받음");
         canvasService.broadcastStrokeOnRoom(stroke, authentication.getUserId());

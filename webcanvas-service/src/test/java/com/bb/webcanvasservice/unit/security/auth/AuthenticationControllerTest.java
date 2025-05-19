@@ -72,7 +72,7 @@ class AuthenticationControllerTest {
         BDDMockito.given(jwtManager.generateToken(any(), any(), anyLong())).willReturn(token);
 
         BDDMockito.given(authenticationService.login(any()))
-                .willReturn(new AuthenticationInnerResponse(fingerprint, realJwtManager.generateToken(userId, fingerprint, expiration), realJwtManager.generateToken(userId, fingerprint, expiration), true));
+                .willReturn(new AuthenticationInnerResponse(userId, fingerprint, realJwtManager.generateToken(userId, fingerprint, expiration), realJwtManager.generateToken(userId, fingerprint, expiration), true));
 
         LoginRequest loginRequest = new LoginRequest(fingerprint);
 
@@ -101,7 +101,7 @@ class AuthenticationControllerTest {
         BDDMockito.given(jwtManager.generateToken(any(), any(), anyLong())).willReturn(token);
 
         BDDMockito.given(authenticationService.login(any()))
-                .willReturn(new AuthenticationInnerResponse(fingerprint, realJwtManager.generateToken(userId, fingerprint, expiration), realJwtManager.generateToken(userId, fingerprint, expiration), true));
+                .willReturn(new AuthenticationInnerResponse(userId, fingerprint, realJwtManager.generateToken(userId, fingerprint, expiration), realJwtManager.generateToken(userId, fingerprint, expiration), true));
 
         LoginRequest loginRequest = new LoginRequest(fingerprint);
 
@@ -138,6 +138,7 @@ class AuthenticationControllerTest {
 
         BDDMockito.given(authenticationService.refreshToken(any()))
                 .willReturn(new AuthenticationInnerResponse(
+                        userId,
                         fingerprint,
                         realJwtManager.generateToken(userId, fingerprint, refreshTokenExpiration),
                         realJwtManager.generateToken(userId, fingerprint, refreshTokenExpiration),
@@ -177,6 +178,7 @@ class AuthenticationControllerTest {
 
         BDDMockito.given(authenticationService.refreshToken(any()))
                 .willReturn(new AuthenticationInnerResponse(
+                        userId,
                         fingerprint,
                         realJwtManager.generateToken(userId, fingerprint, accessTokenExpiration),
                         realJwtManager.generateToken(userId, fingerprint, accessTokenExpiration),

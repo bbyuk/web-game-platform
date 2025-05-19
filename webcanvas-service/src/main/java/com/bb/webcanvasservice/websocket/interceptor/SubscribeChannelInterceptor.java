@@ -39,15 +39,18 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
 
             log.info("WebSocket CONNECT from IP: {}", ipAddress);
 
-
-            if (StringUtils.hasText(destination) && webSocketProperties.enabledBrokers().stream().anyMatch(destination::startsWith) ) {
+            /**
+             * 게임 방 구독 처리
+             */
+            if (StringUtils.hasText(destination)
+                    && destination.startsWith(webSocketProperties.topic().main().gameRoom())) {
                 /**
                  * 입장한 게임 방의 Canvas websocket 서버에 구독 요청 시 구독 요청이 유효한지 검증
                  */
                 Long userId = authentication.getUserId();
                 Long gameRoomId = extractGameRoomId(destination);
 
-                if (!gameRoomService.canEnterWebSocketGameRoom(gameRoomId, userId)) {
+                if (!gameRoomService.canSubscribeGameRoomTopic(gameRoomId, userId)) {
                     log.debug("현재 게임 방에 입장된 정보가 없음.");
                     log.debug("gameRoomId : {}", gameRoomId);
                     log.debug("userId : {}", userId);
@@ -60,8 +63,15 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
         return ChannelInterceptor.super.preSend(message, channel);
     }
 
+    /**
+     * /session/{gameRoomId}/**
+     * 인 게임 방 관련 토픽들로부터 gameRoomId를 추출한다.
+     *
+     * @param destination
+     * @return
+     */
     private Long extractGameRoomId(String destination) {
         String[] parts = destination.split("/");
-        return Long.parseLong(parts[parts.length - 1]);
+        return Long.parseLong(parts[2]);
     }
 }

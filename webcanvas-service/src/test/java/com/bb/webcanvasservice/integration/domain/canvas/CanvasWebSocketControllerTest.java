@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.integration.domain.canvas;
 
+import com.bb.webcanvasservice.config.properties.WebSocketProperties;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.domain.user.User;
@@ -63,15 +64,16 @@ class CanvasWebSocketControllerTest {
 
     @LocalServerPort
     private int port;
-    private String WEBSOCKET_URL;
-    private final String CANVAS_SUBSCRIBE_TOPIC = "/canvas";
-    private final String SEND_DESTINATION = "/canvas/draw/stroke";
 
-    private final String STROKE_SEND_DOMAIN = "/canvas";
-    private final String STROKE_SEND_API = "draw/stroke";
+    @Autowired
+    private WebSocketProperties webSocketProperties;
+
+    private String WEBSOCKET_URL;
+    private final String GAME_ROOM_TOPIC = "session";
+    private final String CANVAS_TOPIC = "canvas";
 
     private String getStrokeSendDestination(Long gameRoomId) {
-        return List.of(STROKE_SEND_DOMAIN, String.valueOf(gameRoomId), STROKE_SEND_API).stream().collect(Collectors.joining("/"));
+        return String.format("/session/%d/canvas/stroke", gameRoomId);
     }
 
     /**
@@ -102,13 +104,16 @@ class CanvasWebSocketControllerTest {
 
 
     /**
-     * 테스트 클라이언트 게임 방 구독 메소드
+     * 테스트 클라이언트 게임 방 캔버스 구독 메소드
      * @param gameRoomId
      * @return
      */
     private CompletableFuture<Stroke> subscribeRoomCanvas(StompSession session, Long gameRoomId) {
         CompletableFuture<Stroke> subscribeFuture = new CompletableFuture<>();
-        session.subscribe(String.format("%s/%d", CANVAS_SUBSCRIBE_TOPIC, gameRoomId), new StompFrameHandler() {
+        String subscribeTopic = String.format("%s/%d/%s", webSocketProperties.topic().main().gameRoom(), gameRoomId, webSocketProperties.topic().sub().canvas());
+
+        System.out.println("subscribeTopic = " + subscribeTopic);
+        session.subscribe(subscribeTopic, new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
                 return Object.class;

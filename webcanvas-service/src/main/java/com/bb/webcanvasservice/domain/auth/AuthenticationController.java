@@ -2,10 +2,10 @@ package com.bb.webcanvasservice.domain.auth;
 
 import com.bb.webcanvasservice.common.JwtManager;
 import com.bb.webcanvasservice.common.code.ErrorCode;
-import com.bb.webcanvasservice.web.security.SecurityProperties;
 import com.bb.webcanvasservice.domain.auth.dto.request.LoginRequest;
 import com.bb.webcanvasservice.domain.auth.dto.response.AuthenticationApiResponse;
 import com.bb.webcanvasservice.domain.auth.dto.response.AuthenticationInnerResponse;
+import com.bb.webcanvasservice.web.security.SecurityProperties;
 import com.bb.webcanvasservice.web.security.exception.ApplicationAuthenticationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,10 +44,10 @@ public class AuthenticationController {
     /**
      * accessToken으로 인증 처리
      */
-    @Operation(summary = "토큰 인증", description = "클라이언트의 토큰을 받아 인증 체크한다.")
+    @Operation(summary = "토큰 인증", description = "클라이언트의 토큰을 받아 인증 체크 후 userId를 리턴한다.")
     @GetMapping("authentication")
-    public ResponseEntity<Boolean> authenticateWithAccessToken() {
-        return ResponseEntity.ok(true);
+    public ResponseEntity<Long> authenticateWithAccessToken(@Authenticated WebCanvasAuthentication authentication) {
+        return ResponseEntity.ok(authentication.getUserId());
     }
 
     /**
@@ -66,7 +66,7 @@ public class AuthenticationController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenResponseCookie.toString())
-                .body(new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), authenticationInnerResponse.accessToken(), true));
+                .body(new AuthenticationApiResponse(authenticationInnerResponse.userId(), authenticationInnerResponse.fingerprint(), authenticationInnerResponse.accessToken(), true));
     }
 
 
@@ -89,7 +89,7 @@ public class AuthenticationController {
 
         AuthenticationInnerResponse authenticationInnerResponse = authenticationService.refreshToken(refreshToken);
 
-        AuthenticationApiResponse responseBody = new AuthenticationApiResponse(authenticationInnerResponse.fingerprint(), authenticationInnerResponse.accessToken(), true);
+        AuthenticationApiResponse responseBody = new AuthenticationApiResponse(authenticationInnerResponse.userId(), authenticationInnerResponse.fingerprint(), authenticationInnerResponse.accessToken(), true);
         ResponseCookie refreshTokenResponseCookie = getResponseCookie(securityProperties.cookie().refreshToken(), authenticationInnerResponse.refreshToken(), securityProperties.refreshTokenExpirationSeconds());
 
         return authenticationInnerResponse.refreshTokenReissued()

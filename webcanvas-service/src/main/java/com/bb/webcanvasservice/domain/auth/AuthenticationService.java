@@ -48,7 +48,7 @@ public class AuthenticationService {
         String refreshToken = jwtManager.generateToken(user.getId(), user.getFingerprint(), securityProperties.refreshTokenExpiration());
         user.updateRefreshToken(refreshToken);
 
-        return new AuthenticationInnerResponse(user.getFingerprint(), accessToken, refreshToken, true);
+        return new AuthenticationInnerResponse(user.getId(), user.getFingerprint(), accessToken, refreshToken, true);
     }
 
     /**
@@ -90,6 +90,6 @@ public class AuthenticationService {
             refreshTokenReissued = true;
         }
 
-        return new AuthenticationInnerResponse(user.getFingerprint(), reissuedAccessToken, user.getRefreshToken(), refreshTokenReissued);
+        return new AuthenticationInnerResponse(user.getId(), user.getFingerprint(), reissuedAccessToken, user.getRefreshToken(), refreshTokenReissued);
     }
 }

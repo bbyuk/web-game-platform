@@ -82,13 +82,16 @@ application:
 websocket:
   # 연결 엔드포인트
   endpoint: /ws/canvas
+  # 활성화 브로커 목록 (message destination)
+  topic:
+    main:
+      game-room: /session
+    sub:
+      canvas: canvas
+      chat: chat
   # CORS 허용 목록
   allowed-origin-patterns:
     - "*"
-  # 활성화 브로커 목록 (message destination)
-  enabled-brokers:
-    - "/canvas"
-    - "/chat"
 
 ##### 비동기 관련 설정 #####
 async:

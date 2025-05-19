@@ -178,7 +178,7 @@ public class GameRoomService {
         GameRoomEntrance gameRoomEntrance =
                 new GameRoomEntrance(
                         targetGameRoom
-                        , userService.finitdUserByUserId(userId)
+                        , userService.findUserByUserId(userId)
                         , String.format("%s %s", koreanAdjective, gameProperties.gameRoomUserNicknameNouns().get(enteredUserCounts)));
 
         GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
@@ -322,7 +322,7 @@ public class GameRoomService {
      * @return
      */
     @Transactional(readOnly = true)
-    public boolean canEnterWebSocketGameRoom(Long gameRoomId, Long userId) {
+    public boolean canSubscribeGameRoomTopic(Long gameRoomId, Long userId) {
         return gameRoomEntranceRepository.existsActiveEntrance(gameRoomId, userId);
     }
 }

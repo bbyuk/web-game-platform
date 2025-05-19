@@ -102,12 +102,16 @@ application:
 websocket:
   # 연결 엔드포인트
   endpoint: /ws/canvas
+  # 활성화 브로커 목록 (message destination)
+  topic:
+    main:
+      game-room: /session
+    sub:
+      canvas: canvas
+      chat: chat
   # CORS 허용 목록
   allowed-origin-patterns:
     - "*"
-  # 활성화 브로커 목록 (message destination)
-  enabled-brokers:
-    - "/session"
   # 비정상 접근 제한 횟수
   abnormal-access-limit: 5
 

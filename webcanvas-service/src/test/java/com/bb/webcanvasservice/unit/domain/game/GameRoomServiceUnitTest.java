@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -45,6 +46,9 @@ class GameRoomServiceUnitTest {
     @Mock
     private DictionaryService dictionaryService;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     /**
      * mock
      */
@@ -62,7 +66,7 @@ class GameRoomServiceUnitTest {
 
     @BeforeEach
     void setup() {
-        this.gameRoomService = new GameRoomService(userService, dictionaryService, gameRoomRepository, gameRoomEntranceRepository, gameProperties);
+        this.gameRoomService = new GameRoomService(userService, dictionaryService, gameRoomRepository, gameRoomEntranceRepository, gameProperties, eventPublisher);
     }
 
     private final Random random = new Random();
@@ -85,6 +89,7 @@ class GameRoomServiceUnitTest {
 
         when(userService.findUserByUserId(any(Long.class)))
                 .thenReturn(testUser);
+
 
         // 테스트 게임 방
         String joinCode = JoinCodeGenerator.generate(10);

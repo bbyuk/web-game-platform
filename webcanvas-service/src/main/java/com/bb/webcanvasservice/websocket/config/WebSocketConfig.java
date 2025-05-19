@@ -16,6 +16,8 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -44,7 +46,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // 메시지 브로커 활성화
-        registry.enableSimpleBroker(webSocketProperties.enabledBrokers().toArray(String[]::new));
+        registry.enableSimpleBroker(webSocketProperties.topic().main().gameRoom());
 
         // 클라이언트로 메시지를 보낼 때 사용할 prefix 설정 (필요시)
         // registry.setApplicationDestinationPrefixes("");
