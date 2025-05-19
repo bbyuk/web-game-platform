@@ -187,7 +187,7 @@ public class GameRoomService {
          * 게임 방 입장 이벤트 pub ->
          * 게임 방 broker에 입장 send 위임
          */
-        applicationEventPublisher.publishEvent(new GameRoomEntranceEvent(gameRoomId, userId));
+        applicationEventPublisher.publishEvent(new GameRoomEntranceEvent(gameRoomId));
 
         return new GameRoomEntranceResponse(targetGameRoom.getId(), newGameRoomEntrance.getId());
     }
