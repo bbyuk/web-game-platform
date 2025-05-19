@@ -8,7 +8,7 @@ import { useApiLock } from '@/api/lock/index.jsx';
 import { pages } from '@/router/index.jsx';
 import { ArrowLeft } from 'lucide-react';
 import { getApiClient } from '@/client/http/index.jsx';
-import { getStompClient } from '@/client/stomp/index.jsx';
+import { getWebSocketClient } from '@/client/stomp/index.jsx';
 
 export default function GameRoomPage() {
   // 현재 캔버스의 획 모음
@@ -131,7 +131,17 @@ export default function GameRoomPage() {
         console.log(frame);
       },
       onMessage: frame => {
-        console.log(frame);
+        if (!frame.event) {
+          // 서버로부터 받은 이벤트가 없음
+          return;
+        }
+        const { event } = frame;
+        if (event === "ROOM/ENTRANCE" || event === "ROOM/EXIT") {
+          /**
+           * 다른 사람 입장 OR 퇴장 이벤트 발생시
+           */
+          onOtherUserStateChange();
+        }
       },
       onError: frame => {
         console.log(frame);
@@ -139,8 +149,23 @@ export default function GameRoomPage() {
       topic: `/session/${gameRoomId}`
     };
 
-    stompClientRef.current = getStompClient(options);
+    stompClientRef.current = getWebSocketClient(options);
   };
+
+  /**
+   * 다른 유저의 입장 및 퇴장 이벤트 발생시
+   * 현재 게임방 정보를 재조회해 leftbar setting
+   */
+  const onOtherUserStateChange = () => {
+    findCurrentGameRoomInfo()
+      .then(response => {
+        if (!response) {
+          return;
+        }
+
+        setLeftSidebar(response);
+      })
+  }
 
   /**
    * =========================== 이벤트 핸들러 =============================

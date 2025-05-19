@@ -1,7 +1,7 @@
 import { Client } from '@stomp/stompjs';
 import { STORAGE_KEY } from '@/constants/storage-key.js';
 
-export const getStompClient = ({ topic, onConnect, onMessage, onError }) => {
+export const getWebSocketClient = ({ topic, onConnect, onMessage, onError }) => {
   const client = new Client({
     webSocketFactory: () => new WebSocket("ws://localhost:9200/ws/canvas"),
     connectHeaders: {
