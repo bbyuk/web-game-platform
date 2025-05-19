@@ -50,7 +50,7 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
                 Long userId = authentication.getUserId();
                 Long gameRoomId = extractGameRoomId(destination);
 
-                if (!gameRoomService.canSubscribeGameRoomTopic(gameRoomId, userId)) {
+                if (!gameRoomService.isEnteredRoom(gameRoomId, userId)) {
                     log.debug("현재 게임 방에 입장된 정보가 없음.");
                     log.debug("gameRoomId : {}", gameRoomId);
                     log.debug("userId : {}", userId);

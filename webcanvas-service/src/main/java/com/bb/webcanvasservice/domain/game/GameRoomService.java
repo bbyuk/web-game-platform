@@ -315,14 +315,14 @@ public class GameRoomService {
     }
 
     /**
-     * 게임 방 입장 여부를 확인 해 웹소켓 서버의 게임 방 단위 이벤트 브로커 구독 여부를 체크한다.
+     * 게임 방 입장 여부를 확인한다.
      *
      * @param gameRoomId
      * @param userId
      * @return
      */
     @Transactional(readOnly = true)
-    public boolean canSubscribeGameRoomTopic(Long gameRoomId, Long userId) {
+    public boolean isEnteredRoom(Long gameRoomId, Long userId) {
         return gameRoomEntranceRepository.existsActiveEntrance(gameRoomId, userId);
     }
 }

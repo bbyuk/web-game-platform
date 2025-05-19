@@ -227,8 +227,8 @@ class CanvasWebSocketControllerTest {
         // then
         Stroke result = subscribeFuture.get(BROADCASTING_TIMEOUT, TimeUnit.MILLISECONDS);
 
-        Assertions.assertThat(result.getLineWidth()).isEqualTo(testStroke.getLineWidth());
-        Assertions.assertThat(result.getPoints().size()).isEqualTo(testStroke.getPoints().size());
+        Assertions.assertThat(result.lineWidth()).isEqualTo(testStroke.lineWidth());
+        Assertions.assertThat(result.points().size()).isEqualTo(testStroke.points().size());
     }
 
 

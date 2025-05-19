@@ -1,7 +1,6 @@
 package com.bb.webcanvasservice.integration.domain.canvas;
 
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
-import com.bb.webcanvasservice.domain.canvas.dto.Point;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
@@ -35,24 +34,11 @@ public class CanvasTestDataLoader {
     User testUser2;
     User testUser3;
     GameRoom testGameRoom;
-    final Stroke testStroke = Stroke.builder()
-            .color("FF5733")  // 예제 색상 (주황빛 빨강)
-            .lineWidth(5)
-            .points(List.of(
-                    Point.builder()
-                            .x(10)
-                            .y(20)
-                            .build(),
-                    Point.builder()
-                            .x(20)
-                            .y(30)
-                            .build(),
-                    Point.builder()
-                            .x(30)
-                            .y(40)
-                            .build()
-            ))
-            .build();
+    final Stroke testStroke =
+            new Stroke("FF5733", 5, List.of(
+                    new Stroke.Point(0.46895640686922063, 0.24273767605633803),
+                    new Stroke.Point(0.46895640686922063, 0.24273767605633803)
+            ));
 
     @EventListener(ApplicationReadyEvent.class)
     public void setupTestData() {
