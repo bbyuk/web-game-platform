@@ -47,6 +47,7 @@ export default function GameRoomPage() {
   const onStrokeHandler = (stroke) => {
     if (stroke.length > 0) {
       setStrokes((prevItems) => [...prevItems, stroke]);
+      console.log(stroke);
     }
   };
 
@@ -82,6 +83,10 @@ export default function GameRoomPage() {
       });
   };
 
+  /**
+   * left sidebar set
+   * @param response
+   */
   const setLeftSidebar = (response) => {
     if (response.enteredUsers) {
       leftSidebar.setItems(
@@ -126,30 +131,69 @@ export default function GameRoomPage() {
       stompClientRef.current.deactivate();
     }
 
+    /**
+     * 게임 방 메세지 브로커 핸들러
+     * @param frame
+     */
+    const gameRoomEventHandler = frame => {
+      if (!frame.event) {
+        // 서버로부터 받은 이벤트가 없음
+        return;
+      }
+      const { event, userId } = frame;
+      if ((event === "ROOM/ENTRANCE" || event === "ROOM/EXIT") && authenticatedUserId !== userId) {
+        /**
+         * 다른 사람 입장 OR 퇴장 이벤트 발생시
+         */
+        onOtherUserStateChange();
+      }
+    };
+
+    /**
+     * 채팅 메세지 브로커 핸들러
+     * @param frame
+     */
+    const gameRoomChatHandler = frame => {
+      console.log(frame);
+    };
+
+    /**
+     * 캔버스 메세지 브로커 핸들러
+     * @param frame
+     */
+    const gameRoomCanvasHandler = frame => {
+      console.log(frame);
+    };
+
+    const subscribeTopics = [
+      // 게임 방 공통 이벤트 broker
+      {
+        destination: `/session/${gameRoomId}`,
+        messageHandler: gameRoomEventHandler
+      },
+      // 게임 방 내 채팅 broker
+      {
+        destination: `/session/${gameRoomId}/chat`,
+        messageHandler: gameRoomChatHandler
+      },
+      // 게임 방 내 캔버스 stroke broker
+      {
+        destination: `/session/${gameRoomId}/canvas`,
+        messageHandler: gameRoomCanvasHandler
+      }
+    ];
+
     /*
      * TODO 웹소켓 접속 - 구독 - 메세지 전송 ( 방입장 브로드캐스팅 )
      */
     const options = {
       onConnect: frame => {
-        console.log(frame);
-      },
-      onMessage: frame => {
-        if (!frame.event) {
-          // 서버로부터 받은 이벤트가 없음
-          return;
-        }
-        const { event, userId } = frame;
-        if ((event === "ROOM/ENTRANCE" || event === "ROOM/EXIT") && authenticatedUserId !== userId) {
-          /**
-           * 다른 사람 입장 OR 퇴장 이벤트 발생시
-           */
-          onOtherUserStateChange();
-        }
+        console.log(`connected At GameRoom ${frame}`);
       },
       onError: frame => {
         console.log(frame);
       },
-      topic: `/session/${gameRoomId}`
+      topics: subscribeTopics
     };
 
     stompClientRef.current = getWebSocketClient(options);
