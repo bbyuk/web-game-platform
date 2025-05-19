@@ -1,14 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 export default function Canvas({
-  strokes = [],
-  onStroke = (stroke) => {},
-  color = "black",
-  reRenderingSignal = false,
-  afterReRendering = () => {},
-  className = String(),
-}) {
-  const elementId = "canvas";
+                                 strokes = [],
+                                 onStroke = (stroke) => {
+                                 },
+                                 color = 'black',
+                                 lineWidth = 5,
+                                 reRenderingSignal = false,
+                                 afterReRendering = () => {
+                                 },
+                                 className = String()
+                               }) {
+  const initialStroke = {
+    color: color,
+    lineWidth: lineWidth,
+    points: []
+  };
+
+  const elementId = 'canvas';
   /**
    * canvas ref
    * @type {React.RefObject<null>}
@@ -23,7 +32,7 @@ export default function Canvas({
   /**
    * Stroke 이벤트마다 집계되는 stroke 획 state
    */
-  const [currentStroke, setCurrentStroke] = useState([]);
+  const [currentStroke, setCurrentStroke] = useState(initialStroke);
 
   /**
    * resize 이벤트 디바운스 타이머
@@ -59,13 +68,20 @@ export default function Canvas({
     if (painting) {
       ctx.lineTo(offsetX, offsetY);
       ctx.stroke();
-      setCurrentStroke((prevItems) => [...prevItems, { x: scaledX, y: scaledY, color: color }]);
+
+      // setCurrentStroke((prevItems) => [...prevItems, { x: scaledX, y: scaledY, color: color }]);
+
+      setCurrentStroke({
+        color: color,
+        lineWidth: 5,
+        points: [...currentStroke.points, {x: scaledX, y: scaledY}]
+      });
     } else {
       ctx.beginPath();
       ctx.moveTo(offsetX, offsetY);
 
       onStroke(currentStroke);
-      setCurrentStroke([]);
+      setCurrentStroke(initialStroke);
     }
   };
 
@@ -103,16 +119,17 @@ export default function Canvas({
     const canvasWidth = canvasRef.current.width;
     const canvasHeight = canvasRef.current.height;
 
+    console.log(strokes);
+
     strokes.forEach((stroke) => {
       ctx.beginPath();
-      ctx.strokeStyle = stroke[0].color;
-      ctx.moveTo(stroke[0].x * canvasWidth, stroke[0].y * canvasHeight);
+      ctx.strokeStyle = stroke.color;
+      ctx.moveTo(stroke.points[0].x * canvasWidth, stroke.points[0].y * canvasHeight);
 
-      stroke.forEach((point, index) => {
+      stroke.points.forEach((point, index) => {
         if (index === 0) {
           return;
         }
-        ctx.strokeStyle = stroke[index].color;
         ctx.lineTo(point.x * canvasWidth, point.y * canvasHeight);
       });
 
@@ -136,21 +153,21 @@ export default function Canvas({
   const initCanvas = () => {
     const canvas = canvasRef.current;
     const parent = canvas.parentElement;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
 
     contextRef.current = ctx;
 
     const { clientWidth, clientHeight } = parent;
 
     // 실제 캔버스 내부 크기 설정 (픽셀 크기)
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
 
     canvas.width = clientWidth;
     canvas.height = clientHeight;
 
-    ctx.lineWidth = 5;
-    ctx.lineCap = "round";
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
     ctx.strokeStyle = color;
   };
 
@@ -162,10 +179,10 @@ export default function Canvas({
    * onComponentLoad
    */
   useEffect(() => {
-    window.addEventListener("resize", onResize);
+    window.addEventListener('resize', onResize);
 
     return () => {
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
@@ -205,7 +222,7 @@ export default function Canvas({
   return (
     <div
       className={`relative w-full bg-white rounded shadow-lg flex justify-center items-center`}
-      style={{ aspectRatio: "4 / 3" }}
+      style={{ aspectRatio: '4 / 3' }}
     >
       <canvas
         id={elementId}

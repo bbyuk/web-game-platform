@@ -33,7 +33,7 @@ export default function GameRoomPage() {
 
   const [gameRoomId, setGameRoomId] = useState(null);
 
-  const stompClientRef = useRef(null);
+  const webSocketClientRef = useRef(null);
 
 
   /**
@@ -45,9 +45,12 @@ export default function GameRoomPage() {
    * @param stroke
    */
   const onStrokeHandler = (stroke) => {
-    if (stroke.length > 0) {
+    if (stroke.points.length > 0) {
       setStrokes((prevItems) => [...prevItems, stroke]);
-      console.log(stroke);
+      webSocketClientRef.current.publish({
+        destination: `/session/${gameRoomId}/canvas/stroke`,
+        body: JSON.stringify(stroke)
+      });
     }
   };
 
@@ -125,10 +128,14 @@ export default function GameRoomPage() {
     }
   };
 
-  const openChannel = (gameRoomId) => {
-    if (stompClientRef.current) {
+  /**
+   * 웹소켓 서버에 연결하고 현재 방에 해당하는 브로커를 구독한다.
+   * @param gameRoomId
+   */
+  const connectToWebSocket = (gameRoomId) => {
+    if (webSocketClientRef.current) {
       // 이전 client 존재시 deactivate
-      stompClientRef.current.deactivate();
+      webSocketClientRef.current.deactivate();
     }
 
     /**
@@ -159,10 +166,12 @@ export default function GameRoomPage() {
 
     /**
      * 캔버스 메세지 브로커 핸들러
-     * @param frame
+     * @param stroke Stroke {color: String, lineWidth: Integer, points: [{x: double, y: double}]}
+     *
      */
-    const gameRoomCanvasHandler = frame => {
-      console.log(frame);
+    const gameRoomCanvasHandler = stroke => {
+      setStrokes((prevItems) => [...prevItems, stroke]);
+      setReRenderingSignal(true);
     };
 
     const subscribeTopics = [
@@ -196,7 +205,7 @@ export default function GameRoomPage() {
       topics: subscribeTopics
     };
 
-    stompClientRef.current = getWebSocketClient(options);
+    webSocketClientRef.current = getWebSocketClient(options);
   };
 
   /**
@@ -228,7 +237,7 @@ export default function GameRoomPage() {
         setGameRoomId(response.gameRoomId);
 
         // stomp 연결
-        openChannel(response.gameRoomId);
+        connectToWebSocket(response.gameRoomId);
 
       })
       .catch((error) => alert(error));
@@ -242,7 +251,7 @@ export default function GameRoomPage() {
     return () => {
       leftSidebar.clear();
       rightSidebar.clear();
-      stompClientRef.current.deactivate();
+      webSocketClientRef.current.deactivate();
     };
   }, []);
 

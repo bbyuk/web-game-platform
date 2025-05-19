@@ -1,10 +1,9 @@
-import CenterPanel from "@/components/layouts/center-panel/index.jsx";
-import { useEffect, useState } from "react";
-import { GitCommit, MessageCircle } from "lucide-react";
-import SidePanel from "@/components/layouts/side-panel/index.jsx";
-import { Outlet, useLocation } from "react-router-dom";
-import { useApplicationContext } from "@/contexts/index.jsx";
-import ItemList from "@/components/layouts/side-panel/item-list/index.jsx";
+import CenterPanel from '@/components/layouts/center-panel/index.jsx';
+import { useEffect } from 'react';
+import SidePanel from '@/components/layouts/side-panel/index.jsx';
+import { Outlet, useLocation } from 'react-router-dom';
+import { useApplicationContext } from '@/contexts/index.jsx';
+import ItemList from '@/components/layouts/side-panel/item-list/index.jsx';
 
 export default function MainLayout() {
   const location = useLocation();
