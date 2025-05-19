@@ -240,13 +240,18 @@ export default function GameRoomPage() {
         connectToWebSocket(response.gameRoomId);
 
       })
-      .catch((error) => alert(error));
+      .catch((error) => alert(error))
+      .finally(() => {
+        /**
+         * TODO 캔버스 팔레트 서비스 개발 및 조회 API로 변경
+         */
+        topTabs.setItems([
+          {label: "black"}, {label: "green"}, {label: "yellow"}, {label: "red"}, {label: "blue"}
+        ]);
+      });
   }, [location.pathname]);
 
   useEffect(() => {
-    /**
-     * TODO canvas 팔레트 서비스 개발 및 조회 API 요청
-     */
 
     return () => {
       leftSidebar.clear();
