@@ -8,5 +8,9 @@ import lombok.Getter;
  */
 @Getter
 public abstract class ApplicationEvent {
-    protected String event;
+    protected final String event;
+
+    protected ApplicationEvent(String event) {
+        this.event = event;
+    }
 }

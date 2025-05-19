@@ -8,10 +8,12 @@ import lombok.Getter;
  */
 @Getter
 public class GameRoomEntranceEvent extends ApplicationEvent {
-    private Long gameRoomId;
+    private final Long gameRoomId;
+    private final Long userId;
 
-    public GameRoomEntranceEvent(Long gameRoomId) {
-        this.event = "ROOM/ENTRANCE";
+    public GameRoomEntranceEvent(Long gameRoomId, Long userId) {
+        super("ROOM/ENTRANCE");
         this.gameRoomId = gameRoomId;
+        this.userId = userId;
     }
 }

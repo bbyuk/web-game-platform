@@ -11,6 +11,7 @@ import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.event.GameRoomEntranceEvent;
+import com.bb.webcanvasservice.domain.game.event.GameRoomExitEvent;
 import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
@@ -177,7 +178,7 @@ public class GameRoomService {
         GameRoomEntrance gameRoomEntrance =
                 new GameRoomEntrance(
                         targetGameRoom
-                        , userService.findUserByUserId(userId)
+                        , userService.finitdUserByUserId(userId)
                         , String.format("%s %s", koreanAdjective, gameProperties.gameRoomUserNicknameNouns().get(enteredUserCounts)));
 
         GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
@@ -187,7 +188,7 @@ public class GameRoomService {
          * 게임 방 입장 이벤트 pub ->
          * 게임 방 broker에 입장 send 위임
          */
-        applicationEventPublisher.publishEvent(new GameRoomEntranceEvent(gameRoomId));
+        applicationEventPublisher.publishEvent(new GameRoomEntranceEvent(gameRoomId, userId));
 
         return new GameRoomEntranceResponse(targetGameRoom.getId(), newGameRoomEntrance.getId());
     }
@@ -306,6 +307,11 @@ public class GameRoomService {
         if (gameRoom.getEntrances().isEmpty()) {
             gameRoom.close();
         }
+
+        /**
+         * 250519 게임방 퇴장시 이벤트 발행
+         */
+        applicationEventPublisher.publishEvent(new GameRoomExitEvent(gameRoom.getId(), userId));
     }
 
     /**
