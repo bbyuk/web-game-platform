@@ -142,9 +142,13 @@ export default function GameRoomPage() {
     webSocketClientRef.current = getWebSocketClient(options);
   };
 
+  /**
+   * 페이지 컴포넌트 unmount 시 현 페이지에서 설정한 전역설정 clear
+   *
+   * 웹소켓 연결 해제
+   */
   useEffect(() => {
     return () => {
-      console.log("clear on game-room unmount");
       webSocketClientRef.current.deactivate();
       leftSidebar.clear();
       rightSidebar.clear();
@@ -152,10 +156,16 @@ export default function GameRoomPage() {
     };
   }, []);
 
+  /**
+   * roomId 서버 조회 및 validation
+   */
   useEffect(() => {
     findCurrentGameRoomInfo().catch((error) => alert(error));
   }, [roomId]);
 
+  /**
+   * leftbar 리스트 등록
+   */
   useEffect(() => {
     if (enteredUsers.length > 0) {
       leftSidebar.setItems(
@@ -164,6 +174,9 @@ export default function GameRoomPage() {
     }
   }, [enteredUsers]);
 
+  /**
+   * leftbar title 등록
+   */
   useEffect(() => {
     leftSidebar.setTitle({
       label: "exit",
@@ -175,6 +188,9 @@ export default function GameRoomPage() {
     });
   }, [gameRoomEntranceId]);
 
+  /**
+   * 웹소켓 토픽 구독 및 메세지 핸들러 등록 useEffect
+   */
   useEffect(() => {
     if (!webSocketClientRef.current || !authenticatedUserIdRef.current) {
       return;
