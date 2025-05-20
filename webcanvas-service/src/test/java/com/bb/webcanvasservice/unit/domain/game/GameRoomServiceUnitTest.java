@@ -302,6 +302,8 @@ class GameRoomServiceUnitTest {
         Assertions.assertThat(enteredGameRoomInfo.enteredUsers().get(1).color()).isEqualTo("#0042ff");
         Assertions.assertThat(enteredGameRoomInfo.enteredUsers().get(2).color()).isEqualTo("#1e9000");
 
+        // 250520 - 게임 방 상태 필드 추가
+        Assertions.assertThat(enteredGameRoomInfo.gameRoomState()).isEqualTo(GameRoomState.WAITING);
     }
 
     @Test

@@ -266,14 +266,15 @@ public class GameRoomService {
     public GameRoomEntranceInfoResponse findEnteredGameRoomInfo(Long userId) {
         GameRoomEntrance userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId)
                 .orElseThrow(GameRoomEntranceNotFoundException::new);
+        GameRoom gameRoom = userEntrance.getGameRoom();
 
         AtomicInteger index = new AtomicInteger(0);
 
         return new GameRoomEntranceInfoResponse(
-                userEntrance.getGameRoom().getId(),
+                gameRoom.getId(),
                 userEntrance.getId(),
                 gameRoomEntranceRepository
-                        .findGameRoomEntrancesByGameRoomId(userEntrance.getGameRoom().getId())
+                        .findGameRoomEntrancesByGameRoomId(gameRoom.getId())
                         .stream()
                         .map(gameRoomEntrance ->
                                 new GameRoomEntranceInfoResponse.EnteredUserSummary(
@@ -282,7 +283,8 @@ public class GameRoomService {
                                         gameRoomEntrance.getNickname()
                                 )
                         )
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                gameRoom.getState()
         );
     }
 
