@@ -22,7 +22,7 @@ export default function GameRoomPlayingPage() {
   // 전역 컨텍스트
   const { topTabs, leftSidebar, rightSidebar } = useApplicationContext();
 
-  const { authenticatedUserId } = useAuthentication();
+  const { authenticatedUserIdRef } = useAuthentication();
 
   const { apiLock } = useApiLock();
 
@@ -163,7 +163,10 @@ export default function GameRoomPlayingPage() {
         return;
       }
       const { event, userId } = frame;
-      if ((event === "ROOM/ENTRANCE" || event === "ROOM/EXIT") && authenticatedUserId !== userId) {
+      if (
+        (event === "ROOM/ENTRANCE" || event === "ROOM/EXIT") &&
+        authenticatedUserIdRef.current !== userId
+      ) {
         /**
          * 다른 사람 입장 OR 퇴장 이벤트 발생시
          */

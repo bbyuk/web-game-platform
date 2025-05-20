@@ -5,7 +5,7 @@ import { getApiClient } from "@/client/http/index.jsx";
 import { pages } from "@/router/index.jsx";
 import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
 import { ArrowLeft } from "lucide-react";
-import { getWebSocketClient, subscribe } from "@/client/stomp/index.jsx";
+import { getWebSocketClient } from "@/client/stomp/index.jsx";
 import { useApplicationContext } from "@/contexts/index.jsx";
 import { useAuthentication } from "@/contexts/authentication/index.jsx";
 import { useApiLock } from "@/api/lock/index.jsx";
@@ -13,7 +13,7 @@ import { useApiLock } from "@/api/lock/index.jsx";
 export default function GameRoomPage() {
   const { roomId } = useParams();
   const { topTabs, leftSidebar, rightSidebar } = useApplicationContext();
-  const { authenticatedUserId } = useAuthentication();
+  const { authenticatedUserIdRef } = useAuthentication();
   const { apiLock } = useApiLock();
   const apiClient = getApiClient();
   const navigate = useNavigate();
@@ -108,71 +108,31 @@ export default function GameRoomPage() {
   };
 
   /**
+   * 다른 유저의 입장 및 퇴장 이벤트 발생시
+   * 현재 게임방 정보를 재조회해 leftbar setting
+   */
+  const onOtherUserStateChange = () => {
+    findCurrentGameRoomInfo().then((response) => {
+      if (!response) {
+        return;
+      }
+
+      setLeftSidebar(response);
+    });
+  };
+
+  /**
    * 웹소켓 서버에 연결하고 현재 방에 해당하는 브로커를 구독한다.
    * @param gameRoomId
    */
   const connectToWebSocket = (gameRoomId) => {
-    /**
-     * 다른 유저의 입장 및 퇴장 이벤트 발생시
-     * 현재 게임방 정보를 재조회해 leftbar setting
-     */
-    const onOtherUserStateChange = () => {
-      findCurrentGameRoomInfo().then((response) => {
-        if (!response) {
-          return;
-        }
-
-        setLeftSidebar(response);
-      });
-    };
-
-    /**
-     * 게임 방 메세지 브로커 핸들러
-     * @param frame
-     */
-    const gameRoomEventHandler = (frame) => {
-      if (!frame.event) {
-        // 서버로부터 받은 이벤트가 없음
-        return;
-      }
-      const { event, userId } = frame;
-      if (authenticatedUserId !== userId && (event === "ROOM/ENTRANCE" || event === "ROOM/EXIT")) {
-        /**
-         * 다른 사람 입장 OR 퇴장 이벤트 발생시
-         */
-        console.log(authenticatedUserId, userId);
-        onOtherUserStateChange();
-      }
-    };
-
-    /**
-     * 채팅 메세지 브로커 핸들러
-     * @param frame
-     */
-    const gameRoomChatHandler = (frame) => {
-      console.log(frame);
-    };
-
     if (webSocketClientRef.current) {
       // 이전 client 존재시 deactivate
       webSocketClientRef.current.deactivate();
     }
-    const subscribeTopics = [
-      // 게임 방 공통 이벤트 broker
-      {
-        destination: `/session/${gameRoomId}`,
-        messageHandler: gameRoomEventHandler,
-      },
-      // 게임 방 내 채팅 broker
-      {
-        destination: `/session/${gameRoomId}/chat`,
-        messageHandler: gameRoomChatHandler,
-      },
-    ];
-
     const options = {
       onConnect: (frame) => {
-        subscribe(webSocketClientRef.current, subscribeTopics);
+        console.log(frame);
       },
       onError: (frame) => {
         console.log(frame);
@@ -214,6 +174,56 @@ export default function GameRoomPage() {
       },
     });
   }, [gameRoomEntranceId]);
+
+  useEffect(() => {
+    if (!webSocketClientRef.current || !authenticatedUserIdRef.current) {
+      return;
+    }
+
+    /**
+     * 게임 방 메세지 브로커 핸들러
+     * @param frame
+     */
+    const gameRoomEventHandler = (frame) => {
+      if (!frame.event) {
+        // 서버로부터 받은 이벤트가 없음
+        return;
+      }
+      const { event, userId } = frame;
+      if (
+        authenticatedUserIdRef.current !== userId &&
+        (event === "ROOM/ENTRANCE" || event === "ROOM/EXIT")
+      ) {
+        /**
+         * 다른 사람 입장 OR 퇴장 이벤트 발생시
+         */
+        onOtherUserStateChange();
+      }
+    };
+
+    /**
+     * 채팅 메세지 브로커 핸들러
+     * @param frame
+     */
+    const gameRoomChatHandler = (frame) => {
+      console.log(frame);
+    };
+
+    const topics = [
+      // 게임 방 공통 이벤트 broker
+      {
+        destination: `/session/${roomId}`,
+        messageHandler: gameRoomEventHandler,
+      },
+      // 게임 방 내 채팅 broker
+      {
+        destination: `/session/${roomId}/chat`,
+        messageHandler: gameRoomChatHandler,
+      },
+    ];
+
+    webSocketClientRef.current.subscribe(topics);
+  }, [webSocketClientRef, authenticatedUserIdRef]);
 
   // 여기서 웹소켓 클라이언트 ref 내려주기
   return (

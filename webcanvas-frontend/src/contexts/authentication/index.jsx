@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { auth } from "@/api/index.js";
 import { getApiClient } from "@/client/http/index.jsx";
 import { useNavigate } from "react-router-dom";
@@ -16,12 +16,12 @@ export const useAuthentication = () => useContext(AuthenticationContext);
  */
 export const AuthenticationProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authenticatedUserId, setAuthenticatedUserId] = useState(null);
+  const authenticatedUserIdRef = useRef(null);
   const apiClient = getApiClient();
   const navigate = useNavigate();
 
   const onAuthenticationSuccess = (userId) => {
-    setAuthenticatedUserId(userId);
+    authenticatedUserIdRef.current = userId;
     setIsAuthenticated(true);
   };
 
@@ -84,7 +84,7 @@ export const AuthenticationProvider = ({ children }) => {
     <AuthenticationContext.Provider
       value={{
         isAuthenticated,
-        authenticatedUserId,
+        authenticatedUserIdRef,
       }}
     >
       {children}
