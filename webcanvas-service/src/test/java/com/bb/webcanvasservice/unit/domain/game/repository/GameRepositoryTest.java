@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.unit.domain.game.repository;
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
@@ -61,7 +62,7 @@ class GameRepositoryTest {
         gameRoomRepository.save(enteredRoom);
         gameRoomRepository.save(otherRoom);
 
-        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(enteredRoom, testUser, "테스트 호랑이");
+        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(enteredRoom, testUser, "테스트 호랑이", GameRoomRole.GUEST);
         gameRoomEntranceRepository.save(gameRoomEntrance);
 
         enteredRoom.addEntrance(gameRoomEntrance);
@@ -162,7 +163,7 @@ class GameRepositoryTest {
         gameRoomRepository.save(waitingRoom);
         gameRoomRepository.save(playingRoom);
 
-        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(waitingRoom, testUser, "테스트 여우");
+        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(waitingRoom, testUser, "테스트 여우", GameRoomRole.GUEST);
         gameRoomEntranceRepository.save(gameRoomEntrance);
 
         // when

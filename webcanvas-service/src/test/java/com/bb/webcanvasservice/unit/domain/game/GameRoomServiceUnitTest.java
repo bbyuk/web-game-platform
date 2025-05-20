@@ -9,6 +9,7 @@ import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
@@ -97,14 +98,14 @@ class GameRoomServiceUnitTest {
         long testGameRoomId = random.nextLong();
         setId(testGameRoom, testGameRoomId);
 
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser1, "테스트 늑대"));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser2, "테스트 수달"));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser1, "테스트 늑대", GameRoomRole.GUEST));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser2, "테스트 수달", GameRoomRole.GUEST));
 
         when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
 
         // 테스트 게임 방 입장
-        GameRoomEntrance testGameRoomEntrance = new GameRoomEntrance(testGameRoom, testUser, "테스트 여우");
+        GameRoomEntrance testGameRoomEntrance = new GameRoomEntrance(testGameRoom, testUser, "테스트 여우", GameRoomRole.GUEST);
         long testGameRoomEntranceId = random.nextLong();
         setId(testGameRoomEntrance, testGameRoomEntranceId);
 
@@ -115,7 +116,7 @@ class GameRoomServiceUnitTest {
 
 
         // when
-        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoom(testGameRoomId, testUserId);
+        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoom(testGameRoomId, testUserId, GameRoomRole.GUEST);
 
         // then
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomEntranceId()).isEqualTo(testGameRoomEntranceId);
@@ -133,7 +134,7 @@ class GameRoomServiceUnitTest {
         Long userId = random.nextLong();
 
         // when
-        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId))
+        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId, GameRoomRole.GUEST))
                 .isInstanceOf(AlreadyEnteredRoomException.class);
 
         // then
@@ -152,7 +153,7 @@ class GameRoomServiceUnitTest {
         long userId = random.nextLong();
 
         // when
-        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId))
+        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId, GameRoomRole.GUEST))
                 .isInstanceOf(IllegalGameRoomStateException.class)
                 .hasMessage(GAME_ROOM_HAS_ILLEGAL_STATUS.getDefaultMessage());
 
@@ -166,14 +167,14 @@ class GameRoomServiceUnitTest {
         when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
                 .thenReturn(Boolean.FALSE);
         GameRoom testGameRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 여우"));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 수달"));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 늑대"));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 고양이"));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 부엉이"));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 다람쥐"));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 호랑이"));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 너구리"));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 여우", GameRoomRole.HOST));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 수달", GameRoomRole.GUEST));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 늑대", GameRoomRole.GUEST));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 고양이", GameRoomRole.GUEST));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 부엉이", GameRoomRole.GUEST));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 다람쥐", GameRoomRole.GUEST));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 호랑이", GameRoomRole.GUEST));
+        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 너구리", GameRoomRole.GUEST));
 
         when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
@@ -186,7 +187,7 @@ class GameRoomServiceUnitTest {
         // when
 
 
-        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId))
+        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId, GameRoomRole.GUEST))
                 .isInstanceOf(IllegalGameRoomStateException.class)
                 .hasMessage("방의 정원이 모두 찼습니다.");
 
@@ -228,9 +229,9 @@ class GameRoomServiceUnitTest {
         setId(user4, 4L);
 
 
-        GameRoomEntrance gameRoomEntrance1 = new GameRoomEntrance(gameRoom, user1, "유저1");
-        GameRoomEntrance gameRoomEntrance2 = new GameRoomEntrance(gameRoom, user2, "유저2");
-        GameRoomEntrance gameRoomEntrance3 = new GameRoomEntrance(gameRoom, user3, "유저3");
+        GameRoomEntrance gameRoomEntrance1 = new GameRoomEntrance(gameRoom, user1, "유저1", GameRoomRole.GUEST);
+        GameRoomEntrance gameRoomEntrance2 = new GameRoomEntrance(gameRoom, user2, "유저2", GameRoomRole.GUEST);
+        GameRoomEntrance gameRoomEntrance3 = new GameRoomEntrance(gameRoom, user3, "유저3", GameRoomRole.GUEST);
         setId(gameRoomEntrance1, 1L);
         setId(gameRoomEntrance2, 2L);
         setId(gameRoomEntrance3, 3L);
@@ -268,9 +269,9 @@ class GameRoomServiceUnitTest {
         var testUser0 = new User(UUID.randomUUID().toString());
         var testUser1 = new User(UUID.randomUUID().toString());
         var testUser2 = new User(UUID.randomUUID().toString());
-        var testGameRoomEntrance0 = new GameRoomEntrance(testGameRoom, testUser0, "테스트 부엉이");
-        var testGameRoomEntrance1 = new GameRoomEntrance(testGameRoom, testUser1, "테스트 고양이");
-        var testGameRoomEntrance2 = new GameRoomEntrance(testGameRoom, testUser2, "테스트 호랑이");
+        var testGameRoomEntrance0 = new GameRoomEntrance(testGameRoom, testUser0, "테스트 부엉이", GameRoomRole.GUEST);
+        var testGameRoomEntrance1 = new GameRoomEntrance(testGameRoom, testUser1, "테스트 고양이", GameRoomRole.GUEST);
+        var testGameRoomEntrance2 = new GameRoomEntrance(testGameRoom, testUser2, "테스트 호랑이", GameRoomRole.GUEST);
 
         setId(testGameRoom, random.nextLong());
         setId(testUser0, random.nextLong());
@@ -312,7 +313,7 @@ class GameRoomServiceUnitTest {
         // given
         var testRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6));
         var testUser = new User(UUID.randomUUID().toString());
-        var testGameRoomEntrance = new GameRoomEntrance(testRoom, testUser, "테스트 여우");
+        var testGameRoomEntrance = new GameRoomEntrance(testRoom, testUser, "테스트 여우", GameRoomRole.GUEST);
 
         setId(testUser, random.nextLong());
         setId(testRoom, random.nextLong());

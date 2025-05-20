@@ -5,6 +5,7 @@ import com.bb.webcanvasservice.domain.game.GameProperties;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
@@ -57,14 +58,14 @@ class GameRoomRepositoryTest {
         // given
         User testUser = userRepository.save(new User(UUID.randomUUID().toString()));
         GameRoom savedGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser, "테스트 부엉이"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser, "테스트 부엉이", GameRoomRole.GUEST));
 
 
         User testUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser1, "테스트 다람쥐"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser1, "테스트 다람쥐", GameRoomRole.GUEST));
 
         User testUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser2, "테스트 고양이"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser2, "테스트 고양이", GameRoomRole.GUEST));
 
 
         // when
@@ -107,11 +108,11 @@ class GameRoomRepositoryTest {
          * 입장가능 room1 ~ room3
          */
         GameRoom room1 = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, userRepository.save(new User(UUID.randomUUID().toString())), "여우"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, userRepository.save(new User(UUID.randomUUID().toString())), "여우", GameRoomRole.GUEST));
         GameRoom room2 = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(room2, userRepository.save(new User(UUID.randomUUID().toString())), "여우"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room2, userRepository.save(new User(UUID.randomUUID().toString())), "여우", GameRoomRole.GUEST));
         GameRoom room3 = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(room3, userRepository.save(new User(UUID.randomUUID().toString())), "여우"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room3, userRepository.save(new User(UUID.randomUUID().toString())), "여우", GameRoomRole.GUEST));
 
 
         /**
@@ -119,7 +120,7 @@ class GameRoomRepositoryTest {
          */
         GameRoom room4 = gameRoomRepository.save(new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(6)));
         gameRoomEntranceRepository.saveAll(
-                Stream.generate(() -> new GameRoomEntrance(room4, userRepository.save(new User(UUID.randomUUID().toString())), "테스트 호랑이"))
+                Stream.generate(() -> new GameRoomEntrance(room4, userRepository.save(new User(UUID.randomUUID().toString())), "테스트 호랑이", GameRoomRole.GUEST))
                         .limit(gameProperties.gameRoomCapacity())
                         .collect(Collectors.toList())
         );
@@ -130,7 +131,7 @@ class GameRoomRepositoryTest {
         GameRoom room5 = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
 
         gameRoomEntranceRepository.saveAll(
-                Stream.generate(() -> new GameRoomEntrance(room5, userRepository.save(new User(UUID.randomUUID().toString())), "테스트 호랑이"))
+                Stream.generate(() -> new GameRoomEntrance(room5, userRepository.save(new User(UUID.randomUUID().toString())), "테스트 호랑이", GameRoomRole.GUEST))
                         .limit(gameProperties.gameRoomCapacity())
                         .collect(Collectors.toList())
         );
@@ -152,11 +153,11 @@ class GameRoomRepositoryTest {
          * 입장가능 room1 ~ room3
          */
         GameRoom room1 = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, userRepository.save(new User(UUID.randomUUID().toString())), "여우"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, userRepository.save(new User(UUID.randomUUID().toString())), "여우", GameRoomRole.GUEST));
         User user2 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, user2, "여우"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, user2, "여우", GameRoomRole.GUEST));
         User user3 = userRepository.save(new User(UUID.randomUUID().toString()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, user3, "여우"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, user3, "여우", GameRoomRole.GUEST));
 
         // when
 
@@ -168,13 +169,13 @@ class GameRoomRepositoryTest {
     void testSelectEnterableGameRoomWithJoinCode() throws Exception {
         // given
         GameRoom gameRoom1 = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom1, userRepository.save(new User(UUID.randomUUID().toString())),"nickname"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom1, userRepository.save(new User(UUID.randomUUID().toString())),"nickname", GameRoomRole.GUEST));
         GameRoom gameRoom2 = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom2, userRepository.save(new User(UUID.randomUUID().toString())), "nickname"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom2, userRepository.save(new User(UUID.randomUUID().toString())), "nickname", GameRoomRole.GUEST));
         GameRoom gameRoom3 = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom3, userRepository.save(new User(UUID.randomUUID().toString())), "nickname"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom3, userRepository.save(new User(UUID.randomUUID().toString())), "nickname", GameRoomRole.GUEST));
         GameRoom gameRoom4 = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(gameProperties.joinCodeLength()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom4, userRepository.save(new User(UUID.randomUUID().toString())), "nickname"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom4, userRepository.save(new User(UUID.randomUUID().toString())), "nickname", GameRoomRole.GUEST));
 
         List<GameRoom> gameRooms = List.of(
                 gameRoom1,

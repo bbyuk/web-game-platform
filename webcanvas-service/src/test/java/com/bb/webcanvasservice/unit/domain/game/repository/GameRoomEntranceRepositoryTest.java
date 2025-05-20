@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.unit.domain.game.repository;
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomEntranceNotFoundException;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
@@ -150,7 +151,7 @@ class GameRoomEntranceRepositoryTest {
         User testUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
         User testUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
 
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1, "테스트 여우"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1, "테스트 여우", GameRoomRole.HOST));
 
         // when
         boolean isTestUser1EnteredTestGameRoom = gameRoomEntranceRepository.existsActiveEntrance(testGameRoom.getId(), testUser1.getId());
@@ -163,7 +164,7 @@ class GameRoomEntranceRepositoryTest {
 
     private void enterTestRoom(User... enteredUsers) {
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
-        Arrays.stream(enteredUsers).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, enteredUser, "테스트 수달")));
+        Arrays.stream(enteredUsers).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, enteredUser, "테스트 수달", GameRoomRole.GUEST)));
     }
 
     public void exit(GameRoomEntrance entrance) {

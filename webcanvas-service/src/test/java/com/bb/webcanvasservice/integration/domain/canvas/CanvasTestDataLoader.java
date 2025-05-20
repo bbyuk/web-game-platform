@@ -4,6 +4,7 @@ import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.GameRoom;
 import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
@@ -52,9 +53,9 @@ public class CanvasTestDataLoader {
 
         testGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
 
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1, "테스트 여우"));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser2, "테스트 수달"));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser3,"테스트 늑대"));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1, "테스트 여우", GameRoomRole.HOST));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser2, "테스트 수달", GameRoomRole.GUEST));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser3,"테스트 늑대", GameRoomRole.GUEST));
     }
 
     @EventListener(ContextClosedEvent.class)

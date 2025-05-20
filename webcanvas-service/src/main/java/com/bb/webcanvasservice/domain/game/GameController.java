@@ -6,6 +6,7 @@ import com.bb.webcanvasservice.domain.game.dto.response.GameRoomExitResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.domain.auth.Authenticated;
 import com.bb.webcanvasservice.domain.auth.WebCanvasAuthentication;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +89,7 @@ public class GameController {
     @PostMapping("room/{gameRoomId}/entrance")
     @Operation(summary = "게임 방 입장", description = "입장 요청을 보낸 유저를 대상 게임 방에 입장시킨다.")
     public ResponseEntity<GameRoomEntranceResponse> enterGameRoom(@PathVariable("gameRoomId") Long gameRoomId, @Authenticated WebCanvasAuthentication authentication) {
-        return ResponseEntity.ok(gameRoomService.enterGameRoom(gameRoomId, authentication.getUserId()));
+        return ResponseEntity.ok(gameRoomService.enterGameRoom(gameRoomId, authentication.getUserId(), GameRoomRole.GUEST));
     }
 
     /**

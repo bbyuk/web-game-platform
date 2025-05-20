@@ -9,6 +9,7 @@ import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResp
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.event.GameRoomEntranceEvent;
 import com.bb.webcanvasservice.domain.game.event.GameRoomExitEvent;
@@ -79,7 +80,7 @@ public class GameRoomService {
     @Transactional
     public GameRoomEntranceResponse createGameRoomAndEnter(Long userId) {
         Long gameRoomId = createGameRoom(userId);
-        return enterGameRoom(gameRoomId, userId);
+        return enterGameRoom(gameRoomId, userId, GameRoomRole.HOST);
     }
 
     /**
@@ -157,7 +158,7 @@ public class GameRoomService {
      * @return gameRoomEntranceId
      */
     @Transactional
-    public GameRoomEntranceResponse enterGameRoom(Long gameRoomId, Long userId) {
+    public GameRoomEntranceResponse enterGameRoom(Long gameRoomId, Long userId, GameRoomRole role) {
         if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
             throw new AlreadyEnteredRoomException();
         }
@@ -179,7 +180,9 @@ public class GameRoomService {
                 new GameRoomEntrance(
                         targetGameRoom
                         , userService.findUserByUserId(userId)
-                        , String.format("%s %s", koreanAdjective, gameProperties.gameRoomUserNicknameNouns().get(enteredUserCounts)));
+                        , String.format("%s %s", koreanAdjective, gameProperties.gameRoomUserNicknameNouns().get(enteredUserCounts))
+                        , role
+                );
 
         GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
         targetGameRoom.addEntrance(newGameRoomEntrance);
@@ -205,7 +208,7 @@ public class GameRoomService {
         GameRoom targetGameRoom = gameRoomRepository.findRoomWithJoinCodeForEnter(joinCode)
                 .orElseThrow(() -> new GameRoomNotFoundException(String.format("입장 코드가 %s인 방을 찾지 못했습니다.", joinCode)));
 
-        return enterGameRoom(targetGameRoom.getId(), userId);
+        return enterGameRoom(targetGameRoom.getId(), userId, GameRoomRole.GUEST);
     }
 
     /**
