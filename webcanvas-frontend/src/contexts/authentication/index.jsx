@@ -78,7 +78,7 @@ export const AuthenticationProvider = ({ children }) => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate(pages.landing, {replace : true});
+      navigate(pages.landing.url, {replace : true});
     }
   }, [isAuthenticated]);
 

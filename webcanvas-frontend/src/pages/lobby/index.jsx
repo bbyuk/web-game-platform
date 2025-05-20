@@ -88,7 +88,7 @@ export default function LobbyPage() {
   };
 
   const moveToGameRoom = (gameRoomId = "temp") => {
-    navigate(`${pages.gameRoom}/${gameRoomId}`, { replace: true });
+    navigate(pages.gameRoom.waiting.url(gameRoomId), { replace: true });
   };
 
   return (

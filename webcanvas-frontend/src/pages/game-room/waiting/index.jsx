@@ -71,8 +71,8 @@ export default function GameRoomPage() {
     return await apiClient
       .get(game.getCurrentEnteredGameRoom)
       .then((response) => {
-        if (location.pathname !== `${pages.gameRoom}/${response.gameRoomId}`) {
-          navigate(`${pages.gameRoom}/${response.gameRoomId}`, { replace: true });
+        if (location.pathname !== pages.gameRoom.waiting.url(response.gameRoomId)) {
+          navigate(pages.gameRoom.waiting.url(response.gameRoomId), { replace: true });
           return null;
         }
         return response;
@@ -81,7 +81,7 @@ export default function GameRoomPage() {
         if (error.code === 'R003') {
           // 로비로 이동
           alert(REDIRECT_MESSAGES.TO_LOBBY);
-          navigate(pages.lobby, { replace: true });
+          navigate(pages.lobby.url, { replace: true });
           return null;
         }
       });
@@ -134,7 +134,7 @@ export default function GameRoomPage() {
     );
 
     if (response.success) {
-      navigate(pages.lobby, { replace: true });
+      navigate(pages.lobby.url, { replace: true });
     }
   };
 

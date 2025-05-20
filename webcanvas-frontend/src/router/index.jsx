@@ -1,27 +1,42 @@
 import MainLayout from "@/components/layouts/index.jsx";
 import LandingPage from "@/pages/landing/index.jsx";
-import GameRoomPage from "@/pages/game-room/index.jsx";
+import GameRoomPage from "@/pages/game-room/waiting/index.jsx";
 import LobbyPage from "@/pages/lobby/index.jsx";
-import { useNavigate } from "react-router-dom";
 
 export const pages = {
-  landing: "/",
-  lobby: "/platform",
-  gameRoom: "/platform/game/room",
+  landing: {
+    path: "/",
+    url: "/"
+  },
+  lobby: {
+    path: "/platform",
+    url: "/platform"
+  },
+  gameRoom: {
+    waiting: {
+      path: "/platform/game/room/:roomId/waiting",
+      url: (gameRoomId) => `/platform/game/room/${gameRoomId}/waiting`
+    },
+    playing: {
+      path: "/platform/game/room/:roomId/playing",
+      url: (gameRoomId) => `/platform/game/room/${gameRoomId}/playing`
+    }
+  }
 };
 
 export const publicRoutes = [
-  { path: pages.landing, element: <LandingPage /> },
+  { path: pages.landing.path, element: <LandingPage /> },
   { path: "*", element: <LandingPage /> },
 ];
 
 export const privateRoutes = [
   {
-    path: pages.lobby,
+    path: pages.lobby.path,
     element: <MainLayout />,
     children: [
-      { path: pages.lobby, element: <LobbyPage /> },
-      { path: `${pages.gameRoom}/:roomId`, element: <GameRoomPage /> },
+      { path: pages.lobby.path, element: <LobbyPage /> },
+      { path: pages.gameRoom.waiting.path, element: <GameRoomPage /> },
+      { path: pages.gameRoom.playing.path, element: <></>}
     ],
   },
 ];
