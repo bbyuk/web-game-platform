@@ -1,4 +1,8 @@
-export default function SidePanelFooterButton({ label = "확인", onClick = () => {}, disabled = false }) {
+export default function SidePanelFooterButton({
+  label = "확인",
+  onClick = () => {},
+  disabled = false,
+}) {
   return (
     <button
       onClick={onClick}

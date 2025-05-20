@@ -1,12 +1,11 @@
-import { auth } from '@/api/index.js';
-import { defaultHeaders, serverDomain } from '@/client/http/constnats.js';
-import { buildUrlWithParams } from '@/client/http/utils.js';
-import { ERROR_CODE_MAPPING } from '@/constants/server-code.js';
-import { toast } from 'react-toastify';
-import { STORAGE_KEY } from '@/constants/storage-key.js';
+import { auth } from "@/api/index.js";
+import { defaultHeaders, serverDomain } from "@/client/http/constnats.js";
+import { buildUrlWithParams } from "@/client/http/utils.js";
+import { ERROR_CODE_MAPPING } from "@/constants/server-code.js";
+import { toast } from "react-toastify";
+import { STORAGE_KEY } from "@/constants/storage-key.js";
 
 export const getApiClient = () => {
-
   /**
    * apiClient 내부 요청 함수
    */
@@ -24,7 +23,7 @@ export const getApiClient = () => {
     const headers = {
       ...defaultHeaders,
       ...options.headers,
-      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     };
 
     const processedUrl = `${serverDomain}${method === "GET" || method === "DELETE" ? buildUrlWithParams(url, data) : url}`;

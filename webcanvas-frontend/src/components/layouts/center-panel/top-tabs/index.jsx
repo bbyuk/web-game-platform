@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 const Container = ({ children }) => {
   return <div className="flex border-b border-gray-700 bg-gray-800">{children}</div>;
@@ -31,8 +31,6 @@ const Tab = ({ label, selected = false, onClick }) => {
 };
 
 const TopTabs = ({ tabs, selectedIndex, onSelected }) => {
-
-
   return (
     <Container>
       {tabs.map((tab, index) => (

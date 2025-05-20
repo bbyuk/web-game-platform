@@ -6,7 +6,7 @@ export default function SidePanel({
   left = Boolean(false),
   right = Boolean(false),
   children,
-  footer
+  footer,
 }) {
   return (
     <div
@@ -14,9 +14,7 @@ export default function SidePanel({
     >
       <Title label={title.label} icon={title.icon} button={title.button} onClick={title.onClick} />
 
-      <div className={"flex-1 overflow-auto"}>
-        {children}
-      </div>
+      <div className={"flex-1 overflow-auto"}>{children}</div>
 
       {footer && <div className={"mt-4"}>{footer}</div>}
     </div>

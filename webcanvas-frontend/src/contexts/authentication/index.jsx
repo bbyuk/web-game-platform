@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "@/api/index.js";
-import {getApiClient} from "@/client/http/index.jsx";
-import {useNavigate} from "react-router-dom";
-import {pages} from "@/router/index.jsx";
-import { STORAGE_KEY } from '@/constants/storage-key.js';
+import { getApiClient } from "@/client/http/index.jsx";
+import { useNavigate } from "react-router-dom";
+import { pages } from "@/router/index.jsx";
+import { STORAGE_KEY } from "@/constants/storage-key.js";
 
 const AuthenticationContext = createContext(null);
 export const useAuthentication = () => useContext(AuthenticationContext);
@@ -20,7 +20,6 @@ export const AuthenticationProvider = ({ children }) => {
   const apiClient = getApiClient();
   const navigate = useNavigate();
 
-
   const onAuthenticationSuccess = (userId) => {
     setAuthenticatedUserId(userId);
     setIsAuthenticated(true);
@@ -31,13 +30,12 @@ export const AuthenticationProvider = ({ children }) => {
     localStorage.setItem(STORAGE_KEY.ACCESS_TOKEN, accessToken);
 
     onAuthenticationSuccess(userId);
-  }
+  };
 
   const onAuthenticationFailed = () => {
     localStorage.removeItem(STORAGE_KEY.ACCESS_TOKEN);
     setIsAuthenticated(false);
   };
-
 
   useEffect(() => {
     /**
@@ -45,7 +43,7 @@ export const AuthenticationProvider = ({ children }) => {
      */
     apiClient
       .get(auth.authentication)
-      .then(userId => {
+      .then((userId) => {
         if (userId) {
           onAuthenticationSuccess(userId);
         } else {
@@ -60,13 +58,13 @@ export const AuthenticationProvider = ({ children }) => {
 
         const fingerprint = localStorage.getItem(STORAGE_KEY.FINGERPRINT);
         apiClient
-          .post(auth.login, {fingerprint: fingerprint})
-          .then(async ({userId, fingerprint, accessToken, success}) => {
+          .post(auth.login, { fingerprint: fingerprint })
+          .then(async ({ userId, fingerprint, accessToken, success }) => {
             if (success) {
               onLoginSuccess(userId, fingerprint, accessToken);
             }
           })
-          .catch(error => {
+          .catch((error) => {
             onAuthenticationFailed();
           });
       });
@@ -78,7 +76,7 @@ export const AuthenticationProvider = ({ children }) => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate(pages.landing.url, {replace : true});
+      navigate(pages.landing.url, { replace: true });
     }
   }, [isAuthenticated]);
 
@@ -86,7 +84,7 @@ export const AuthenticationProvider = ({ children }) => {
     <AuthenticationContext.Provider
       value={{
         isAuthenticated,
-        authenticatedUserId
+        authenticatedUserId,
       }}
     >
       {children}

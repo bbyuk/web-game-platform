@@ -3,7 +3,7 @@ import { auth } from "@/api/index.js";
 import { useNavigate } from "react-router-dom";
 import { EMPTY_MESSAGES } from "@/constants/message.js";
 import { GitCommit, MessageCircle } from "lucide-react";
-import {Slide, ToastContainer} from "react-toastify";
+import { Slide, ToastContainer } from "react-toastify";
 
 const ApplicationContext = createContext(null);
 
@@ -23,14 +23,14 @@ export function ApplicationContextProvider({ children }) {
       button: false,
       onClick: () => {},
     },
-    leftSidebarFooter: (<></>),
+    leftSidebarFooter: <></>,
     rightSidebarTitle: {
       label: "chat",
       icon: <MessageCircle size={20} className="text-gray-400" />,
       button: false,
       onClick: () => {},
     },
-    rightSidebarFooter: (<></>),
+    rightSidebarFooter: <></>,
     currentGameRoomId: null,
     currentGameRoomEntranceId: null,
     currentGameRoomEnteredUsers: [],
@@ -216,24 +216,9 @@ export function ApplicationContextProvider({ children }) {
     },
   };
 
-  /**
-   * current gameRoom
-   */
-  const currentGame = {
-    gameRoomId: currentGameRoomId,
-    gameRoomEntranceId: currentGameRoomEntranceId,
-    enteredUsers: currentGameRoomEnteredUsers,
-    setGameRoomInfo: ({ gameRoomId, gameRoomEntranceId, enteredUsers }) => {
-      setCurrentGameRoomId(gameRoomId);
-      setCurrentGameRoomEntranceId(gameRoomEntranceId);
-      setCurrentGameRoomEnteredUsers(enteredUsers);
-    },
-    clear: () => {
-      setCurrentGameRoomId(init.currentGameRoomId);
-      setCurrentGameRoomEntranceId(init.currentGameRoomEntranceId);
-      setCurrentGameRoomEnteredUsers(init.currentGameRoomEnteredUsers);
-    },
-  };
+  useEffect(() => {
+    console.log(leftSidebarItems);
+  }, [leftSidebarItems]);
 
   return (
     <ApplicationContext.Provider
@@ -241,7 +226,6 @@ export function ApplicationContextProvider({ children }) {
         topTabs,
         leftSidebar,
         rightSidebar,
-        currentGame,
       }}
     >
       <ToastContainer

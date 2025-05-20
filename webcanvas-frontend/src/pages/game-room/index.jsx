@@ -1,0 +1,230 @@
+import { Outlet, useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { game } from "@/api/index.js";
+import { getApiClient } from "@/client/http/index.jsx";
+import { pages } from "@/router/index.jsx";
+import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
+import { ArrowLeft } from "lucide-react";
+import { getWebSocketClient, subscribe } from "@/client/stomp/index.jsx";
+import { useApplicationContext } from "@/contexts/index.jsx";
+import { useAuthentication } from "@/contexts/authentication/index.jsx";
+import { useApiLock } from "@/api/lock/index.jsx";
+
+export default function GameRoomPage() {
+  const { roomId } = useParams();
+  const { topTabs, leftSidebar, rightSidebar } = useApplicationContext();
+  const { authenticatedUserId } = useAuthentication();
+  const { apiLock } = useApiLock();
+  const apiClient = getApiClient();
+  const navigate = useNavigate();
+  const webSocketClientRef = useRef(null);
+
+  /**
+   * 페이지 상태
+   */
+  const [enteredUsers, setEnteredUsers] = useState([]);
+  const [gameRoomEntranceId, setGameRoomEntranceId] = useState(null);
+  const [nickname, setNickname] = useState(null);
+  const [userColor, setUserColor] = useState(null);
+
+  /**
+   * 현재 입장한 게임 방의 정보를 조회한다.
+   * @returns {Promise<awaited Promise<Result<RootNode> | void> | Promise<Result<Root> | void> | Promise<any>>}
+   */
+  const findCurrentGameRoomInfo = async () => {
+    // 방 정보 조회
+    return await apiClient
+      .get(game.getCurrentEnteredGameRoom)
+      .then((response) => {
+        // 상태 셋팅
+        setGameRoomEntranceId(response.gameRoomEntranceId);
+        setEnteredUsers(response.enteredUsers);
+        setNickname(response.nickname);
+        setUserColor(response.color);
+
+        // stomp 연결
+        connectToWebSocket(response.gameRoomId);
+
+        if (response.gameRoomState === "WAITING") {
+          navigate(pages.gameRoom.waiting.url(response.gameRoomId), { replace: true });
+          return null;
+        } else if (response.gameRoomState === "PLAYING") {
+          navigate(pages.gameRoom.playing.url(response.gameRoomId), { replace: true });
+          return null;
+        }
+
+        return response;
+      })
+      .catch((error) => {
+        if (error.code === "R003") {
+          // 로비로 이동
+          alert(REDIRECT_MESSAGES.TO_LOBBY);
+          navigate(pages.lobby.url, { replace: true });
+          return null;
+        }
+      });
+  };
+
+  /**
+   * left sidebar set
+   * @param response
+   */
+  const setLeftSidebar = (response) => {
+    if (response.enteredUsers) {
+      leftSidebar.setItems(
+        response.enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest }))
+      );
+    } else {
+      leftSidebar.setItems(EMPTY_MESSAGES.ENTERED_USER_LIST);
+    }
+
+    leftSidebar.setTitle({
+      label: "exit",
+      icon: <ArrowLeft size={20} className="text-gray-400" />,
+      button: true,
+      onClick: () => {
+        exitGameRoom(response.gameRoomEntranceId);
+      },
+    });
+  };
+
+  /**
+   * 현재 게임 방에서 퇴장한다.
+   * @returns {Promise<void>}
+   */
+  const exitGameRoom = async (gameRoomEntranceId) => {
+    if (!confirm("방에서 나가시겠습니까?")) {
+      return;
+    }
+
+    const response = await apiLock(
+      game.exitFromGameRoom(gameRoomEntranceId),
+      async () => await apiClient.delete(game.exitFromGameRoom(gameRoomEntranceId))
+    );
+
+    if (response.success) {
+      navigate(pages.lobby.url, { replace: true });
+    }
+  };
+
+  /**
+   * 웹소켓 서버에 연결하고 현재 방에 해당하는 브로커를 구독한다.
+   * @param gameRoomId
+   */
+  const connectToWebSocket = (gameRoomId) => {
+    /**
+     * 다른 유저의 입장 및 퇴장 이벤트 발생시
+     * 현재 게임방 정보를 재조회해 leftbar setting
+     */
+    const onOtherUserStateChange = () => {
+      findCurrentGameRoomInfo().then((response) => {
+        if (!response) {
+          return;
+        }
+
+        setLeftSidebar(response);
+      });
+    };
+
+    /**
+     * 게임 방 메세지 브로커 핸들러
+     * @param frame
+     */
+    const gameRoomEventHandler = (frame) => {
+      if (!frame.event) {
+        // 서버로부터 받은 이벤트가 없음
+        return;
+      }
+      const { event, userId } = frame;
+      if (authenticatedUserId !== userId && (event === "ROOM/ENTRANCE" || event === "ROOM/EXIT")) {
+        /**
+         * 다른 사람 입장 OR 퇴장 이벤트 발생시
+         */
+        console.log(authenticatedUserId, userId);
+        onOtherUserStateChange();
+      }
+    };
+
+    /**
+     * 채팅 메세지 브로커 핸들러
+     * @param frame
+     */
+    const gameRoomChatHandler = (frame) => {
+      console.log(frame);
+    };
+
+    if (webSocketClientRef.current) {
+      // 이전 client 존재시 deactivate
+      webSocketClientRef.current.deactivate();
+    }
+    const subscribeTopics = [
+      // 게임 방 공통 이벤트 broker
+      {
+        destination: `/session/${gameRoomId}`,
+        messageHandler: gameRoomEventHandler,
+      },
+      // 게임 방 내 채팅 broker
+      {
+        destination: `/session/${gameRoomId}/chat`,
+        messageHandler: gameRoomChatHandler,
+      },
+    ];
+
+    const options = {
+      onConnect: (frame) => {
+        subscribe(webSocketClientRef.current, subscribeTopics);
+      },
+      onError: (frame) => {
+        console.log(frame);
+      },
+    };
+
+    webSocketClientRef.current = getWebSocketClient(options);
+  };
+
+  useEffect(() => {
+    return () => {
+      console.log("clear on game-room unmount");
+      webSocketClientRef.current.deactivate();
+      leftSidebar.clear();
+      rightSidebar.clear();
+      topTabs.clear();
+    };
+  }, []);
+
+  useEffect(() => {
+    findCurrentGameRoomInfo().catch((error) => alert(error));
+  }, [roomId]);
+
+  useEffect(() => {
+    if (enteredUsers.length > 0) {
+      leftSidebar.setItems(
+        enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest }))
+      );
+    }
+  }, [enteredUsers]);
+
+  useEffect(() => {
+    leftSidebar.setTitle({
+      label: "exit",
+      icon: <ArrowLeft size={20} className="text-gray-400" />,
+      button: true,
+      onClick: () => {
+        exitGameRoom(gameRoomEntranceId);
+      },
+    });
+  }, [gameRoomEntranceId]);
+
+  // 여기서 웹소켓 클라이언트 ref 내려주기
+  return (
+    <Outlet
+      context={{
+        enteredUsers,
+        nickname,
+        userColor,
+        webSocketClientRef,
+        gameRoomEntranceId,
+      }}
+    />
+  );
+}

@@ -1,4 +1,4 @@
-import { LobbyPlaceholder } from "@/components/lobby-placeholder/index.jsx";
+import { LobbyPlaceholder } from "@/components/placeholder/lobby/index.jsx";
 import { useEffect, useState } from "react";
 import { useApplicationContext } from "@/contexts/index.jsx";
 import { game } from "@/api/index.js";
@@ -88,7 +88,7 @@ export default function LobbyPage() {
   };
 
   const moveToGameRoom = (gameRoomId = "temp") => {
-    navigate(pages.gameRoom.waiting.url(gameRoomId), { replace: true });
+    navigate(pages.gameRoom.url(gameRoomId), { replace: true });
   };
 
   return (
