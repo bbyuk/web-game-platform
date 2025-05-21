@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import { useApplicationContext } from "@/contexts/index.jsx";
-import SidePanelFooterButton from "@/components/layouts/side-panel/footer-button/index.jsx";
 import { GameRoomWaitingPlaceholder } from "@/components/placeholder/game-room/waiting/index.jsx";
 import { useOutletContext } from "react-router-dom";
+import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
+import SidePanelFooterButton from "@/components/layouts/side-panel/footer-button/index.jsx";
 
 export default function GameRoomWaitingPage() {
-  // 전역 컨텍스트
-  const { leftSidebar } = useApplicationContext();
+  // Outlet context
   const { enteredUsers, nickname, userColor, webSocketClientRef } = useOutletContext();
+  const leftSideStore = useLeftSideStore();
 
   /**
    * =========================== 이벤트 핸들러 =============================
@@ -21,13 +21,14 @@ export default function GameRoomWaitingPage() {
   };
 
   useEffect(() => {
-    leftSidebar.setFooter(
-      <SidePanelFooterButton
-        label={"게임 시작"}
-        onClick={startGame}
-        disabled={enteredUsers.length === 1}
-      />
-    );
+    leftSideStore.setFooter({
+      slot: SidePanelFooterButton,
+      props: {
+        label: "게임 시작",
+        onClick: startGame,
+        disabled: enteredUsers.length === 1,
+      },
+    });
   }, []);
 
   /**

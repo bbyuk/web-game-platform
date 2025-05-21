@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "@/api/index.js";
 import { useNavigate } from "react-router-dom";
 import { EMPTY_MESSAGES } from "@/constants/message.js";
 import { GitCommit, MessageCircle } from "lucide-react";
@@ -31,9 +30,6 @@ export function ApplicationContextProvider({ children }) {
       onClick: () => {},
     },
     rightSidebarFooter: <></>,
-    currentGameRoomId: null,
-    currentGameRoomEntranceId: null,
-    currentGameRoomEnteredUsers: [],
   };
 
   /**
@@ -59,102 +55,8 @@ export function ApplicationContextProvider({ children }) {
   const [rightSidebarFooter, setRightSidebarFooter] = useState(init.rightSidebarFooter);
 
   /**
-   * 현재 입장한 게임 방 관련 state
-   */
-  // 현재 입장한 방의 ID
-  const [currentGameRoomId, setCurrentGameRoomId] = useState(init.currentGameRoomId);
-  // 현재 입장 ID
-  const [currentGameRoomEntranceId, setCurrentGameRoomEntranceId] = useState(
-    init.currentGameRoomEntranceId
-  );
-  const [currentGameRoomEnteredUsers, setCurrentGameRoomEnteredUsers] = useState(
-    init.currentGameRoomEnteredUsers
-  );
-
-  /**
    * ========================= states ===========================
    */
-
-  /**
-   * constant with hook
-   */
-  /**
-   * fetch wrapper
-   * @param method
-   * @param url
-   * @param data
-   * @param options
-   * @returns {Promise<any>}
-   */
-  const request = async (method, url, data = {}, options = {}) => {
-    const headers = {
-      ...api.constants.defaultHeaders,
-      ...options.headers,
-    };
-
-    const processedUrl = `${api.constants.serverDomain}${method === "GET" || method === "DELETE" ? api.utils.buildUrlWithParams(url, data) : url}`;
-    const fetchOption = {
-      method,
-      headers,
-      credentials: "include",
-      ...options,
-      ...(method !== "GET" && method !== "DELETE" && { body: JSON.stringify(data) }),
-    };
-
-    return fetch(processedUrl, fetchOption)
-      .then(async (response) => {
-        if (!response.ok) {
-          const error = await response.json();
-
-          throw {
-            status: response.status,
-            ...error,
-          };
-        }
-
-        return response.json();
-      })
-      .catch(async (error) => {
-        if (error.status === 401) {
-          if (error.code !== "A001") {
-            /**
-             * 토큰 만료가 아닐 경우 unauthorized handler 호출
-             */
-            navigate("/", { replace: true });
-            return;
-          }
-          /**
-           * 토큰 만료시
-           * 1. 토큰 refresh 요청
-           * 2. API 재요청
-           */
-
-          /**
-           * 토큰 refresh
-           */
-          const { isAuthenticated } = await api.tokenRefresh();
-
-          if (!isAuthenticated) {
-            /**
-             * 인증 실패 -> 토큰 만료시 refresh 시도 -> refresh마저 실패시 unauthorized handling
-             */
-            navigate("/", { replace: true });
-            return;
-          }
-
-          /**
-           * API 재요청
-           */
-          return request(method, url, data, options);
-        } else {
-          /**
-           * TODO alert modal로 변경
-           */
-          alert(error.message);
-          throw error;
-        }
-      });
-  };
 
   /**
    * 상단 탭 관련 context

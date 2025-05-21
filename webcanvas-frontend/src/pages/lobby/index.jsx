@@ -1,6 +1,5 @@
 import { LobbyPlaceholder } from "@/components/placeholder/lobby/index.jsx";
-import { useEffect, useState } from "react";
-import { useApplicationContext } from "@/contexts/index.jsx";
+import { useEffect } from "react";
 import { game } from "@/api/index.js";
 import { useApiLock } from "@/api/lock/index.jsx";
 import { EMPTY_MESSAGES } from "@/constants/message.js";
@@ -8,14 +7,17 @@ import { useNavigate } from "react-router-dom";
 import { pages } from "@/router/index.jsx";
 import { GitCommit } from "lucide-react";
 import { getApiClient } from "@/client/http/index.jsx";
+import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
+import ItemList from "@/components/layouts/side-panel/item-list/index.jsx";
 
 export default function LobbyPage() {
   // 전역 context
-  const { leftSidebar } = useApplicationContext();
   const apiClient = getApiClient();
   // API 중복 요청을 block하기 위한 lock
   const { apiLock } = useApiLock();
   const navigate = useNavigate();
+
+  const leftSideStore = useLeftSideStore();
 
   /**
    * ============== 유저 정의 함수 ===============
@@ -45,18 +47,24 @@ export default function LobbyPage() {
     );
 
     if (response) {
-      leftSidebar.setItems(
-        response.roomList
-          ? response.roomList.map(({ joinCode, enterCount, capacity, gameRoomId }) => ({
-              label: "입장 가능",
-              current: enterCount,
-              isButton: enterCount < capacity,
-              capacity: capacity,
-              gameRoomId: gameRoomId,
-              onClick: () => enterRoom(gameRoomId),
-            }))
-          : []
-      );
+      const leftSideList = response.roomList
+        ? response.roomList.map(({ joinCode, enterCount, capacity, gameRoomId }) => ({
+            label: "입장 가능",
+            current: enterCount,
+            isButton: enterCount < capacity,
+            capacity: capacity,
+            gameRoomId: gameRoomId,
+            onClick: () => enterRoom(gameRoomId),
+          }))
+        : [];
+
+      leftSideStore.setContents({
+        slot: ItemList,
+        props: {
+          value: leftSideList,
+          emptyPlaceholder: EMPTY_MESSAGES.GENERIC,
+        },
+      });
     }
   };
 
@@ -65,13 +73,18 @@ export default function LobbyPage() {
      * 입장 가능한 방 목록 조회
      */
     findEnterableGameRooms().finally(() => {
-      leftSidebar.setTitle({
+      leftSideStore.setTitle({
         label: "main",
         icon: <GitCommit size={20} className="text-gray-400" />,
         button: true,
         onClick: findEnterableGameRooms,
       });
-      leftSidebar.setEmptyPlaceholder(EMPTY_MESSAGES.ROOM_LIST);
+      leftSideStore.setContents({
+        slot: ItemList,
+        props: {
+          emptyPlaceholder: EMPTY_MESSAGES.ROOM_LIST,
+        },
+      });
     });
   }, []);
 
