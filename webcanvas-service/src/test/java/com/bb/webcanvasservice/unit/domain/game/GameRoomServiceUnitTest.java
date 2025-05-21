@@ -291,7 +291,6 @@ class GameRoomServiceUnitTest {
         // when
 
         GameRoomEntranceInfoResponse enteredGameRoomInfo0 = gameRoomService.findEnteredGameRoomInfo(testUser0.getId());
-        GameRoomEntranceInfoResponse enteredGameRoomInfo1 = gameRoomService.findEnteredGameRoomInfo(testUser1.getId());
 
 
         // then
@@ -309,7 +308,7 @@ class GameRoomServiceUnitTest {
         Assertions.assertThat(enteredGameRoomInfo0.gameRoomState()).isEqualTo(GameRoomState.WAITING);
 
         // 250921 - 게임 방 ROLE 필드 추가
-        Assertions.assertThat(enteredGameRoomInfo0.role()).isEqualTo(GUEST);
+        Assertions.assertThat(enteredGameRoomInfo0.requesterUserSummary().role()).isEqualTo(GUEST);
     }
 
     @Test

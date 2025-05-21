@@ -273,22 +273,24 @@ public class GameRoomService {
 
         AtomicInteger index = new AtomicInteger(0);
 
+        List<GameRoomEntranceInfoResponse.EnteredUserSummary> enteredUserSummaries = gameRoomEntranceRepository
+                .findGameRoomEntrancesByGameRoomId(gameRoom.getId())
+                .stream()
+                .map(gameRoomEntrance ->
+                        new GameRoomEntranceInfoResponse.EnteredUserSummary(
+                                gameRoomEntrance.getUser().getId(),
+                                gameProperties.gameRoomUserColors().get(index.getAndIncrement()),
+                                gameRoomEntrance.getNickname(),
+                                userEntrance.getRole()
+                        )
+                )
+                .collect(Collectors.toList());
         return new GameRoomEntranceInfoResponse(
                 gameRoom.getId(),
                 userEntrance.getId(),
-                gameRoomEntranceRepository
-                        .findGameRoomEntrancesByGameRoomId(gameRoom.getId())
-                        .stream()
-                        .map(gameRoomEntrance ->
-                                new GameRoomEntranceInfoResponse.EnteredUserSummary(
-                                        gameRoomEntrance.getId(),
-                                        gameProperties.gameRoomUserColors().get(index.getAndIncrement()),
-                                        gameRoomEntrance.getNickname()
-                                )
-                        )
-                        .collect(Collectors.toList()),
+                enteredUserSummaries,
                 gameRoom.getState(),
-                userEntrance.getRole()
+                enteredUserSummaries.stream().filter(enteredUserSummary -> enteredUserSummary.userId().equals(userId)).findFirst().get()
         );
     }
 

@@ -14,15 +14,14 @@ public record GameRoomEntranceInfoResponse(
         @Schema(description = "게임 방 입장 ID", example = "2231")
         Long gameRoomEntranceId,
 
-        @Schema(description = "현재 게임방에 접속해있는 다른 유저들의 정보")
+        @Schema(description = "현재 게임방에 접속해있는 유저들의 정보")
         List<EnteredUserSummary> enteredUsers,
 
         @Schema(description = "현재 입장한 게임 방의 상태")
         GameRoomState gameRoomState,
 
-        @Schema(description = "요청한 유저의 게임 방 내에서의 ROLE")
-        GameRoomRole role
-
+        @Schema(description = "요청한 유저의 정보")
+        EnteredUserSummary requesterUserSummary
 ) {
     /**
      * 게임 방에 입장한 유저 정보 DTO
@@ -38,6 +37,10 @@ public record GameRoomEntranceInfoResponse(
             String color,
 
             @Schema(description = "자동 생성된 게임 방 내 유저 닉네임", example = "고매한 여우")
-            String nickname
+            String nickname,
+
+            @Schema(description = "게임 방 내에서의 ROLE")
+            GameRoomRole role
+
     ) {};
 }
