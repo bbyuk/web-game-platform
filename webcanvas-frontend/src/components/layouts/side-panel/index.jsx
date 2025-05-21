@@ -9,7 +9,6 @@ export default function SidePanel({ position }) {
 
   const ContentComponent = contents.slot;
   const FooterComponent = footer.slot;
-
   return (
     <div
       className={`w-60 bg-gray-900 ${position === "left" ? "border-r" : position === "right" ? "border-l" : ""}border-gray-700 p-4 flex flex-col h-full`}

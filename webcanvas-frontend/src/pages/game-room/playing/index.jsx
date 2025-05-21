@@ -1,6 +1,5 @@
 import Canvas from "@/components/canvas/index.jsx";
 import { useEffect, useRef, useState } from "react";
-import { useApplicationContext } from "@/contexts/index.jsx";
 import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import { game } from "@/api/index.js";
@@ -20,7 +19,7 @@ export default function GameRoomPlayingPage() {
   const [reRenderingSignal, setReRenderingSignal] = useState(false);
 
   // 전역 컨텍스트
-  const { topTabs, leftSidebar, rightSidebar } = useApplicationContext();
+  // const { topTabs, leftSidebar, rightSidebar } = useApplicationContext();
 
   const { authenticatedUserIdRef } = useAuthentication();
 
@@ -258,20 +257,18 @@ export default function GameRoomPlayingPage() {
         /**
          * TODO 캔버스 팔레트 서비스 개발 및 조회 API로 변경
          */
-        topTabs.setItems([
-          { label: "black" },
-          { label: "green" },
-          { label: "yellow" },
-          { label: "red" },
-          { label: "blue" },
-        ]);
+        // topTabs.setItems([
+        //   { label: "black" },
+        //   { label: "green" },
+        //   { label: "yellow" },
+        //   { label: "red" },
+        //   { label: "blue" },
+        // ]);
       });
   }, [location.pathname]);
 
   useEffect(() => {
     return () => {
-      leftSidebar.clear();
-      rightSidebar.clear();
       webSocketClientRef.current.deactivate();
     };
   }, []);

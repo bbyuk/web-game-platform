@@ -47,45 +47,35 @@ export default function LobbyPage() {
     );
 
     if (response) {
-      const leftSideList = response.roomList
-        ? response.roomList.map(({ joinCode, enterCount, capacity, gameRoomId }) => ({
-            label: "입장 가능",
-            current: enterCount,
-            isButton: enterCount < capacity,
-            capacity: capacity,
-            gameRoomId: gameRoomId,
-            onClick: () => enterRoom(gameRoomId),
-          }))
-        : [];
-
+      const leftSideList = response.roomList.map(({ joinCode, enterCount, capacity, gameRoomId }) => ({
+        label: "입장 가능",
+        current: enterCount,
+        isButton: enterCount < capacity,
+        capacity: capacity,
+        gameRoomId: gameRoomId,
+        onClick: () => enterRoom(gameRoomId),
+      }));
       leftSideStore.setContents({
         slot: ItemList,
         props: {
           value: leftSideList,
-          emptyPlaceholder: EMPTY_MESSAGES.GENERIC,
+          emptyPlaceholder: EMPTY_MESSAGES.ROOM_LIST,
         },
       });
     }
   };
 
   useEffect(() => {
+    leftSideStore.setTitle({
+      label: "main",
+      icon: <GitCommit size={20} className="text-gray-400" />,
+      button: true,
+      onClick: findEnterableGameRooms,
+    })
     /**
      * 입장 가능한 방 목록 조회
      */
-    findEnterableGameRooms().finally(() => {
-      leftSideStore.setTitle({
-        label: "main",
-        icon: <GitCommit size={20} className="text-gray-400" />,
-        button: true,
-        onClick: findEnterableGameRooms,
-      });
-      leftSideStore.setContents({
-        slot: ItemList,
-        props: {
-          emptyPlaceholder: EMPTY_MESSAGES.ROOM_LIST,
-        },
-      });
-    });
+    findEnterableGameRooms();
   }, []);
 
   /**
