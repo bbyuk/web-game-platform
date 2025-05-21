@@ -49,7 +49,9 @@ export default function GameRoomPage() {
         setUserRole(role);
 
         // stomp 연결
-        connectToWebSocket(response.gameRoomId);
+        if (roomId !== "temp") {
+          connectToWebSocket(response.gameRoomId);
+        }
 
         if (response.gameRoomState === "WAITING") {
           navigate(pages.gameRoom.waiting.url(response.gameRoomId), { replace: true });
@@ -156,7 +158,6 @@ export default function GameRoomPage() {
         console.log(frame);
       },
     };
-
     webSocketClientRef.current = getWebSocketClient(options);
   };
 
