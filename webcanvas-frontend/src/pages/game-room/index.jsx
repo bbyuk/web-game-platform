@@ -26,6 +26,7 @@ export default function GameRoomPage() {
   const [gameRoomEntranceId, setGameRoomEntranceId] = useState(null);
   const [nickname, setNickname] = useState(null);
   const [userColor, setUserColor] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
   /**
    * 현재 입장한 게임 방의 정보를 조회한다.
@@ -39,8 +40,12 @@ export default function GameRoomPage() {
         // 상태 셋팅
         setGameRoomEntranceId(response.gameRoomEntranceId);
         setEnteredUsers(response.enteredUsers);
-        setNickname(response.nickname);
-        setUserColor(response.color);
+
+        const { nickname, color, role } = response.requesterUserSummary;
+
+        setNickname(nickname);
+        setUserColor(color);
+        setUserRole(role);
 
         // stomp 연결
         connectToWebSocket(response.gameRoomId);
@@ -237,9 +242,8 @@ export default function GameRoomPage() {
         messageHandler: gameRoomChatHandler,
       },
     ];
-
     webSocketClientRef.current.subscribe(topics);
-  }, [webSocketClientRef, authenticatedUserIdRef]);
+  }, [webSocketClientRef.current, authenticatedUserIdRef.current]);
 
   // 여기서 웹소켓 클라이언트 ref 내려주기
   return (
