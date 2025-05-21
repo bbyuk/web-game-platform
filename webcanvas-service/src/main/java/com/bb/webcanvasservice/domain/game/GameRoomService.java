@@ -287,7 +287,8 @@ public class GameRoomService {
                                 )
                         )
                         .collect(Collectors.toList()),
-                gameRoom.getState()
+                gameRoom.getState(),
+                userEntrance.getRole()
         );
     }
 

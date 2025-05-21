@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.domain.game.dto.response;
 
+import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -17,7 +18,10 @@ public record GameRoomEntranceInfoResponse(
         List<EnteredUserSummary> enteredUsers,
 
         @Schema(description = "현재 입장한 게임 방의 상태")
-        GameRoomState gameRoomState
+        GameRoomState gameRoomState,
+
+        @Schema(description = "요청한 유저의 게임 방 내에서의 ROLE")
+        GameRoomRole role
 
 ) {
     /**
