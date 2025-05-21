@@ -1,22 +1,27 @@
-import Title from "@/components/layouts/side-panel/title/index.jsx";
-import { JSX } from "react";
+import SidePanelTitle from "@/components/layouts/side-panel/title/index.jsx";
+import SidePanelFooter from "@/components/layouts/side-panel/footer/index.jsx";
+import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
+import { useRightSideStore } from "@/stores/layout/rightSideStore.jsx";
 
-export default function SidePanel({
-  title = { label: String(), icon: JSX.Element, button: false, onClick: () => {} },
-  left = Boolean(false),
-  right = Boolean(false),
-  children,
-  footer,
-}) {
+export default function SidePanel({ position }) {
+  const { contents, footer } =
+    position === "left" ? useLeftSideStore() : position === "right" ? useRightSideStore() : {};
+
+  const ContentComponent = contents.slot;
+  const FooterComponent = footer.slot;
   return (
     <div
-      className={`w-60 bg-gray-900 ${left ? "border-r" : right ? "border-l" : ""}border-gray-700 p-4 flex flex-col h-full`}
+      className={`w-60 bg-gray-900 ${position === "left" ? "border-r" : position === "right" ? "border-l" : ""}border-gray-700 p-4 flex flex-col h-full`}
     >
-      <Title label={title.label} icon={title.icon} button={title.button} onClick={title.onClick} />
+      <SidePanelTitle position={position} />
 
-      <div className={"flex-1 overflow-auto"}>{children}</div>
+      <div className={"flex-1 overflow-auto"}>
+        {ContentComponent ? <ContentComponent {...contents?.props} /> : null}
+      </div>
 
-      {footer && <div className={"mt-4"}>{footer}</div>}
+      <SidePanelFooter>
+        {FooterComponent ? <FooterComponent {...footer?.props} /> : null}
+      </SidePanelFooter>
     </div>
   );
 }

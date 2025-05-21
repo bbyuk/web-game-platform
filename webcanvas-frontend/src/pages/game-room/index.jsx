@@ -6,18 +6,19 @@ import { pages } from "@/router/index.jsx";
 import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
 import { ArrowLeft } from "lucide-react";
 import { getWebSocketClient } from "@/client/stomp/index.jsx";
-import { useApplicationContext } from "@/contexts/index.jsx";
 import { useAuthentication } from "@/contexts/authentication/index.jsx";
 import { useApiLock } from "@/api/lock/index.jsx";
+import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
+import ItemList from "@/components/layouts/side-panel/item-list/index.jsx";
 
 export default function GameRoomPage() {
   const { roomId } = useParams();
-  const { topTabs, leftSidebar, rightSidebar } = useApplicationContext();
   const { authenticatedUserIdRef } = useAuthentication();
   const { apiLock } = useApiLock();
   const apiClient = getApiClient();
   const navigate = useNavigate();
   const webSocketClientRef = useRef(null);
+  const leftSideStore = useLeftSideStore();
 
   /**
    * 페이지 상태
@@ -48,7 +49,9 @@ export default function GameRoomPage() {
         setUserRole(role);
 
         // stomp 연결
-        connectToWebSocket(response.gameRoomId);
+        if (roomId !== "temp") {
+          connectToWebSocket(response.gameRoomId);
+        }
 
         if (response.gameRoomState === "WAITING") {
           navigate(pages.gameRoom.waiting.url(response.gameRoomId), { replace: true });
@@ -76,14 +79,26 @@ export default function GameRoomPage() {
    */
   const setLeftSidebar = (response) => {
     if (response.enteredUsers) {
-      leftSidebar.setItems(
-        response.enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest }))
-      );
+      leftSideStore.setContents({
+        slot: ItemList,
+        props: {
+          value: response.enteredUsers.map(({ nickname, ...rest }) => ({
+            label: nickname,
+            ...rest,
+          })),
+        },
+      });
     } else {
-      leftSidebar.setItems(EMPTY_MESSAGES.ENTERED_USER_LIST);
+      leftSideStore.setContents({
+        slot: ItemList,
+        props: {
+          value: [],
+          emptyPlaceholder: EMPTY_MESSAGES.ENTERED_USER_LIST,
+        },
+      });
     }
 
-    leftSidebar.setTitle({
+    leftSideStore.setTitle({
       label: "exit",
       icon: <ArrowLeft size={20} className="text-gray-400" />,
       button: true,
@@ -143,7 +158,6 @@ export default function GameRoomPage() {
         console.log(frame);
       },
     };
-
     webSocketClientRef.current = getWebSocketClient(options);
   };
 
@@ -155,9 +169,6 @@ export default function GameRoomPage() {
   useEffect(() => {
     return () => {
       webSocketClientRef.current.deactivate();
-      leftSidebar.clear();
-      rightSidebar.clear();
-      topTabs.clear();
     };
   }, []);
 
@@ -173,9 +184,12 @@ export default function GameRoomPage() {
    */
   useEffect(() => {
     if (enteredUsers.length > 0) {
-      leftSidebar.setItems(
-        enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest }))
-      );
+      leftSideStore.setContents({
+        slot: ItemList,
+        props: {
+          value: enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest })),
+        },
+      });
     }
   }, [enteredUsers]);
 
@@ -183,7 +197,7 @@ export default function GameRoomPage() {
    * leftbar title 등록
    */
   useEffect(() => {
-    leftSidebar.setTitle({
+    leftSideStore.setTitle({
       label: "exit",
       icon: <ArrowLeft size={20} className="text-gray-400" />,
       button: true,
