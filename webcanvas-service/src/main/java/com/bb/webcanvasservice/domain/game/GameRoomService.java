@@ -311,8 +311,11 @@ public class GameRoomService {
 
         gameRoomEntrance.exit();
 
+
         GameRoom gameRoom = gameRoomEntrance.getGameRoom();
-        if (gameRoom.getEntrances().isEmpty()) {
+        List<GameRoomEntrance> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoom.getId());
+
+        if (entrances.isEmpty()) {
             gameRoom.close();
         }
 

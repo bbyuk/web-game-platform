@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.integration.domain.game;
 
+import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
 import com.bb.webcanvasservice.domain.game.GameRoom;
@@ -27,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 import java.util.concurrent.*;
 
+import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.GUEST;
+import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
 import static org.mockito.ArgumentMatchers.any;
 
 @Transactional
@@ -67,8 +70,8 @@ class GameRoomServiceIntegrationTest {
         playingRoom = gameRoomRepository.save(new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(10)));
 
         // 테스트 공통 방 호스트 입장
-        gameRoomEntranceRepository.save(new GameRoomEntrance(waitingRoom, waitingRoomHost, "테스트 수달", GameRoomRole.HOST));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(playingRoom, playingRoomHost, "테스트 늑대", GameRoomRole.HOST));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(waitingRoom, waitingRoomHost, "테스트 수달", HOST));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(playingRoom, playingRoomHost, "테스트 늑대", HOST));
     }
 
     @Test
@@ -80,7 +83,7 @@ class GameRoomServiceIntegrationTest {
 
 
         // when
-        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoom(waitingRoom.getId(), testUser.getId(), GameRoomRole.GUEST);
+        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoom(waitingRoom.getId(), testUser.getId(), GUEST);
 
         // then
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomId()).isEqualTo(waitingRoom.getId());
@@ -93,7 +96,7 @@ class GameRoomServiceIntegrationTest {
         // given - 공통 Entity 사용
 
         // when
-        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(playingRoom.getId(), testUser.getId(), GameRoomRole.GUEST))
+        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(playingRoom.getId(), testUser.getId(), GUEST))
                 .isInstanceOf(IllegalGameRoomStateException.class);
 
         // then
@@ -105,10 +108,10 @@ class GameRoomServiceIntegrationTest {
         // given - 다른 방에 이미 입장해 있는 경우
         GameRoom anotherGameRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
         gameRoomRepository.save(anotherGameRoom);
-        gameRoomEntranceRepository.save(new GameRoomEntrance(anotherGameRoom, testUser, "테스트 호랑이", GameRoomRole.HOST));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(anotherGameRoom, testUser, "테스트 호랑이", HOST));
 
         // when
-        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(waitingRoom.getId(), testUser.getId(), GameRoomRole.GUEST))
+        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(waitingRoom.getId(), testUser.getId(), GUEST))
                 .isInstanceOf(AlreadyEnteredRoomException.class);
 
         // then
@@ -170,6 +173,27 @@ class GameRoomServiceIntegrationTest {
         executor.shutdown();
 
         Assertions.assertThat(firstThreadResult.get()).isNotEqualTo(secondThreadResult.get());
+    }
+
+    @Test
+    @DisplayName("게임 방 퇴장 - 게임 방에서 모든 유저가 나가면 game room이 closed 된다.")
+    void gameRoomClosedWhenAllUserExit() throws Exception {
+        // given
+        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+
+        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
+
+        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "닉네임1", HOST));
+        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "닉네임2", GUEST));
+
+        // when
+        gameRoomService.exitFromRoom(gameRoomEntrance2.getId(), user2.getId());
+        gameRoomService.exitFromRoom(gameRoomEntrance1.getId(), user1.getId());
+
+        // then
+        Assertions.assertThat(gameRoom.getState()).isEqualTo(GameRoomState.CLOSED);
+
     }
 
 }

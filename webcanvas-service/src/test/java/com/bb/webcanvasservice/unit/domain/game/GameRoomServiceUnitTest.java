@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.unit.domain.game;
 
+import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
 import com.bb.webcanvasservice.domain.game.GameProperties;
@@ -346,7 +347,6 @@ class GameRoomServiceUnitTest {
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomId()).isEqualTo(testRoom.getId());
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomEntranceId()).isEqualTo(testGameRoomEntrance.getId());
     }
-
 
 
     private void setId(Object entity, Long id) throws NoSuchFieldException, IllegalAccessException {

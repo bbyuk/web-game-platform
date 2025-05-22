@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 게임 방을 나타내는 엔티티 클래스
@@ -51,8 +53,8 @@ public class GameRoom {
         this.joinCode = joinCode;
     }
 
-    public void addEntrance(GameRoomEntrance entrance) {
-        entrances.add(entrance);
+    public void addEntrance(GameRoomEntrance... entrance) {
+        entrances.addAll(Arrays.stream(entrance).toList());
     }
 
     public void close() {
