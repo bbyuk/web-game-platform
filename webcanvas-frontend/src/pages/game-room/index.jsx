@@ -50,7 +50,7 @@ export default function GameRoomPage() {
         setUserColor(color);
         setUserRole(role);
 
-        if (roomId !== "temp") {
+        if (roomId !== "temp" && !connected) {
           console.log("성공적으로 방에 입장했습니다.");
           setConnected(true);
         }
