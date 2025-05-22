@@ -270,7 +270,7 @@ class GameRoomServiceUnitTest {
         var testUser0 = new User(UUID.randomUUID().toString());
         var testUser1 = new User(UUID.randomUUID().toString());
         var testUser2 = new User(UUID.randomUUID().toString());
-        var testGameRoomEntrance0 = new GameRoomEntrance(testGameRoom, testUser0, "테스트 부엉이", GUEST);
+        var testGameRoomEntrance0 = new GameRoomEntrance(testGameRoom, testUser0, "테스트 부엉이", HOST);
         var testGameRoomEntrance1 = new GameRoomEntrance(testGameRoom, testUser1, "테스트 고양이", GUEST);
         var testGameRoomEntrance2 = new GameRoomEntrance(testGameRoom, testUser2, "테스트 호랑이", GUEST);
 
@@ -308,8 +308,11 @@ class GameRoomServiceUnitTest {
         // 250520 - 게임 방 상태 필드 추가
         Assertions.assertThat(enteredGameRoomInfo0.gameRoomState()).isEqualTo(GameRoomState.WAITING);
 
-        // 250921 - 게임 방 ROLE 필드 추가
-        Assertions.assertThat(enteredGameRoomInfo0.requesterUserSummary().role()).isEqualTo(GUEST);
+        // 250521 - 게임 방 ROLE 필드 추가
+        Assertions.assertThat(enteredGameRoomInfo0.requesterUserSummary().role()).isEqualTo(HOST);
+
+        // 250523 - 게임 방 ready 필드 추가 / HOST는 무조건 레디 상태
+        Assertions.assertThat(enteredGameRoomInfo0.requesterUserSummary().ready()).isTrue();
     }
 
     @Test

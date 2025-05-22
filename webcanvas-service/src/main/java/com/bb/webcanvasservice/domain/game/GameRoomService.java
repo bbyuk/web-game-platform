@@ -284,7 +284,8 @@ public class GameRoomService {
                                 gameRoomEntrance.getUser().getId(),
                                 gameProperties.gameRoomUserColors().get(index.getAndIncrement()),
                                 gameRoomEntrance.getNickname(),
-                                userEntrance.getRole()
+                                userEntrance.getRole(),
+                                gameRoomEntrance.isReady()
                         )
                 )
                 .collect(Collectors.toList());

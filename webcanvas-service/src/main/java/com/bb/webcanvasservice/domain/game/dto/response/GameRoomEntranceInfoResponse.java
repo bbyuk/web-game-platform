@@ -40,7 +40,10 @@ public record GameRoomEntranceInfoResponse(
             String nickname,
 
             @Schema(description = "게임 방 내에서의 ROLE")
-            GameRoomRole role
+            GameRoomRole role,
+
+            @Schema(description = "레디 여부")
+            boolean ready
 
     ) {};
 }

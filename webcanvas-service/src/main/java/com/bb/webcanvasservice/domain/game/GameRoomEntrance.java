@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
+
 /**
  * 유저의 게임 방 입장을 나타내는 엔티티 클래스
  */
@@ -59,12 +61,24 @@ public class GameRoomEntrance {
     @Column(name = "game_room_entrance_state")
     private GameRoomEntranceState state;
 
+    @Column(name = "ready")
+    private boolean ready;
+
+    public boolean isReady() {
+        if (this.role == HOST) {
+            return true;
+        }
+
+        return ready;
+    }
+
     public GameRoomEntrance(GameRoom gameRoom, User user, String nickname, GameRoomRole role) {
         this.gameRoom = gameRoom;
         this.user = user;
         this.state = GameRoomEntranceState.ACTIVE;
         this.nickname = nickname;
         this.role = role;
+        this.ready = role == HOST;
     }
 
     /**
@@ -82,5 +96,15 @@ public class GameRoomEntrance {
      */
     public void changeRole(GameRoomRole gameRoomRole) {
         this.role = gameRoomRole;
+        if (this.role == HOST) {
+            this.ready = true;
+        }
+    }
+
+    /**
+     * 레디 상태를 바꾼다.
+     */
+    public void toggleReady() {
+        this.ready = !this.ready;
     }
 }
