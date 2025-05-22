@@ -33,7 +33,7 @@ import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
 import static org.mockito.ArgumentMatchers.any;
 
 @Transactional
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("[integration] [service] 게임 방 서비스 통합테스트")
 class GameRoomServiceIntegrationTest {
 
@@ -193,6 +193,26 @@ class GameRoomServiceIntegrationTest {
 
         // then
         Assertions.assertThat(gameRoom.getState()).isEqualTo(GameRoomState.CLOSED);
+
+    }
+
+    @Test
+    @DisplayName("게임 방 퇴장 - 게임 방에서 HOST가 나가면 남은 유저 중 입장한지 가장 오래된 유저가 HOST가 된다.")
+    void gameRoomHostChangedWhenHostExit() throws Exception {
+        // given
+        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+
+        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
+
+        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "닉네임1", HOST));
+        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "닉네임2", GUEST));
+
+        // when
+        gameRoomService.exitFromRoom(gameRoomEntrance1.getId(), user1.getId());
+
+        // then
+        Assertions.assertThat(gameRoomEntrance2.getRole()).isEqualTo(HOST);
 
     }
 

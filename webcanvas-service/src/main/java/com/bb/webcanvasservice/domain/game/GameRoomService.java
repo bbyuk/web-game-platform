@@ -13,6 +13,7 @@ import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.event.GameRoomEntranceEvent;
 import com.bb.webcanvasservice.domain.game.event.GameRoomExitEvent;
+import com.bb.webcanvasservice.domain.game.event.GameRoomHostChangedEvent;
 import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
@@ -27,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
 
 /**
  * 게임 방과 관련된 비즈니스 로직을 처리하는 서비스 클래스
@@ -80,7 +83,7 @@ public class GameRoomService {
     @Transactional
     public GameRoomEntranceResponse createGameRoomAndEnter(Long userId) {
         Long gameRoomId = createGameRoom(userId);
-        return enterGameRoom(gameRoomId, userId, GameRoomRole.HOST);
+        return enterGameRoom(gameRoomId, userId, HOST);
     }
 
     /**
@@ -296,31 +299,49 @@ public class GameRoomService {
 
     /**
      * 게임 방에서 퇴장한다.
+     *
+     * HOST 퇴장 시 입장한 지 가장 오래된 유저가 HOST로 변경
      * @param gameRoomEntranceId
      * @param userId
      */
     @Transactional
     public void exitFromRoom(Long gameRoomEntranceId, Long userId) {
-        GameRoomEntrance gameRoomEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
+        GameRoomEntrance targetEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
                 .orElseThrow(GameRoomEntranceNotFoundException::new);
 
-        if (!gameRoomEntrance.getUser().getId().equals(userId)) {
+        if (!targetEntrance.getUser().getId().equals(userId)) {
             log.error("대상 게임 방 입장 기록과 요청 유저가 다릅니다.");
             throw new AbnormalAccessException();
         }
 
-        gameRoomEntrance.exit();
+        targetEntrance.exit();
 
-
-        GameRoom gameRoom = gameRoomEntrance.getGameRoom();
+        GameRoom gameRoom = targetEntrance.getGameRoom();
         List<GameRoomEntrance> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoom.getId());
 
         if (entrances.isEmpty()) {
             gameRoom.close();
         }
+        else if (targetEntrance.getRole() == HOST) {
+            /**
+             * 250522
+             * 퇴장 요청을 보낸 유저가 HOST일 경우 남은 유저 중 제일 처음 입장한 유저가 HOST가 된다.
+             */
+            entrances.stream()
+                    .filter(entrance -> entrance.getId() != gameRoomEntranceId)
+                    .findFirst()
+                    .ifPresentOrElse(
+                            entrance -> {
+                                entrance.changeRole(HOST);
+                                // HOST changed event 발행
+                                applicationEventPublisher.publishEvent(new GameRoomHostChangedEvent(entrance.getGameRoom().getId(), entrance.getUser().getId()));
+                            },
+                            () -> gameRoom.close()
+                    );
+        }
 
         /**
-         * 250519 게임방 퇴장시 이벤트 발행
+         * 250519 게임방 퇴장시 event 발행
          */
         applicationEventPublisher.publishEvent(new GameRoomExitEvent(gameRoom.getId(), userId));
     }

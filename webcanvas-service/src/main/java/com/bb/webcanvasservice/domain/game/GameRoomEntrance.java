@@ -75,4 +75,12 @@ public class GameRoomEntrance {
         this.gameRoom.getEntrances()
                 .removeIf(entrance -> entrance.id.equals(this.id));
     }
+
+    /**
+     * 역할을 변경한다.
+     * @param gameRoomRole
+     */
+    public void changeRole(GameRoomRole gameRoomRole) {
+        this.role = gameRoomRole;
+    }
 }
