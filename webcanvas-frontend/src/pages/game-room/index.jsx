@@ -26,10 +26,12 @@ export default function GameRoomPage() {
   const [connected, setConnected] = useState(false);
 
   const [enteredUsers, setEnteredUsers] = useState([]);
-  const [gameRoomEntranceId, setGameRoomEntranceId] = useState(null);
-  const [nickname, setNickname] = useState(null);
-  const [userColor, setUserColor] = useState(null);
-  const [userRole, setUserRole] = useState(null);
+  const [myInfo, setMyInfo] = useState({
+    gameRoomEntranceId: null,
+    nickname: null,
+    color: null,
+    role: null,
+  });
 
   /**
    * 현재 입장한 게임 방의 정보를 조회한다.
@@ -41,14 +43,14 @@ export default function GameRoomPage() {
       .get(game.getCurrentEnteredGameRoom)
       .then((response) => {
         // 상태 셋팅
-        setGameRoomEntranceId(response.gameRoomEntranceId);
         setEnteredUsers(response.enteredUsers);
 
-        const { nickname, color, role } = response.requesterUserSummary;
-
-        setNickname(nickname);
-        setUserColor(color);
-        setUserRole(role);
+        setMyInfo({
+          nickname: response.requesterUserSummary.nickname,
+          color: response.requesterUserSummary.color,
+          role: response.requesterUserSummary.role,
+          gameRoomEntranceId: response.gameRoomEntranceId,
+        });
 
         if (roomId !== "temp" && !connected) {
           console.log("성공적으로 방에 입장했습니다.");
@@ -248,10 +250,10 @@ export default function GameRoomPage() {
       icon: <ArrowLeft size={20} className="text-gray-400" />,
       button: true,
       onClick: () => {
-        exitGameRoom(gameRoomEntranceId);
+        exitGameRoom(myInfo.gameRoomEntranceId);
       },
     });
-  }, [gameRoomEntranceId]);
+  }, [myInfo]);
 
   /**
    * 웹소켓 토픽 구독 및 메세지 핸들러 등록 useEffect
@@ -283,10 +285,8 @@ export default function GameRoomPage() {
     <Outlet
       context={{
         enteredUsers,
-        nickname,
-        userColor,
+        myInfo,
         webSocketClientRef,
-        gameRoomEntranceId,
       }}
     />
   );

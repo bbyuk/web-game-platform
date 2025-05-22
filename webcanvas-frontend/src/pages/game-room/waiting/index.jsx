@@ -6,7 +6,7 @@ import SidePanelFooterButton from "@/components/layouts/side-panel/footer-button
 
 export default function GameRoomWaitingPage() {
   // Outlet context
-  const { enteredUsers, nickname, userColor, webSocketClientRef } = useOutletContext();
+  const { enteredUsers, myInfo, webSocketClientRef } = useOutletContext();
   const leftSideStore = useLeftSideStore();
 
   /**
@@ -21,15 +21,23 @@ export default function GameRoomWaitingPage() {
   };
 
   useEffect(() => {
+    const label = myInfo.role === "HOST" ? "START" : myInfo.role === "GUEST" ? "READY" : "";
+
+    const disabled = myInfo.role === "HOST" ? enteredUsers.length === 1 : myInfo.role !== "GUEST";
+
     leftSideStore.setFooter({
       slot: SidePanelFooterButton,
       props: {
-        label: "게임 시작",
+        label: label,
         onClick: startGame,
-        disabled: enteredUsers.length === 1,
+        disabled: disabled,
       },
     });
-  }, []);
+
+    return () => {
+      leftSideStore.clear();
+    };
+  }, [enteredUsers, myInfo]);
 
   /**
    * =========================== 이벤트 핸들러 =============================
