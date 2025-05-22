@@ -47,14 +47,16 @@ export default function LobbyPage() {
     );
 
     if (response) {
-      const leftSideList = response.roomList.map(({ joinCode, enterCount, capacity, gameRoomId }) => ({
-        label: "입장 가능",
-        current: enterCount,
-        isButton: enterCount < capacity,
-        capacity: capacity,
-        gameRoomId: gameRoomId,
-        onClick: () => enterRoom(gameRoomId),
-      }));
+      const leftSideList = response.roomList.map(
+        ({ joinCode, enterCount, capacity, gameRoomId }) => ({
+          label: "입장 가능",
+          current: enterCount,
+          isButton: enterCount < capacity,
+          capacity: capacity,
+          gameRoomId: gameRoomId,
+          onClick: () => enterRoom(gameRoomId),
+        })
+      );
       leftSideStore.setContents({
         slot: ItemList,
         props: {
@@ -71,7 +73,7 @@ export default function LobbyPage() {
       icon: <GitCommit size={20} className="text-gray-400" />,
       button: true,
       onClick: findEnterableGameRooms,
-    })
+    });
     /**
      * 입장 가능한 방 목록 조회
      */

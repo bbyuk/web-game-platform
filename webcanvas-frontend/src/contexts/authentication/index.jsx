@@ -16,12 +16,13 @@ export const useAuthentication = () => useContext(AuthenticationContext);
  */
 export const AuthenticationProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const authenticatedUserIdRef = useRef(null);
+  const [authenticatedUserId, setAuthenticatedUserId] = useState(null);
+
   const apiClient = getApiClient();
   const navigate = useNavigate();
 
   const onAuthenticationSuccess = (userId) => {
-    authenticatedUserIdRef.current = userId;
+    setAuthenticatedUserId(userId);
     setIsAuthenticated(true);
   };
 
@@ -51,6 +52,7 @@ export const AuthenticationProvider = ({ children }) => {
         }
       })
       .catch((error) => {
+        console.log("인증 실패");
         /**
          * 앱 진입 인증 요청에 실패시 핸들링
          * 자동 로그인 요청
@@ -59,7 +61,7 @@ export const AuthenticationProvider = ({ children }) => {
         const fingerprint = localStorage.getItem(STORAGE_KEY.FINGERPRINT);
         apiClient
           .post(auth.login, { fingerprint: fingerprint })
-          .then(async ({ userId, fingerprint, accessToken, success }) => {
+          .then(({ userId, fingerprint, accessToken, success }) => {
             if (success) {
               onLoginSuccess(userId, fingerprint, accessToken);
             }
@@ -84,7 +86,7 @@ export const AuthenticationProvider = ({ children }) => {
     <AuthenticationContext.Provider
       value={{
         isAuthenticated,
-        authenticatedUserIdRef,
+        authenticatedUserId,
       }}
     >
       {children}
