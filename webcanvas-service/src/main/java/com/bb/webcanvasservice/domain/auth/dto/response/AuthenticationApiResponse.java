@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record AuthenticationApiResponse(
 
         @Schema(description = "유저 식별 시퀀스")
-        Long userID,
+        Long userId,
 
         @Schema(description = "서버에서 생성된 유저의 fingerprint")
         String fingerprint,
