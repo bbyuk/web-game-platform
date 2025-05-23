@@ -261,11 +261,20 @@ export default function GameRoomPage() {
    * leftbar 리스트 등록
    */
   useEffect(() => {
+    const getLeftSideItemTheme = (role, ready) => {
+      if (role === "GUEST" && ready) {
+        return "green";
+      }
+    };
+
     if (enteredUsers.length > 0) {
       leftSideStore.setContents({
         slot: ItemList,
         props: {
-          value: enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest })),
+          value: enteredUsers.map(
+            ({ nickname, ready, role, ...rest })=>
+              ({ label: nickname, highlight: ready, theme: getLeftSideItemTheme(role, ready), ...rest })
+          ),
         },
       });
     }
