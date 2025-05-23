@@ -30,6 +30,7 @@ import java.util.concurrent.*;
 
 import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.GUEST;
 import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
+import static com.bb.webcanvasservice.domain.game.enums.GameRoomState.WAITING;
 import static org.mockito.ArgumentMatchers.any;
 
 @Transactional
@@ -66,7 +67,7 @@ class GameRoomServiceIntegrationTest {
         playingRoomHost = userRepository.save(new User(UUID.randomUUID().toString()));
 
         // 테스트 공통 게임 방 저장
-        waitingRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10)));
+        waitingRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(10)));
         playingRoom = gameRoomRepository.save(new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(10)));
 
         // 테스트 공통 방 호스트 입장
@@ -106,7 +107,7 @@ class GameRoomServiceIntegrationTest {
     @DisplayName("게임 방 입장 - 요청 유저가 현재 게임 방에 입장해있을 시 실패")
     public void enterGameRoomFailedWhenUserAlreadyEnterAnyGameRoom() {
         // given - 다른 방에 이미 입장해 있는 경우
-        GameRoom anotherGameRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
+        GameRoom anotherGameRoom = new GameRoom(WAITING, JoinCodeGenerator.generate(10));
         gameRoomRepository.save(anotherGameRoom);
         gameRoomEntranceRepository.save(new GameRoomEntrance(anotherGameRoom, testUser, "테스트 호랑이", HOST));
 
@@ -146,7 +147,7 @@ class GameRoomServiceIntegrationTest {
                 String verifiedJoinCode = gameRoomService.verifyJoinCode(joinCode);
 
                 // verify된 joinCode로 방을 먼저 생성한다. (단순테스트 로직)
-                gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, verifiedJoinCode));
+                gameRoomRepository.save(new GameRoom(WAITING, verifiedJoinCode));
 
                 Thread.sleep(3000); // 일부러 지연 -> 락 유지됨
                 return verifiedJoinCode;
@@ -182,7 +183,7 @@ class GameRoomServiceIntegrationTest {
         User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
         User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
 
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
+        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(6)));
 
         GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "닉네임1", HOST));
         GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "닉네임2", GUEST));
@@ -203,7 +204,7 @@ class GameRoomServiceIntegrationTest {
         User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
         User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
 
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
+        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(6)));
 
         GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "닉네임1", HOST));
         GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "닉네임2", GUEST));
@@ -214,6 +215,26 @@ class GameRoomServiceIntegrationTest {
         // then
         Assertions.assertThat(gameRoomEntrance2.getRole()).isEqualTo(HOST);
 
+    }
+
+    @Test
+    @DisplayName("게임 방 레디 - 레디 상태 JPA 변경 감지 테스트")
+    void testGameRoomEntranceReadyDirtyCheck() throws Exception {
+        // given
+        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+
+        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(6)));
+
+        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "닉네임1", HOST));
+        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "닉네임2", GUEST));
+
+        // when
+        gameRoomService.updateReady(gameRoomEntrance2.getId(), user2.getId(), true);
+
+        // then
+        gameRoomEntranceRepository.findById(gameRoomEntrance2.getId())
+                .ifPresent(gameRoomEntrance -> Assertions.assertThat(gameRoomEntrance.isReady()).isTrue());
     }
 
 }

@@ -12,6 +12,7 @@ import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
+import com.bb.webcanvasservice.domain.game.exception.GameRoomHostCanNotChangeReadyException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
@@ -351,6 +352,25 @@ class GameRoomServiceUnitTest {
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomEntranceId()).isEqualTo(testGameRoomEntrance.getId());
     }
 
+    @Test
+    @DisplayName("레디 상태 변경 - 호스트는 게임 레디 상태를 임의로 변경할 수 없다.")
+    void hostCannotChangeReady() throws Exception {
+        // given
+        User user = new User(FingerprintGenerator.generate());
+        setId(user, 1L);
+        GameRoom gameRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6));
+
+        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(gameRoom, user, "닉네임1", HOST);
+
+        when(gameRoomEntranceRepository.findById(anyLong())).thenReturn(Optional.of(gameRoomEntrance));
+
+        // when
+
+        Assertions.assertThatThrownBy(() -> gameRoomService.updateReady(1L, 1L, true))
+                .isInstanceOf(GameRoomHostCanNotChangeReadyException.class);
+
+        // then
+    }
 
     private void setId(Object entity, Long id) throws NoSuchFieldException, IllegalAccessException {
         Field idField = entity.getClass().getDeclaredField("id");

@@ -104,7 +104,7 @@ public class GameRoomEntrance {
     /**
      * 레디 상태를 바꾼다.
      */
-    public void toggleReady() {
-        this.ready = !this.ready;
+    public void changeReady(boolean ready) {
+        this.ready = ready;
     }
 }

@@ -358,4 +358,33 @@ public class GameRoomService {
     public boolean isEnteredRoom(Long gameRoomId, Long userId) {
         return gameRoomEntranceRepository.existsActiveEntrance(gameRoomId, userId);
     }
+
+    /**
+     * 게임 방에 입장한 유저의 레디 값을 변경한다.
+     *
+     * @param gameRoomEntranceId
+     * @param userId
+     * @param ready
+     * @return
+     */
+    @Transactional
+    public boolean updateReady(Long gameRoomEntranceId, Long userId, boolean ready) {
+        GameRoomEntrance targetEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
+                .orElseThrow(GameRoomEntranceNotFoundException::new);
+
+        if (targetEntrance.getUser().getId() != userId) {
+            log.error("다른 유저의 정보 접근 시도");
+            log.error("userId = {} ===>>> gameRoomEntranceId = {}", userId, gameRoomEntranceId);
+            throw new AbnormalAccessException();
+        }
+
+        if (targetEntrance.getRole() == HOST) {
+            log.debug("호스트는 레디 상태를 변경할 수 없습니다.");
+            throw new GameRoomHostCanNotChangeReadyException();
+        }
+
+        targetEntrance.changeReady(ready);
+
+        return true;
+    }
 }
