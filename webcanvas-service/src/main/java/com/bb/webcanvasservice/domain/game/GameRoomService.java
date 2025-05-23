@@ -387,6 +387,6 @@ public class GameRoomService {
         targetEntrance.changeReady(ready);
         applicationEventPublisher.publishEvent(new UserReadyChanged(targetEntrance.getGameRoom().getId(), userId, ready));
 
-        return true;
+        return ready;
     }
 }
