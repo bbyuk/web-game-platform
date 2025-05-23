@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GameRoomWaitingPlaceholder } from "@/components/placeholder/game-room/waiting/index.jsx";
 import { useOutletContext } from "react-router-dom";
 import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
@@ -57,11 +57,13 @@ export default function GameRoomWaitingPage() {
         onClick: buttonOnClickHandler,
       },
     });
+  }, [enteredUsers, myInfo]);
 
+  useEffect(() => {
     return () => {
       leftSideStore.clear();
     };
-  }, [enteredUsers, myInfo]);
+  }, []);
 
   /**
    * =========================== 이벤트 핸들러 =============================

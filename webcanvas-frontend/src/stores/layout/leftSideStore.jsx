@@ -23,8 +23,10 @@ export const useLeftSideStore = create((set) => ({
   setTitle: (value) => set({ title: value }),
   contents: init.contents,
   setContents: (value) => set({ contents: value }),
+  clearContents: () => set({ contents: init.contents }),
   footer: init.footer,
   setFooter: (value) => set({ footer: value }),
+  clearFooter: () => set({ footer: init.footer }),
 
   clear: () => set({ title: init.title, contents: init.contents, footer: init.footer }),
 }));

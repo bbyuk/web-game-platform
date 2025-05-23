@@ -24,13 +24,13 @@ export default function GameRoomPage() {
    * 페이지 상태
    */
   const [connected, setConnected] = useState(false);
-
   const [enteredUsers, setEnteredUsers] = useState([]);
   const [myInfo, setMyInfo] = useState({
     gameRoomEntranceId: null,
     nickname: null,
     color: null,
     role: null,
+    ready: false,
   });
 
   const changeReadyState = (ready) => {
@@ -54,6 +54,7 @@ export default function GameRoomPage() {
           color: response.requesterUserSummary.color,
           role: response.requesterUserSummary.role,
           gameRoomEntranceId: response.gameRoomEntranceId,
+          ready: response.requesterUserSummary.ready,
         });
 
         if (roomId !== "temp" && !connected) {
@@ -139,7 +140,7 @@ export default function GameRoomPage() {
    * 다른 유저의 입장 및 퇴장 이벤트 발생시
    * 현재 게임방 정보를 재조회해 leftbar setting
    */
-  const onOtherUserStateChange = () => {
+  const findEnteredUsers = () => {
     findCurrentGameRoomInfo().then((response) => {
       if (!response) {
         return;
@@ -181,12 +182,36 @@ export default function GameRoomPage() {
         // 서버로부터 받은 이벤트가 없음
         return;
       }
-      const { event, userId } = frame;
-      if (authenticatedUserId !== userId && (event === "ROOM/ENTRANCE" || event === "ROOM/EXIT")) {
-        /**
-         * 다른 사람 입장 OR 퇴장 이벤트 발생시
-         */
-        onOtherUserStateChange();
+
+      switch (frame.event) {
+        case "ROOM/ENTRANCE":
+        case "ROOM/EXIT":
+          if (authenticatedUserId !== frame.userId) {
+            /**
+             * 다른 사람 입장 OR 퇴장 이벤트 발생시
+             */
+            findCurrentGameRoomInfo().then((response) => {
+              if (!response) {
+                return;
+              }
+
+              setLeftSidebar(response);
+            });
+          }
+          break;
+        case "ROOM/USER_READY_CHANGED":
+          console.log("누군가 레디를 했다.");
+          /**
+           * 다른 사람 ready 발생시
+           */
+          findCurrentGameRoomInfo().then((response) => {
+            if (!response) {
+              return;
+            }
+
+            setLeftSidebar(response);
+          });
+          break;
       }
     };
 
@@ -221,6 +246,7 @@ export default function GameRoomPage() {
   useEffect(() => {
     return () => {
       webSocketClientRef.current.deactivate();
+      leftSideStore.clear();
     };
   }, []);
 
