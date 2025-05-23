@@ -14,6 +14,7 @@ import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.event.GameRoomEntranceEvent;
 import com.bb.webcanvasservice.domain.game.event.GameRoomExitEvent;
 import com.bb.webcanvasservice.domain.game.event.GameRoomHostChangedEvent;
+import com.bb.webcanvasservice.domain.game.event.UserReadyChanged;
 import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
@@ -384,6 +385,7 @@ public class GameRoomService {
         }
 
         targetEntrance.changeReady(ready);
+        applicationEventPublisher.publishEvent(new UserReadyChanged(targetEntrance.getGameRoom().getId(), userId, ready));
 
         return true;
     }

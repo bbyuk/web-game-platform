@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.domain.game.listener;
 import com.bb.webcanvasservice.domain.game.event.GameRoomEntranceEvent;
 import com.bb.webcanvasservice.domain.game.event.GameRoomExitEvent;
 import com.bb.webcanvasservice.domain.game.event.GameRoomHostChangedEvent;
+import com.bb.webcanvasservice.domain.game.event.UserReadyChanged;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,11 @@ public class GameEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameRoomHostChange(GameRoomHostChangedEvent event) {
+        messagingTemplate.convertAndSend("/session/" + event.getGameRoomId(), event);
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleUserReadyChanged(UserReadyChanged event) {
         messagingTemplate.convertAndSend("/session/" + event.getGameRoomId(), event);
     }
 }
