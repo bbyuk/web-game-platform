@@ -15,4 +15,6 @@ export const game = {
   getCurrentEnteredGameRoom: `${BASE}/room/entrance`,
   // 현재 입장한 게임 방 퇴장
   exitFromGameRoom: (gameRoomEntranceId) => `${BASE}/room/entrance/${gameRoomEntranceId}`,
+  // 레디 상태 변경
+  updateReady: (gameRoomEntranceId) => `${BASE}/room/entrance/${gameRoomEntranceId}/ready`,
 };

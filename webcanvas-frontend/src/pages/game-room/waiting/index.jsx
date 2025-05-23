@@ -3,11 +3,16 @@ import { GameRoomWaitingPlaceholder } from "@/components/placeholder/game-room/w
 import { useOutletContext } from "react-router-dom";
 import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
 import SidePanelFooterButton from "@/components/layouts/side-panel/footer-button/index.jsx";
+import { useApiLock } from "@/api/lock/index.jsx";
+import { getApiClient } from "@/client/http/index.jsx";
+import { game } from "@/api/index.js";
 
 export default function GameRoomWaitingPage() {
   // Outlet context
-  const { enteredUsers, myInfo, webSocketClientRef } = useOutletContext();
+  const { enteredUsers, myInfo, changeReadyState, webSocketClientRef } = useOutletContext();
   const leftSideStore = useLeftSideStore();
+  const { apiLock } = useApiLock();
+  const apiClient = getApiClient();
 
   /**
    * =========================== 이벤트 핸들러 =============================
@@ -20,17 +25,36 @@ export default function GameRoomWaitingPage() {
     alert("게임 시작");
   };
 
-  useEffect(() => {
-    const label = myInfo.role === "HOST" ? "START" : myInfo.role === "GUEST" ? "READY" : "";
+  /**
+   * 레디 버튼 토글
+   */
+  const toggleReady = () => {
+    apiClient
+      .patch(game.updateReady(myInfo.gameRoomEntranceId), {
+        ready: !myInfo.ready,
+      })
+      .then((response) => {
+        changeReadyState(response);
+      });
+  };
 
-    const disabled = myInfo.role === "HOST" ? enteredUsers.length === 1 : myInfo.role !== "GUEST";
+  useEffect(() => {
+    const buttonOnClickHandler =
+      myInfo.role === "HOST" ? startGame : myInfo.role === "GUEST" ? toggleReady : null;
+    const status =
+      myInfo.role === "HOST"
+        ? "start"
+        : myInfo.role === "GUEST" && myInfo.ready
+          ? "ready"
+          : myInfo.role === "GUEST" && !myInfo.ready
+            ? "not-ready"
+            : null;
 
     leftSideStore.setFooter({
       slot: SidePanelFooterButton,
       props: {
-        label: label,
-        onClick: startGame,
-        disabled: disabled,
+        status: status,
+        onClick: buttonOnClickHandler,
       },
     });
 

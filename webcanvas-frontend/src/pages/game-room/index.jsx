@@ -33,6 +33,10 @@ export default function GameRoomPage() {
     role: null,
   });
 
+  const changeReadyState = (ready) => {
+    setMyInfo({ ...myInfo, ready });
+  };
+
   /**
    * 현재 입장한 게임 방의 정보를 조회한다.
    * @returns {Promise<awaited Promise<Result<RootNode> | void> | Promise<Result<Root> | void> | Promise<any>>}
@@ -286,6 +290,7 @@ export default function GameRoomPage() {
       context={{
         enteredUsers,
         myInfo,
+        changeReadyState,
         webSocketClientRef,
       }}
     />

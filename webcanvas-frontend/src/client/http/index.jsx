@@ -160,6 +160,9 @@ export const getApiClient = () => {
     put: (target, data = {}, options = {}) => {
       return request("PUT", target, data, options);
     },
+    patch: async (target, data = {}, options = {}) => {
+      return request("PATCH", target, data, options);
+    },
     delete: (target, params = {}, options = {}) => {
       return request("DELETE", target, params, options);
     },
