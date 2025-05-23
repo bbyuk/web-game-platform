@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.config.properties;
+package com.bb.webcanvasservice.websocket.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

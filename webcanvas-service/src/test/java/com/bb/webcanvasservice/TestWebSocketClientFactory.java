@@ -1,8 +1,7 @@
 package com.bb.webcanvasservice;
 
 import com.bb.webcanvasservice.common.JwtManager;
-import com.bb.webcanvasservice.config.properties.WebSocketProperties;
-import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
+import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.domain.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;

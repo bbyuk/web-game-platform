@@ -373,7 +373,7 @@ public class GameRoomService {
         GameRoomEntrance targetEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
                 .orElseThrow(GameRoomEntranceNotFoundException::new);
 
-        if (targetEntrance.getUser().getId() != userId) {
+        if (!targetEntrance.getUser().getId().equals(userId)) {
             log.error("다른 유저의 정보 접근 시도");
             log.error("userId = {} ===>>> gameRoomEntranceId = {}", userId, gameRoomEntranceId);
             throw new AbnormalAccessException();

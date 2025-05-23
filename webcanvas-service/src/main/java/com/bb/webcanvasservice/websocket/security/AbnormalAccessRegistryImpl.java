@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.websocket.security;
 
 import com.bb.webcanvasservice.common.ban.Ban;
 import com.bb.webcanvasservice.common.ban.BanRepository;
-import com.bb.webcanvasservice.config.properties.WebSocketProperties;
+import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

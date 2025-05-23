@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.domain.canvas;
 
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
-import com.bb.webcanvasservice.config.properties.WebSocketProperties;
+import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
 import lombok.RequiredArgsConstructor;

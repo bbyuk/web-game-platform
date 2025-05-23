@@ -52,7 +52,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         configurer.configurationSource(request -> {
                             var config = new org.springframework.web.cors.CorsConfiguration();
                             config.setAllowedOrigins(List.of("http://localhost:5173"));
-                            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                            config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                             config.setAllowedHeaders(List.of("*"));
                             config.setAllowCredentials(true); // 쿠키 등 인증정보 포함 허용
                             return config;

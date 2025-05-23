@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.websocket.config;
 
-import com.bb.webcanvasservice.config.properties.WebSocketProperties;
+import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.common.JwtManager;
 import com.bb.webcanvasservice.domain.game.GameRoomService;
 import com.bb.webcanvasservice.websocket.interceptor.JwtAuthenticationChannelInterceptor;
@@ -16,8 +16,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 
 
