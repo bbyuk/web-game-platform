@@ -1,6 +1,4 @@
-import MainPanel from "@/components/layouts/center-panel/main-panel/index.jsx";
-import TopTabs from "@/components/layouts/center-panel/top-tabs/index.jsx";
-// import { useApplicationContext } from "@/contexts/index.jsx";
+import MainPanel from '@/components/layouts/center-panel/main-panel/index.jsx';
 
 export default function CenterPanel({ children }) {
   /**

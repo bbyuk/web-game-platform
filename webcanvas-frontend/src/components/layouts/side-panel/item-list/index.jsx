@@ -31,7 +31,6 @@ const Item = ({
     defaultText = "text-white";
   }
 
-  console.log(theme);
 
   return (
     <li

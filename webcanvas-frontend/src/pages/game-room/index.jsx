@@ -161,10 +161,8 @@ export default function GameRoomPage() {
     }
     const options = {
       onConnect: (frame) => {
-        console.log(frame);
       },
       onError: (frame) => {
-        console.log(frame);
       },
     };
     webSocketClientRef.current = getWebSocketClient(options);

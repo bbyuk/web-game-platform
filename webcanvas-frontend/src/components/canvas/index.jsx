@@ -117,8 +117,6 @@ export default function Canvas({
     const canvasWidth = canvasRef.current.width;
     const canvasHeight = canvasRef.current.height;
 
-    console.log(strokes);
-
     strokes.forEach((stroke) => {
       ctx.beginPath();
       ctx.strokeStyle = stroke.color;

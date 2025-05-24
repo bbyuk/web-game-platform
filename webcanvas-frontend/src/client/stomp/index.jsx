@@ -9,9 +9,8 @@ export const getWebSocketClient = ({ onConnect, onError }) => {
         Authorization: `Bearer ${localStorage.getItem(STORAGE_KEY.ACCESS_TOKEN)}`,
       },
       reconnectDelay: 5000,
-      debug: (msg) => console.log("[STOMP]", msg),
+      debug: (msg) => {},
       onConnect: (frame) => {
-        console.log("STOMP Connected:", frame);
         clientWrapper.isConnected = true;
 
         if (clientWrapper.subscribeTopicQueue.length > 0) {
@@ -24,7 +23,6 @@ export const getWebSocketClient = ({ onConnect, onError }) => {
         onConnect?.(frame);
       },
       onStompError: (frame) => {
-        console.error("STOMP Error:", frame);
         onError?.(frame);
       },
     }),
