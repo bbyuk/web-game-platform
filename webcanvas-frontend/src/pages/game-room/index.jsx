@@ -263,7 +263,7 @@ export default function GameRoomPage() {
   useEffect(() => {
     const getLeftSideItemTheme = (role, ready) => {
       if (role === "GUEST" && ready) {
-        return "green";
+        return "indigo";
       }
     };
 

@@ -31,6 +31,7 @@ const Item = ({
     defaultText = "text-white";
   }
 
+  console.log(theme);
 
   return (
     <li
@@ -71,6 +72,7 @@ const ItemList = ({ value, emptyPlaceholder }) => {
             label={el.label}
             color={el.color}
             highlight={el.highlight}
+            theme={el.theme}
             current={el.current}
             capacity={el.capacity}
             isButton={el.isButton}
