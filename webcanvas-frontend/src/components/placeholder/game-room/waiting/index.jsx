@@ -11,17 +11,17 @@ export function GameRoomWaitingPlaceholder({ className = "", role, ready, allGue
     } else {
       icon = "⏱️";
       title = "플레이어들을 기다리는 중...";
-      description = "모든 참가자가 준비할 때까지 기다려주세요.";
+      description = "모든 플레이어가 준비할 때까지 기다려주세요.";
     }
   } else {
     if (ready) {
       icon = "🙌";
       title = "준비 완료!";
-      description = "방장이 게임을 시작할 때까지 기다려주세요.";
+      description = "호스트가 게임을 시작할 때까지 기다려주세요.";
     } else {
       icon = "🕹️";
       title = "게임을 시작할 준비가 되셨나요?";
-      description = "준비가 되면 'READY' 버튼을 눌러주세요.";
+      description = "준비가 되면 READY 버튼을 눌러주세요.";
     }
   }
 
