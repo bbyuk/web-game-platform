@@ -13,7 +13,13 @@ export default function SidePanelFooterButton({ status = "not-ready", onClick = 
           disabled: false,
           className: "bg-gray-600 hover:bg-gray-500",
         };
-      case "start":
+      case "not-all-ready":
+        return {
+          label: "START",
+          disabled: true,
+          className: "bg-gray-600 cursor-default",
+        };
+      case "all-ready":
         return {
           label: "START",
           disabled: false,

@@ -1,4 +1,4 @@
-import MainPanel from '@/components/layouts/center-panel/main-panel/index.jsx';
+import MainPanel from "@/components/layouts/center-panel/main-panel/index.jsx";
 
 export default function CenterPanel({ children }) {
   /**

@@ -41,14 +41,21 @@ export default function GameRoomWaitingPage() {
   useEffect(() => {
     const buttonOnClickHandler =
       myInfo.role === "HOST" ? startGame : myInfo.role === "GUEST" ? toggleReady : null;
-    const status =
-      myInfo.role === "HOST"
-        ? "start"
-        : myInfo.role === "GUEST" && myInfo.ready
-          ? "ready"
-          : myInfo.role === "GUEST" && !myInfo.ready
-            ? "not-ready"
-            : null;
+
+    let status;
+    if (myInfo.role === "HOST") {
+      if (enteredUsers.filter((user) => !user.ready).length > 0) {
+        status = "not-all-ready";
+      } else {
+        status = "all-ready";
+      }
+    } else {
+      if (myInfo.ready) {
+        status = "ready";
+      } else {
+        status = "not-ready";
+      }
+    }
 
     leftSideStore.setFooter({
       slot: SidePanelFooterButton,
@@ -69,5 +76,11 @@ export default function GameRoomWaitingPage() {
    * =========================== 이벤트 핸들러 =============================
    */
 
-  return <GameRoomWaitingPlaceholder />;
+  return (
+    <GameRoomWaitingPlaceholder
+      role={myInfo.role}
+      ready={myInfo.ready}
+      allGuestsReady={enteredUsers.filter((user) => !user.ready).length === 0}
+    />
+  );
 }

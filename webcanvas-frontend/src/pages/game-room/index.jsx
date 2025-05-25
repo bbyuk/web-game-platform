@@ -160,10 +160,8 @@ export default function GameRoomPage() {
       webSocketClientRef.current.deactivate();
     }
     const options = {
-      onConnect: (frame) => {
-      },
-      onError: (frame) => {
-      },
+      onConnect: (frame) => {},
+      onError: (frame) => {},
     };
     webSocketClientRef.current = getWebSocketClient(options);
   };
@@ -269,10 +267,12 @@ export default function GameRoomPage() {
       leftSideStore.setContents({
         slot: ItemList,
         props: {
-          value: enteredUsers.map(
-            ({ nickname, ready, role, ...rest })=>
-              ({ label: nickname, highlight: ready, theme: getLeftSideItemTheme(role, ready), ...rest })
-          ),
+          value: enteredUsers.map(({ nickname, ready, role, ...rest }) => ({
+            label: nickname,
+            highlight: ready,
+            theme: getLeftSideItemTheme(role, ready),
+            ...rest,
+          })),
         },
       });
     }

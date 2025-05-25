@@ -1,4 +1,4 @@
-import {ChevronRight} from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 const Container = ({ children }) => {
   return <ul className="space-y-2">{children}</ul>;
@@ -15,7 +15,6 @@ const Item = ({
   isButton = false,
   onClick = () => {},
 }) => {
-
   let defaultBg = "bg-gray-800";
   let defaultBorder = "border-gray-600";
   let defaultText = "text-gray-300";
@@ -24,13 +23,11 @@ const Item = ({
     defaultBg = "bg-indigo-900";
     defaultBorder = "border-indigo-500";
     defaultText = "text-white";
-  }
-  else if (theme === "green") {
+  } else if (theme === "green") {
     defaultBg = "bg-green-900/40";
     defaultBorder = "border-green-500";
     defaultText = "text-white";
   }
-
 
   return (
     <li
@@ -39,7 +36,7 @@ const Item = ({
                    ${highlight ? `${defaultBg} ${defaultBorder}` : ""}`}
       onClick={isButton ? onClick : null}
     >
-      { icon ? icon : <ChevronRight size={16} className="text-gray-400 shrink-0 mt-1" /> }
+      {icon ? icon : <ChevronRight size={16} className="text-gray-400 shrink-0 mt-1" />}
       <div className="flex flex-col">
         {/* 아이템  컬러 */}
         {color ? (
