@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.domain.game.repository;
 
 import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -46,26 +47,6 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
            and     gre.state = 'WAITING'
            """)
     Optional<GameRoomEntrance> findByUserId(@Param("userId") Long userId);
-
-    /**
-     * 게임 방 ID로 해당 게임 방에 입장한 정보 조회
-     *
-     * 250430 - 입장한 순서대로 정렬 추가
-     * @param gameRoomId
-     * @return gameRoomEntrances
-     */
-    @Query(
-            """
-            select      gre
-            from        GameRoomEntrance gre
-            join fetch  User u on gre.user = u
-            join fetch  GameRoom gr on gre.gameRoom = gr
-            where       gre.gameRoom.id = :gameRoomId
-            and         gre.state = 'WAITING'
-            order by    gre.id asc
-            """
-    )
-    List<GameRoomEntrance> findGameRoomEntrancesByGameRoomId(@Param("gameRoomId") Long gameRoomId);
 
     /**
      * 게임 방 ID로 해당 게임 방에 입장한 정보 조회 (비관적 락 적용)
@@ -123,4 +104,21 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             """
     )
     boolean existsActiveEntrance(@Param("gameRoomId") Long gameRoomId, @Param("userId") Long userId);
+
+    /**
+     * 게임 방 ID와 상태로 GameRoomEntrance 목록을 조회한다.
+     * @param gameRoomId
+     * @param gameRoomEntranceState
+     * @return
+     */
+    @Query("""
+            select      gre
+            from        GameRoomEntrance gre
+            join fetch  User u on gre.user = u
+            join fetch  GameRoom gr on gre.gameRoom = gr
+            where       gre.gameRoom.id = :gameRoomId
+            and         gre.state = :gameRoomEntranceState
+            order by    gre.id asc
+            """)
+    List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomEntranceState") GameRoomEntranceState gameRoomEntranceState);
 }

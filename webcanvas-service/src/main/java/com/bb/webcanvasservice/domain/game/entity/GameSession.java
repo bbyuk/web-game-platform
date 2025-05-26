@@ -52,7 +52,7 @@ public class GameSession {
      */
     private GameRoom gameRoom;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "gameSession")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "gameSession")
     /**
      * 세션에 포함되어 있는 턴 목록
      */

@@ -25,8 +25,11 @@ public class GameTurn {
      */
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "game_session_id")
+    /**
+     *
+     */
     private GameSession gameSession;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -55,7 +58,9 @@ public class GameTurn {
      */
     private List<Score> scores = new ArrayList<>();
 
-    public GameTurn(User drawer, String answer) {
+    public GameTurn(GameSession gameSession, User drawer, String answer) {
+        this.gameSession = gameSession;
+        this.gameSession.getGameTurns().add(this);
         this.drawer = drawer;
         this.answer = answer;
     }

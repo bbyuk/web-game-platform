@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.unit.domain.game.repository;
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.game.entity.GameRoom;
 import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomEntranceNotFoundException;
@@ -127,7 +128,7 @@ class GameRoomEntranceRepositoryTest {
 
         // then
         Assertions.assertThat(gameRoomEntrance).isPresent();
-        List<GameRoomEntrance> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoomEntrance.get().getGameRoom().getId());
+        List<GameRoomEntrance> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomEntrance.get().getGameRoom().getId(), GameRoomEntranceState.WAITING);
         Assertions.assertThat(entrances)
                 .hasSize(5);
 

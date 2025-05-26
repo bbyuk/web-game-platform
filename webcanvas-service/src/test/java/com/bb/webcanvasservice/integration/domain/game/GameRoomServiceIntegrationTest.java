@@ -203,7 +203,7 @@ class GameRoomServiceIntegrationTest {
         User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
         User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
 
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(6)));
+        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
 
         GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "닉네임1", HOST));
         GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "닉네임2", GUEST));

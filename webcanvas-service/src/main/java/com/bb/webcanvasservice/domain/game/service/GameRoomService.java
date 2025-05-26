@@ -186,7 +186,7 @@ public class GameRoomService {
             throw new IllegalGameRoomStateException();
         }
 
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoomId);
+        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, GameRoomEntranceState.WAITING);
         int enteredUserCounts = gameRoomEntrances.size();
 
         if (enteredUserCounts >= gameProperties.gameRoomCapacity()) {
@@ -292,7 +292,7 @@ public class GameRoomService {
         AtomicInteger index = new AtomicInteger(0);
 
         List<GameRoomEntranceInfoResponse.EnteredUserSummary> enteredUserSummaries = gameRoomEntranceRepository
-                .findGameRoomEntrancesByGameRoomId(gameRoom.getId())
+                .findGameRoomEntrancesByGameRoomIdAndState(gameRoom.getId(), GameRoomEntranceState.WAITING)
                 .stream()
                 .map(gameRoomEntrance ->
                         new GameRoomEntranceInfoResponse.EnteredUserSummary(
@@ -333,7 +333,8 @@ public class GameRoomService {
         targetEntrance.exit();
 
         GameRoom gameRoom = targetEntrance.getGameRoom();
-        List<GameRoomEntrance> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(gameRoom.getId());
+        List<GameRoomEntrance> entrances = gameRoomEntranceRepository
+                .findGameRoomEntrancesByGameRoomIdAndState(gameRoom.getId(), GameRoomEntranceState.WAITING);
 
         if (entrances.isEmpty()) {
             gameRoom.close();
@@ -412,5 +413,16 @@ public class GameRoomService {
     @Transactional
     public List<GameRoomEntrance> findCurrentGameRoomEntrancesWithLock(Long gameRoomId) {
         return gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdWithLock(gameRoomId);
+    }
+
+    /**
+     * 게임 방 ID와 게임 방 입장 상태에 맞는 게임 방 입장 목록을 조회해온다.
+     * @param gameRoomId
+     * @param gameRoomEntranceState
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndState(Long gameRoomId, GameRoomEntranceState gameRoomEntranceState) {
+        return gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, gameRoomEntranceState);
     }
 }

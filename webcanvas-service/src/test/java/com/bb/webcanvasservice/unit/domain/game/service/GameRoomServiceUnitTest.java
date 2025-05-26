@@ -6,6 +6,7 @@ import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
 import com.bb.webcanvasservice.domain.game.GameProperties;
 import com.bb.webcanvasservice.domain.game.entity.GameRoom;
 import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
@@ -180,7 +181,7 @@ class GameRoomServiceUnitTest {
 
         when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
-        when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(anyLong()))
+        when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(anyLong(), any()))
                 .thenReturn(testGameRoom.getEntrances());
 
         long gameRoomId = random.nextLong();
@@ -286,7 +287,7 @@ class GameRoomServiceUnitTest {
         when(gameRoomEntranceRepository.findGameRoomEntranceByUserId(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoomEntrance0));
 
-        when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomId(any(Long.class)))
+        when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(any(Long.class), any()))
                 .thenReturn(List.of(testGameRoomEntrance0, testGameRoomEntrance1, testGameRoomEntrance2));
 
 
