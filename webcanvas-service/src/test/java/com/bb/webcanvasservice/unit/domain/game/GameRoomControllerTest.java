@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.unit.domain.game;
 
-import com.bb.webcanvasservice.domain.game.GameRoomService;
+import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.common.JwtManager;
@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("[unit] [presentation] 게임 API Controller WebMvcTest 단위테스트")
-class GameControllerTest {
+class GameRoomControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

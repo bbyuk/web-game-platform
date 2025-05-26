@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.websocket.config;
 
 import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.common.JwtManager;
-import com.bb.webcanvasservice.domain.game.GameRoomService;
+import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.websocket.interceptor.JwtAuthenticationChannelInterceptor;
 import com.bb.webcanvasservice.websocket.interceptor.SubscribeChannelInterceptor;
 import com.bb.webcanvasservice.websocket.registry.SessionRegistry;

@@ -58,7 +58,7 @@ public class GameRoomEntrance {
      * 게임 방 입장 기록 상태
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "game_room_entrance_state")
+    @Column(name = "state")
     private GameRoomEntranceState state;
 
     @Column(name = "ready")

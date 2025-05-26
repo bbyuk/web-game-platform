@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.integration.domain.canvas;
 import com.bb.webcanvasservice.TestWebSocketClientFactory;
 import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
-import com.bb.webcanvasservice.domain.game.GameRoomService;
+import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.domain.user.User;
 import com.bb.webcanvasservice.domain.user.UserRepository;
 import com.bb.webcanvasservice.common.JwtManager;
