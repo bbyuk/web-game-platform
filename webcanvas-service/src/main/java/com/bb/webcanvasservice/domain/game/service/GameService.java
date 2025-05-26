@@ -47,11 +47,6 @@ public class GameService {
         GameRoom gameRoom = gameRoomService.findGameRoom(request.gameRoomId());
         GameRoomEntranceInfoResponse enteredGameRoomInfo = gameRoomService.findEnteredGameRoomInfo(userId);
 
-        if (gameRoom.getState() != GameRoomState.WAITING) {
-            log.debug("게임 방의 상태가 게임을 시작할 수 없는 상태입니다. ====== {}", gameRoom.getState());
-            throw new IllegalGameRoomStateException();
-        }
-
         /**
          * 요청 보낸 유저가 HOST가 맞는지 확인
          */
@@ -66,6 +61,13 @@ public class GameService {
                     throw new AbnormalAccessException();
                 });
 
+        /**
+         * 게임 방 상태 확인
+         */
+        if (gameRoom.getState() != GameRoomState.WAITING) {
+            log.debug("게임 방의 상태가 게임을 시작할 수 없는 상태입니다. ====== {}", gameRoom.getState());
+            throw new IllegalGameRoomStateException();
+        }
 
         GameSession gameSession = new GameSession(gameRoom, request.turnCount(), request.timePerTurn());
         /**

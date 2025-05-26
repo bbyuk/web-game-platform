@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.unit.domain.game.service;
 
 import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
+import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
 import com.bb.webcanvasservice.domain.game.entity.GameRoom;
 import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
@@ -74,10 +75,10 @@ class GameServiceUnitTest {
         GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "유저1", GameRoomRole.HOST));
         gameRoomEntrance1.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "유저2", GameRoomRole.HOST));
+        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "유저2", GameRoomRole.GUEST));
         gameRoomEntrance2.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user3, "유저3", GameRoomRole.HOST));
+        GameRoomEntrance gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user3, "유저3", GameRoomRole.GUEST));
         gameRoomEntrance3.changeReady(true);
 
         List<GameRoomEntrance> entrances = List.of(gameRoomEntrance1, gameRoomEntrance2, gameRoomEntrance3);
@@ -92,6 +93,38 @@ class GameServiceUnitTest {
         // then
         Assertions.assertThat(gameRoom.getState()).isEqualTo(GameRoomState.PLAYING);
         entrances.stream().forEach(entrance -> Assertions.assertThat(entrance.getState()).isEqualTo(PLAYING));
+    }
+
+
+    @Test
+    @DisplayName("게임 시작 - HOST가 아닌 유저가 요청보낼 경우 비정상적인 접근 예외 발생")
+    void startGameFailedWhenNotHostUserRequestToStartGame() throws Exception {
+        // given
+        // given
+        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user3 = userRepository.save(new User(FingerprintGenerator.generate()));
+
+        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
+
+        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "유저1", GameRoomRole.HOST));
+        gameRoomEntrance1.changeReady(true);
+
+        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "유저2", GameRoomRole.GUEST));
+        gameRoomEntrance2.changeReady(true);
+
+        GameRoomEntrance gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user3, "유저3", GameRoomRole.GUEST));
+        gameRoomEntrance3.changeReady(true);
+
+        List<GameRoomEntrance> entrances = List.of(gameRoomEntrance1, gameRoomEntrance2, gameRoomEntrance3);
+
+        GameStartRequest gameStartRequest = new GameStartRequest(gameRoom.getId(), 3, 90);
+
+        // when
+        Assertions.assertThatThrownBy(() -> gameService.startGame(gameStartRequest, user2.getId()))
+                .isInstanceOf(AbnormalAccessException.class);
+
+        // then
     }
 
 
