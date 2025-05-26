@@ -110,7 +110,7 @@ class AuthenticationServiceUnitTest {
                 .compact();
         user.updateRefreshToken(userRefreshToken);
 
-        when(userService.findUserByUserId(any(Long.class))).thenReturn(user);
+        when(userService.findUser(any(Long.class))).thenReturn(user);
         when(jwtManager.getUserIdFromToken(any())).thenReturn(userId);
 
         // when
@@ -142,7 +142,7 @@ class AuthenticationServiceUnitTest {
         idField.setAccessible(true);
         idField.set(user, userId);
 
-        when(userService.findUserByUserId(any(Long.class))).thenReturn(user);
+        when(userService.findUser(any(Long.class))).thenReturn(user);
         when(jwtManager.getUserIdFromToken(any())).thenReturn(userId);
         when(jwtManager.generateToken(any(), any(), anyLong())).thenReturn(realJwtManagerObject.generateToken(user.getId(), user.getFingerprint(), 15 * 60 * 1000));
         when(jwtManager.calculateRemainingExpiration(any())).thenReturn(Long.valueOf(3 * 24 * 60 * 60 * 1000));

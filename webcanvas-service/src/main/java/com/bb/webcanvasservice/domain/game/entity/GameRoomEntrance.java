@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.game;
+package com.bb.webcanvasservice.domain.game.entity;
 
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
@@ -75,7 +75,7 @@ public class GameRoomEntrance {
     public GameRoomEntrance(GameRoom gameRoom, User user, String nickname, GameRoomRole role) {
         this.gameRoom = gameRoom;
         this.user = user;
-        this.state = GameRoomEntranceState.ACTIVE;
+        this.state = GameRoomEntranceState.WAITING;
         this.nickname = nickname;
         this.role = role;
         this.ready = role == HOST;
@@ -85,7 +85,7 @@ public class GameRoomEntrance {
      * 게임 입장 Entity를 exit 처리한다.
      */
     public void exit() {
-        this.state = GameRoomEntranceState.INACTIVE;
+        this.state = GameRoomEntranceState.EXITED;
         this.gameRoom.getEntrances()
                 .removeIf(entrance -> entrance.id.equals(this.id));
     }
@@ -106,5 +106,13 @@ public class GameRoomEntrance {
      */
     public void changeReady(boolean ready) {
         this.ready = ready;
+    }
+
+    /**
+     * GameRoomEntranceState를 변경한다.
+     * @param state
+     */
+    public void changeState(GameRoomEntranceState state) {
+        this.state = state;
     }
 }

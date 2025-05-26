@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.unit.domain.game;
+package com.bb.webcanvasservice.unit.domain.game.controller;
 
 import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;

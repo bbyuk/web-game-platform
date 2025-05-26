@@ -6,8 +6,8 @@ import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
 import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import com.bb.webcanvasservice.domain.game.GameProperties;
-import com.bb.webcanvasservice.domain.game.GameRoom;
-import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.entity.GameRoom;
+import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
@@ -79,6 +79,17 @@ public class GameRoomService {
     }
 
     /**
+     * 게임 방을 찾는다.
+     * @param gameRoomId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public GameRoom findGameRoom(Long gameRoomId) {
+        return gameRoomRepository.findById(gameRoomId)
+                .orElseThrow(GameRoomNotFoundException::new);
+    }
+
+    /**
      * 게임 방을 새로 생성하고, 생성을 요청한 유저를 입장시킨다.
      *
      * @param userId
@@ -102,7 +113,7 @@ public class GameRoomService {
          * 유저가 새로 게임을 생성할 수 있는 상태인지 확인한다.
          * - 유저가 현재 아무 방에도 입장하지 않은 상태여야 한다.
          */
-        User user = userService.findUserByUserId(userId);
+        User user = userService.findUser(userId);
         if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(user.getId())) {
             throw new AlreadyEnteredRoomException();
         }
@@ -186,7 +197,7 @@ public class GameRoomService {
         GameRoomEntrance gameRoomEntrance =
                 new GameRoomEntrance(
                         targetGameRoom
-                        , userService.findUserByUserId(userId)
+                        , userService.findUser(userId)
                         , String.format("%s %s", koreanAdjective, gameProperties.gameRoomUserNicknameNouns().get(enteredUserCounts))
                         , role
                 );
@@ -234,7 +245,7 @@ public class GameRoomService {
      * <p>
      * 이미 입장한 방이 있는 경우, AlreadyEnteredRoomException 을 throw한다.
      *
-     * TODO 메모리에서 ACTIVE GameRoomEntrance filtering 처리 -> batch size 및 페이징 처리 필요
+     * TODO 메모리에서 WAITING GameRoomEntrance filtering 처리 -> batch size 및 페이징 처리 필요
      * 
      * @param userId 유저 ID
      * @return GameRoomListResponse 게임 방 조회 응답 DTO
@@ -247,14 +258,14 @@ public class GameRoomService {
 
 
         return new GameRoomListResponse(
-                gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), GameRoomState.enterable(), GameRoomEntranceState.ACTIVE)
+                gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), GameRoomState.enterable(), GameRoomEntranceState.WAITING)
                         .stream()
                         .map(gameRoom ->
                                 new GameRoomListResponse.GameRoomSummary(
                                         gameRoom.getId(),
                                         gameProperties.gameRoomCapacity(),
                                         (int) gameRoom.getEntrances().stream()
-                                                .filter(entrance -> entrance.getState().equals(GameRoomEntranceState.ACTIVE))
+                                                .filter(entrance -> entrance.getState().equals(GameRoomEntranceState.WAITING))
                                                 .count(),
                                         gameRoom.getJoinCode()
                                 )
@@ -391,5 +402,15 @@ public class GameRoomService {
         applicationEventPublisher.publishEvent(new UserReadyChanged(targetEntrance.getGameRoom().getId(), userId, ready));
 
         return ready;
+    }
+
+    /**
+     * 락을 걸어 현재 게임 방에 입장한 유저 입장 목록을 가져온다.
+     * @param gameRoomId
+     * @return
+     */
+    @Transactional
+    public List<GameRoomEntrance> findCurrentGameRoomEntrancesWithLock(Long gameRoomId) {
+        return gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdWithLock(gameRoomId);
     }
 }

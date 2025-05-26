@@ -64,7 +64,7 @@ public class AuthenticationService {
          * 이 토큰이 유저에게 할당된 refreshToken인지 validation
          */
         Long userId = jwtManager.getUserIdFromToken(token);
-        User user = userService.findUserByUserId(userId);
+        User user = userService.findUser(userId);
 
         if (!user.getRefreshToken().equals(token)) {
             log.error("유저에게 할당되지 않은 refresh token 입니다.");

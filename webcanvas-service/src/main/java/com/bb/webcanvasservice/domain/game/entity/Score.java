@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.game;
+package com.bb.webcanvasservice.domain.game.entity;
 
 import com.bb.webcanvasservice.domain.game.enums.ScoreType;
 import com.bb.webcanvasservice.domain.user.User;

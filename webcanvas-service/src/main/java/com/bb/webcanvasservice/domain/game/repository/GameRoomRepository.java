@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.domain.game.repository;
 
-import com.bb.webcanvasservice.domain.game.GameRoom;
+import com.bb.webcanvasservice.domain.game.entity.GameRoom;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import jakarta.persistence.LockModeType;
@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +16,6 @@ import java.util.Optional;
 /**
  * 게임 방의 persitence layer를 담당하는 레포지토리 클래스
  */
-@Repository
 public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
 
     /**

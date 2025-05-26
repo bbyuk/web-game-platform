@@ -2,8 +2,8 @@ package com.bb.webcanvasservice.integration.domain.canvas;
 
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
-import com.bb.webcanvasservice.domain.game.GameRoom;
-import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.entity.GameRoom;
+import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;

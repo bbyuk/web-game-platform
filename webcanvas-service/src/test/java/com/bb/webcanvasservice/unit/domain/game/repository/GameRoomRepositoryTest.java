@@ -2,8 +2,8 @@ package com.bb.webcanvasservice.unit.domain.game.repository;
 
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.game.GameProperties;
-import com.bb.webcanvasservice.domain.game.GameRoom;
-import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.entity.GameRoom;
+import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
@@ -138,7 +138,7 @@ class GameRoomRepositoryTest {
 
 
         // when
-        List<GameRoom> enterableGameRooms = gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), GameRoomState.enterable(), GameRoomEntranceState.ACTIVE);
+        List<GameRoom> enterableGameRooms = gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), GameRoomState.enterable(), GameRoomEntranceState.WAITING);
 
 
         // then
@@ -190,7 +190,7 @@ class GameRoomRepositoryTest {
 
         gameRoomRepository.saveAll(gameRooms);
         // when
-        List<GameRoom> enterableGameRooms = gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), List.of(GameRoomState.WAITING), GameRoomEntranceState.ACTIVE);
+        List<GameRoom> enterableGameRooms = gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), List.of(GameRoomState.WAITING), GameRoomEntranceState.WAITING);
 
         // then
         Assertions.assertThat(enterableGameRooms).hasSize(4);

@@ -1,11 +1,11 @@
-package com.bb.webcanvasservice.unit.domain.game;
+package com.bb.webcanvasservice.unit.domain.game.service;
 
 import com.bb.webcanvasservice.common.FingerprintGenerator;
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
 import com.bb.webcanvasservice.domain.game.GameProperties;
-import com.bb.webcanvasservice.domain.game.GameRoom;
-import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.entity.GameRoom;
+import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
@@ -90,7 +90,7 @@ class GameRoomServiceUnitTest {
         setId(testUser, testUserId);
 
 
-        when(userService.findUserByUserId(any(Long.class)))
+        when(userService.findUser(any(Long.class)))
                 .thenReturn(testUser);
 
 
@@ -336,7 +336,7 @@ class GameRoomServiceUnitTest {
 
         when(gameRoomEntranceRepository.save(any())).thenReturn(testGameRoomEntrance);
 
-        when(userService.findUserByUserId(testUser.getId())).thenReturn(testUser);
+        when(userService.findUser(testUser.getId())).thenReturn(testUser);
 
         /**
          * 입장 mock

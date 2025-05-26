@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.unit.domain.game.repository;
 
 import com.bb.webcanvasservice.common.JoinCodeGenerator;
-import com.bb.webcanvasservice.domain.game.GameRoom;
-import com.bb.webcanvasservice.domain.game.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.entity.GameRoom;
+import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomEntranceNotFoundException;
@@ -72,7 +72,7 @@ class GameRoomEntranceRepositoryTest {
     }
 
     @Test
-    @DisplayName("게임 방 입장 여부 조회 - 게임 방 입장 기록 중 ACTIVE 상태가 없다면 false return")
+    @DisplayName("게임 방 입장 여부 조회 - 게임 방 입장 기록 중 WAITING 상태가 없다면 false return")
     void existsGameRoomEntranceByUserIdFalseWhenNoActive() {
         // given
         enterTestRoom(testUser);

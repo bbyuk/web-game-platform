@@ -6,12 +6,17 @@ package com.bb.webcanvasservice.domain.game.enums;
 public enum GameRoomEntranceState {
 
     /**
-     * 활성 상태
+     * 대기 상태
      */
-    ACTIVE,
+    WAITING,
 
     /**
-     * 비활성 상태
+     * 게임 플레이중
      */
-    INACTIVE
+    PLAYING,
+
+    /**
+     * 퇴장
+     */
+    EXITED
 }

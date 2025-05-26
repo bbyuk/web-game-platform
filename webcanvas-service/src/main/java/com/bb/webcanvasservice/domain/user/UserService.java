@@ -37,7 +37,7 @@ public class UserService {
      * @return User
      */
     @Transactional(readOnly = true)
-    public User findUserByUserId(Long userId) {
+    public User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
     }
