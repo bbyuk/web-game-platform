@@ -26,6 +26,10 @@ public class GameTurn {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_session_id")
+    private GameSession gameSession;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "drawer_id")
     /**
      * 해당 턴에 그림을 그릴 차례인 유저

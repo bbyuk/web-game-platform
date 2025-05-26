@@ -48,6 +48,7 @@ public enum ErrorCode {
     DICTIONARY_FILE_PARSE_FAILED("D000", "사전 파일을 파싱하는 도중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     DICTIONARY_FILE_DOWNLOAD_FAILED("D001", "사전 파일을 다운로드 받는 도중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     WORD_NOT_FOUND("D002", "단어를 찾지 못했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    GAME_SESSION_NOT_FOUND("G000", "진행중인 게임을 찾지 못했습니다.", HttpStatus.NOT_FOUND),
     ABNORMAL_ACCESS("B000", "비정상적인 접근이 감지되었습니다.", HttpStatus.BAD_REQUEST);
 
     @Getter

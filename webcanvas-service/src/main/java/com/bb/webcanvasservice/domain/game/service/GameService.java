@@ -6,9 +6,11 @@ import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResp
 import com.bb.webcanvasservice.domain.game.entity.GamePlayHistory;
 import com.bb.webcanvasservice.domain.game.entity.GameRoom;
 import com.bb.webcanvasservice.domain.game.entity.GameSession;
+import com.bb.webcanvasservice.domain.game.entity.GameTurn;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
+import com.bb.webcanvasservice.domain.game.exception.GameSessionNotFoundException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
 import com.bb.webcanvasservice.domain.game.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
@@ -97,5 +99,25 @@ public class GameService {
         gamePlayHistoryRepository.saveAll(gamePlayHistories);
 
         return gameSession.getId();
+    }
+
+    /**
+     * 게임 세션에 포함된 턴 목록을 조회한다.
+     * @param gameSessionId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public List<GameTurn> findTurnsInGameSession(Long gameSessionId) {
+        return gameSessionRepository.findById(gameSessionId)
+                .orElseThrow(GameSessionNotFoundException::new)
+                .getGameTurns();
+    }
+
+    /**
+     * 현재 라운드를 조회한다.
+     */
+    @Transactional(readOnly = true)
+    public int findCurrentRound(Long gameSessionId) {
+        return gameSessionRepository.findCurrentRound(gameSessionId);
     }
 }

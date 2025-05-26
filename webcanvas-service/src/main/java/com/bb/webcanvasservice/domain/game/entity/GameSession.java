@@ -6,6 +6,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 게임의 세션을 나타내는 엔티티 클래스
  */
@@ -48,6 +51,12 @@ public class GameSession {
      * 게임 방
      */
     private GameRoom gameRoom;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "gameSession")
+    /**
+     * 세션에 포함되어 있는 턴 목록
+     */
+    private List<GameTurn> gameTurns = new ArrayList<>();
 
     public GameSession(GameRoom gameRoom, int turnCount, int timePerTurn) {
         this.gameRoom = gameRoom;
