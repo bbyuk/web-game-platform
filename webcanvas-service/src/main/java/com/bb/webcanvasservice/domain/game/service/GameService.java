@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
@@ -35,7 +34,7 @@ import static com.bb.webcanvasservice.domain.game.enums.GameSessionState.PLAYING
 @RequiredArgsConstructor
 public class GameService {
 
-    private final GameRoomService gameRoomService;
+    private final GameRoomFacade gameRoomService;
 
     private final GameSessionRepository gameSessionRepository;
     private final GamePlayHistoryRepository gamePlayHistoryRepository;

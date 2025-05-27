@@ -1,9 +1,9 @@
 package com.bb.webcanvasservice.unit.domain.game.controller;
 
-import com.bb.webcanvasservice.domain.game.service.GameRoomService;
+import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.common.util.JwtManager;
+import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -40,7 +40,7 @@ class GameRoomControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private GameRoomService gameRoomService;
+    private GameRoomFacade gameRoomFacade;
 
     @MockitoBean
     private GameRoomRepository gameRoomRepository;
@@ -67,7 +67,7 @@ class GameRoomControllerTest {
                 .signWith(secretKey, Jwts.SIG.HS256)
                 .compact();;
 
-        BDDMockito.given(gameRoomService.createGameRoomAndEnter(any()))
+        BDDMockito.given(gameRoomFacade.createGameRoomAndEnter(any()))
                 .willReturn(new GameRoomEntranceResponse(gameRoomId, gameRoomEntranceId));
 
         BDDMockito.given(jwtManager.generateToken(any(), any(), anyLong()))

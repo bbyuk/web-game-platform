@@ -1,9 +1,9 @@
 package com.bb.webcanvasservice.websocket.interceptor;
 
-import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
-import com.bb.webcanvasservice.domain.game.service.GameRoomService;
+import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.web.security.exception.BadAccessException;
+import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -23,7 +23,7 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class SubscribeChannelInterceptor implements ChannelInterceptor {
 
-    private final GameRoomService gameRoomService;
+    private final GameRoomFacade gameRoomFacade;
 
     private final WebSocketProperties webSocketProperties;
 
@@ -50,7 +50,7 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
                 Long userId = authentication.getUserId();
                 Long gameRoomId = extractGameRoomId(destination);
 
-                if (!gameRoomService.isEnteredRoom(gameRoomId, userId)) {
+                if (!gameRoomFacade.isEnteredRoom(gameRoomId, userId)) {
                     log.debug("현재 게임 방에 입장된 정보가 없음.");
                     log.debug("gameRoomId : {}", gameRoomId);
                     log.debug("userId : {}", userId);

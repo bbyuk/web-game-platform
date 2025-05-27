@@ -1,10 +1,10 @@
 package com.bb.webcanvasservice.websocket.config;
 
-import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.common.util.JwtManager;
-import com.bb.webcanvasservice.domain.game.service.GameRoomService;
+import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.websocket.interceptor.JwtAuthenticationChannelInterceptor;
 import com.bb.webcanvasservice.websocket.interceptor.SubscribeChannelInterceptor;
+import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.websocket.registry.SessionRegistry;
 import com.bb.webcanvasservice.websocket.security.WebSocketAuthenticationArgumentResolver;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     /**
      * 게임 방과 연관되어 있는 웹소켓 이벤트 브로커 구독 요청의 validation 처리를 위한 서비스 주입
      */
-    private final GameRoomService gameRoomService;
+    private final GameRoomFacade gameRoomFacade;
 
     /**
      * 메세지 브로커 설정
@@ -74,7 +74,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(
                 new JwtAuthenticationChannelInterceptor(jwtManager, sessionRegistry),
-                new SubscribeChannelInterceptor(gameRoomService, webSocketProperties)
+                new SubscribeChannelInterceptor(gameRoomFacade, webSocketProperties)
         );
     }
 

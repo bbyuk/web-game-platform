@@ -1,12 +1,12 @@
 package com.bb.webcanvasservice.integration.domain.canvas;
 
 import com.bb.webcanvasservice.TestWebSocketClientFactory;
-import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
+import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
-import com.bb.webcanvasservice.domain.game.service.GameRoomService;
+import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.user.entity.User;
 import com.bb.webcanvasservice.domain.user.repository.UserRepository;
-import com.bb.webcanvasservice.common.util.JwtManager;
+import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.websocket.registry.SessionRegistry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -69,7 +69,7 @@ class CanvasWebSocketControllerTest {
     @Autowired
     private JwtManager jwtManager;
     @Autowired
-    private GameRoomService gameRoomService;
+    private GameRoomFacade gameRoomFacade;
     @Autowired
     private UserRepository userRepository;
     @Autowired

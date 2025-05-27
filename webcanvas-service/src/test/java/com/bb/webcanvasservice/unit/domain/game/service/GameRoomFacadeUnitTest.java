@@ -4,18 +4,21 @@ import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 import com.bb.webcanvasservice.domain.game.GameProperties;
-import com.bb.webcanvasservice.domain.game.entity.GameRoom;
-import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
+import com.bb.webcanvasservice.domain.game.entity.GameRoom;
+import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomHostCanNotChangeReadyException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
+import com.bb.webcanvasservice.domain.game.service.GameRoomCrossDomainService;
+import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
+import com.bb.webcanvasservice.domain.game.service.InGameRoomService;
+import com.bb.webcanvasservice.domain.game.service.LobbyService;
 import com.bb.webcanvasservice.domain.user.entity.User;
 import com.bb.webcanvasservice.domain.user.service.UserService;
 import org.assertj.core.api.Assertions;
@@ -28,7 +31,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 
 import static com.bb.webcanvasservice.common.code.ErrorCode.GAME_ROOM_HAS_ILLEGAL_STATUS;
 import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.GUEST;
@@ -38,7 +44,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("[unit] [service] 게임 방 서비스 단위테스트")
-class GameRoomServiceUnitTest {
+class GameRoomFacadeUnitTest {
 
     @Mock
     private GameRoomRepository gameRoomRepository;
@@ -65,11 +71,15 @@ class GameRoomServiceUnitTest {
             "너구리",
             "다람쥐"
     ));
-    private GameRoomService gameRoomService;
+    private GameRoomFacade gameRoomFacade;
 
     @BeforeEach
     void setup() {
-        this.gameRoomService = new GameRoomService(userService, dictionaryService, gameRoomRepository, gameRoomEntranceRepository, gameProperties, eventPublisher);
+        this.gameRoomFacade = new GameRoomFacade(
+                new LobbyService(gameProperties, userService, dictionaryService, gameRoomRepository, gameRoomEntranceRepository, eventPublisher),
+                new InGameRoomService(gameRoomRepository, gameRoomEntranceRepository, gameProperties, eventPublisher),
+                new GameRoomCrossDomainService(gameRoomEntranceRepository, gameRoomRepository)
+        );
     }
 
     private final Random random = new Random();
@@ -118,7 +128,7 @@ class GameRoomServiceUnitTest {
 
 
         // when
-        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoom(testGameRoomId, testUserId, GUEST);
+        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomFacade.enterGameRoom(testGameRoomId, testUserId, GUEST);
 
         // then
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomEntranceId()).isEqualTo(testGameRoomEntranceId);
@@ -136,7 +146,7 @@ class GameRoomServiceUnitTest {
         Long userId = random.nextLong();
 
         // when
-        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId, GUEST))
+        Assertions.assertThatThrownBy(() -> gameRoomFacade.enterGameRoom(gameRoomId, userId, GUEST))
                 .isInstanceOf(AlreadyEnteredRoomException.class);
 
         // then
@@ -155,7 +165,7 @@ class GameRoomServiceUnitTest {
         long userId = random.nextLong();
 
         // when
-        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId, GUEST))
+        Assertions.assertThatThrownBy(() -> gameRoomFacade.enterGameRoom(gameRoomId, userId, GUEST))
                 .isInstanceOf(IllegalGameRoomStateException.class)
                 .hasMessage(GAME_ROOM_HAS_ILLEGAL_STATUS.getDefaultMessage());
 
@@ -189,7 +199,7 @@ class GameRoomServiceUnitTest {
         // when
 
 
-        Assertions.assertThatThrownBy(() -> gameRoomService.enterGameRoom(gameRoomId, userId, GUEST))
+        Assertions.assertThatThrownBy(() -> gameRoomFacade.enterGameRoom(gameRoomId, userId, GUEST))
                 .isInstanceOf(IllegalGameRoomStateException.class)
                 .hasMessage("방의 정원이 모두 찼습니다.");
 
@@ -206,7 +216,7 @@ class GameRoomServiceUnitTest {
         Long userId = random.nextLong();
 
         // when
-        Assertions.assertThatThrownBy(() -> gameRoomService.findEnterableGameRooms(userId))
+        Assertions.assertThatThrownBy(() -> gameRoomFacade.findEnterableGameRooms(userId))
                 .isInstanceOf(AlreadyEnteredRoomException.class);
         // then
 
@@ -255,7 +265,7 @@ class GameRoomServiceUnitTest {
 //                .thenReturn(8);
 
         // when
-        GameRoomListResponse enterableGameRooms = gameRoomService.findEnterableGameRooms(4L);
+        GameRoomListResponse enterableGameRooms = gameRoomFacade.findEnterableGameRooms(4L);
 
         // then
         Assertions.assertThat(enterableGameRooms).usingRecursiveComparison().isEqualTo(new GameRoomListResponse(
@@ -292,7 +302,7 @@ class GameRoomServiceUnitTest {
 
         // when
 
-        GameRoomEntranceInfoResponse enteredGameRoomInfo0 = gameRoomService.findEnteredGameRoomInfo(testUser0.getId());
+        GameRoomEntranceInfoResponse enteredGameRoomInfo0 = gameRoomFacade.findEnteredGameRoomInfo(testUser0.getId());
 
 
         // then
@@ -345,7 +355,7 @@ class GameRoomServiceUnitTest {
         when(gameRoomRepository.findById(testRoom.getId())).thenReturn(Optional.of(testRoom));
 
         // when
-        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomService.enterGameRoomWithJoinCode(testRoom.getJoinCode(), testUser.getId());
+        GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomFacade.enterGameRoomWithJoinCode(testRoom.getJoinCode(), testUser.getId());
 
         // then
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomId()).isEqualTo(testRoom.getId());
@@ -366,7 +376,7 @@ class GameRoomServiceUnitTest {
 
         // when
 
-        Assertions.assertThatThrownBy(() -> gameRoomService.updateReady(1L, 1L, true))
+        Assertions.assertThatThrownBy(() -> gameRoomFacade.updateReady(1L, 1L, true))
                 .isInstanceOf(GameRoomHostCanNotChangeReadyException.class);
 
         // then

@@ -13,7 +13,7 @@ import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.GameSessionIsOverException;
 import com.bb.webcanvasservice.domain.game.repository.*;
-import com.bb.webcanvasservice.domain.game.service.GameRoomService;
+import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.game.service.GameService;
 import com.bb.webcanvasservice.domain.user.entity.User;
 import com.bb.webcanvasservice.domain.user.repository.UserRepository;
@@ -39,7 +39,7 @@ class GameServiceUnitTest {
 
 
     @Autowired
-    GameRoomService gameRoomService;
+    GameRoomFacade gameRoomFacade;
 
     @Autowired
     GameSessionRepository gameSessionRepository;
