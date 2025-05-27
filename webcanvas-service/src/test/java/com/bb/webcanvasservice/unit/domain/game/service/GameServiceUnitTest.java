@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.unit.domain.game.service;
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
+import com.bb.webcanvasservice.config.JpaConfig;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
 import com.bb.webcanvasservice.domain.game.entity.GameRoom;
 import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
@@ -30,6 +32,7 @@ import java.util.List;
 import static com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState.PLAYING;
 
 @Transactional
+@Import(JpaConfig.class)
 @SpringBootTest
 @DisplayName("[unit] [service] 게임 서비스 단위테스트")
 class GameServiceUnitTest {
