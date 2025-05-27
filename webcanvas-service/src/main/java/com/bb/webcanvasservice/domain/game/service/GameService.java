@@ -197,4 +197,16 @@ public class GameService {
         return candidates.get(randomIndex);
     }
 
+    /**
+     * TODO nextTurn 메소드 개발
+     * 1. startGame 로직 완료 후 -> 별도 트랜잭션에서 -> nextTurn
+     * TODO nextTurn 슈도코드
+     * - GameTurn Entity 생성
+     * - turn-progress 이벤트 발행
+     * - 이벤트 리스너에서 메세지 브로커로 메세지 pub
+     * TODO chat 메세지에서 검증 처리 추가
+     * - chat 메세지 브로드캐스팅 전 게임 상태로 분기해 게임 진행중이면 정답 체크
+     * - 정답과 동등성 비교 후 정답 hit시 정답 answer 이벤트 발행 후 브로드캐스팅
+     * - 정답 처리 후 타이머 초기화 && nextTurn 호출
+     */
 }
