@@ -44,7 +44,7 @@ public class Score {
     private int value;
 
     @Column(name = "score_type")
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private ScoreType type;
 
     public Score(User scorer, GameTurn scoredTurn, int value, ScoreType type) {

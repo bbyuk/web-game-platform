@@ -2,9 +2,6 @@ package com.bb.webcanvasservice.domain.game.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-/**
- * 게임 방 생성 응답 DTO
- */
 @Schema(description = "게임 방 생성 응답 DTO")
 public record GameRoomCreateResponse(
         /**

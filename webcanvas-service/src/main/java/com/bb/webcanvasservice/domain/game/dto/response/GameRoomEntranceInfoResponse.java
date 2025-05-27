@@ -23,10 +23,6 @@ public record GameRoomEntranceInfoResponse(
         @Schema(description = "요청한 유저의 정보")
         EnteredUserSummary requesterUserSummary
 ) {
-    /**
-     * 게임 방에 입장한 유저 정보 DTO
-     * @param userId
-     */
     @Schema(description = "게임 방에 입장한 유저 정보 DTO")
     public record EnteredUserSummary (
 

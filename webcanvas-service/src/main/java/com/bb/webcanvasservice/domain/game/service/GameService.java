@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.domain.game.service;
 
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
+import com.bb.webcanvasservice.domain.game.dto.response.GameProgressResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.entity.*;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
@@ -195,5 +196,13 @@ public class GameService {
         int randomIndex = randomGenerator.nextInt(candidates.size());
 
         return candidates.get(randomIndex);
+    }
+
+    @Transactional(readOnly = true)
+    public GameProgressResponse findCurrentGameProgress(Long gameSessionId, Long userId) {
+        GameSession gameSession = gameSessionRepository.findById(gameSessionId)
+                .orElseThrow(GameSessionNotFoundException::new);
+
+
     }
 }
