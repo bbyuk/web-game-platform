@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.web.security;
 
-import com.bb.webcanvasservice.domain.auth.Authenticated;
-import com.bb.webcanvasservice.domain.auth.WebCanvasAuthentication;
+import com.bb.webcanvasservice.common.security.Authenticated;
+import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import com.bb.webcanvasservice.web.security.exception.ApplicationAuthenticationException;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;

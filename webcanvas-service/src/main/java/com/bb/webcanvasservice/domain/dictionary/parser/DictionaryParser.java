@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.domain.dictionary.parser;
 
 import com.bb.webcanvasservice.common.sequence.SequenceRepository;
-import com.bb.webcanvasservice.domain.dictionary.Word;
+import com.bb.webcanvasservice.domain.dictionary.entity.Word;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 

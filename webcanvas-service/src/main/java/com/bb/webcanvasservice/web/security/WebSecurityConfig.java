@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.web.security;
 
-import com.bb.webcanvasservice.common.JwtManager;
+import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.web.security.filter.ApplicationSecurityExceptionHandlingFilter;
 import com.bb.webcanvasservice.web.security.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;

@@ -198,11 +198,11 @@ public class GameService {
         return candidates.get(randomIndex);
     }
 
-    @Transactional(readOnly = true)
-    public GameProgressResponse findCurrentGameProgress(Long gameSessionId, Long userId) {
-        GameSession gameSession = gameSessionRepository.findById(gameSessionId)
-                .orElseThrow(GameSessionNotFoundException::new);
-
-
-    }
+//    @Transactional(readOnly = true)
+//    public GameProgressResponse findCurrentGameProgress(Long gameSessionId, Long userId) {
+//        GameSession gameSession = gameSessionRepository.findById(gameSessionId)
+//                .orElseThrow(GameSessionNotFoundException::new);
+//
+//
+//    }
 }

@@ -1,7 +1,8 @@
 package com.bb.webcanvasservice.domain.game.entity;
 
+import com.bb.webcanvasservice.common.entity.BaseEntity;
 import com.bb.webcanvasservice.domain.game.enums.ScoreType;
-import com.bb.webcanvasservice.domain.user.User;
+import com.bb.webcanvasservice.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "scores")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Score {
+public class Score extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "id")

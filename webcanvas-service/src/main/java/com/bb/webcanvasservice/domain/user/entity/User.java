@@ -1,5 +1,6 @@
-package com.bb.webcanvasservice.domain.user;
+package com.bb.webcanvasservice.domain.user.entity;
 
+import com.bb.webcanvasservice.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue

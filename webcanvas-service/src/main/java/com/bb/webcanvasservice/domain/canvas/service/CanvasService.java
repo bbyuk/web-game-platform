@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.canvas;
+package com.bb.webcanvasservice.domain.canvas.service;
 
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;

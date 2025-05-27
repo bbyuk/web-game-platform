@@ -6,8 +6,8 @@ import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResp
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomExitResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
-import com.bb.webcanvasservice.domain.auth.Authenticated;
-import com.bb.webcanvasservice.domain.auth.WebCanvasAuthentication;
+import com.bb.webcanvasservice.common.security.Authenticated;
+import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

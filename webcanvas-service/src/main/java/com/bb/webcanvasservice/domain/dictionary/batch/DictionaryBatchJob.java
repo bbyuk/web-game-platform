@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.domain.dictionary.batch;
 
 import com.bb.webcanvasservice.domain.dictionary.DictionarySourceProperties;
-import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
+import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileParseFailedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,10 +1,10 @@
-package com.bb.webcanvasservice.domain.auth;
+package com.bb.webcanvasservice.domain.auth.service;
 
-import com.bb.webcanvasservice.common.FingerprintGenerator;
-import com.bb.webcanvasservice.common.JwtManager;
+import com.bb.webcanvasservice.common.util.FingerprintGenerator;
+import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.common.code.ErrorCode;
-import com.bb.webcanvasservice.domain.user.User;
-import com.bb.webcanvasservice.domain.user.UserService;
+import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.service.UserService;
 import com.bb.webcanvasservice.web.security.SecurityProperties;
 import com.bb.webcanvasservice.domain.auth.dto.response.AuthenticationInnerResponse;
 import com.bb.webcanvasservice.web.security.exception.ApplicationAuthenticationException;

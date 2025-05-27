@@ -1,12 +1,11 @@
 package com.bb.webcanvasservice.unit.domain.game.service;
 
-import com.bb.webcanvasservice.common.FingerprintGenerator;
-import com.bb.webcanvasservice.common.JoinCodeGenerator;
-import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
+import com.bb.webcanvasservice.common.util.FingerprintGenerator;
+import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
+import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 import com.bb.webcanvasservice.domain.game.GameProperties;
 import com.bb.webcanvasservice.domain.game.entity.GameRoom;
 import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
@@ -17,8 +16,8 @@ import com.bb.webcanvasservice.domain.game.exception.GameRoomHostCanNotChangeRea
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.domain.user.User;
-import com.bb.webcanvasservice.domain.user.UserService;
+import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.service.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

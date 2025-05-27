@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.domain.game.entity;
 
+import com.bb.webcanvasservice.common.entity.BaseEntity;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -18,7 +19,7 @@ import java.util.List;
 @Getter
 @Table(name = "game_rooms")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GameRoom {
+public class GameRoom extends BaseEntity {
 
     @Id
     @GeneratedValue

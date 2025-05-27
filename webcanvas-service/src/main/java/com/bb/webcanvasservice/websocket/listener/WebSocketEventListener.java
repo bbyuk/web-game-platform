@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.websocket.listener;
 
 import com.bb.webcanvasservice.websocket.registry.SessionRegistry;
-import com.bb.webcanvasservice.domain.auth.WebCanvasAuthentication;
+import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

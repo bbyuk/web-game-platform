@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.common;
+package com.bb.webcanvasservice.common.util;
 
 import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.web.security.SecurityProperties;

@@ -1,5 +1,6 @@
-package com.bb.webcanvasservice.domain.dictionary;
+package com.bb.webcanvasservice.domain.dictionary.entity;
 
+import com.bb.webcanvasservice.common.entity.BaseEntity;
 import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "words")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Word {
+public class Word extends BaseEntity {
 
     @Id
     @GeneratedValue

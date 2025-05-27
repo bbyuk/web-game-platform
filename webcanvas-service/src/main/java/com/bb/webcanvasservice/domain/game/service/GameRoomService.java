@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.domain.game.service;
 
-import com.bb.webcanvasservice.common.JoinCodeGenerator;
+import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
-import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
+import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import com.bb.webcanvasservice.domain.game.GameProperties;
@@ -21,8 +21,8 @@ import com.bb.webcanvasservice.domain.game.event.UserReadyChanged;
 import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.domain.user.User;
-import com.bb.webcanvasservice.domain.user.UserService;
+import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;

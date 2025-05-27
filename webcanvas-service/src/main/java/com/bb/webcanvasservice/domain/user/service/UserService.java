@@ -1,5 +1,7 @@
-package com.bb.webcanvasservice.domain.user;
+package com.bb.webcanvasservice.domain.user.service;
 
+import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.repository.UserRepository;
 import com.bb.webcanvasservice.domain.user.exception.AlreadyRegisteredUserException;
 import com.bb.webcanvasservice.domain.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;

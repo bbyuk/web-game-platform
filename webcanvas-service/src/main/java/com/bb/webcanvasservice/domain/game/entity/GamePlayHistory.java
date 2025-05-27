@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.domain.game.entity;
 
-import com.bb.webcanvasservice.domain.user.User;
+import com.bb.webcanvasservice.common.entity.BaseEntity;
+import com.bb.webcanvasservice.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @Entity
 @Table(name = "game_play_histories")
 @RequiredArgsConstructor
-public class GamePlayHistory {
+public class GamePlayHistory extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "id")

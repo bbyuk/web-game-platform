@@ -1,5 +1,6 @@
-package com.bb.webcanvasservice.domain.user;
+package com.bb.webcanvasservice.domain.user.repository;
 
+import com.bb.webcanvasservice.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

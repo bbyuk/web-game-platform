@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.dictionary;
+package com.bb.webcanvasservice.domain.dictionary.service;
 
 import com.bb.webcanvasservice.common.sequence.SequenceRepository;
 import com.bb.webcanvasservice.domain.dictionary.enums.Language;

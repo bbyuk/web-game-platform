@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.unit.domain.game.service;
 
-import com.bb.webcanvasservice.common.FingerprintGenerator;
-import com.bb.webcanvasservice.common.JoinCodeGenerator;
+import com.bb.webcanvasservice.common.util.FingerprintGenerator;
+import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
 import com.bb.webcanvasservice.domain.game.entity.GameRoom;
@@ -14,8 +14,8 @@ import com.bb.webcanvasservice.domain.game.exception.GameSessionIsOverException;
 import com.bb.webcanvasservice.domain.game.repository.*;
 import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.domain.game.service.GameService;
-import com.bb.webcanvasservice.domain.user.User;
-import com.bb.webcanvasservice.domain.user.UserRepository;
+import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -204,11 +204,11 @@ class GameServiceUnitTest {
         // when
 
         /**
-         * 3L -> 2회
-         * 1L, 2L -> 1회
+         * user3 -> 2회
+         * user1, user2 -> 1회
          */
         Long nextDrawer = gameService.findNextDrawer(gameSessionId);
-        Assertions.assertThat(List.of(1L, 2L)).contains(nextDrawer);
+        Assertions.assertThat(List.of(user1.getId(), user2.getId())).contains(nextDrawer);
     }
 
     @Test

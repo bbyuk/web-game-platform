@@ -1,9 +1,8 @@
 package com.bb.webcanvasservice.unit.domain.dictionary;
 
-import com.bb.webcanvasservice.common.sequence.SequenceRepository;
 import com.bb.webcanvasservice.common.sequence.SequenceRepositoryImpl;
-import com.bb.webcanvasservice.domain.dictionary.DictionaryService;
-import com.bb.webcanvasservice.domain.dictionary.Word;
+import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
+import com.bb.webcanvasservice.domain.dictionary.entity.Word;
 import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import com.bb.webcanvasservice.domain.dictionary.repository.WordRepository;
@@ -17,7 +16,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest

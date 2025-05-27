@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.dictionary;
+package com.bb.webcanvasservice.domain.dictionary.controller;
 
 import com.bb.webcanvasservice.domain.dictionary.batch.DictionaryBatchExecutor;
 import io.swagger.v3.oas.annotations.Operation;

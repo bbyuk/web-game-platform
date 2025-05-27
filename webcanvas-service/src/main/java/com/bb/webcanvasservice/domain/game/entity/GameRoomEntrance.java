@@ -1,8 +1,9 @@
 package com.bb.webcanvasservice.domain.game.entity;
 
+import com.bb.webcanvasservice.common.entity.BaseEntity;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
-import com.bb.webcanvasservice.domain.user.User;
+import com.bb.webcanvasservice.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
 @Getter
 @Table(name = "game_room_entrances")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GameRoomEntrance {
+public class GameRoomEntrance extends BaseEntity {
 
     @Id
     @GeneratedValue

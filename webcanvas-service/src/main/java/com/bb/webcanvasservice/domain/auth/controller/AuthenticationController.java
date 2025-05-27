@@ -1,10 +1,13 @@
-package com.bb.webcanvasservice.domain.auth;
+package com.bb.webcanvasservice.domain.auth.controller;
 
-import com.bb.webcanvasservice.common.JwtManager;
+import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.common.code.ErrorCode;
+import com.bb.webcanvasservice.common.security.Authenticated;
+import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import com.bb.webcanvasservice.domain.auth.dto.request.LoginRequest;
 import com.bb.webcanvasservice.domain.auth.dto.response.AuthenticationApiResponse;
 import com.bb.webcanvasservice.domain.auth.dto.response.AuthenticationInnerResponse;
+import com.bb.webcanvasservice.domain.auth.service.AuthenticationService;
 import com.bb.webcanvasservice.web.security.SecurityProperties;
 import com.bb.webcanvasservice.web.security.exception.ApplicationAuthenticationException;
 import io.swagger.v3.oas.annotations.Operation;

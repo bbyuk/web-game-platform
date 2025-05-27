@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.auth;
+package com.bb.webcanvasservice.common.security;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

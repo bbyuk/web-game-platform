@@ -1,8 +1,9 @@
-package com.bb.webcanvasservice.domain.canvas;
+package com.bb.webcanvasservice.domain.canvas.controller;
 
+import com.bb.webcanvasservice.domain.canvas.service.CanvasService;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
-import com.bb.webcanvasservice.domain.auth.Authenticated;
-import com.bb.webcanvasservice.domain.auth.WebCanvasAuthentication;
+import com.bb.webcanvasservice.common.security.Authenticated;
+import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

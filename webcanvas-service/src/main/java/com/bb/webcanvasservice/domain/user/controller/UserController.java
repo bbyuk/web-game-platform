@@ -1,7 +1,9 @@
-package com.bb.webcanvasservice.domain.user;
+package com.bb.webcanvasservice.domain.user.controller;
 
+import com.bb.webcanvasservice.domain.user.entity.User;
 import com.bb.webcanvasservice.domain.user.dto.request.UserCreateRequest;
 import com.bb.webcanvasservice.domain.user.dto.response.UserInfo;
+import com.bb.webcanvasservice.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

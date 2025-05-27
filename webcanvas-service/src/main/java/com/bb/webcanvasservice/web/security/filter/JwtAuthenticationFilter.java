@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.web.security.filter;
 
 import com.bb.webcanvasservice.web.security.SecurityProperties;
-import com.bb.webcanvasservice.common.JwtManager;
-import com.bb.webcanvasservice.domain.auth.WebCanvasAuthentication;
+import com.bb.webcanvasservice.common.util.JwtManager;
+import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

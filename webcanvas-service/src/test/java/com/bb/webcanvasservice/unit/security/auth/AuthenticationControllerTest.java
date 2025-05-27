@@ -1,11 +1,11 @@
 package com.bb.webcanvasservice.unit.security.auth;
 
-import com.bb.webcanvasservice.common.FingerprintGenerator;
-import com.bb.webcanvasservice.domain.user.User;
-import com.bb.webcanvasservice.domain.user.UserService;
+import com.bb.webcanvasservice.common.util.FingerprintGenerator;
+import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.service.UserService;
 import com.bb.webcanvasservice.web.security.SecurityProperties;
-import com.bb.webcanvasservice.domain.auth.AuthenticationService;
-import com.bb.webcanvasservice.common.JwtManager;
+import com.bb.webcanvasservice.domain.auth.service.AuthenticationService;
+import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.domain.auth.dto.request.LoginRequest;
 import com.bb.webcanvasservice.domain.auth.dto.response.AuthenticationInnerResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;

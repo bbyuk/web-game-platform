@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.common;
+package com.bb.webcanvasservice.common.util;
 
 import java.security.SecureRandom;
 

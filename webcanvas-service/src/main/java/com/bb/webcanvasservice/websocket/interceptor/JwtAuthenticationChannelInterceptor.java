@@ -2,8 +2,8 @@ package com.bb.webcanvasservice.websocket.interceptor;
 
 import com.bb.webcanvasservice.websocket.registry.SessionRegistry;
 import com.bb.webcanvasservice.websocket.exception.AlreadyConnectedException;
-import com.bb.webcanvasservice.common.JwtManager;
-import com.bb.webcanvasservice.domain.auth.WebCanvasAuthentication;
+import com.bb.webcanvasservice.common.util.JwtManager;
+import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;

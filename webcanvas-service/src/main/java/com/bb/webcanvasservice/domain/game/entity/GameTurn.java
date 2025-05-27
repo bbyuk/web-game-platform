@@ -1,14 +1,14 @@
 package com.bb.webcanvasservice.domain.game.entity;
 
+import com.bb.webcanvasservice.common.entity.BaseEntity;
 import com.bb.webcanvasservice.domain.game.enums.GameTurnState;
-import com.bb.webcanvasservice.domain.user.User;
+import com.bb.webcanvasservice.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "game_turns")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GameTurn {
+public class GameTurn extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "id")

@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.domain.dictionary.repository;
 
-import com.bb.webcanvasservice.domain.dictionary.Word;
+import com.bb.webcanvasservice.domain.dictionary.entity.Word;
 import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import org.springframework.data.jpa.repository.JpaRepository;
