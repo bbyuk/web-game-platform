@@ -1,8 +1,10 @@
 package com.bb.webcanvasservice.domain.game.dto.response;
 
 import com.bb.webcanvasservice.domain.game.enums.GameSessionState;
+import com.bb.webcanvasservice.domain.game.enums.GameTurnState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Schema(description = "현재 게임 진행 정보 조회 API의 응답 DTO")
@@ -25,6 +27,15 @@ public record GameProgressResponse(
 
     @Schema(description = "게임 세션 내에서 진행되는 턴 정보")
     public record GameTurnInfo(
-
+            @Schema(description = "해당 턴에 그림을 그릴 차례인 사람의 ID")
+            Long drawerId,
+            @Schema(description = "턴 종료 시간")
+            LocalDateTime expiration,
+            @Schema(description = "정답 - 해당 턴에 그림을 그릴 차례인 사람인 경우에만 값을 채워 리턴", nullable = true)
+            String answer,
+            @Schema(description = "정답자 ID")
+            Long correctAnswererId,
+            @Schema(description = "턴의 상태")
+            GameTurnState gameTurnState
     ) {}
 }

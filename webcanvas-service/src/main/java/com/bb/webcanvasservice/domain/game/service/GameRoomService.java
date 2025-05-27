@@ -1,16 +1,16 @@
 package com.bb.webcanvasservice.domain.game.service;
 
-import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
-import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
+import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
+import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 import com.bb.webcanvasservice.domain.game.GameProperties;
-import com.bb.webcanvasservice.domain.game.entity.GameRoom;
-import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
+import com.bb.webcanvasservice.domain.game.entity.GameRoom;
+import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
@@ -55,6 +55,8 @@ public class GameRoomService {
     private final GameRoomRepository gameRoomRepository;
     private final GameRoomEntranceRepository gameRoomEntranceRepository;
 
+
+
     /**
      * 설정 변수
      */
@@ -64,6 +66,8 @@ public class GameRoomService {
      * 이벤트 퍼블리셔
      */
     private final ApplicationEventPublisher applicationEventPublisher;
+
+
 
     /**
      * 요청자가 입장한 게임 방을 리턴한다.
@@ -80,6 +84,7 @@ public class GameRoomService {
 
     /**
      * 게임 방을 찾는다.
+     *
      * @param gameRoomId
      * @return
      */
@@ -244,9 +249,9 @@ public class GameRoomService {
      * 입장 가능한 게임 방을 조회해 리턴한다.
      * <p>
      * 이미 입장한 방이 있는 경우, AlreadyEnteredRoomException 을 throw한다.
-     *
+     * <p>
      * TODO 메모리에서 WAITING GameRoomEntrance filtering 처리 -> batch size 및 페이징 처리 필요
-     * 
+     *
      * @param userId 유저 ID
      * @return GameRoomListResponse 게임 방 조회 응답 DTO
      */
@@ -277,7 +282,7 @@ public class GameRoomService {
     /**
      * 현재 입장한 게임 방과 입장 정보를 리턴한다.
      * <p>
-     *
+     * <p>
      * 250430 - 유저 Summary 데이터에 노출 컬러 필드 추가
      *
      * @param userId
@@ -315,8 +320,9 @@ public class GameRoomService {
 
     /**
      * 게임 방에서 퇴장한다.
-     *
+     * <p>
      * HOST 퇴장 시 입장한 지 가장 오래된 유저가 HOST로 변경
+     *
      * @param gameRoomEntranceId
      * @param userId
      */
@@ -338,8 +344,7 @@ public class GameRoomService {
 
         if (entrances.isEmpty()) {
             gameRoom.close();
-        }
-        else if (targetEntrance.getRole() == HOST) {
+        } else if (targetEntrance.getRole() == HOST) {
             /**
              * 250522
              * 퇴장 요청을 보낸 유저가 HOST일 경우 남은 유저 중 제일 처음 입장한 유저가 HOST가 된다.
@@ -407,6 +412,7 @@ public class GameRoomService {
 
     /**
      * 락을 걸어 현재 게임 방에 입장한 유저 입장 목록을 가져온다.
+     *
      * @param gameRoomId
      * @return
      */
@@ -417,6 +423,7 @@ public class GameRoomService {
 
     /**
      * 게임 방 ID와 게임 방 입장 상태에 맞는 게임 방 입장 목록을 조회해온다.
+     *
      * @param gameRoomId
      * @param gameRoomEntranceState
      * @return
@@ -425,4 +432,7 @@ public class GameRoomService {
     public List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndState(Long gameRoomId, GameRoomEntranceState gameRoomEntranceState) {
         return gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, gameRoomEntranceState);
     }
+
+
+
 }

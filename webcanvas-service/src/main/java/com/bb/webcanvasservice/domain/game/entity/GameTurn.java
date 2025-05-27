@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,5 +88,14 @@ public class GameTurn extends BaseEntity {
      */
     public void pass() {
         this.state = GameTurnState.PASSED;
+    }
+
+    /**
+     * 게임 세션과 연관된 종료 시각을 계산해 리턴한다.
+     * Seconds
+     * @return
+     */
+    public LocalDateTime getExpiration() {
+        return createdAt.plus(gameSession.getTimePerTurn(), ChronoUnit.SECONDS);
     }
 }

@@ -2,7 +2,6 @@ package com.bb.webcanvasservice.domain.game.service;
 
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
-import com.bb.webcanvasservice.domain.game.dto.response.GameProgressResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.entity.*;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
@@ -20,9 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
@@ -40,6 +39,7 @@ public class GameService {
 
     private final GameSessionRepository gameSessionRepository;
     private final GamePlayHistoryRepository gamePlayHistoryRepository;
+
 
     /**
      * 게임을 시작한다.
@@ -198,11 +198,4 @@ public class GameService {
         return candidates.get(randomIndex);
     }
 
-//    @Transactional(readOnly = true)
-//    public GameProgressResponse findCurrentGameProgress(Long gameSessionId, Long userId) {
-//        GameSession gameSession = gameSessionRepository.findById(gameSessionId)
-//                .orElseThrow(GameSessionNotFoundException::new);
-//
-//
-//    }
 }
