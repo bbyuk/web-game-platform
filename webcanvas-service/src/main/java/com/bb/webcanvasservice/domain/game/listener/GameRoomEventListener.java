@@ -11,11 +11,11 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
- * 게임 관련 이벤트 리스너
+ * 게임 방 관련 이벤트 리스너
  */
 @Component
 @RequiredArgsConstructor
-public class GameEventListener {
+public class GameRoomEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -37,11 +37,19 @@ public class GameEventListener {
         messagingTemplate.convertAndSend("/session/" + event.getGameRoomId(), event);
     }
 
+    /**
+     * 게임 방 호스트 변경 시 게임 방 메세지 브로커로 호스트 변경 이벤트를 push한다.
+     * @param event
+     */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameRoomHostChange(GameRoomHostChangedEvent event) {
         messagingTemplate.convertAndSend("/session/" + event.getGameRoomId(), event);
     }
 
+    /**
+     * 게임 방에 접속한 유저들의 레디 상태 변경시 게임 방 메세지 브로커로 레디 변경 이벤트를 push한다.
+     * @param event
+     */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleUserReadyChanged(UserReadyChanged event) {
         messagingTemplate.convertAndSend("/session/" + event.getGameRoomId(), event);

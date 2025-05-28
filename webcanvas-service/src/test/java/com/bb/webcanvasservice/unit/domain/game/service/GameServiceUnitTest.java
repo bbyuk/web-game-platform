@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.unit.domain.game.service;
 
+import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
-import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.config.JpaConfig;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
 import com.bb.webcanvasservice.domain.game.entity.GameRoom;
@@ -15,7 +15,6 @@ import com.bb.webcanvasservice.domain.game.exception.GameSessionIsOverException;
 import com.bb.webcanvasservice.domain.game.repository.*;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.game.service.GameService;
-import com.bb.webcanvasservice.domain.game.service.GameTurnPlayingService;
 import com.bb.webcanvasservice.domain.user.entity.User;
 import com.bb.webcanvasservice.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -66,8 +65,6 @@ class GameServiceUnitTest {
     @Autowired
     GameService gameService;
 
-    @Autowired
-    GameTurnPlayingService gameTurnPlayingService;
 
     private void setId(Object object, Long id) throws Exception {
         Field field = object.getClass().getDeclaredField("id");
@@ -167,7 +164,7 @@ class GameServiceUnitTest {
         Long gameSessionId = gameService.startGame(gameStartRequest, user1.getId());
 
         // when
-        Assertions.assertThat(gameTurnPlayingService.findNextDrawerId(gameSessionId)).isNotNull();
+        Assertions.assertThat(gameService.findNextDrawerId(gameSessionId)).isNotNull();
 
 
         // then
@@ -214,7 +211,7 @@ class GameServiceUnitTest {
          * user3 -> 2회
          * user1, user2 -> 1회
          */
-        Long nextDrawer = gameTurnPlayingService.findNextDrawerId(gameSessionId);
+        Long nextDrawer = gameService.findNextDrawerId(gameSessionId);
         Assertions.assertThat(List.of(user1.getId(), user2.getId())).contains(nextDrawer);
     }
 
@@ -252,7 +249,7 @@ class GameServiceUnitTest {
         gameTurnRepository.save(new GameTurn(gameSession, user3, "핸덤 명사3"));
 
         // when
-        Assertions.assertThatThrownBy(() -> gameTurnPlayingService.findNextDrawerId(gameSessionId))
+        Assertions.assertThatThrownBy(() -> gameService.findNextDrawerId(gameSessionId))
                         .isInstanceOf(GameSessionIsOverException.class);
 
         // then

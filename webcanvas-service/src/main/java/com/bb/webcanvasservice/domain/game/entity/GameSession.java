@@ -66,4 +66,8 @@ public class GameSession extends BaseEntity {
         this.timePerTurn = timePerTurn;
     }
 
+    public void end() {
+        this.state = GameSessionState.COMPLETED;
+    }
+
 }
