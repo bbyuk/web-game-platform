@@ -196,7 +196,6 @@ export default function GameRoomPage() {
           }
           break;
         case "ROOM/USER_READY_CHANGED":
-          console.log("누군가 레디를 했다.");
           /**
            * 다른 사람 ready 발생시
            */
@@ -207,6 +206,9 @@ export default function GameRoomPage() {
 
             setLeftSidebar(response);
           });
+          break;
+        case "SESSION/STARTED":
+          console.log(frame);
           break;
       }
     };

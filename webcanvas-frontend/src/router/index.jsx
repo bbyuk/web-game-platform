@@ -23,7 +23,7 @@ export const pages = {
     },
     playing: {
       path: "playing",
-      url: (gameRoomId) => `/game/room/${gameRoomId}/playing`,
+      url: (gameRoomId, gameSessionId) => `/game/room/${gameRoomId}/playing/${gameSessionId}`,
     },
   },
 };
