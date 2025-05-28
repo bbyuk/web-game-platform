@@ -10,7 +10,6 @@ import com.bb.webcanvasservice.domain.game.entity.*;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
-import com.bb.webcanvasservice.domain.game.enums.GameSessionState;
 import com.bb.webcanvasservice.domain.game.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionStartEvent;
 import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;
@@ -23,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -242,7 +240,7 @@ public class GameService {
      * 해당 메소드는 startGame 등과 같은 메소드 이후 시점에 실행되어야 하나
      * 별도의 컨텍스트에서 싫랭되어야 하므로 트랜잭션읇 분리한다.
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void processToNextTurn(Long gameSessionId) {
         GameSession gameSession = gameSessionRepository.findById(gameSessionId)
                 .orElseThrow(GameSessionNotFoundException::new);
@@ -256,10 +254,7 @@ public class GameService {
             log.debug("모든 턴이 진행되었습니다.");
             log.debug("게임 세션 종료");
 
-            /**
-             * TODO 게임 종료 처리 메세지 push or 이벤트 pub
-             */
-//            endGame(gameSessionId);
+            applicationEventPublisher.publishEvent(new GameSessionEndEvent(gameSessionId, gameSession.getGameRoom().getId()));
             return;
         }
 

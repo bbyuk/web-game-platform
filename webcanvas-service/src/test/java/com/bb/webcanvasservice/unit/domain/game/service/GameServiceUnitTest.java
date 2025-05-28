@@ -254,4 +254,5 @@ class GameServiceUnitTest {
 
         // then
     }
+
 }

@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.domain.game.controller;
 
+import com.bb.webcanvasservice.domain.chat.service.ChatService;
 import com.bb.webcanvasservice.domain.game.service.GameService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,5 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GameController {
 
     private final GameService gameService;
+    private final ChatService chatService;
+
 
 }
