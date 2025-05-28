@@ -50,6 +50,7 @@ public enum ErrorCode {
     WORD_NOT_FOUND("D002", "단어를 찾지 못했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     GAME_SESSION_NOT_FOUND("G000", "진행중인 게임을 찾지 못했습니다.", HttpStatus.NOT_FOUND),
     GAME_SESSION_IS_OVER("G001", "게임 세션이 종료되었습니다.", HttpStatus.CONFLICT),
+    GAME_TURN_NOT_FOUND("G002", "게임 턴을 찾지 못했습니다.", HttpStatus.NOT_FOUND),
     ABNORMAL_ACCESS("B000", "비정상적인 접근이 감지되었습니다.", HttpStatus.BAD_REQUEST);
 
     @Getter

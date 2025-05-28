@@ -14,10 +14,7 @@ import com.bb.webcanvasservice.domain.game.enums.GameSessionState;
 import com.bb.webcanvasservice.domain.game.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionStartEvent;
 import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;
-import com.bb.webcanvasservice.domain.game.exception.GameSessionIsOverException;
-import com.bb.webcanvasservice.domain.game.exception.GameSessionNotFoundException;
-import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
-import com.bb.webcanvasservice.domain.game.exception.NextDrawerNotFoundException;
+import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameTurnRepository;
@@ -166,12 +163,6 @@ public class GameService {
 
 
     /**
-     * TODO nextTurn 메소드 개발
-     * 1. startGame 로직 완료 후 -> 별도 트랜잭션에서 -> nextTurn
-     * TODO nextTurn 슈도코드
-     * - GameTurn Entity 생성
-     * - turn-progress 이벤트 발행
-     * - 이벤트 리스너에서 메세지 브로커로 메세지 pub
      * TODO chat 메세지에서 검증 처리 추가
      * - chat 메세지 브로드캐스팅 전 게임 상태로 분기해 게임 진행중이면 정답 체크
      * - 정답과 동등성 비교 후 정답 hit시 정답 answer 이벤트 발행 후 브로드캐스팅
@@ -336,5 +327,18 @@ public class GameService {
 
         return gameSession.getState() == COMPLETED
                 || gameSession.getGameTurns().size() >= gameSession.getTurnCount();
+    }
+
+    /**
+     * 정답인지 체크한다.
+     * @param gameTurnId
+     * @param answer
+     * @return
+     */
+    @Transactional
+    public boolean isAnswer(Long gameTurnId, String answer) {
+        return gameTurnRepository
+                .findById(gameTurnId).orElseThrow(GameTurnNotFoundException::new)
+                .getAnswer().equals(answer);
     }
 }
