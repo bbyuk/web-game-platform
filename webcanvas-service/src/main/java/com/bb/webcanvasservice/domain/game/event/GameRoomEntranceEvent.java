@@ -8,6 +8,7 @@ import lombok.Getter;
  */
 @Getter
 public class GameRoomEntranceEvent extends ApplicationEvent {
+
     private final Long gameRoomId;
     private final Long userId;
 

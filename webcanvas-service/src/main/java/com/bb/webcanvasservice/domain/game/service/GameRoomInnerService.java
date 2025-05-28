@@ -31,7 +31,7 @@ import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class InGameRoomService {
+public class GameRoomInnerService {
 
     /**
      * 레포지토리

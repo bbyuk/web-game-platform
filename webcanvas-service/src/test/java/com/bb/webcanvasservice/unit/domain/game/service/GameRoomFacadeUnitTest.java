@@ -17,7 +17,7 @@ import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.game.service.GameRoomCrossDomainService;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
-import com.bb.webcanvasservice.domain.game.service.InGameRoomService;
+import com.bb.webcanvasservice.domain.game.service.GameRoomInnerService;
 import com.bb.webcanvasservice.domain.game.service.LobbyService;
 import com.bb.webcanvasservice.domain.user.entity.User;
 import com.bb.webcanvasservice.domain.user.service.UserService;
@@ -77,7 +77,7 @@ class GameRoomFacadeUnitTest {
     void setup() {
         this.gameRoomFacade = new GameRoomFacade(
                 new LobbyService(gameProperties, userService, dictionaryService, gameRoomRepository, gameRoomEntranceRepository, eventPublisher),
-                new InGameRoomService(gameRoomRepository, gameRoomEntranceRepository, gameProperties, eventPublisher),
+                new GameRoomInnerService(gameRoomRepository, gameRoomEntranceRepository, gameProperties, eventPublisher),
                 new GameRoomCrossDomainService(gameRoomEntranceRepository, gameRoomRepository)
         );
     }

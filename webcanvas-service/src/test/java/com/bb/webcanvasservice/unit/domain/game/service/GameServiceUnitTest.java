@@ -15,6 +15,7 @@ import com.bb.webcanvasservice.domain.game.exception.GameSessionIsOverException;
 import com.bb.webcanvasservice.domain.game.repository.*;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.game.service.GameService;
+import com.bb.webcanvasservice.domain.game.service.GameTurnPlayingService;
 import com.bb.webcanvasservice.domain.user.entity.User;
 import com.bb.webcanvasservice.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -64,6 +65,9 @@ class GameServiceUnitTest {
 
     @Autowired
     GameService gameService;
+
+    @Autowired
+    GameTurnPlayingService gameTurnPlayingService;
 
     private void setId(Object object, Long id) throws Exception {
         Field field = object.getClass().getDeclaredField("id");
@@ -163,7 +167,7 @@ class GameServiceUnitTest {
         Long gameSessionId = gameService.startGame(gameStartRequest, user1.getId());
 
         // when
-        Assertions.assertThat(gameService.findNextDrawer(gameSessionId)).isNotNull();
+        Assertions.assertThat(gameTurnPlayingService.findNextDrawerId(gameSessionId)).isNotNull();
 
 
         // then
@@ -210,7 +214,7 @@ class GameServiceUnitTest {
          * user3 -> 2회
          * user1, user2 -> 1회
          */
-        Long nextDrawer = gameService.findNextDrawer(gameSessionId);
+        Long nextDrawer = gameTurnPlayingService.findNextDrawerId(gameSessionId);
         Assertions.assertThat(List.of(user1.getId(), user2.getId())).contains(nextDrawer);
     }
 
@@ -248,7 +252,7 @@ class GameServiceUnitTest {
         gameTurnRepository.save(new GameTurn(gameSession, user3, "핸덤 명사3"));
 
         // when
-        Assertions.assertThatThrownBy(() -> gameService.findNextDrawer(gameSessionId))
+        Assertions.assertThatThrownBy(() -> gameTurnPlayingService.findNextDrawerId(gameSessionId))
                         .isInstanceOf(GameSessionIsOverException.class);
 
         // then

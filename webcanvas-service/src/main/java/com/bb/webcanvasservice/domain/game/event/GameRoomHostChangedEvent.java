@@ -9,7 +9,14 @@ import lombok.Getter;
 @Getter
 public class GameRoomHostChangedEvent extends ApplicationEvent {
 
+    /**
+     * 게임 방 ID
+     */
     private Long gameRoomId;
+
+    /**
+     * 변경된 호스트 유저 ID
+     */
     private Long hostUserId;
 
     public GameRoomHostChangedEvent(Long gameRoomId, Long userId) {

@@ -9,7 +9,14 @@ import lombok.Getter;
 @Getter
 public class GameRoomExitEvent extends ApplicationEvent {
 
+    /**
+     * 게임 방 ID
+     */
     private final Long gameRoomId;
+
+    /**
+     * 유저 ID
+     */
     private final Long userId;
 
     public GameRoomExitEvent(Long gameRoomId, Long userId) {

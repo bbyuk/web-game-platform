@@ -9,8 +9,19 @@ import lombok.Getter;
 @Getter
 public class UserReadyChanged extends ApplicationEvent {
 
+    /**
+     * 게임 방 ID
+     */
     private final Long gameRoomId;
+
+    /**
+     * 유저 ID
+     */
     private final Long userId;
+
+    /**
+     * 레디 여부
+     */
     private final boolean ready;
 
     public UserReadyChanged(Long gameRoomId, Long userId, boolean ready) {

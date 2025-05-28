@@ -29,7 +29,7 @@ public class GameRoomFacade {
     /**
      * 게임 방 내 서비스
      */
-    private final InGameRoomService inGameRoomService;
+    private final GameRoomInnerService gameRoomInnerService;
 
     /**
      * 크로스 도메인 서비스
@@ -129,7 +129,7 @@ public class GameRoomFacade {
      */
     @Transactional
     public GameRoomEntranceInfoResponse findEnteredGameRoomInfo(Long userId) {
-        return inGameRoomService.findEnteredGameRoomInfo(userId);
+        return gameRoomInnerService.findEnteredGameRoomInfo(userId);
     }
 
     /**
@@ -142,7 +142,7 @@ public class GameRoomFacade {
      */
     @Transactional
     public void exitFromRoom(Long gameRoomEntranceId, Long userId) {
-        inGameRoomService.exitFromRoom(gameRoomEntranceId, userId);
+        gameRoomInnerService.exitFromRoom(gameRoomEntranceId, userId);
     }
 
     /**
@@ -155,7 +155,7 @@ public class GameRoomFacade {
      */
     @Transactional
     public boolean updateReady(Long gameRoomEntranceId, Long userId, boolean ready) {
-        return inGameRoomService.updateReady(gameRoomEntranceId, userId, ready);
+        return gameRoomInnerService.updateReady(gameRoomEntranceId, userId, ready);
     }
 
     /**
