@@ -51,7 +51,7 @@ public class CanvasTestDataLoader {
         System.out.println("testUser2 = " + testUser2.getId());
         System.out.println("testUser3 = " + testUser3.getId());
 
-        testGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
+        testGameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
 
         gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1, "테스트 여우", GameRoomRole.HOST));
         gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser2, "테스트 수달", GameRoomRole.GUEST));

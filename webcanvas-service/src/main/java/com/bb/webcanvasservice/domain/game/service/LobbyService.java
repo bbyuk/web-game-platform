@@ -21,6 +21,7 @@ import com.bb.webcanvasservice.domain.game.exception.JoinCodeNotGeneratedExcepti
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
 import com.bb.webcanvasservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -164,6 +165,9 @@ public class LobbyService {
 
         GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
         targetGameRoom.addEntrance(newGameRoomEntrance);
+
+        userService.changeUserState(userId, UserStateCode.IN_ROOM);
+
 
         /**
          * 게임 방 입장 이벤트 pub ->

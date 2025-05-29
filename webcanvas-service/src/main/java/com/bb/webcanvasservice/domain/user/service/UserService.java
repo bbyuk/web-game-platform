@@ -1,6 +1,8 @@
 package com.bb.webcanvasservice.domain.user.service;
 
+import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
 import com.bb.webcanvasservice.domain.user.repository.UserRepository;
 import com.bb.webcanvasservice.domain.user.exception.AlreadyRegisteredUserException;
 import com.bb.webcanvasservice.domain.user.exception.UserNotFoundException;
@@ -14,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
 
     private final UserRepository userRepository;
 
@@ -63,5 +64,26 @@ public class UserService {
         return userRepository.save(new User(fingerprint));
     }
 
+    /**
+     * 유저 상태를 변경한다.
+     * @param userId
+     * @param state
+     */
+    @Transactional
+    public void changeUserState(Long userId, UserStateCode state) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
 
+        user.changeState(state);
+    }
+
+    /**
+     * 유저 상태를 조회한다.
+     * @param userId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public UserStateCode findUserState(Long userId) {
+        return userRepository.findUserState(userId);
+    }
 }

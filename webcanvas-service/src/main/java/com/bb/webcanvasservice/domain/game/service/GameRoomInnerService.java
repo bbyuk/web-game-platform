@@ -13,6 +13,8 @@ import com.bb.webcanvasservice.domain.game.exception.GameRoomEntranceNotFoundExc
 import com.bb.webcanvasservice.domain.game.exception.GameRoomHostCanNotChangeReadyException;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
+import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
+import com.bb.webcanvasservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -39,6 +41,11 @@ public class GameRoomInnerService {
     private final GameRoomRepository gameRoomRepository;
     private final GameRoomEntranceRepository gameRoomEntranceRepository;
 
+    /**
+     * 서비스
+     */
+    private final UserService userService;
+    
     /**
      * 설정 변수
      */
@@ -133,6 +140,8 @@ public class GameRoomInnerService {
                     );
         }
 
+        userService.changeUserState(userId, UserStateCode.IN_LOBBY);
+        
         /**
          * 250519 게임방 퇴장시 event 발행
          */

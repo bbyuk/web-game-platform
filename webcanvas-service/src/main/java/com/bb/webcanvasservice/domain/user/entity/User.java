@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.domain.user.entity;
 
 import com.bb.webcanvasservice.common.entity.BaseEntity;
+import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,8 +37,16 @@ public class User extends BaseEntity {
      */
     private String refreshToken;
 
+    @Column(name = "state")
+    @Enumerated(EnumType.STRING)
+    /**
+     * 유저 상태
+     */
+    private UserStateCode state;
+
     public User(String fingerprint) {
         this.fingerprint = fingerprint;
+        state = UserStateCode.IN_LOBBY;
     }
 
     /**
@@ -46,5 +55,13 @@ public class User extends BaseEntity {
      */
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    /**
+     * 유저 상태를 변경한다.
+     * @param state
+     */
+    public void changeState(UserStateCode state) {
+        this.state = state;
     }
 }

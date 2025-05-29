@@ -17,6 +17,7 @@ import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameTurnRepository;
+import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
 import com.bb.webcanvasservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -114,6 +115,8 @@ public class GameService {
          */
         gameSessionRepository.save(gameSession);
         gamePlayHistoryRepository.saveAll(gamePlayHistories);
+
+        userService.changeUserState(userId, UserStateCode.IN_GAME);
 
         /**
          * 이벤트 발행하여 커밋 이후 next turn 및 메세징 처리
@@ -303,9 +306,14 @@ public class GameService {
 
         List<GameRoomEntrance> currentPlayingEntrances = gameRoomFacade.findGameRoomEntrancesByGameRoomIdAndState(gameRoom.getId(), GameRoomEntranceState.PLAYING);
         currentPlayingEntrances.stream()
-                .forEach(gameRoomEntrance -> gameRoomEntrance.changeState(GameRoomEntranceState.WAITING));
+                .forEach(gameRoomEntrance -> {
+                    gameRoomEntrance.changeState(GameRoomEntranceState.WAITING);
+                    userService.changeUserState(gameRoomEntrance.getUser().getId(), UserStateCode.IN_ROOM);
+                });
 
         gameSession.end();
+
+
 
         applicationEventPublisher.publishEvent(new GameSessionEndEvent(gameSessionId, gameRoom.getId()));
     }

@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.integration.domain.game;
+package com.bb.webcanvasservice.integration.domain.game.service;
 
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
@@ -13,6 +13,7 @@ import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateExcepti
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
 import com.bb.webcanvasservice.domain.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,15 +80,16 @@ class GameRoomFacadeIntegrationTest {
     public void enterGameRoom() {
         // given - 공통 Entity 사용
         BDDMockito.given(dictionaryService.drawRandomWordValue(any(), any()))
-                .willReturn("테스트 여우");
-
-
+                .willReturn("테스트 명사");
+        
         // when
         GameRoomEntranceResponse gameRoomEntranceResponse = gameRoomFacade.enterGameRoom(waitingRoom.getId(), testUser.getId(), GUEST);
 
         // then
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomId()).isEqualTo(waitingRoom.getId());
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomEntranceId()).isNotNull();
+
+        Assertions.assertThat(userRepository.findUserState(testUser.getId())).isEqualTo(UserStateCode.IN_ROOM);
     }
 
     @Test
@@ -193,7 +195,28 @@ class GameRoomFacadeIntegrationTest {
 
         // then
         Assertions.assertThat(gameRoom.getState()).isEqualTo(GameRoomState.CLOSED);
+    }
 
+    @Test
+    @DisplayName("게임 방 퇴장 - 게임 방에서 퇴장한 유저의 상태는 IN_LOBBY로 변경된다.")
+    void testUserStateWhenExitFromRoom() throws Exception {
+        // given
+        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+
+        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(6)));
+
+        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "닉네임1", HOST));
+        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "닉네임2", GUEST));
+
+
+        // when
+        gameRoomFacade.exitFromRoom(gameRoomEntrance2.getId(), user2.getId());
+        gameRoomFacade.exitFromRoom(gameRoomEntrance1.getId(), user1.getId());
+
+        // then
+        Assertions.assertThat(userRepository.findUserState(user1.getId())).isEqualTo(UserStateCode.IN_LOBBY);
+        Assertions.assertThat(userRepository.findUserState(user2.getId())).isEqualTo(UserStateCode.IN_LOBBY);
     }
 
     @Test

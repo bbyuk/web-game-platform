@@ -1,5 +1,8 @@
 package com.bb.webcanvasservice.domain.user.controller;
 
+import com.bb.webcanvasservice.common.security.Authenticated;
+import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
+import com.bb.webcanvasservice.domain.user.dto.response.UserStateInfo;
 import com.bb.webcanvasservice.domain.user.entity.User;
 import com.bb.webcanvasservice.domain.user.dto.request.UserCreateRequest;
 import com.bb.webcanvasservice.domain.user.dto.response.UserInfo;
@@ -8,10 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 유저 API의 endpoint
@@ -38,4 +38,9 @@ public class UserController {
         return ResponseEntity.ok(new UserInfo(user.getId(), user.getFingerprint()));
     }
 
+    @GetMapping("state")
+    @Operation(summary = "유저 상태 조회", description = "유저의 현재 상태를 조회한다.")
+    public ResponseEntity<UserStateInfo> findUserState(@Authenticated WebCanvasAuthentication authentication) {
+        return ResponseEntity.ok(new UserStateInfo(userService.findUserState(authentication.getUserId())));
+    }
 }

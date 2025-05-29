@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.domain.user.repository;
 
 import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,4 +26,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
             where   u.fingerprint = :fingerprint
             """)
     Optional<User> findByFingerprint(@Param("fingerprint") String fingerprint);
+
+    /**
+     * 유저 상태를 조회한다.
+     * @param userId
+     * @return
+     */
+    @Query("""
+            select  u.state
+            from    User u
+            where   u.id = :userId
+            """)
+    UserStateCode findUserState(@Param("userId") Long userId);
 }

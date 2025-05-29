@@ -77,7 +77,7 @@ class GameRoomFacadeUnitTest {
     void setup() {
         this.gameRoomFacade = new GameRoomFacade(
                 new LobbyService(gameProperties, userService, dictionaryService, gameRoomRepository, gameRoomEntranceRepository, eventPublisher),
-                new GameRoomInnerService(gameRoomRepository, gameRoomEntranceRepository, gameProperties, eventPublisher),
+                new GameRoomInnerService(gameRoomRepository, gameRoomEntranceRepository, userService, gameProperties, eventPublisher),
                 new GameRoomCrossDomainService(gameRoomEntranceRepository, gameRoomRepository)
         );
     }
