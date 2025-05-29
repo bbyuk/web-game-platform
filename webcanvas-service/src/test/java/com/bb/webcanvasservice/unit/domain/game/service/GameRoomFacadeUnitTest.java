@@ -296,7 +296,7 @@ class GameRoomFacadeUnitTest {
         when(gameRoomEntranceRepository.findGameRoomEntranceByUserId(any(Long.class), any()))
                 .thenReturn(Optional.of(testGameRoomEntrance0));
 
-        when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(any(Long.class), any()))
+        when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndStates(any(Long.class), any()))
                 .thenReturn(List.of(testGameRoomEntrance0, testGameRoomEntrance1, testGameRoomEntrance2));
 
 

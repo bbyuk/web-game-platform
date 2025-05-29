@@ -76,8 +76,10 @@ public class GameRoomInnerService {
 
         AtomicInteger index = new AtomicInteger(0);
 
-        List<GameRoomEntranceInfoResponse.EnteredUserSummary> enteredUserSummaries = gameRoomEntranceRepository
-                .findGameRoomEntrancesByGameRoomIdAndStates(gameRoom.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING))
+        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository
+                .findGameRoomEntrancesByGameRoomIdAndStates(gameRoom.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING));
+
+        List<GameRoomEntranceInfoResponse.EnteredUserSummary> enteredUserSummaries = gameRoomEntrances
                 .stream()
                 .map(gameRoomEntrance ->
                         new GameRoomEntranceInfoResponse.EnteredUserSummary(
