@@ -18,5 +18,5 @@ export const game = {
   // 레디 상태 변경
   updateReady: (gameRoomEntranceId) => `${BASE}/room/entrance/${gameRoomEntranceId}/ready`,
   // 게임 시작
-  startGame: `${BASE}/session`
+  startGame: `${BASE}/session`,
 };

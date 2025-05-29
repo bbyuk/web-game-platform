@@ -1,6 +1,6 @@
 import { LobbyPlaceholder } from "@/components/placeholder/lobby/index.jsx";
 import { useEffect } from "react";
-import { game } from "@/api/index.js";
+import { game, user } from "@/api/index.js";
 import { useApiLock } from "@/api/lock/index.jsx";
 import { EMPTY_MESSAGES } from "@/constants/message.js";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import { GitCommit } from "lucide-react";
 import { getApiClient } from "@/client/http/index.jsx";
 import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
 import ItemList from "@/components/layouts/side-panel/item-list/index.jsx";
+import { useUserStore } from "@/stores/user/userStore.jsx";
 
 export default function LobbyPage() {
   // 전역 context
@@ -18,7 +19,7 @@ export default function LobbyPage() {
   const navigate = useNavigate();
 
   const leftSideStore = useLeftSideStore();
-
+  const { userState, setUserState } = useUserStore();
   /**
    * ============== 유저 정의 함수 ===============
    */
@@ -74,9 +75,7 @@ export default function LobbyPage() {
       button: true,
       onClick: findEnterableGameRooms,
     });
-    /**
-     * 입장 가능한 방 목록 조회
-     */
+
     findEnterableGameRooms();
   }, []);
 
