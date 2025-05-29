@@ -293,7 +293,7 @@ class GameRoomFacadeUnitTest {
         setId(testGameRoomEntrance1, random.nextLong());
         setId(testGameRoomEntrance2, random.nextLong());
 
-        when(gameRoomEntranceRepository.findGameRoomEntranceByUserId(any(Long.class)))
+        when(gameRoomEntranceRepository.findGameRoomEntranceByUserId(any(Long.class), any()))
                 .thenReturn(Optional.of(testGameRoomEntrance0));
 
         when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(any(Long.class), any()))

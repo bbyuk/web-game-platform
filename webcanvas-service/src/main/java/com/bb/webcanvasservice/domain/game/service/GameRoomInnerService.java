@@ -68,14 +68,16 @@ public class GameRoomInnerService {
      */
     @Transactional(readOnly = true)
     public GameRoomEntranceInfoResponse findEnteredGameRoomInfo(Long userId) {
-        GameRoomEntrance userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId)
+        GameRoomEntrance userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId, List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING))
                 .orElseThrow(GameRoomEntranceNotFoundException::new);
+
+
         GameRoom gameRoom = userEntrance.getGameRoom();
 
         AtomicInteger index = new AtomicInteger(0);
 
         List<GameRoomEntranceInfoResponse.EnteredUserSummary> enteredUserSummaries = gameRoomEntranceRepository
-                .findGameRoomEntrancesByGameRoomIdAndState(gameRoom.getId(), GameRoomEntranceState.WAITING)
+                .findGameRoomEntrancesByGameRoomIdAndStates(gameRoom.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING))
                 .stream()
                 .map(gameRoomEntrance ->
                         new GameRoomEntranceInfoResponse.EnteredUserSummary(

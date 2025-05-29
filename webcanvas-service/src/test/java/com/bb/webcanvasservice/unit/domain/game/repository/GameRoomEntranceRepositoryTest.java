@@ -80,7 +80,7 @@ class GameRoomEntranceRepositoryTest {
     void existsGameRoomEntranceByUserIdFalseWhenNoActive() {
         // given
         enterTestRoom(testUser);
-        GameRoomEntrance gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId()).orElseThrow(() -> new GameRoomEntranceNotFoundException("왜 여기서,,?"));
+        GameRoomEntrance gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING)).orElseThrow(() -> new GameRoomEntranceNotFoundException("왜 여기서,,?"));
         exit(gameRoomEntrance);
 
         // when
@@ -127,7 +127,7 @@ class GameRoomEntranceRepositoryTest {
 
         enterTestRoom(otherUser1, testUser, otherUser2, otherUser3, otherUser4);
         // when
-        Optional<GameRoomEntrance> gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId());
+        Optional<GameRoomEntrance> gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING));
 
         // then
         Assertions.assertThat(gameRoomEntrance).isPresent();

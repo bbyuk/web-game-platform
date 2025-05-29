@@ -81,10 +81,10 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             join    fetch User u on gre.user = u
             join    fetch GameRoom gr on gre.gameRoom = gr
             where   gre.user.id = :userId
-            and     gre.state = 'WAITING'
+            and     gre.state in :gameRoomEntranceStates
             """
     )
-    Optional<GameRoomEntrance> findGameRoomEntranceByUserId(@Param("userId") Long userId);
+    Optional<GameRoomEntrance> findGameRoomEntranceByUserId(@Param("userId") Long userId, @Param("gameRoomEntranceStates") List<GameRoomEntranceState> gameRoomEntranceStates);
 
     /**
      * gameRoom에 입장되어 있는지 여부를 조회한다.
@@ -121,4 +121,21 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             order by    gre.id asc
             """)
     List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomEntranceState") GameRoomEntranceState gameRoomEntranceState);
+
+    /**
+     * 게임 방 ID와 상태들로 GameRoomEntrance 목록을 조회한다.
+     * @param gameRoomId
+     * @param gameRoomEntranceStates
+     * @return
+     */
+    @Query("""
+            select      gre
+            from        GameRoomEntrance gre
+            join fetch  User u on gre.user = u
+            join fetch  GameRoom gr on gre.gameRoom = gr
+            where       gre.gameRoom.id = :gameRoomId
+            and         gre.state in :gameRoomEntranceStates
+            order by    gre.id asc
+            """)
+    List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndStates(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomEntranceStates") List<GameRoomEntranceState> gameRoomEntranceStates);
 }
