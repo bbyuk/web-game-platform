@@ -22,8 +22,8 @@ export const pages = {
       url: (gameRoomId) => `/game/room/${gameRoomId}/waiting`,
     },
     playing: {
-      path: "session::sessionId",
-      url: (gameRoomId, gameSessionId) => `/game/room/${gameRoomId}/session/${gameSessionId}`,
+      path: "session",
+      url: (gameRoomId) => `/game/room/${gameRoomId}/session`,
     },
   },
 };

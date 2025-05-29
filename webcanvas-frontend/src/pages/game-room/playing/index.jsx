@@ -236,33 +236,6 @@ export default function GameRoomPlayingPage() {
   /**
    * =========================== 이벤트 핸들러 =============================
    */
-  useEffect(() => {
-    findCurrentGameRoomInfo()
-      .then((response) => {
-        if (!response) {
-          return;
-        }
-        // 정상적인 방 경로로 입장.
-        setLeftSidebar(response);
-        setGameRoomId(response.gameRoomId);
-
-        // stomp 연결
-        connectToWebSocket(response.gameRoomId);
-      })
-      .catch((error) => alert(error))
-      .finally(() => {
-        /**
-         * TODO 캔버스 팔레트 서비스 개발 및 조회 API로 변경
-         */
-        // topTabs.setItems([
-        //   { label: "black" },
-        //   { label: "green" },
-        //   { label: "yellow" },
-        //   { label: "red" },
-        //   { label: "blue" },
-        // ]);
-      });
-  }, [location.pathname]);
 
   useEffect(() => {
     return () => {
@@ -277,9 +250,9 @@ export default function GameRoomPlayingPage() {
       onStroke={onStrokeHandler}
       reRenderingSignal={reRenderingSignal}
       afterReRendering={onReRenderingHandler}
-      color={
-        topTabs.items[topTabs.selectedIndex] ? topTabs.items[topTabs.selectedIndex].label : "black"
-      }
+      // color={
+      //   topTabs.items[topTabs.selectedIndex] ? topTabs.items[topTabs.selectedIndex].label : "black"
+      // }
     />
   );
 }
