@@ -25,18 +25,11 @@ export default function ProtectedRoute() {
           navigate(pages.lobby.url, { replace: true });
           return;
         } else if (response.state === "IN_ROOM" || response.state === "IN_GAME") {
-          apiClient
-            .get(game.getCurrentEnteredGameRoom)
-            .then((response) => {
-              navigate(pages.gameRoom.waiting.url(response.gameRoomId), {
-                state: response,
-                replace: true,
-              });
-            })
-            .catch((error) => {
-              console.log(error);
-              alert(error);
-            });
+          navigate(pages.gameRoom.waiting.url("temp"), {
+            state: response,
+            replace: true,
+          });
+          return;
         } else {
           alert("유저 상태를 찾지 못했습니다.");
         }

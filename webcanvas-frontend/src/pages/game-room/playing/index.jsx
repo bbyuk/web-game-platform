@@ -86,44 +86,6 @@ export default function GameRoomPlayingPage() {
   };
 
   /**
-   * 게임을 시작한다.
-   */
-  const startGame = () => {
-    alert("게임 시작");
-  };
-
-  /**
-   * left sidebar set
-   * @param response
-   */
-  const setLeftSidebar = (response) => {
-    if (response.enteredUsers) {
-      leftSidebar.setItems(
-        response.enteredUsers.map(({ nickname, ...rest }) => ({ label: nickname, ...rest }))
-      );
-    } else {
-      leftSidebar.setItems(EMPTY_MESSAGES.ENTERED_USER_LIST);
-    }
-
-    leftSidebar.setTitle({
-      label: "exit",
-      icon: <ArrowLeft size={20} className="text-gray-400" />,
-      button: true,
-      onClick: () => {
-        exitGameRoom(response.gameRoomEntranceId);
-      },
-    });
-
-    leftSidebar.setFooter(
-      <SidePanelFooterButton
-        label={"게임 시작"}
-        onClick={startGame}
-        disabled={response.enteredUsers.length === 1}
-      />
-    );
-  };
-
-  /**
    * 현재 게임 방에서 퇴장한다.
    * @returns {Promise<void>}
    */
