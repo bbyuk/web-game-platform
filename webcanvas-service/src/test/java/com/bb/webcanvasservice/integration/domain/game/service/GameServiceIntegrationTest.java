@@ -5,7 +5,11 @@ import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
+import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
+import com.bb.webcanvasservice.domain.game.entity.GameSession;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
+import com.bb.webcanvasservice.domain.game.enums.GameSessionState;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
@@ -39,6 +43,9 @@ class GameServiceIntegrationTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    GameRoomEntranceRepository gameRoomEntranceRepository;
 
     @MockitoBean
     DictionaryService dictionaryService;
@@ -96,5 +103,49 @@ class GameServiceIntegrationTest {
         Assertions.assertThat(userRepository.findUserState(user1.getId())).isEqualTo(UserStateCode.IN_GAME);
         Assertions.assertThat(userRepository.findUserState(user2.getId())).isEqualTo(UserStateCode.IN_GAME);
         Assertions.assertThat(userRepository.findUserState(user3.getId())).isEqualTo(UserStateCode.IN_GAME);
+    }
+
+    @Test
+    @DisplayName("게임 종료")
+    void endGame() throws Exception {
+        // given
+        // given
+        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user3 = userRepository.save(new User(FingerprintGenerator.generate()));
+
+        GameRoomEntranceResponse user1Entrance = gameRoomFacade.createGameRoomAndEnter(user1.getId());
+        Long gameRoomId = user1Entrance.gameRoomId();
+
+        GameRoomEntranceResponse user2Entrance = gameRoomFacade.enterGameRoom(gameRoomId, user2.getId(), GUEST);
+        GameRoomEntranceResponse user3Entrance = gameRoomFacade.enterGameRoom(gameRoomId, user3.getId(), GUEST);
+
+        // 레디
+        gameRoomFacade.updateReady(user2Entrance.gameRoomEntranceId(), user2.getId(), true);
+        gameRoomFacade.updateReady(user3Entrance.gameRoomEntranceId(), user3.getId(), true);
+
+        // when
+        GameStartRequest gameStartRequest = new GameStartRequest(gameRoomId, 3, 70);
+        Long gameSessionId = gameService.startGame(gameStartRequest, user1.getId());
+
+        // when
+        gameService.endGame(gameSessionId);
+
+        // then
+        Assertions.assertThat(user1.getState()).isEqualTo(UserStateCode.IN_ROOM);
+        Assertions.assertThat(user2.getState()).isEqualTo(UserStateCode.IN_ROOM);
+        Assertions.assertThat(user3.getState()).isEqualTo(UserStateCode.IN_ROOM);
+
+        GameRoomEntrance user1EntranceEntity = gameRoomEntranceRepository.findById(user1Entrance.gameRoomEntranceId()).get();
+        Assertions.assertThat(user1EntranceEntity.getState()).isEqualTo(GameRoomEntranceState.WAITING);
+
+        GameRoomEntrance user2EntranceEntity = gameRoomEntranceRepository.findById(user2Entrance.gameRoomEntranceId()).get();
+        Assertions.assertThat(user2EntranceEntity.getState()).isEqualTo(GameRoomEntranceState.WAITING);
+
+        GameRoomEntrance user3EntranceEntity = gameRoomEntranceRepository.findById(user3Entrance.gameRoomEntranceId()).get();
+        Assertions.assertThat(user3EntranceEntity.getState()).isEqualTo(GameRoomEntranceState.WAITING);
+
+        GameSession gameSession = gameService.findGameSession(gameSessionId);
+        Assertions.assertThat(gameSession.getState()).isEqualTo(GameSessionState.COMPLETED);
     }
 }
