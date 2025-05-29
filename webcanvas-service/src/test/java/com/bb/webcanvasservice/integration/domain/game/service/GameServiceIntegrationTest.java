@@ -1,7 +1,9 @@
 package com.bb.webcanvasservice.integration.domain.game.service;
 
+import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
+import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
@@ -20,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.GUEST;
 import static org.mockito.ArgumentMatchers.any;
 
 @Transactional
@@ -42,7 +45,7 @@ class GameServiceIntegrationTest {
 
     @Test
     @DisplayName("게임 방 퇴장 - 퇴장시 유저 상태가 IN_LOBBY로 변경된다.")
-    public void exitFromGameRoom() throws Exception {
+    void exitFromGameRoom() throws Exception {
         // given
         BDDMockito.given(dictionaryService.drawRandomWordValue(any(), any()))
                 .willReturn("테스트 명사");
@@ -51,12 +54,47 @@ class GameServiceIntegrationTest {
         User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
 
         GameRoomEntranceResponse user1Entrance = gameRoomFacade.createGameRoomAndEnter(user1.getId());
-        GameRoomEntranceResponse user2Entrance = gameRoomFacade.enterGameRoom(user1Entrance.gameRoomId(), user2.getId(), GameRoomRole.GUEST);
+        GameRoomEntranceResponse user2Entrance = gameRoomFacade.enterGameRoom(user1Entrance.gameRoomId(), user2.getId(), GUEST);
 
         // when
         gameRoomFacade.exitFromRoom(user2Entrance.gameRoomEntranceId(), user2.getId());
 
         // then
         Assertions.assertThat(user2.getState()).isEqualTo(UserStateCode.IN_LOBBY);
+    }
+
+    @Test
+    @DisplayName("게임 시작")
+    void startGame() throws Exception {
+        // given
+        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user3 = userRepository.save(new User(FingerprintGenerator.generate()));
+
+        GameRoomEntranceResponse user1Entrance = gameRoomFacade.createGameRoomAndEnter(user1.getId());
+        Long gameRoomId = user1Entrance.gameRoomId();
+
+        GameRoomEntranceResponse user2Entrance = gameRoomFacade.enterGameRoom(gameRoomId, user2.getId(), GUEST);
+        GameRoomEntranceResponse user3Entrance = gameRoomFacade.enterGameRoom(gameRoomId, user3.getId(), GUEST);
+
+        // 레디
+        gameRoomFacade.updateReady(user2Entrance.gameRoomEntranceId(), user2.getId(), true);
+        gameRoomFacade.updateReady(user3Entrance.gameRoomEntranceId(), user3.getId(), true);
+
+        // when
+        GameStartRequest gameStartRequest = new GameStartRequest(gameRoomId, 3, 70);
+
+        /**
+         * 방장이 아닌 유저가 게임시작 요청시 Exception 발생
+         */
+        Assertions.assertThatThrownBy(() -> gameService.startGame(gameStartRequest, user2.getId()))
+                .isInstanceOf(AbnormalAccessException.class);
+
+        Long gameSessionId = gameService.startGame(gameStartRequest, user1.getId());
+        // then
+        Assertions.assertThat(gameSessionId).isNotNull();
+        Assertions.assertThat(userRepository.findUserState(user1.getId())).isEqualTo(UserStateCode.IN_GAME);
+        Assertions.assertThat(userRepository.findUserState(user2.getId())).isEqualTo(UserStateCode.IN_GAME);
+        Assertions.assertThat(userRepository.findUserState(user3.getId())).isEqualTo(UserStateCode.IN_GAME);
     }
 }

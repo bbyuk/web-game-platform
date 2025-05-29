@@ -92,12 +92,14 @@ public class GameService {
         GameSession gameSession = new GameSession(gameRoom, request.turnCount(), request.timePerTurn());
         /**
          * 입장 정보의 state를 PLAYING으로 변경하고, GamePlayHistory entity로 매핑
+         * 유저 상태 변경
          * startGame 처리중 exit하는 유저와의 동시성 문제를 막고자 lock을 걸어 조회한다.
          */
         List<GamePlayHistory> gamePlayHistories = gameRoomFacade.findCurrentGameRoomEntrancesWithLock(gameRoom.getId())
                 .stream()
                 .map(entrance -> {
                     entrance.changeState(GameRoomEntranceState.PLAYING);
+                    entrance.getUser().changeState(UserStateCode.IN_GAME);
                     return new GamePlayHistory(entrance.getUser(), gameSession);
                 })
                 .collect(Collectors.toList());
@@ -116,7 +118,7 @@ public class GameService {
         gameSessionRepository.save(gameSession);
         gamePlayHistoryRepository.saveAll(gamePlayHistories);
 
-        userService.changeUserState(userId, UserStateCode.IN_GAME);
+
 
         /**
          * 이벤트 발행하여 커밋 이후 next turn 및 메세징 처리
