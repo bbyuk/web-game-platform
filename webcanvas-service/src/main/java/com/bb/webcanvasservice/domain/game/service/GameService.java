@@ -94,12 +94,19 @@ public class GameService {
          * 입장 정보의 state를 PLAYING으로 변경하고, GamePlayHistory entity로 매핑
          * 유저 상태 변경
          * startGame 처리중 exit하는 유저와의 동시성 문제를 막고자 lock을 걸어 조회한다.
+         *
+         * 250531 게임 시작시 레디상태 false로 모두 변경
          */
         List<GamePlayHistory> gamePlayHistories = gameRoomFacade.findCurrentGameRoomEntrancesWithLock(gameRoom.getId())
                 .stream()
                 .map(entrance -> {
                     entrance.changeState(GameRoomEntranceState.PLAYING);
                     entrance.getUser().changeState(UserStateCode.IN_GAME);
+
+                    if (entrance.getRole() == GameRoomRole.GUEST) {
+                        entrance.changeReady(false);
+                    }
+
                     return new GamePlayHistory(entrance.getUser(), gameSession);
                 })
                 .collect(Collectors.toList());
@@ -117,7 +124,6 @@ public class GameService {
          */
         gameSessionRepository.save(gameSession);
         gamePlayHistoryRepository.saveAll(gamePlayHistories);
-
 
 
         /**
