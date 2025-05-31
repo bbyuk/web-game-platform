@@ -1,28 +1,24 @@
-export function GameRoomWaitingPlaceholder({ className = "", role, ready, allGuestsReady }) {
+export function GameRoomWaitingPlaceholder({ className = "", readyStatus }) {
   let icon = "⏳";
   let title = "";
   let description = "";
 
-  if (role === "HOST") {
-    if (allGuestsReady) {
-      icon = "🚀";
-      title = "모든 플레이어가 준비되었습니다!";
-      description = "이제 게임을 시작할 수 있어요. START 버튼을 눌러주세요.";
-    } else {
-      icon = "⏱️";
-      title = "플레이어들을 기다리는 중...";
-      description = "모든 플레이어가 준비할 때까지 기다려주세요.";
-    }
-  } else {
-    if (ready) {
-      icon = "🙌";
-      title = "준비 완료!";
-      description = "호스트가 게임을 시작할 때까지 기다려주세요.";
-    } else {
-      icon = "🕹️";
-      title = "게임을 시작할 준비가 되셨나요?";
-      description = "준비가 되면 READY 버튼을 눌러주세요.";
-    }
+  if (readyStatus === "not-all-ready") {
+    icon = "⏱️";
+    title = "플레이어들을 기다리는 중...";
+    description = "모든 플레이어가 준비할 때까지 기다려주세요.";
+  } else if (readyStatus === "all-ready") {
+    icon = "🚀";
+    title = "모든 플레이어가 준비되었습니다!";
+    description = "이제 게임을 시작할 수 있어요. START 버튼을 눌러주세요.";
+  } else if (readyStatus === "ready") {
+    icon = "🙌";
+    title = "준비 완료!";
+    description = "호스트가 게임을 시작할 때까지 기다려주세요.";
+  } else if (readyStatus === "not-ready") {
+    icon = "🕹️";
+    title = "게임을 시작할 준비가 되셨나요?";
+    description = "준비가 되면 READY 버튼을 눌러주세요.";
   }
 
   return (
