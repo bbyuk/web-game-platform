@@ -14,8 +14,6 @@ export const getWebSocketClient = ({ onConnect, onError }) => {
         clientWrapper.isConnected = true;
 
         if (clientWrapper.subscribeTopicQueue.length > 0) {
-          console.log("lazy subscribe / poll ===> ", clientWrapper.subscribeTopicQueue);
-
           clientWrapper.subscribe(clientWrapper.subscribeTopicQueue);
           clientWrapper.subscribeTopicQueue.length = 0;
         }
@@ -34,14 +32,10 @@ export const getWebSocketClient = ({ onConnect, onError }) => {
     subscribe: (topics) => {
       // 연결되어 있다면 바로 구독 처리 / 연결되어 있지 않다면 토픽 큐에 담아두었다가 onConnect 시점에 lazy subscribe
       if (clientWrapper.isConnected) {
-        console.log("direct subscribe ===> ", topics);
-
         topics.forEach((topic) => {
           clientWrapper.client.subscribe(topic.destination, (message) => {
             try {
               const payload = JSON.parse(message.body);
-              console.log("STOMP Message:", payload);
-
               topic.messageHandler?.(payload);
             } catch (e) {
               console.error("Failed to parse STOMP message", e);
@@ -49,8 +43,6 @@ export const getWebSocketClient = ({ onConnect, onError }) => {
           });
         });
       } else {
-        console.log("lazy subscribe / enqueue ===> ", topics);
-
         clientWrapper.subscribeTopicQueue.push(...topics);
       }
     },

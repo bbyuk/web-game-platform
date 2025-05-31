@@ -49,6 +49,7 @@ export default function GameRoomPage() {
         // 상태 셋팅
         setEnteredUsers(response.enteredUsers);
 
+        console.log(response);
         setMyInfo({
           nickname: response.requesterUserSummary.nickname,
           color: response.requesterUserSummary.color,
@@ -58,7 +59,6 @@ export default function GameRoomPage() {
         });
 
         if (roomId !== "temp" && !connected) {
-          console.log("성공적으로 방에 입장했습니다.");
           setConnected(true);
         }
 
@@ -167,8 +167,6 @@ export default function GameRoomPage() {
   };
 
   const subscribeTopics = () => {
-    console.log("구독 정상적으로 시작");
-
     /**
      * 게임 방 메세지 브로커 핸들러
      * @param frame
@@ -209,6 +207,13 @@ export default function GameRoomPage() {
           break;
         case "SESSION/STARTED":
           console.log(frame);
+          findCurrentGameRoomInfo().then((response) => {
+            if (!response) {
+              return;
+            }
+
+            setLeftSidebar(response);
+          });
           break;
       }
     };
@@ -242,6 +247,15 @@ export default function GameRoomPage() {
    * 웹소켓 연결 해제
    */
   useEffect(() => {
+    leftSideStore.setTitle({
+      label: "exit",
+      icon: <ArrowLeft size={20} className="text-gray-400" />,
+      button: true,
+      onClick: () => {
+        exitGameRoom(myInfo.gameRoomEntranceId);
+      },
+    });
+
     return () => {
       webSocketClientRef.current.deactivate();
       leftSideStore.clear();
@@ -281,37 +295,14 @@ export default function GameRoomPage() {
   }, [enteredUsers]);
 
   /**
-   * leftbar title 등록
-   */
-  useEffect(() => {
-    leftSideStore.setTitle({
-      label: "exit",
-      icon: <ArrowLeft size={20} className="text-gray-400" />,
-      button: true,
-      onClick: () => {
-        exitGameRoom(myInfo.gameRoomEntranceId);
-      },
-    });
-  }, [myInfo]);
-
-  /**
    * 웹소켓 토픽 구독 및 메세지 핸들러 등록 useEffect
    */
   useEffect(() => {
-    console.log("구독 시도1 ====== ", webSocketClientRef.current, authenticatedUserId);
     if (!webSocketClientRef.current || !authenticatedUserId) {
       return;
     }
     subscribeTopics();
-  }, [webSocketClientRef.current]);
-
-  useEffect(() => {
-    console.log("구독 시도2 ====== ", webSocketClientRef.current, authenticatedUserId);
-    if (!webSocketClientRef.current || !authenticatedUserId) {
-      return;
-    }
-    subscribeTopics();
-  }, [authenticatedUserId]);
+  }, [authenticatedUserId, webSocketClientRef.current]);
 
   useEffect(() => {
     if (connected) {

@@ -52,7 +52,6 @@ export const AuthenticationProvider = ({ children }) => {
         }
       })
       .catch((error) => {
-        console.log("인증 실패");
         /**
          * 앱 진입 인증 요청에 실패시 핸들링
          * 자동 로그인 요청

@@ -1,15 +1,16 @@
 import Canvas from "@/components/canvas/index.jsx";
-import { useEffect, useRef, useState } from "react";
-import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { REDIRECT_MESSAGES } from "@/constants/message.js";
+import { useLocation, useNavigate, useOutlet, useOutletContext } from "react-router-dom";
 import { game } from "@/api/index.js";
 import { useApiLock } from "@/api/lock/index.jsx";
 import { pages } from "@/router/index.jsx";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Gamepad2 } from "lucide-react";
 import { getApiClient } from "@/client/http/index.jsx";
 import { getWebSocketClient } from "@/client/stomp/index.jsx";
 import { useAuthentication } from "@/contexts/authentication/index.jsx";
-import SidePanelFooterButton from "@/components/layouts/side-panel/footer-button/index.jsx";
+import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
+import ItemList from "@/components/layouts/side-panel/item-list/index.jsx";
 
 export default function GameRoomPlayingPage() {
   // 현재 캔버스의 획 모음
@@ -34,6 +35,12 @@ export default function GameRoomPlayingPage() {
   const [gameRoomId, setGameRoomId] = useState(null);
 
   const webSocketClientRef = useRef(null);
+
+  const { enteredUsers } = useOutletContext();
+
+  const { setTitle, setContents } = useLeftSideStore();
+
+  const [currentDrawerId, setCurrentDrawerId] = useState(null);
 
   /**
    * =========================== 이벤트 핸들러 =============================
@@ -182,24 +189,33 @@ export default function GameRoomPlayingPage() {
   };
 
   /**
-   * 다른 유저의 입장 및 퇴장 이벤트 발생시
-   * 현재 게임방 정보를 재조회해 leftbar setting
-   */
-  const onOtherUserStateChange = () => {
-    findCurrentGameRoomInfo().then((response) => {
-      if (!response) {
-        return;
-      }
-
-      setLeftSidebar(response);
-    });
-  };
-
-  /**
    * =========================== 이벤트 핸들러 =============================
    */
 
   useEffect(() => {
+    setTitle({
+      label: "playing",
+      icon: <Gamepad2 className="w-6 h-6 text-green-500" />,
+      button: false,
+    });
+
+    const getLeftSideItemTheme = (userId) => {
+      const theme = userId === currentDrawerId ? "indigo" : "default";
+      console.log(theme);
+      return theme;
+    };
+    setContents({
+      slot: ItemList,
+      props: {
+        value: enteredUsers.map(({ userId, nickname, ready, role, ...rest }) => ({
+          label: nickname,
+          highlight: ready,
+          theme: getLeftSideItemTheme(userId),
+          ...rest,
+        })),
+      },
+    });
+
     return () => {
       webSocketClientRef.current.deactivate();
     };

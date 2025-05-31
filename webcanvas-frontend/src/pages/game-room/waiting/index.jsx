@@ -82,7 +82,6 @@ export default function GameRoomWaitingPage() {
   useEffect(() => {
     const buttonOnClickHandler =
       myInfo.role === "HOST" ? startGame : myInfo.role === "GUEST" ? toggleReady : null;
-
     leftSideStore.setFooter({
       slot: SidePanelFooterButton,
       props: {
@@ -90,7 +89,7 @@ export default function GameRoomWaitingPage() {
         onClick: buttonOnClickHandler,
       },
     });
-  }, [readyStatus]);
+  }, [readyStatus, myInfo]);
 
   useEffect(() => {
     return () => {
