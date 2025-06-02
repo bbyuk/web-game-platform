@@ -28,6 +28,7 @@ class GameTurnTimerServiceUnitTest {
     void testRegisterSuccess() throws Exception {
         // given
         Long gameRoomId = 5L;
+        Long gameSessionId = 213L;
         int period = 3;
         int gameTurns = 3;
         AtomicInteger currentTurn = new AtomicInteger();
@@ -53,7 +54,7 @@ class GameTurnTimerServiceUnitTest {
         // when
 
         System.out.println(LocalDateTime.now() + " " + gameRoomId + " 방 턴 타이머 등록");
-        gameTurnTimerService.registerTurnTimer(gameRoomId, period, turnEndHandler, gameEndChecker, gameEndHandler);
+        gameTurnTimerService.registerTurnTimer(gameRoomId, gameSessionId, period, turnEndHandler, gameEndChecker, gameEndHandler);
 
         boolean finished = latch.await(10, TimeUnit.SECONDS);
         Assertions.assertThat(finished).isTrue();

@@ -29,12 +29,12 @@ public class GameTurnTimerService {
      * @param gameEndChecker 게임 종료 여부 체크 메소드
      * @param gameEndHandler 게임 종료시 작업할 핸들러
      */
-    public void registerTurnTimer(Long gameRoomId, int period, Consumer<Long> turnEndHandler, Function<Long, Boolean> gameEndChecker, Consumer<Long> gameEndHandler) {
+    public void registerTurnTimer(Long gameRoomId, Long gameSessionId, int period, Consumer<Long> turnEndHandler, Function<Long, Boolean> gameEndChecker, Consumer<Long> gameEndHandler) {
         ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> {
-            if (gameEndChecker.apply(gameRoomId)) {
-                gameEndHandler.accept(gameRoomId);
+            if (gameEndChecker.apply(gameSessionId)) {
+                gameEndHandler.accept(gameSessionId);
             } else {
-                turnEndHandler.accept(gameRoomId);
+                turnEndHandler.accept(gameSessionId);
             }
         }, 0, period, TimeUnit.SECONDS);
 

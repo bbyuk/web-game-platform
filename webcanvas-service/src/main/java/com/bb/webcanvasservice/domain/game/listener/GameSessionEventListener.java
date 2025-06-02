@@ -39,6 +39,7 @@ public class GameSessionEventListener {
 
         gameTurnTimerService.registerTurnTimer(
                 event.getGameRoomId(),
+                event.getGameSessionId(),
                 gameSession.getTimePerTurn(),
                 gameService::processToNextTurn,
                 gameService::isGameEnd,

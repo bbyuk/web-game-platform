@@ -253,6 +253,7 @@ public class GameService {
      */
     @Transactional
     public void processToNextTurn(Long gameSessionId) {
+        log.debug("{} 세션 다음 턴으로 진행", gameSessionId);
         GameSession gameSession = gameSessionRepository.findById(gameSessionId)
                 .orElseThrow(GameSessionNotFoundException::new);
 
@@ -336,8 +337,11 @@ public class GameService {
         GameSession gameSession = gameSessionRepository.findById(gameSessionId)
                 .orElseThrow(GameSessionNotFoundException::new);
 
-        return gameSession.getState() == COMPLETED
+        boolean isEnd = gameSession.getState() == COMPLETED
                 || gameSession.getGameTurns().size() >= gameSession.getTurnCount();
+
+        log.debug("{} game session end = {}", gameSessionId, isEnd);
+        return isEnd;
     }
 
     /**
