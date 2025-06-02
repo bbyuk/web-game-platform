@@ -192,6 +192,14 @@ export default function GameRoomPage() {
             setLeftSidebar(response);
           });
           break;
+        case "SESSION/TURN_PROGRESSED":
+          // TODO 턴 진행 이벤트 클라이언트 핸들링
+          console.log(frame);
+          break;
+        case "SESSION/END":
+          // TODO 게임 종료 이벤트 클라이언트 핸들링
+          console.log(frame);
+          break;
       }
     };
 

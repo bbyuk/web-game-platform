@@ -199,6 +199,13 @@ export default function GameRoomPlayingPage() {
       button: false,
     });
 
+    return () => {
+      webSocketClientRef.current.deactivate();
+    };
+  }, []);
+
+  useEffect(() => {
+
     const getLeftSideItemTheme = (userId) => {
       const theme = userId === currentDrawerId ? "indigo" : "default";
       console.log(theme);
@@ -216,10 +223,7 @@ export default function GameRoomPlayingPage() {
       },
     });
 
-    return () => {
-      webSocketClientRef.current.deactivate();
-    };
-  }, []);
+  }, [currentDrawerId]);
 
   return (
     <Canvas
