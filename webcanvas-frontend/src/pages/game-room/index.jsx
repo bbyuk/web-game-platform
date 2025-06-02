@@ -49,7 +49,6 @@ export default function GameRoomPage() {
         // 상태 셋팅
         setEnteredUsers(response.enteredUsers);
 
-        console.log(response);
         setMyInfo({
           nickname: response.requesterUserSummary.nickname,
           color: response.requesterUserSummary.color,
@@ -70,6 +69,7 @@ export default function GameRoomPage() {
           return null;
         }
 
+        setLeftSidebar(response);
         return response;
       })
       .catch((error) => {
@@ -106,15 +106,6 @@ export default function GameRoomPage() {
         },
       });
     }
-
-    leftSideStore.setTitle({
-      label: "exit",
-      icon: <ArrowLeft size={20} className="text-gray-400" />,
-      button: true,
-      onClick: () => {
-        exitGameRoom(response.gameRoomEntranceId);
-      },
-    });
   };
 
   /**
@@ -134,20 +125,6 @@ export default function GameRoomPage() {
     if (response.success) {
       navigate(pages.lobby.url, { replace: true });
     }
-  };
-
-  /**
-   * 다른 유저의 입장 및 퇴장 이벤트 발생시
-   * 현재 게임방 정보를 재조회해 leftbar setting
-   */
-  const findEnteredUsers = () => {
-    findCurrentGameRoomInfo().then((response) => {
-      if (!response) {
-        return;
-      }
-
-      setLeftSidebar(response);
-    });
   };
 
   /**
@@ -241,11 +218,6 @@ export default function GameRoomPage() {
     webSocketClientRef.current.subscribe(topics);
   };
 
-  /**
-   * 페이지 컴포넌트 unmount 시 현 페이지에서 설정한 전역설정 clear
-   *
-   * 웹소켓 연결 해제
-   */
   useEffect(() => {
     leftSideStore.setTitle({
       label: "exit",
@@ -255,7 +227,14 @@ export default function GameRoomPage() {
         exitGameRoom(myInfo.gameRoomEntranceId);
       },
     });
+  }, [myInfo.gameRoomEntranceId]);
 
+  /**
+   * 페이지 컴포넌트 unmount 시 현 페이지에서 설정한 전역설정 clear
+   *
+   * 웹소켓 연결 해제
+   */
+  useEffect(() => {
     return () => {
       webSocketClientRef.current.deactivate();
       leftSideStore.clear();
