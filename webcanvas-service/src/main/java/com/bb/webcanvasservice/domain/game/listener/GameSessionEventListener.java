@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.domain.game.listener;
 import com.bb.webcanvasservice.domain.game.entity.GameSession;
 import com.bb.webcanvasservice.domain.game.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionStartEvent;
+import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;
 import com.bb.webcanvasservice.domain.game.service.GameService;
 import com.bb.webcanvasservice.domain.game.service.GameTurnTimerService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class GameSessionEventListener {
     private final GameTurnTimerService gameTurnTimerService;
 
     /**
-     * 게임 세션 시작시 발생하는 이벤트 핸들링
+     * 게임 세션 시작시 발생하는 이벤트 핸들러
      * <p>
      * 클라이언트로 게임 시작 event 메세지 push
      * 게임 턴 타이머 등록
@@ -37,16 +38,34 @@ public class GameSessionEventListener {
 
         GameSession gameSession = gameService.findGameSession(event.getGameSessionId());
 
+        /**
+         * 게임이 종료 상태이거나 게임을 종료해야 하는 상태인 경우 타이머를 종료할 수 있도록 처리
+         */
         gameTurnTimerService.registerTurnTimer(
                 event.getGameRoomId(),
                 event.getGameSessionId(),
                 gameSession.getTimePerTurn(),
                 gameService::processToNextTurn,
-                gameService::isGameEnd,
+                (gameSessionId) -> gameService.isGameEnd(gameSessionId) || gameService.shouldGameEnd(gameSessionId),
                 gameService::endGame
         );
     }
 
+    /**
+     * 게임 턴 진행 이벤트 핸들러
+     * gameRoom 메세지 브로커에 턴 진행 이벤트 메세지 push
+     *
+     * @param event
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleGameTurnProgressed(GameTurnProgressedEvent event) {
+        messagingTemplate.convertAndSend("/session/" + event.getGameRoomId(), event);
+    }
+
+    /**
+     * 게임 세션 종료 이벤트 핸들러
+     * @param event
+     */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameSessionEnd(GameSessionEndEvent event) {
         messagingTemplate.convertAndSend("/session/" + event.getGameRoomId(), event);

@@ -270,6 +270,12 @@ public class GameService {
             return;
         }
 
+        /**
+         * 지난 턴이 존재할 경우 pass한다.
+         */
+        gameTurnRepository.findLastTurn(gameSessionId)
+                .ifPresent(GameTurn::pass);
+
 
         /**
          * @param GameSession gameSession
@@ -322,8 +328,6 @@ public class GameService {
 
         gameSession.end();
 
-
-
         applicationEventPublisher.publishEvent(new GameSessionEndEvent(gameSessionId, gameRoom.getId()));
     }
 
@@ -337,11 +341,23 @@ public class GameService {
         GameSession gameSession = gameSessionRepository.findById(gameSessionId)
                 .orElseThrow(GameSessionNotFoundException::new);
 
-        boolean isEnd = gameSession.getState() == COMPLETED
-                || gameSession.getGameTurns().size() >= gameSession.getTurnCount();
+        boolean isEnd = gameSession.getState() == COMPLETED;
 
         log.debug("{} game session end = {}", gameSessionId, isEnd);
         return isEnd;
+    }
+
+    /**
+     * 게임 턴이 모두 진행되어 게임을 종료상태로 변경해야하는지 체크한다.
+     * @param gameSessionId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public boolean shouldGameEnd(Long gameSessionId) {
+        GameSession gameSession = gameSessionRepository.findById(gameSessionId)
+                .orElseThrow(GameSessionNotFoundException::new);
+
+        return gameSession.getGameTurns().size() >= gameSession.getTurnCount();
     }
 
     /**
