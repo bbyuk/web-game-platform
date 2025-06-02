@@ -22,11 +22,11 @@ public class GameTurnCustomRepositoryImpl implements GameTurnCustomRepository {
                 order by    gt.id asc
                 """;
 
-        return Optional.of(
-                em.createQuery(jpql, GameTurn.class)
-                        .setParameter("gameSessionId", gameSessionId)
-                        .setMaxResults(1)
-                        .getSingleResult()
-        );
+        return em.createQuery(jpql, GameTurn.class)
+                .setParameter("gameSessionId", gameSessionId)
+                .setMaxResults(1)
+                .getResultList()
+                .stream()
+                .findFirst();
     }
 }
