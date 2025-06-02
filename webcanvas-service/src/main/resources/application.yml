@@ -42,6 +42,7 @@ logging:
         security: debug
         web: debug
         messaging: debug
+    com.bb.webcanvasservice: debug
 
 ##### 애플리케이션 설정 #####
 application:
