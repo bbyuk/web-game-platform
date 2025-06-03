@@ -257,12 +257,12 @@ public class GameService {
         GameSession gameSession = gameSessionRepository.findById(gameSessionId)
                 .orElseThrow(GameSessionNotFoundException::new);
 
-        if (gameSession.getState() != PLAYING) {
+        if (isGameEnd(gameSessionId)) {
             log.debug("진행중인 게임 세션이 아닙니다. ====== {} : {}", gameSession, gameSession.getState());
             throw new GameSessionIsOverException();
         }
 
-        if (gameSession.getGameTurns().size() >= gameSession.getTurnCount()) {
+        if (shouldGameEnd(gameSessionId)) {
             log.debug("모든 턴이 진행되었습니다.");
             log.debug("게임 세션 종료");
 
