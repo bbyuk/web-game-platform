@@ -38,6 +38,8 @@ export default function GameRoomPlayingPage() {
 
   const [gameSessionId, setGameSessionId] = useState(null);
 
+
+
   /**
    * =========================== 이벤트 핸들러 =============================
    */
@@ -57,6 +59,7 @@ export default function GameRoomPlayingPage() {
   };
 
   const subscribeTopics = () => {
+    console.log("게임 세션 이벤트브로커 구독");
     /**
      * 게임 방 메세지 브로커 핸들러
      * @param frame
@@ -69,6 +72,14 @@ export default function GameRoomPlayingPage() {
       switch (frame.event) {
         case "SESSION/TURN_PROGRESSED":
           // TODO 턴 진행 이벤트 클라이언트 핸들링
+
+          apiClient.get(game.getCurrentGameTurn(gameSessionId))
+            .then((response => {
+              console.log(response);
+              setCurrentDrawerId(response.drawerId);
+
+            }));
+
           console.log(frame);
           break;
         case "SESSION/END":
@@ -84,6 +95,10 @@ export default function GameRoomPlayingPage() {
         messageHandler: gameSessionEventHandler,
       },
     ];
+
+    console.log("topic 구독 => ");
+    console.log(topics);
+
     webSocketClientRef.current.subscribe(topics);
   };
 
