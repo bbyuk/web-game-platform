@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.domain.game.event;
 
+import com.bb.webcanvasservice.common.event.ApplicationEvent;
 import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
 
 /**
  * 게임 세션 종료시 발생하는 이벤트
