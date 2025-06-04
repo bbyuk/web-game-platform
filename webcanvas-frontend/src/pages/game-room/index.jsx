@@ -182,8 +182,7 @@ export default function GameRoomPage() {
             setLeftSidebar(response);
           });
           break;
-        case "SESSION/STARTED":
-          console.log(frame);
+        case "ROOM/SESSION_STARTED":
           findCurrentGameRoomInfo().then((response) => {
             if (!response) {
               return;
@@ -191,14 +190,6 @@ export default function GameRoomPage() {
 
             setLeftSidebar(response);
           });
-          break;
-        case "SESSION/TURN_PROGRESSED":
-          // TODO 턴 진행 이벤트 클라이언트 핸들링
-          console.log(frame);
-          break;
-        case "SESSION/END":
-          // TODO 게임 종료 이벤트 클라이언트 핸들링
-          console.log(frame);
           break;
       }
     };
@@ -214,12 +205,12 @@ export default function GameRoomPage() {
     const topics = [
       // 게임 방 공통 이벤트 broker
       {
-        destination: `/session/${roomId}`,
+        destination: `/room/${roomId}`,
         messageHandler: gameRoomEventHandler,
       },
       // 게임 방 내 채팅 broker
       {
-        destination: `/session/${roomId}/chat`,
+        destination: `/room/${roomId}/chat`,
         messageHandler: gameRoomChatHandler,
       },
     ];

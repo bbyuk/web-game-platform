@@ -19,4 +19,5 @@ export const game = {
   updateReady: (gameRoomEntranceId) => `${BASE}/room/entrance/${gameRoomEntranceId}/ready`,
   // 게임 시작
   startGame: `${BASE}/session`,
+  getCurrentGameSession: (gameRoomId) => `${BASE}/room/${gameRoomId}/session`,
 };

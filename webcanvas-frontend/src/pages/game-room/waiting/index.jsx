@@ -41,7 +41,7 @@ export default function GameRoomWaitingPage() {
             timePerTurn: 90,
           })
           .then((response) => {
-            navigate(pages.gameRoom.playing.url(response.gameSessionId, roomId), { replace: true });
+            navigate(pages.gameRoom.playing.url(roomId), { replace: true });
           })
     );
   };
