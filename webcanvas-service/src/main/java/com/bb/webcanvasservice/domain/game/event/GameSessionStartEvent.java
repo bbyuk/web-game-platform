@@ -19,7 +19,7 @@ public class GameSessionStartEvent extends ApplicationEvent {
     private final Long gameSessionId;
 
     public GameSessionStartEvent(Long gameRoomId, Long gameSessionId) {
-        super("SESSION/STARTED");
+        super("ROOM/SESSION_STARTED");
         this.gameRoomId = gameRoomId;
         this.gameSessionId = gameSessionId;
     }

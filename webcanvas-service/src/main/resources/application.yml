@@ -106,7 +106,8 @@ websocket:
   # 활성화 브로커 목록 (message destination)
   topic:
     main:
-      game-room: /session
+      game-room: /room
+      game-session: /session
     sub:
       canvas: canvas
       chat: chat

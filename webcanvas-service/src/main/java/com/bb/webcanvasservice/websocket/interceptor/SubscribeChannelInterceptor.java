@@ -43,7 +43,7 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
              * 게임 방 구독 처리
              */
             if (StringUtils.hasText(destination)
-                    && destination.startsWith(webSocketProperties.topic().main().gameRoom())) {
+                    && (destination.startsWith(webSocketProperties.topic().main().gameRoom())) || destination.startsWith(webSocketProperties.topic().main().gameSession())) {
                 /**
                  * 입장한 게임 방의 Canvas websocket 서버에 구독 요청 시 구독 요청이 유효한지 검증
                  */

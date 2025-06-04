@@ -6,6 +6,8 @@ import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameSessionResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameTurnFindResponse;
 import com.bb.webcanvasservice.domain.game.entity.*;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
@@ -13,10 +15,7 @@ import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionStartEvent;
 import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;
-import com.bb.webcanvasservice.domain.game.exception.GameSessionIsOverException;
-import com.bb.webcanvasservice.domain.game.exception.GameSessionNotFoundException;
-import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
-import com.bb.webcanvasservice.domain.game.exception.NextDrawerNotFoundException;
+import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameTurnRepository;
@@ -29,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.random.RandomGenerator;
@@ -170,6 +170,34 @@ public class GameService {
     @Transactional(readOnly = true)
     public int findCurrentRound(Long gameSessionId) {
         return gameSessionRepository.findCurrentRound(gameSessionId);
+    }
+
+
+    /**
+     * 현재 게임 세션을 조회한다.
+     * @param gameRoomId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public GameSessionResponse findCurrentGameSession(Long gameRoomId) {
+        GameSession gameSession = gameSessionRepository.findGameSessionsByGameRoomId(gameRoomId)
+                .stream()
+                .filter(gs -> gs.getState() == PLAYING)
+                .findFirst()
+                .orElseThrow(GameSessionNotFoundException::new);
+        return new GameSessionResponse(gameSession.getId());
+    }
+
+    /**
+     * 현재 진행중인 게임 턴을 조회한다.
+     * @param gameSessionId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public GameTurnFindResponse findCurrentGameTurn(Long gameSessionId) {
+        GameSession gameSession = findGameSession(gameSessionId);
+        GameTurn gameTurn = gameSession.getGameTurns().stream().min(Comparator.comparing(GameTurn::getId)).orElseThrow(GameTurnNotFoundException::new);
+        return new GameTurnFindResponse(gameTurn.getDrawer().getId(), gameTurn.getAnswer(), gameTurn.getExpiration());
     }
 
 

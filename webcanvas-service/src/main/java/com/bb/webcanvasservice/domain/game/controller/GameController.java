@@ -4,16 +4,15 @@ import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import com.bb.webcanvasservice.domain.chat.service.ChatService;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
+import com.bb.webcanvasservice.domain.game.dto.response.GameSessionResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameStartResponse;
+import com.bb.webcanvasservice.domain.game.dto.response.GameTurnFindResponse;
 import com.bb.webcanvasservice.domain.game.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Game API", description = "게임 플레이 관련 API")
 @RestController
@@ -31,4 +30,15 @@ public class GameController {
         return ResponseEntity.ok(new GameStartResponse(gameService.startGame(request, authentication.getUserId())));
     }
 
+    @GetMapping("session/{gameSessionId}/turn")
+    @Operation(summary = "게임 턴 조회", description = "현재 진행중인 게임 턴을 조회한다.")
+    public ResponseEntity<GameTurnFindResponse> findCurrentGameTurn(@PathVariable("gameSessionId") Long gameSessionId, @Authenticated WebCanvasAuthentication authentication) {
+        return ResponseEntity.ok(gameService.findCurrentGameTurn(gameSessionId));
+    }
+
+    @GetMapping("room/{gameRoomId}/session")
+    @Operation(summary = "게임 세션 조회", description = "현재 진행중인 게임 세션을 조회한다.")
+    public ResponseEntity<GameSessionResponse> findCurrentGameSession(@PathVariable("gameRoomId") Long gameRoomId) {
+        return ResponseEntity.ok(gameService.findCurrentGameSession(gameRoomId));
+    }
 }

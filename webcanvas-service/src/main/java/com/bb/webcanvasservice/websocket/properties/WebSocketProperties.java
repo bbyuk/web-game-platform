@@ -22,7 +22,8 @@ public record WebSocketProperties(
         SubTopic sub
     ) {
         public record MainTopic(
-                String gameRoom
+                String gameRoom,
+                String gameSession
         ) {}
         public record SubTopic(
                 String canvas,

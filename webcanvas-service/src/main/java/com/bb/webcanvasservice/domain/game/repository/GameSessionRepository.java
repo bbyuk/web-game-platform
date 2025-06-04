@@ -2,11 +2,13 @@ package com.bb.webcanvasservice.domain.game.repository;
 
 import com.bb.webcanvasservice.domain.game.entity.GameSession;
 import com.bb.webcanvasservice.domain.game.entity.GameTurn;
+import com.bb.webcanvasservice.domain.game.enums.GameSessionState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 게임 세션 레포지토리
@@ -35,5 +37,13 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
             from    GameTurn gt
             where   gt.gameSession.id = :gameSessionId
             """)
-    List<GameTurn> findTurnsByGameSessionId(Long gameSessionId);
+    List<GameTurn> findTurnsByGameSessionId(@Param("gameSessionId") Long gameSessionId);
+
+    @Query("""
+          select  gs
+          from    GameSession gs
+          where   gs.gameRoom.id = :gameRoomId
+          """)
+    List<GameSession> findGameSessionsByGameRoomId(@Param("gameRoomId") Long gameRoomId);
+
 }
