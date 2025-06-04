@@ -153,7 +153,6 @@ export default function GameRoomPlayingPage() {
 
     const getLeftSideItemTheme = (userId) => {
       const theme = userId === currentDrawerId ? "indigo" : "default";
-      console.log(theme);
       return theme;
     };
     setContents({

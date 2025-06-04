@@ -15,6 +15,8 @@ const Item = ({
   isButton = false,
   onClick = () => {},
 }) => {
+  console.log(theme);
+
   let defaultBg = "bg-gray-800";
   let defaultBorder = "border-gray-600";
   let defaultText = "text-gray-300";
