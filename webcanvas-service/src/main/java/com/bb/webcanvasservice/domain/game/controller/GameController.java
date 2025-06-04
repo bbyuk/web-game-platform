@@ -33,7 +33,7 @@ public class GameController {
     @GetMapping("session/{gameSessionId}/turn")
     @Operation(summary = "게임 턴 조회", description = "현재 진행중인 게임 턴을 조회한다.")
     public ResponseEntity<GameTurnFindResponse> findCurrentGameTurn(@PathVariable("gameSessionId") Long gameSessionId, @Authenticated WebCanvasAuthentication authentication) {
-        return ResponseEntity.ok(gameService.findCurrentGameTurn(gameSessionId));
+        return ResponseEntity.ok(gameService.findCurrentGameTurn(gameSessionId, authentication.getUserId()));
     }
 
     @GetMapping("room/{gameRoomId}/session")

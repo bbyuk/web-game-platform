@@ -12,6 +12,7 @@ import com.bb.webcanvasservice.domain.game.entity.*;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
+import com.bb.webcanvasservice.domain.game.enums.GameTurnState;
 import com.bb.webcanvasservice.domain.game.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionStartEvent;
 import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;
@@ -172,9 +173,24 @@ public class GameService {
         return gameSessionRepository.findCurrentRound(gameSessionId);
     }
 
+    /**
+     * 게임 세션에 유저가 참여해 있는지 여부를 체크한다.
+     *
+     * @param gameSessionId
+     * @param userId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public boolean inGameSession(Long gameSessionId, Long userId) {
+        GameSession gameSession = findGameSession(gameSessionId);
+        return gameSession.getGameRoom().getEntrances().stream()
+                .anyMatch(gameRoomEntrance -> gameRoomEntrance.getUser().getId().equals(userId) && gameRoomEntrance.getState() == GameRoomEntranceState.PLAYING);
+    }
+
 
     /**
      * 현재 게임 세션을 조회한다.
+     *
      * @param gameRoomId
      * @return
      */
@@ -190,14 +206,20 @@ public class GameService {
 
     /**
      * 현재 진행중인 게임 턴을 조회한다.
+     *
      * @param gameSessionId
      * @return
      */
     @Transactional(readOnly = true)
-    public GameTurnFindResponse findCurrentGameTurn(Long gameSessionId) {
+    public GameTurnFindResponse findCurrentGameTurn(Long gameSessionId, Long userId) {
         GameSession gameSession = findGameSession(gameSessionId);
-        GameTurn gameTurn = gameSession.getGameTurns().stream().min(Comparator.comparing(GameTurn::getId)).orElseThrow(GameTurnNotFoundException::new);
-        return new GameTurnFindResponse(gameTurn.getDrawer().getId(), gameTurn.getAnswer(), gameTurn.getExpiration());
+        GameTurn gameTurn = gameSession.getGameTurns()
+                .stream()
+                .filter(GameTurn::isActive)
+                .min(Comparator.comparing(GameTurn::getId)).orElseThrow(GameTurnNotFoundException::new);
+        return new GameTurnFindResponse(gameTurn.getDrawer().getId(),
+                gameTurn.getDrawer().getId().equals(userId) ? gameTurn.getAnswer() : null,
+                gameTurn.getExpiration());
     }
 
 
@@ -297,7 +319,7 @@ public class GameService {
          */
         gameSession.getLastTurn()
                 .ifPresent(lastTurn -> {
-                    log.error("{}",lastTurn);
+                    log.error("{}", lastTurn);
                     lastTurn.pass();
                 });
 

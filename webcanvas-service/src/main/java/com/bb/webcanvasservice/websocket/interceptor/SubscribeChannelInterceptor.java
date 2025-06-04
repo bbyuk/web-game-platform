@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.websocket.interceptor;
 
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
+import com.bb.webcanvasservice.domain.game.service.GameService;
 import com.bb.webcanvasservice.web.security.exception.BadAccessException;
 import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import org.springframework.util.StringUtils;
 public class SubscribeChannelInterceptor implements ChannelInterceptor {
 
     private final GameRoomFacade gameRoomFacade;
+    private final GameService gameService;
 
     private final WebSocketProperties webSocketProperties;
 
@@ -42,17 +44,33 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
             /**
              * 게임 방 구독 처리
              */
-            if (StringUtils.hasText(destination)
-                    && (destination.startsWith(webSocketProperties.topic().main().gameRoom())) || destination.startsWith(webSocketProperties.topic().main().gameSession())) {
+            if (!StringUtils.hasText(destination)) {
+                return ChannelInterceptor.super.preSend(message, channel);
+            }
+
+            Long userId = authentication.getUserId();
+
+            if (destination.startsWith(webSocketProperties.topic().main().gameRoom())) {
                 /**
                  * 입장한 게임 방의 Canvas websocket 서버에 구독 요청 시 구독 요청이 유효한지 검증
                  */
-                Long userId = authentication.getUserId();
-                Long gameRoomId = extractGameRoomId(destination);
+                Long gameRoomId = extractId(destination);
 
                 if (!gameRoomFacade.isEnteredRoom(gameRoomId, userId)) {
                     log.debug("현재 게임 방에 입장된 정보가 없음.");
                     log.debug("gameRoomId : {}", gameRoomId);
+                    log.debug("userId : {}", userId);
+
+                    throw new BadAccessException("잘못된 접근입니다.");
+                }
+            }
+
+            if (destination.startsWith(webSocketProperties.topic().main().gameSession())) {
+                Long gameSessionId = extractId(destination);
+
+                if (!gameService.inGameSession(gameSessionId, userId)) {
+                    log.debug("현재 게임 세션에 참여한 정보가 없음.");
+                    log.debug("gameSessionId : {}", gameSessionId);
                     log.debug("userId : {}", userId);
 
                     throw new BadAccessException("잘못된 접근입니다.");
@@ -70,7 +88,7 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
      * @param destination
      * @return
      */
-    private Long extractGameRoomId(String destination) {
+    private Long extractId(String destination) {
         String[] parts = destination.split("/");
         return Long.parseLong(parts[2]);
     }
