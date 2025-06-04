@@ -13,7 +13,10 @@ import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionStartEvent;
 import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;
-import com.bb.webcanvasservice.domain.game.exception.*;
+import com.bb.webcanvasservice.domain.game.exception.GameSessionIsOverException;
+import com.bb.webcanvasservice.domain.game.exception.GameSessionNotFoundException;
+import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
+import com.bb.webcanvasservice.domain.game.exception.NextDrawerNotFoundException;
 import com.bb.webcanvasservice.domain.game.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameTurnRepository;
@@ -31,7 +34,6 @@ import java.util.Map;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
-import static com.bb.webcanvasservice.domain.game.enums.GameSessionState.COMPLETED;
 import static com.bb.webcanvasservice.domain.game.enums.GameSessionState.PLAYING;
 
 /**
@@ -114,7 +116,7 @@ public class GameService {
         /**
          * 게임 방 상태를 변경
          */
-        gameRoom.readyToPlay();
+        gameRoom.changeStateToPlay();
 
         /**
          * 새로 생성된 Entity 저장
@@ -257,25 +259,27 @@ public class GameService {
         GameSession gameSession = gameSessionRepository.findById(gameSessionId)
                 .orElseThrow(GameSessionNotFoundException::new);
 
-        if (isGameEnd(gameSessionId)) {
+        if (gameSession.isEnd()) {
             log.debug("진행중인 게임 세션이 아닙니다. ====== {} : {}", gameSession, gameSession.getState());
             throw new GameSessionIsOverException();
         }
 
-        if (shouldGameEnd(gameSessionId)) {
+        /**
+         * 지난 턴이 아직 ACTIVE로 존재할 경우 pass한다.
+         */
+        gameSession.getLastTurn()
+                .ifPresent(lastTurn -> {
+                    log.error("{}",lastTurn);
+                    lastTurn.pass();
+                });
+
+        if (gameSession.shouldEnd()) {
             log.debug("모든 턴이 진행되었습니다.");
             log.debug("게임 세션 종료");
 
-            applicationEventPublisher.publishEvent(new GameSessionEndEvent(gameSessionId, gameSession.getGameRoom().getId()));
+            endGame(gameSessionId);
             return;
         }
-
-        /**
-         * 지난 턴이 존재할 경우 pass한다.
-         */
-        gameTurnRepository.findLastTurn(gameSessionId)
-                .ifPresent(GameTurn::pass);
-
 
         /**
          * @param GameSession gameSession
@@ -303,16 +307,20 @@ public class GameService {
 
     /**
      * 게임을 종료한다.
+     *
      * @param gameSessionId
      */
     @Transactional
     public void endGame(Long gameSessionId) {
-        if (isGameEnd(gameSessionId)) {
+        GameSession gameSession = gameSessionRepository.findById(gameSessionId)
+                .orElseThrow(GameSessionNotFoundException::new);
+
+        if (gameSession.isEnd()) {
             log.debug("이미 게임 세션이 종료되었습니다.");
             throw new GameSessionIsOverException();
         }
-        GameSession gameSession = gameSessionRepository.findById(gameSessionId)
-                .orElseThrow(GameSessionNotFoundException::new);
+        log.debug("게임 세션 종료 ====== gameSessionId : {}", gameSessionId);
+
 
         /**
          * 내부에서만 요청되는 메소드로 클라이언트 validation 처리 없이 complete한다.
@@ -321,55 +329,11 @@ public class GameService {
 
         List<GameRoomEntrance> currentPlayingEntrances = gameRoomFacade.findGameRoomEntrancesByGameRoomIdAndState(gameRoom.getId(), GameRoomEntranceState.PLAYING);
         currentPlayingEntrances.stream()
-                .forEach(gameRoomEntrance -> {
-                    gameRoomEntrance.changeState(GameRoomEntranceState.WAITING);
-                    userService.changeUserState(gameRoomEntrance.getUser().getId(), UserStateCode.IN_ROOM);
-                });
+                .forEach(GameRoomEntrance::resetGameRoomEntranceInfo);
 
         gameSession.end();
 
         applicationEventPublisher.publishEvent(new GameSessionEndEvent(gameSessionId, gameRoom.getId()));
     }
 
-    /**
-     * 게임 종료인지 여부를 체크한다.
-     * @param gameSessionId
-     * @return
-     */
-    @Transactional(readOnly = true)
-    public boolean isGameEnd(Long gameSessionId) {
-        GameSession gameSession = gameSessionRepository.findById(gameSessionId)
-                .orElseThrow(GameSessionNotFoundException::new);
-
-        boolean isEnd = gameSession.getState() == COMPLETED;
-
-        log.debug("{} game session end = {}", gameSessionId, isEnd);
-        return isEnd;
-    }
-
-    /**
-     * 게임 턴이 모두 진행되어 게임을 종료상태로 변경해야하는지 체크한다.
-     * @param gameSessionId
-     * @return
-     */
-    @Transactional(readOnly = true)
-    public boolean shouldGameEnd(Long gameSessionId) {
-        GameSession gameSession = gameSessionRepository.findById(gameSessionId)
-                .orElseThrow(GameSessionNotFoundException::new);
-
-        return gameSession.getGameTurns().size() >= gameSession.getTurnCount();
-    }
-
-    /**
-     * 정답인지 체크한다.
-     * @param gameTurnId
-     * @param answer
-     * @return
-     */
-    @Transactional
-    public boolean isAnswer(Long gameTurnId, String answer) {
-        return gameTurnRepository
-                .findById(gameTurnId).orElseThrow(GameTurnNotFoundException::new)
-                .getAnswer().equals(answer);
-    }
 }

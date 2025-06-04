@@ -64,4 +64,14 @@ public class User extends BaseEntity {
     public void changeState(UserStateCode state) {
         this.state = state;
     }
+
+
+    /**
+     * 현재 플레이중인 게임을 완료하고 게임 방으로 돌아간다.
+     */
+    public void endGameAndResetToRoom() {
+        if (this.state == UserStateCode.IN_GAME) {
+            this.state = UserStateCode.IN_ROOM;
+        }
+    }
 }

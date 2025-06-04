@@ -61,8 +61,15 @@ public class GameRoom extends BaseEntity {
         entrances.addAll(Arrays.stream(entrance).toList());
     }
 
-    public void readyToPlay() {
+    public void changeStateToPlay() {
         this.state = GameRoomState.PLAYING;
+    }
+
+    /**
+     * 게임 세션이 종료된 후 WAITING 상태로 방 상태를 리셋한다.
+     */
+    public void resetGameRoomState() {
+        this.state = GameRoomState.WAITING;
     }
 
     public void close() {

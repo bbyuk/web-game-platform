@@ -7,6 +7,7 @@ import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;
 import com.bb.webcanvasservice.domain.game.service.GameService;
 import com.bb.webcanvasservice.domain.game.service.GameTurnTimerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -15,6 +16,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 /**
  * 게임 세션 관련 이벤트 리스너
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class GameSessionEventListener {
@@ -45,9 +47,7 @@ public class GameSessionEventListener {
                 event.getGameRoomId(),
                 event.getGameSessionId(),
                 gameSession.getTimePerTurn(),
-                gameService::processToNextTurn,
-                (gameSessionId) -> gameService.isGameEnd(gameSessionId) || gameService.shouldGameEnd(gameSessionId),
-                gameService::endGame
+                gameService::processToNextTurn
         );
     }
 
@@ -68,6 +68,7 @@ public class GameSessionEventListener {
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameSessionEnd(GameSessionEndEvent event) {
+        gameTurnTimerService.stopTurnTimer(event.getGameRoomId());
         messagingTemplate.convertAndSend("/session/" + event.getGameRoomId(), event);
 
         /**

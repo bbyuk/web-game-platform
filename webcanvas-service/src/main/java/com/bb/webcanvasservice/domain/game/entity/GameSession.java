@@ -8,7 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 게임의 세션을 나타내는 엔티티 클래스
@@ -66,8 +68,39 @@ public class GameSession extends BaseEntity {
         this.timePerTurn = timePerTurn;
     }
 
+    /**
+     * 게임 세션을 종료하고 게임 세션과 연관되어 있는 게임방 객체의 상태 리셋을 요청한다.
+     */
     public void end() {
-        this.state = GameSessionState.COMPLETED;
+        state = GameSessionState.COMPLETED;
+        gameRoom.resetGameRoomState();
     }
 
+    /**
+     * 게임 종료인지 여부를 체크한다.
+     * @return 게임 종료 여부
+     */
+    public boolean isEnd() {
+        return state == GameSessionState.COMPLETED;
+    }
+
+    /**
+     * 게임 턴이 모두 진행되어 게임을 종료상태로 변경해야하는지 체크한다.
+     * @return 게임을 종료해야되는지 여부
+     */
+    public boolean shouldEnd() {
+        return gameTurns.size() >= turnCount;
+    }
+
+    /**
+     * 지난 턴 조회
+     * @return 지난 턴
+     */
+    public Optional<GameTurn> getLastTurn() {
+        return gameTurns
+                .stream()
+                .filter(GameTurn::isActive)
+                .sorted(Comparator.comparingLong(GameTurn::getId))
+                .findFirst();
+    }
 }

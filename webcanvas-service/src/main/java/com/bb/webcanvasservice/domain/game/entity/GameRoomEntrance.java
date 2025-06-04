@@ -116,4 +116,12 @@ public class GameRoomEntrance extends BaseEntity {
     public void changeState(GameRoomEntranceState state) {
         this.state = state;
     }
+
+    /**
+     * 게임 방 입장 정보 entity의 상태를 초기화하고, 유저 entity의 상태 초기화를 요청한다.
+     */
+    public void resetGameRoomEntranceInfo() {
+        this.state = GameRoomEntranceState.WAITING;
+        user.endGameAndResetToRoom();
+    }
 }

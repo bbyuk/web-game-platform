@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 @Getter
 @Entity
+@ToString
 @Table(name = "game_turns")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameTurn extends BaseEntity {
@@ -87,13 +89,32 @@ public class GameTurn extends BaseEntity {
      * 정답을 맟히지 못하고 제한 시간이 넘은 경우 호출
      */
     public void pass() {
-        this.state = GameTurnState.PASSED;
+        if (isActive()) {
+            this.state = GameTurnState.PASSED;
+        }
     }
 
     /**
-     * 게임 세션과 연관된 종료 시각을 계산해 리턴한다.
-     * Seconds
+     * 현재 활성화 되어 있는 턴인지 여부를 체크한다.
+     * @return 활성화 여부
+     */
+    public boolean isActive() {
+        return this.state == GameTurnState.ACTIVE;
+    }
+
+    /**
+     * 대상 턴의 정답이 맞는지 체크한다.
+     * @param answer
      * @return
+     */
+    public boolean isAnswer(String answer) {
+        return this.answer.equals(answer);
+    }
+
+    /**
+     * 종료 시각을 계산해 리턴한다.
+     * Seconds
+     * @return 게임 턴 Entity의 만료 시각
      */
     public LocalDateTime getExpiration() {
         return createdAt.plus(gameSession.getTimePerTurn(), ChronoUnit.SECONDS);

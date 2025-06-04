@@ -26,19 +26,13 @@ public class GameTurnTimerService {
      * @param gameRoomId 게임 방 ID
      * @param period 타이머 간격
      * @param turnEndHandler 턴 종료시 작업할 핸들러
-     * @param gameEndChecker 게임 종료 여부 체크 메소드
-     * @param gameEndHandler 게임 종료시 작업할 핸들러
      */
-    public void registerTurnTimer(Long gameRoomId, Long gameSessionId, int period, Consumer<Long> turnEndHandler, Function<Long, Boolean> gameEndChecker, Consumer<Long> gameEndHandler) {
+    public void registerTurnTimer(Long gameRoomId, Long gameSessionId, int period, Consumer<Long> turnEndHandler) {
         ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> {
-            if (gameEndChecker.apply(gameSessionId)) {
-                gameEndHandler.accept(gameSessionId);
-            } else {
-                turnEndHandler.accept(gameSessionId);
-            }
+            turnEndHandler.accept(gameSessionId);
         }, 0, period, TimeUnit.SECONDS);
 
-        gameTurnTimerRegistry.register(gameRoomId, new GameTurnTimerEntry(future, period, turnEndHandler, gameEndChecker, gameEndHandler));
+        gameTurnTimerRegistry.register(gameRoomId, new GameTurnTimerEntry(future, period, turnEndHandler));
     }
 
     /**
@@ -48,9 +42,11 @@ public class GameTurnTimerService {
     public void stopTurnTimer(Long gameRoomId) {
         GameTurnTimerEntry gameTurnTimerEntry = gameTurnTimerRegistry.get(gameRoomId);
         if (gameTurnTimerRegistry.contains(gameRoomId)) {
+            log.debug("게임 턴 타이머 종료 ====== {}", gameRoomId);
             gameTurnTimerEntry.future().cancel(false);
         }
 
+        log.debug("게임 턴 타이머 등록 제거 ====== {}", gameRoomId);
         gameTurnTimerRegistry.remove(gameRoomId);
     }
 
@@ -70,13 +66,10 @@ public class GameTurnTimerService {
 
         // 새 타이머 등록
         ScheduledFuture<?> newTimer = scheduler.scheduleAtFixedRate(() -> {
-            if (oldEntry.gameEndChecker().apply(gameRoomId)) {
-                oldEntry.gameEndHandler().accept(gameRoomId);
-            } else {
-                oldEntry.turnEndHandler().accept(gameRoomId);
-            }
+            oldEntry.turnEndHandler().accept(gameRoomId);
         }, 0, oldEntry.period(), TimeUnit.SECONDS);
 
-        gameTurnTimerRegistry.register(gameRoomId, new GameTurnTimerEntry(newTimer, oldEntry.period(), oldEntry.turnEndHandler(), oldEntry.gameEndChecker(), oldEntry.gameEndHandler()));
+        gameTurnTimerRegistry.register(gameRoomId, new GameTurnTimerEntry(newTimer, oldEntry.period(), oldEntry.turnEndHandler()));
     }
+
 }

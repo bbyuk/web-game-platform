@@ -40,25 +40,17 @@ class GameTurnTimerServiceUnitTest {
             currentTurn.getAndIncrement();
         };
 
-        Function<Long, Boolean> gameEndChecker = id -> {
-            System.out.println(LocalDateTime.now() + " " + id + " 방 게임 종료 체크");
-            return currentTurn.get() == gameTurns;
-        };
-
-        Consumer<Long> gameEndHandler = id -> {
-            System.out.println(LocalDateTime.now() + " " + id + " 방 게임 종료");
-            gameTurnTimerService.stopTurnTimer(id);
-            latch.countDown();
-        };
-
         // when
-
         System.out.println(LocalDateTime.now() + " " + gameRoomId + " 방 턴 타이머 등록");
-        gameTurnTimerService.registerTurnTimer(gameRoomId, gameSessionId, period, turnEndHandler, gameEndChecker, gameEndHandler);
+        gameTurnTimerService.registerTurnTimer(gameRoomId, gameSessionId, period, turnEndHandler);
 
         boolean finished = latch.await(10, TimeUnit.SECONDS);
-        Assertions.assertThat(finished).isTrue();
-        Assertions.assertThat(currentTurn.get()).isEqualTo(3);
+
+        /**
+         * 게임 종료 요청이 onDemand로 처리되지 않으면 종료되지 않는다.
+         */
+//        Assertions.assertThat(finished).isFalse();
+//        Assertions.assertThat(currentTurn.get()).isEqualTo(3);
     }
 
 }

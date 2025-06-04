@@ -15,12 +15,6 @@ public record GameTurnTimerEntry(
         int period,
 
         @Schema(description = "턴 종료시 작업할 핸들러")
-        Consumer<Long> turnEndHandler,
-
-        @Schema(description = "게임 종료 여부 체크 메소드")
-        Function<Long, Boolean> gameEndChecker,
-
-        @Schema(description = "게임 종료시 작업할 핸들러")
-        Consumer<Long> gameEndHandler
+        Consumer<Long> turnEndHandler
 ) {
 }
