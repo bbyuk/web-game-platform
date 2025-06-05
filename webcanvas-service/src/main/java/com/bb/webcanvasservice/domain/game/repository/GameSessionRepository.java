@@ -3,7 +3,9 @@ package com.bb.webcanvasservice.domain.game.repository;
 import com.bb.webcanvasservice.domain.game.entity.GameSession;
 import com.bb.webcanvasservice.domain.game.entity.GameTurn;
 import com.bb.webcanvasservice.domain.game.enums.GameSessionState;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -13,7 +15,7 @@ import java.util.Optional;
 /**
  * 게임 세션 레포지토리
  */
-public interface GameSessionRepository extends JpaRepository<GameSession, Long> {
+public interface GameSessionRepository extends JpaRepository<GameSession, Long>, GameSessionCustomRepository {
 
     /**
      * 현재 라운드를 조회한다.
@@ -45,5 +47,4 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
           where   gs.gameRoom.id = :gameRoomId
           """)
     List<GameSession> findGameSessionsByGameRoomId(@Param("gameRoomId") Long gameRoomId);
-
 }

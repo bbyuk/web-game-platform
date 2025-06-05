@@ -1,5 +1,7 @@
 package com.bb.webcanvasservice.domain.game.enums;
 
+import java.util.List;
+
 /**
  * 게임 방 입장 Entity 의 상태 코드
  */
@@ -11,6 +13,11 @@ public enum GameRoomEntranceState {
     WAITING,
 
     /**
+     * 로딩 상태
+     */
+    LOADING,
+
+    /**
      * 게임 플레이중
      */
     PLAYING,
@@ -18,5 +25,7 @@ public enum GameRoomEntranceState {
     /**
      * 퇴장
      */
-    EXITED
+    EXITED;
+
+    public static final List<GameRoomEntranceState> entered = List.of(WAITING, LOADING, PLAYING);
 }

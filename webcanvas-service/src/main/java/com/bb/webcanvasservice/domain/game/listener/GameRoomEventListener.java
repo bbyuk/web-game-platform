@@ -1,9 +1,6 @@
 package com.bb.webcanvasservice.domain.game.listener;
 
-import com.bb.webcanvasservice.domain.game.entity.GameSession;
 import com.bb.webcanvasservice.domain.game.event.*;
-import com.bb.webcanvasservice.domain.game.service.GameService;
-import com.bb.webcanvasservice.domain.game.service.GameTurnTimerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -19,8 +16,6 @@ public class GameRoomEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    private final GameService gameService;
-    private final GameTurnTimerService gameTurnTimerService;
     /**
      * 유저가 게임방에 입장할 때 게임 방 메세지 브로커로 입장 이벤트를 push한다.
      * @param event
@@ -68,15 +63,5 @@ public class GameRoomEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameSessionStart(GameSessionStartEvent event) {
         messagingTemplate.convertAndSend("/room/" + event.getGameRoomId(), event);
-
-        GameSession gameSession = gameService.findGameSession(event.getGameSessionId());
-
-
-        gameTurnTimerService.registerTurnTimer(
-                event.getGameRoomId(),
-                event.getGameSessionId(),
-                gameSession.getTimePerTurn(),
-                gameService::processToNextTurn
-        );
     }
 }

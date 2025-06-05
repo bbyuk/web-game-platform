@@ -5,6 +5,7 @@ import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
+import com.bb.webcanvasservice.domain.game.dto.response.GameLoadSuccessResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameSessionResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameTurnFindResponse;
@@ -12,7 +13,7 @@ import com.bb.webcanvasservice.domain.game.entity.*;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
-import com.bb.webcanvasservice.domain.game.enums.GameTurnState;
+import com.bb.webcanvasservice.domain.game.event.AllUserInGameSessionLoadedEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionStartEvent;
 import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;
@@ -103,7 +104,6 @@ public class GameService {
         List<GamePlayHistory> gamePlayHistories = gameRoomFacade.findCurrentGameRoomEntrancesWithLock(gameRoom.getId())
                 .stream()
                 .map(entrance -> {
-                    entrance.changeState(GameRoomEntranceState.PLAYING);
                     entrance.getUser().changeState(UserStateCode.IN_GAME);
 
                     if (entrance.getRole() == GameRoomRole.GUEST) {
@@ -184,7 +184,7 @@ public class GameService {
     public boolean inGameSession(Long gameSessionId, Long userId) {
         GameSession gameSession = findGameSession(gameSessionId);
         return gameSession.getGameRoom().getEntrances().stream()
-                .anyMatch(gameRoomEntrance -> gameRoomEntrance.getUser().getId().equals(userId) && gameRoomEntrance.getState() == GameRoomEntranceState.PLAYING);
+                .anyMatch(gameRoomEntrance -> gameRoomEntrance.getUser().getId().equals(userId) && GameRoomEntranceState.entered.contains(gameRoomEntrance.getState()));
     }
 
 
@@ -384,6 +384,31 @@ public class GameService {
         gameSession.end();
 
         applicationEventPublisher.publishEvent(new GameSessionEndEvent(gameSessionId, gameRoom.getId()));
+    }
+
+
+    /**
+     * 게임 세션 토픽 구독에 성공했다고 상태에 기록하고,
+     * 게임 세션 내의 유저들이 모두 로딩 상태가 되면 턴타이머 시작 이벤트를 발행
+     * @param userId
+     */
+    @Transactional
+    public GameLoadSuccessResponse successSubscription(Long gameSessionId, Long userId) {
+        log.debug("success subscription = {}", gameSessionId);
+        GameSession gameSession = findGameSession(gameSessionId);
+        GameRoomEntrance entrance = gameSession.getGameRoom()
+                .getEntrances()
+                .stream()
+                .filter(gameRoomEntrance -> gameRoomEntrance.getState() == GameRoomEntranceState.WAITING && gameRoomEntrance.getUser().getId().equals(userId))
+                .findFirst().orElseThrow(GameRoomEntranceNotFoundException::new);
+
+        entrance.loadToPlay();
+
+        if (gameSessionRepository.isAllUserLoaded(gameSessionId)) {
+            applicationEventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSessionId, gameSession.getGameRoom().getId()));
+        }
+
+        return new GameLoadSuccessResponse(true);
     }
 
 }
