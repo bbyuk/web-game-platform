@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.domain.game.entity;
 
 import com.bb.webcanvasservice.common.entity.BaseEntity;
+import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -42,7 +43,7 @@ public class GameRoom extends BaseEntity {
      */
     private String joinCode;
 
-    @OneToMany(mappedBy = "gameRoom")
+    @OneToMany(mappedBy = "gameRoom", fetch = FetchType.EAGER)
     /**
      * 게임 방의 입장 목록
      */
@@ -74,6 +75,10 @@ public class GameRoom extends BaseEntity {
 
     public void close() {
         this.state = GameRoomState.CLOSED;
+    }
+
+    public int getEnteredUserCount() {
+        return (int) entrances.stream().filter(GameRoomEntranceState.entered::contains).count();
     }
 
 }

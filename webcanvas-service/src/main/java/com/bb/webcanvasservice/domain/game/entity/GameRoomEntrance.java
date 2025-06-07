@@ -125,13 +125,6 @@ public class GameRoomEntrance extends BaseEntity {
     }
 
     /**
-     * 로딩 여부 확인
-     */
-    public boolean isLoaded() {
-        return state == GameRoomEntranceState.LOADING;
-    }
-
-    /**
      * 게임 방 입장 정보 entity의 상태를 초기화하고, 유저 entity의 상태 초기화를 요청한다.
      */
     public void resetGameRoomEntranceInfo() {

@@ -34,7 +34,6 @@ public class GameSessionEventListener {
     public void handleAllUserInGameSessionLoaded(AllUserInGameSessionLoadedEvent event) {
         messagingTemplate.convertAndSend("/session/" + event.getGameSessionId(), event);
 
-
         GameSession gameSession = gameService.findGameSession(event.getGameSessionId());
         gameTurnTimerService.registerTurnTimer(
                 event.getGameRoomId(),

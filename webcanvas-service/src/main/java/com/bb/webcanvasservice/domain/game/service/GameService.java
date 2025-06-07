@@ -18,6 +18,7 @@ import com.bb.webcanvasservice.domain.game.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionStartEvent;
 import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;
 import com.bb.webcanvasservice.domain.game.exception.*;
+import com.bb.webcanvasservice.domain.game.registry.GameSessionLoadRegistry;
 import com.bb.webcanvasservice.domain.game.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameTurnRepository;
@@ -54,6 +55,8 @@ public class GameService {
     private final DictionaryService dictionaryService;
     private final UserService userService;
     private final GameRoomFacade gameRoomFacade;
+
+    private final GameSessionLoadRegistry gameSessionLoadRegistry;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -396,16 +399,14 @@ public class GameService {
     public GameLoadSuccessResponse successSubscription(Long gameSessionId, Long userId) {
         log.debug("success subscription = {}", gameSessionId);
         GameSession gameSession = findGameSession(gameSessionId);
-        GameRoomEntrance entrance = gameSession.getGameRoom()
-                .getEntrances()
-                .stream()
-                .filter(gameRoomEntrance -> gameRoomEntrance.getState() == GameRoomEntranceState.WAITING && gameRoomEntrance.getUser().getId().equals(userId))
-                .findFirst().orElseThrow(GameRoomEntranceNotFoundException::new);
+        GameRoom gameRoom = gameSession.getGameRoom();
 
-        entrance.loadToPlay();
+        int enteredUserCount = gameRoom.getEnteredUserCount();
+        gameSessionLoadRegistry.register(gameSessionId, userId);
 
-        if (gameSessionRepository.isAllUserLoaded(gameSessionId)) {
-            applicationEventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSessionId, gameSession.getGameRoom().getId()));
+        if (gameSessionLoadRegistry.isAllLoaded(gameSessionId, enteredUserCount)) {
+            applicationEventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSessionId, gameRoom.getId()));
+            gameSessionLoadRegistry.clear(gameSessionId);
         }
 
         return new GameLoadSuccessResponse(true);
