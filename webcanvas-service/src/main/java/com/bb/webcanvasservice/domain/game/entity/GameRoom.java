@@ -73,15 +73,21 @@ public class GameRoom extends BaseEntity {
         this.state = GameRoomState.WAITING;
     }
 
+    /**
+     * 게임 방 상태를 close한다.
+     */
     public void close() {
         this.state = GameRoomState.CLOSED;
     }
 
+    /**
+     * 게임 방에 현재 입장해있는 입장 정보 목록을 가져온다.
+     * @return
+     */
     public int getEnteredUserCount() {
         return (int) entrances
                 .stream()
                 .filter(entrance
                         -> GameRoomEntranceState.entered.contains(entrance.getState())).count();
     }
-
 }

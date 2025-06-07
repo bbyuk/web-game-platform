@@ -393,6 +393,7 @@ public class GameService {
     /**
      * 게임 세션 토픽 구독에 성공했다고 상태에 기록하고,
      * 게임 세션 내의 유저들이 모두 로딩 상태가 되면 턴타이머 시작 이벤트를 발행
+     *
      * @param userId
      */
     @Transactional
@@ -407,6 +408,11 @@ public class GameService {
         gameSessionLoadRegistry.register(gameSessionId, userId);
 
         if (gameSessionLoadRegistry.isAllLoaded(gameSessionId, enteredUserCount)) {
+            gameRoom.getEntrances()
+                    .stream()
+                    .filter(entrance -> entrance.getState().equals(GameRoomEntranceState.WAITING))
+                    .forEach(entrance -> entrance.changeState(GameRoomEntranceState.PLAYING));
+
             applicationEventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSessionId, gameRoom.getId()));
             gameSessionLoadRegistry.clear(gameSessionId);
         }
