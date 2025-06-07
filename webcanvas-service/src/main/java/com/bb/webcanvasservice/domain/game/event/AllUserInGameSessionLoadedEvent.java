@@ -8,12 +8,12 @@ import lombok.Getter;
  */
 @Getter
 public class AllUserInGameSessionLoadedEvent extends ApplicationEvent {
-    private final Long gameRoomId;
     private final Long gameSessionId;
+    private final Long gameRoomId;
 
-    public AllUserInGameSessionLoadedEvent(Long gameRoomId, Long gameSessionId) {
+    public AllUserInGameSessionLoadedEvent(Long gameSessionId, Long gameRoomId) {
         super("SESSION/ALL_USER_LOADED");
-        this.gameRoomId = gameRoomId;
         this.gameSessionId = gameSessionId;
+        this.gameRoomId = gameRoomId;
     }
 }

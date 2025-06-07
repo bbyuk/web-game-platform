@@ -401,6 +401,8 @@ public class GameService {
         GameSession gameSession = findGameSession(gameSessionId);
         GameRoom gameRoom = gameSession.getGameRoom();
 
+        log.debug("gameRoom.entrances = {}", gameRoom.getEntrances().toString());
+
         int enteredUserCount = gameRoom.getEnteredUserCount();
         gameSessionLoadRegistry.register(gameSessionId, userId);
 

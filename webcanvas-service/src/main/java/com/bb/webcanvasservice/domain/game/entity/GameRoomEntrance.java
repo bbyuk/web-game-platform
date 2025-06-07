@@ -118,13 +118,6 @@ public class GameRoomEntrance extends BaseEntity {
     }
 
     /**
-     * 게임 세션 시작 후 토픽 구독 완료 상태로 변경
-     */
-    public void loadToPlay() {
-        this.state = GameRoomEntranceState.LOADING;
-    }
-
-    /**
      * 게임 방 입장 정보 entity의 상태를 초기화하고, 유저 entity의 상태 초기화를 요청한다.
      */
     public void resetGameRoomEntranceInfo() {

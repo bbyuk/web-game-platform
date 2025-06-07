@@ -12,10 +12,6 @@ public enum GameRoomEntranceState {
      */
     WAITING,
 
-    /**
-     * 로딩 상태
-     */
-    LOADING,
 
     /**
      * 게임 플레이중
@@ -27,5 +23,5 @@ public enum GameRoomEntranceState {
      */
     EXITED;
 
-    public static final List<GameRoomEntranceState> entered = List.of(WAITING, LOADING, PLAYING);
+    public static final List<GameRoomEntranceState> entered = List.of(WAITING, PLAYING);
 }

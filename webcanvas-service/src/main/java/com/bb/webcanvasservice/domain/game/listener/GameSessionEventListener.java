@@ -8,6 +8,7 @@ import com.bb.webcanvasservice.domain.game.service.GameService;
 import com.bb.webcanvasservice.domain.game.service.GameTurnTimerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -30,7 +31,7 @@ public class GameSessionEventListener {
     /**
      * 게임 세션이 시작되고 모든 유저가 게임 세션 브로커 토픽을 구독완료하고 로딩 되었을 때 발행되는 이벤트를 핸들링한다.
      */
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     public void handleAllUserInGameSessionLoaded(AllUserInGameSessionLoadedEvent event) {
         messagingTemplate.convertAndSend("/session/" + event.getGameSessionId(), event);
 

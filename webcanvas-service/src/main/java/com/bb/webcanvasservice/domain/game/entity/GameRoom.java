@@ -78,7 +78,10 @@ public class GameRoom extends BaseEntity {
     }
 
     public int getEnteredUserCount() {
-        return (int) entrances.stream().filter(GameRoomEntranceState.entered::contains).count();
+        return (int) entrances
+                .stream()
+                .filter(entrance
+                        -> GameRoomEntranceState.entered.contains(entrance.getState())).count();
     }
 
 }
