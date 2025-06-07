@@ -22,5 +22,5 @@ export const game = {
   // 현재 세션 조회
   getCurrentGameSession: (gameRoomId) => `${BASE}/room/${gameRoomId}/session`,
   // 현재 턴 조회
-  getCurrentGameTurn: (gameSessionId) => `${BASE}/session/${gameSessionId}/turn`
+  getCurrentGameTurn: (gameSessionId) => `${BASE}/session/${gameSessionId}/turn`,
 };

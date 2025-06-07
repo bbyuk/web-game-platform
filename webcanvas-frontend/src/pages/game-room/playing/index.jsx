@@ -8,6 +8,7 @@ import { getApiClient } from "@/client/http/index.jsx";
 import { useAuthentication } from "@/contexts/authentication/index.jsx";
 import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
 import ItemList from "@/components/layouts/side-panel/item-list/index.jsx";
+import { pages } from "@/router/index.jsx";
 
 export default function GameRoomPlayingPage() {
   // 현재 캔버스의 획 모음
@@ -31,14 +32,10 @@ export default function GameRoomPlayingPage() {
   const { webSocketClientRef } = useOutletContext();
 
   const { enteredUsers } = useOutletContext();
-
   const { setTitle, setContents } = useLeftSideStore();
 
   const [currentDrawerId, setCurrentDrawerId] = useState(null);
-
   const [gameSessionId, setGameSessionId] = useState(null);
-
-
 
   /**
    * =========================== 이벤트 핸들러 =============================
@@ -73,18 +70,17 @@ export default function GameRoomPlayingPage() {
         case "SESSION/TURN_PROGRESSED":
           // TODO 턴 진행 이벤트 클라이언트 핸들링
 
-          apiClient.get(game.getCurrentGameTurn(gameSessionId))
-            .then((response => {
-              console.log(response);
-              setCurrentDrawerId(response.drawerId);
-
-            }));
+          apiClient.get(game.getCurrentGameTurn(gameSessionId)).then((response) => {
+            console.log(response);
+            setCurrentDrawerId(response.drawerId);
+          });
 
           console.log(frame);
           break;
         case "SESSION/END":
           // TODO 게임 종료 이벤트 클라이언트 핸들링
-          console.log(frame);
+          alert("게임이 종료되었습니다. 대기실로 이동합니다.");
+          navigate(pages.gameRoom.waiting.url(roomId), { replace: true });
           break;
       }
     };
