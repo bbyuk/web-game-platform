@@ -143,26 +143,21 @@ export default function GameRoomPlayingPage() {
   }, [gameSessionId, webSocketClientRef]);
 
   useEffect(() => {
-    if (currentDrawerId === authenticatedUserId) {
-      console.log("제차롑니다");
-    }
+    const theme = authenticatedUserId === currentDrawerId ? "indigo" : "default";
+    console.log(authenticatedUserId + " : " + theme);
 
-    const getLeftSideItemTheme = (userId) => {
-      const theme = userId === currentDrawerId ? "indigo" : "default";
-      return theme;
-    };
     setContents({
       slot: ItemList,
       props: {
         value: enteredUsers.map(({ userId, nickname, ready, role, ...rest }) => ({
           label: nickname,
           highlight: ready,
-          theme: getLeftSideItemTheme(userId),
+          theme: theme,
           ...rest,
         })),
       },
     });
-  }, [currentDrawerId]);
+  }, [authenticatedUserId, currentDrawerId]);
 
   return (
     <Canvas
