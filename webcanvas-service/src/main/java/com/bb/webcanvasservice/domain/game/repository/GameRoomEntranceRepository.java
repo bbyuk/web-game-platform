@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * User - GameRoom 엔티티간 조인 테이블 Entity인 GameRoomEntrance Entity의 persitence layer를 담당하는 레포지토리 클래스
  */
-public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntrance, Long> {
+public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntrance, Long>, GameRoomEntranceCustomRepository {
 
     /**
      * 게임 방 입장 여부 조회
@@ -85,25 +85,6 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             """
     )
     Optional<GameRoomEntrance> findGameRoomEntranceByUserId(@Param("userId") Long userId, @Param("gameRoomEntranceStates") List<GameRoomEntranceState> gameRoomEntranceStates);
-
-    /**
-     * gameRoom에 입장되어 있는지 여부를 조회한다.
-     * @param gameRoomId
-     * @param userId
-     * @return
-     */
-    @Query(
-            """
-            select exists (
-                 select 1
-                 from   GameRoomEntrance gre
-                 where  gre.gameRoom.id = :gameRoomId
-                 and    gre.user.id = :userId
-                 and    gre.state = 'WAITING'
-            )
-            """
-    )
-    boolean existsActiveEntrance(@Param("gameRoomId") Long gameRoomId, @Param("userId") Long userId);
 
     /**
      * 게임 방 ID와 상태로 GameRoomEntrance 목록을 조회한다.
