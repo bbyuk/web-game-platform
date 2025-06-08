@@ -35,7 +35,7 @@ class DictionaryServiceTest {
     @DisplayName("랜덤 단어 뽑기 테스트")
     public void testDrawRandomWord() throws Exception {
         BDDMockito.given(sequenceRepository.getCurrentValue(any())).willReturn(2L);
-        BDDMockito.given(wordRepository.findByLanguageAndPosAndIndex(any(), any(), any())).willReturn(Optional.of(new Word(
+        BDDMockito.given(wordRepository.findRandomWordByLanguageAndPos(any(), any())).willReturn(Optional.of(new Word(
                 Language.KOREAN,
                 "행복한",
                 1234L,

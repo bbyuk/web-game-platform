@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
-import java.util.random.RandomGenerator;
 
 /**
  * https://opendict.korean.go.kr/main
@@ -69,10 +68,7 @@ public class DictionaryService {
             throw new WordNotFoundException();
         }
 
-        RandomGenerator randomGenerator = RandomGenerator.getDefault();
-        long randomWordIndex = randomGenerator.nextLong(lowerBound, upperBound);
-
-        return wordRepository.findByLanguageAndPosAndIndex(language, pos, randomWordIndex)
+        return wordRepository.findRandomWordByLanguageAndPos(language, pos)
                 .orElseThrow(WordNotFoundException::new)
                 .getValue();
     }
