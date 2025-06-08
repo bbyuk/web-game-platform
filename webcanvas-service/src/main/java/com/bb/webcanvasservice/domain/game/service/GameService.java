@@ -204,7 +204,7 @@ public class GameService {
                 .filter(gs -> gs.getState() == PLAYING)
                 .findFirst()
                 .orElseThrow(GameSessionNotFoundException::new);
-        return new GameSessionResponse(gameSession.getId());
+        return new GameSessionResponse(gameSession.getId(), gameSession.getState());
     }
 
     /**
