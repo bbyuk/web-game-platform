@@ -15,7 +15,6 @@ const Item = ({
   isButton = false,
   onClick = () => {},
 }) => {
-  console.log(theme);
 
   let defaultBg = "bg-gray-800";
   let defaultBorder = "border-gray-600";
@@ -30,6 +29,8 @@ const Item = ({
     defaultBorder = "border-green-500";
     defaultText = "text-white";
   }
+
+  console.log("Item.theme = " + theme);
 
   return (
     <li

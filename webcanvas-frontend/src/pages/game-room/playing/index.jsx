@@ -69,9 +69,7 @@ export default function GameRoomPlayingPage() {
       switch (frame.event) {
         case "SESSION/TURN_PROGRESSED":
           // TODO 턴 진행 이벤트 클라이언트 핸들링
-
           apiClient.get(game.getCurrentGameTurn(gameSessionId)).then((response) => {
-            console.log(response);
             setCurrentDrawerId(response.drawerId);
           });
 
@@ -128,9 +126,6 @@ export default function GameRoomPlayingPage() {
       setGameSessionId(response.gameSessionId);
     });
 
-    return () => {
-      webSocketClientRef.current.deactivate();
-    };
   }, []);
 
   useEffect(() => {
@@ -143,16 +138,13 @@ export default function GameRoomPlayingPage() {
   }, [gameSessionId, webSocketClientRef]);
 
   useEffect(() => {
-    const theme = authenticatedUserId === currentDrawerId ? "indigo" : "default";
-    console.log(authenticatedUserId + " : " + theme);
-
     setContents({
       slot: ItemList,
       props: {
         value: enteredUsers.map(({ userId, nickname, ready, role, ...rest }) => ({
           label: nickname,
           highlight: ready,
-          theme: theme,
+          theme: userId === currentDrawerId ? "indigo" : "default",
           ...rest,
         })),
       },
