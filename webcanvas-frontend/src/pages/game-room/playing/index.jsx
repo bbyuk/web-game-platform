@@ -90,8 +90,7 @@ export default function GameRoomPlayingPage() {
       },
     ];
 
-    console.log("topic 구독 => ");
-    console.log(topics);
+    console.log("game-room/playing/index.jsx = 구독");
 
     webSocketClientRef.current.subscribe(topics);
   };
@@ -129,13 +128,17 @@ export default function GameRoomPlayingPage() {
   }, []);
 
   useEffect(() => {
+    console.log("여긴 타나??");
+
+    console.log("gameSessionId = ", gameSessionId);
+    console.log("webSocketClientRef", webSocketClientRef);
     if (!gameSessionId || !webSocketClientRef.current) return;
 
     /**
      * 게임 세션 ID를 상태에 저장한 후 세션 웹소켓을 구독한다.
      */
     subscribeTopics();
-  }, [gameSessionId, webSocketClientRef]);
+  }, [gameSessionId, webSocketClientRef.current]);
 
   useEffect(() => {
     setContents({

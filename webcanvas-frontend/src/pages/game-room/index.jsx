@@ -214,6 +214,9 @@ export default function GameRoomPage() {
         messageHandler: gameRoomChatHandler,
       },
     ];
+
+    console.log("game-room/index.jsx = 구독");
+
     webSocketClientRef.current.subscribe(topics);
   };
 
