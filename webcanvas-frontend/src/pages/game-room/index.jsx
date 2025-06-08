@@ -9,7 +9,10 @@ import { getWebSocketClient } from "@/client/stomp/index.jsx";
 import { useAuthentication } from "@/contexts/authentication/index.jsx";
 import { useApiLock } from "@/api/lock/index.jsx";
 import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
-import ItemList from "@/components/layouts/side-panel/item-list/index.jsx";
+import ItemList from "@/components/layouts/side-panel/contents/item-list/index.jsx";
+import { useRightSideStore } from "@/stores/layout/rightSideStore.jsx";
+import ChatList from "@/components/layouts/side-panel/contents/chat-list/index.jsx";
+import SidePanelFooterInput from "@/components/layouts/side-panel/footer/input/index.jsx";
 
 export default function GameRoomPage() {
   const { roomId } = useParams();
@@ -19,6 +22,7 @@ export default function GameRoomPage() {
   const navigate = useNavigate();
   const webSocketClientRef = useRef(null);
   const leftSideStore = useLeftSideStore();
+  const rightSideStore = useRightSideStore();
 
   /**
    * 페이지 상태
@@ -237,9 +241,28 @@ export default function GameRoomPage() {
    * 웹소켓 연결 해제
    */
   useEffect(() => {
+    rightSideStore.setContents({
+      slot: ChatList,
+      props: {
+        chats: [
+          { sender: "me", message: "테스트" },
+          { sender: "other", message: "테스트123" },
+        ],
+      },
+    });
+    rightSideStore.setFooter({
+      slot: SidePanelFooterInput,
+      props: {
+        onSubmit: (message) => {
+          console.log(message);
+        },
+      },
+    });
+
     return () => {
       webSocketClientRef.current.deactivate();
       leftSideStore.clear();
+      rightSideStore.clear();
     };
   }, []);
 

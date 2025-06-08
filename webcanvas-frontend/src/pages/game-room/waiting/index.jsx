@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { GameRoomWaitingPlaceholder } from "@/components/placeholder/game-room/waiting/index.jsx";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
-import SidePanelFooterButton from "@/components/layouts/side-panel/footer-button/index.jsx";
+import SidePanelFooterButton from "@/components/layouts/side-panel/footer/button/index.jsx";
 import { useApiLock } from "@/api/lock/index.jsx";
 import { getApiClient } from "@/client/http/index.jsx";
 import { game } from "@/api/index.js";

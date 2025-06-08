@@ -8,7 +8,7 @@ import { pages } from "@/router/index.jsx";
 import { GitCommit } from "lucide-react";
 import { getApiClient } from "@/client/http/index.jsx";
 import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
-import ItemList from "@/components/layouts/side-panel/item-list/index.jsx";
+import ItemList from "@/components/layouts/side-panel/contents/item-list/index.jsx";
 import { useUserStore } from "@/stores/user/userStore.jsx";
 
 export default function LobbyPage() {

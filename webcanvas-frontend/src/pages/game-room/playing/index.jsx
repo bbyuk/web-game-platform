@@ -7,7 +7,7 @@ import { Gamepad2 } from "lucide-react";
 import { getApiClient } from "@/client/http/index.jsx";
 import { useAuthentication } from "@/contexts/authentication/index.jsx";
 import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
-import ItemList from "@/components/layouts/side-panel/item-list/index.jsx";
+import ItemList from "@/components/layouts/side-panel/contents/item-list/index.jsx";
 import { pages } from "@/router/index.jsx";
 
 export default function GameRoomPlayingPage() {
