@@ -144,10 +144,10 @@ export default function GameRoomPlayingPage() {
     setContents({
       slot: ItemList,
       props: {
-        value: enteredUsers.map(({ userId, nickname, ready, role, ...rest }) => ({
+        value: enteredUsers.map(({ userId, nickname, role, ...rest }) => ({
           label: nickname,
-          highlight: ready,
-          theme: userId === currentDrawerId ? "indigo" : "default",
+          highlight: userId === currentDrawerId,
+          theme: "indigo",
           ...rest,
         })),
       },

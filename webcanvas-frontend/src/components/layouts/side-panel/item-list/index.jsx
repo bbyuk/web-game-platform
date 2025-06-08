@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { useEffect, useState } from 'react';
 
 const Container = ({ children }) => {
   return <ul className="space-y-2">{children}</ul>;
@@ -15,28 +16,31 @@ const Item = ({
   isButton = false,
   onClick = () => {},
 }) => {
+  const [bg, setBg] = useState("bg-gray-800");
+  const [border, setBorder] = useState("border-gray-600");
+  const [text, setText] = useState("text-gray-300");
 
-  let defaultBg = "bg-gray-800";
-  let defaultBorder = "border-gray-600";
-  let defaultText = "text-gray-300";
+  useEffect(() => {
+    console.log("theme : " + theme);
+    console.log("클래스 변경");
+    if (theme === "indigo") {
+      setBg("bg-indigo-900");
+      setBorder("border-indigo-500");
+      setText("text-white");
+    }
+    else if (theme === "green") {
+      setBg("bg-green-900/40");
+      setBorder("border-green-500");
+      setText("text-white");
+    }
+  }, [theme]);
 
-  if (theme === "indigo") {
-    defaultBg = "bg-indigo-900";
-    defaultBorder = "border-indigo-500";
-    defaultText = "text-white";
-  } else if (theme === "green") {
-    defaultBg = "bg-green-900/40";
-    defaultBorder = "border-green-500";
-    defaultText = "text-white";
-  }
-
-  console.log("Item.theme = " + theme);
 
   return (
     <li
       className={`flex items-start space-x-2 p-2 rounded
                   ${isButton ? "hover:bg-gray-700 cursor-pointer" : ""}
-                   ${highlight ? `${defaultBg} ${defaultBorder}` : ""}`}
+                   ${highlight ? `${bg} ${border}` : ""}`}
       onClick={isButton ? onClick : null}
     >
       {icon ? icon : <ChevronRight size={16} className="text-gray-400 shrink-0 mt-1" />}
@@ -62,6 +66,7 @@ const Item = ({
 
 const ItemList = ({ value, emptyPlaceholder }) => {
   const hasData = value && value.length > 0;
+  console.log(value);
   return (
     <Container>
       {hasData ? (
