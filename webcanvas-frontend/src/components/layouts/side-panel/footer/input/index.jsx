@@ -18,7 +18,7 @@ export default function SidePanelFooterInput({ onSubmit }) {
         className="flex-1 min-w-0 px-2 py-1.5 rounded-md bg-gray-800 text-gray-200 placeholder-gray-500 outline-none text-sm"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        onKeyDown={(e) => {
+        onKeyUp={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             handleSubmit();
