@@ -3,8 +3,8 @@ import { MessageCircle } from "lucide-react";
 
 const init = {
   title: {
-    label: "chat",
-    icon: <MessageCircle size={20} className="text-gray-400" />,
+    label: null,
+    icon: null,
     button: false,
     onClick: () => {},
   },

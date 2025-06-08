@@ -1,3 +1,5 @@
+import { useAuthentication } from '@/contexts/authentication/index.jsx';
+
 /**
  * 말풍선 컴포넌트
  * @param sender
@@ -6,7 +8,8 @@
  * @constructor
  */
 export default function ChatBubble({ sender, message }) {
-  const isMe = sender === "me";
+  const { authenticatedUserId } = useAuthentication();
+  const isMe = authenticatedUserId === sender;
 
   return (
     <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>

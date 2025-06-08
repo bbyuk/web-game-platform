@@ -4,7 +4,7 @@ import { game } from "@/api/index.js";
 import { getApiClient } from "@/client/http/index.jsx";
 import { pages } from "@/router/index.jsx";
 import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MessageCircle } from 'lucide-react';
 import { getWebSocketClient } from "@/client/stomp/index.jsx";
 import { useAuthentication } from "@/contexts/authentication/index.jsx";
 import { useApiLock } from "@/api/lock/index.jsx";
@@ -36,6 +36,7 @@ export default function GameRoomPage() {
     role: null,
     ready: false,
   });
+  const [chats, setChats] = useState([]);
 
   const changeReadyState = (ready) => {
     setMyInfo({ ...myInfo, ready });
@@ -241,13 +242,17 @@ export default function GameRoomPage() {
    * 웹소켓 연결 해제
    */
   useEffect(() => {
+    rightSideStore.setTitle({
+      label: "chat",
+      icon: <MessageCircle size={20} className="text-gray-400" />,
+      button: false,
+      onClick: () => {},
+    });
+
     rightSideStore.setContents({
       slot: ChatList,
       props: {
-        chats: [
-          { sender: "me", message: "테스트" },
-          { sender: "other", message: "테스트123" },
-        ],
+        chats: chats
       },
     });
     rightSideStore.setFooter({
@@ -255,6 +260,7 @@ export default function GameRoomPage() {
       props: {
         onSubmit: (message) => {
           console.log(message);
+          setChats((prevItems) => [...prevItems, { sender: authenticatedUserId, message: message }]);
         },
       },
     });
@@ -265,6 +271,15 @@ export default function GameRoomPage() {
       rightSideStore.clear();
     };
   }, []);
+
+  useEffect(() => {
+    rightSideStore.setContents({
+      slot: ChatList,
+      props: {
+        chats: chats
+      },
+    });
+  }, [chats]);
 
   /**
    * roomId 서버 조회 및 validation
