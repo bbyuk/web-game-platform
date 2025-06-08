@@ -266,7 +266,9 @@ export default function GameRoomPage() {
     });
 
     return () => {
-      webSocketClientRef.current.deactivate();
+      if (webSocketClientRef.current) {
+        webSocketClientRef.current.deactivate();
+      }
       leftSideStore.clear();
       rightSideStore.clear();
     };
