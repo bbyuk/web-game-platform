@@ -68,7 +68,6 @@ export default function GameRoomPlayingPage() {
       }
       switch (frame.event) {
         case "SESSION/TURN_PROGRESSED":
-          // TODO 턴 진행 이벤트 클라이언트 핸들링
           apiClient.get(game.getCurrentGameTurn(gameSessionId)).then((response) => {
             setCurrentDrawerId(response.drawerId);
           });
@@ -116,22 +115,24 @@ export default function GameRoomPlayingPage() {
     /**
      * 게임 세션 정보를 조회한다.
      */
-    console.log(roomId);
     apiLock(
       game.getCurrentGameSession(roomId),
       async () => await apiClient.get(game.getCurrentGameSession(roomId))
     ).then((response) => {
+      if (response.state === "PLAYING") {
+        /**
+         * 새로고침 시 PLAING 중일 경우 현재 턴 정보 조회
+         */
+        apiClient.get(game.getCurrentGameTurn(response.gameSessionId)).then((response) => {
+          setCurrentDrawerId(response.drawerId);
+        });
+      }
       console.log(response);
       setGameSessionId(response.gameSessionId);
     });
-
   }, []);
 
   useEffect(() => {
-    console.log("여긴 타나??");
-
-    console.log("gameSessionId = ", gameSessionId);
-    console.log("webSocketClientRef", webSocketClientRef);
     if (!gameSessionId || !webSocketClientRef.current) return;
 
     /**

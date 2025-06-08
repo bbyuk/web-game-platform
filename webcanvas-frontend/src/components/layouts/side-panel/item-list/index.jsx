@@ -1,5 +1,5 @@
 import { ChevronRight } from "lucide-react";
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 const Container = ({ children }) => {
   return <ul className="space-y-2">{children}</ul>;
@@ -27,14 +27,12 @@ const Item = ({
       setBg("bg-indigo-900");
       setBorder("border-indigo-500");
       setText("text-white");
-    }
-    else if (theme === "green") {
+    } else if (theme === "green") {
       setBg("bg-green-900/40");
       setBorder("border-green-500");
       setText("text-white");
     }
   }, [theme]);
-
 
   return (
     <li
