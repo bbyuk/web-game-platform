@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
+import static com.bb.webcanvasservice.domain.game.enums.GameSessionState.LOADING;
 import static com.bb.webcanvasservice.domain.game.enums.GameSessionState.PLAYING;
 
 /**
@@ -201,7 +202,7 @@ public class GameService {
     public GameSessionResponse findCurrentGameSession(Long gameRoomId) {
         GameSession gameSession = gameSessionRepository.findGameSessionsByGameRoomId(gameRoomId)
                 .stream()
-                .filter(gs -> gs.getState() == PLAYING)
+                .filter(gs -> gs.getState() == PLAYING || gs.getState() == LOADING)
                 .findFirst()
                 .orElseThrow(GameSessionNotFoundException::new);
         return new GameSessionResponse(gameSession.getId(), gameSession.getState());
@@ -397,9 +398,14 @@ public class GameService {
      * @param userId
      */
     @Transactional
-    public GameLoadSuccessResponse successSubscription(Long gameSessionId, Long userId) {
+    public void successSubscription(Long gameSessionId, Long userId) {
         log.debug("success subscription = {}", gameSessionId);
         GameSession gameSession = findGameSession(gameSessionId);
+        if (gameSession.isPlaying()) {
+            log.debug("이미 게임이 진행중입니다.");
+            return;
+        }
+
         GameRoom gameRoom = gameSession.getGameRoom();
 
         log.debug("gameRoom.entrances = {}", gameRoom.getEntrances().toString());
@@ -408,6 +414,7 @@ public class GameService {
         gameSessionLoadRegistry.register(gameSessionId, userId);
 
         if (gameSessionLoadRegistry.isAllLoaded(gameSessionId, enteredUserCount)) {
+            gameSession.start();
             gameRoom.getEntrances()
                     .stream()
                     .filter(entrance -> entrance.getState().equals(GameRoomEntranceState.WAITING))
@@ -416,8 +423,6 @@ public class GameService {
             applicationEventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSessionId, gameRoom.getId()));
             gameSessionLoadRegistry.clear(gameSessionId);
         }
-
-        return new GameLoadSuccessResponse(true);
     }
 
 }

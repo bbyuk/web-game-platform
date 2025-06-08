@@ -63,7 +63,7 @@ public class GameSession extends BaseEntity {
 
     public GameSession(GameRoom gameRoom, int turnCount, int timePerTurn) {
         this.gameRoom = gameRoom;
-        this.state = GameSessionState.PLAYING;
+        this.state = GameSessionState.LOADING;
         this.turnCount = turnCount;
         this.timePerTurn = timePerTurn;
     }
@@ -74,6 +74,17 @@ public class GameSession extends BaseEntity {
     public void end() {
         state = GameSessionState.COMPLETED;
         gameRoom.resetGameRoomState();
+    }
+
+    /**
+     * 게임 세션을 시작한다.
+     */
+    public void start() {
+        state = GameSessionState.PLAYING;
+    }
+
+    public boolean isPlaying() {
+        return state == GameSessionState.PLAYING;
     }
 
     /**
@@ -103,4 +114,5 @@ public class GameSession extends BaseEntity {
                 .sorted(Comparator.comparingLong(GameTurn::getId))
                 .findFirst();
     }
+
 }

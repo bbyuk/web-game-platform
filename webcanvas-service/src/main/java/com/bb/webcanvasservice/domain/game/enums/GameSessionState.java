@@ -5,5 +5,6 @@ package com.bb.webcanvasservice.domain.game.enums;
  */
 public enum GameSessionState {
     PLAYING,
+    LOADING,
     COMPLETED
 }
