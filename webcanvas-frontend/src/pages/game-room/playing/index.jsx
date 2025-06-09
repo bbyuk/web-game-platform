@@ -1,16 +1,17 @@
-import Canvas from "@/components/canvas/index.jsx";
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { game } from "@/api/index.js";
-import { useApiLock } from "@/api/lock/index.jsx";
-import { Gamepad2 } from "lucide-react";
-import { getApiClient } from "@/client/http/index.jsx";
-import { useAuthentication } from "@/contexts/authentication/index.jsx";
-import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
-import ItemList from "@/components/layouts/side-panel/contents/item-list/index.jsx";
-import { pages } from "@/router/index.jsx";
-import GameTurnTimer from "@/components/game-turn-timer/index.jsx";
-import AnswerBoard from "@/components/answer-board/index.jsx";
+import Canvas from '@/components/canvas/index.jsx';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { game } from '@/api/index.js';
+import { useApiLock } from '@/api/lock/index.jsx';
+import { Gamepad2 } from 'lucide-react';
+import { getApiClient } from '@/client/http/index.jsx';
+import { useAuthentication } from '@/contexts/authentication/index.jsx';
+import { useLeftSideStore } from '@/stores/layout/leftSideStore.jsx';
+import ItemList from '@/components/layouts/side-panel/contents/item-list/index.jsx';
+import { pages } from '@/router/index.jsx';
+import GameTurnTimer from '@/components/game-turn-timer/index.jsx';
+import AnswerBoard from '@/components/answer-board/index.jsx';
+import { useTimer } from '@/pages/game-room/playing/timer.jsx';
 
 export default function GameRoomPlayingPage() {
   // ===============================================================
@@ -35,7 +36,6 @@ export default function GameRoomPlayingPage() {
 
   const [gameSessionId, setGameSessionId] = useState(null);
   const [currentDrawerId, setCurrentDrawerId] = useState(null);
-
   const [displayedAnswer, setDisplayedAnswer] = useState(null);
 
   // 게임 턴 별 시간 (s)
@@ -44,6 +44,18 @@ export default function GameRoomPlayingPage() {
   const [currentTurnIndex, setCurrentTurnIndex] = useState(0);
   // 전체 턴 수
   const [turnCount, setTurnCount] = useState(0);
+  const [isTurnActive, setIsTurnActive] = useState(false);
+
+  const {
+    remainingTime,
+    remainingPercent,
+    stop,
+    reset
+  } = useTimer({
+    durationSec: timePerTurn,
+    isRunning: isTurnActive,
+    onExpire: () => onTurnTimerExpiredHandler()
+  });
 
   // ===============================================================
   // 유저 정의 함수
@@ -82,9 +94,9 @@ export default function GameRoomPlayingPage() {
           apiClient.get(game.getCurrentGameTurn(gameSessionId)).then((response) => {
             setCurrentDrawerId(response.drawerId);
             setDisplayedAnswer(response.answer);
+
           });
 
-          console.log(frame);
           break;
         case "SESSION/END":
           // TODO 게임 종료 이벤트 클라이언트 핸들링
@@ -112,6 +124,13 @@ export default function GameRoomPlayingPage() {
   const onReRenderingHandler = () => {
     setReRenderingSignal(false);
   };
+
+  /**
+   * 턴 타이머 종료시 이벤트 핸들러
+   */
+  const onTurnTimerExpiredHandler = () => {
+    console.log("턴 타이머 종료");
+  }
 
   // ===============================================================
   // useEffect 훅
@@ -142,7 +161,8 @@ export default function GameRoomPlayingPage() {
       console.log(response);
       setGameSessionId(response.gameSessionId);
       setTimePerTurn(response.timePerTurn);
-      set;
+      setCurrentTurnIndex(response.currentTurnIndex);
+      setTurnCount(response.turnCount);
     });
   }, []);
 
@@ -173,7 +193,7 @@ export default function GameRoomPlayingPage() {
 
   return (
     <>
-      <GameTurnTimer remainingPercent={65} />
+      <GameTurnTimer remainingPercent={remainingPercent} />
       {isDrawer && <AnswerBoard answer={displayedAnswer} />}
       <Canvas
         className="flex-1"
