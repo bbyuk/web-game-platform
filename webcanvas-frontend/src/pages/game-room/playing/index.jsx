@@ -9,12 +9,13 @@ import { useAuthentication } from "@/contexts/authentication/index.jsx";
 import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
 import ItemList from "@/components/layouts/side-panel/contents/item-list/index.jsx";
 import { pages } from "@/router/index.jsx";
+import GameTurnTimer from "@/components/game-turn-timer/index.jsx";
+import AnswerBoard from "@/components/answer-board/index.jsx";
 
 export default function GameRoomPlayingPage() {
-
-// ===============================================================
-// 상태 정의
-// ===============================================================
+  // ===============================================================
+  // 상태 정의
+  // ===============================================================
 
   // 현재 캔버스의 획 모음
   const [strokes, setStrokes] = useState([]);
@@ -32,13 +33,21 @@ export default function GameRoomPlayingPage() {
   const { enteredUsers } = useOutletContext();
   const { setTitle, setContents } = useLeftSideStore();
 
-  const [currentDrawerId, setCurrentDrawerId] = useState(null);
   const [gameSessionId, setGameSessionId] = useState(null);
-  const [timePerTurn, setTimePerTurn] = useState(0);
+  const [currentDrawerId, setCurrentDrawerId] = useState(null);
 
-// ===============================================================
-// 유저 정의 함수
-// ===============================================================
+  const [displayedAnswer, setDisplayedAnswer] = useState(null);
+
+  // 게임 턴 별 시간 (s)
+  const [timePerTurn, setTimePerTurn] = useState(0);
+  // 현재 턴의 인덱스
+  const [currentTurnIndex, setCurrentTurnIndex] = useState(0);
+  // 전체 턴 수
+  const [turnCount, setTurnCount] = useState(0);
+
+  // ===============================================================
+  // 유저 정의 함수
+  // ===============================================================
 
   /**
    * 캔버스 컴포넌트 stroke 이벤트 핸들러
@@ -72,6 +81,7 @@ export default function GameRoomPlayingPage() {
         case "SESSION/TURN_PROGRESSED":
           apiClient.get(game.getCurrentGameTurn(gameSessionId)).then((response) => {
             setCurrentDrawerId(response.drawerId);
+            setDisplayedAnswer(response.answer);
           });
 
           console.log(frame);
@@ -103,10 +113,9 @@ export default function GameRoomPlayingPage() {
     setReRenderingSignal(false);
   };
 
-
-// ===============================================================
-// useEffect 훅
-// ===============================================================
+  // ===============================================================
+  // useEffect 훅
+  // ===============================================================
 
   useEffect(() => {
     setTitle({
@@ -132,6 +141,8 @@ export default function GameRoomPlayingPage() {
       }
       console.log(response);
       setGameSessionId(response.gameSessionId);
+      setTimePerTurn(response.timePerTurn);
+      set;
     });
   }, []);
 
@@ -158,16 +169,22 @@ export default function GameRoomPlayingPage() {
     });
   }, [authenticatedUserId, currentDrawerId]);
 
+  const isDrawer = authenticatedUserId === currentDrawerId;
+
   return (
-    <Canvas
-      className="flex-1"
-      strokes={strokes}
-      onStroke={onStrokeHandler}
-      reRenderingSignal={reRenderingSignal}
-      afterReRendering={onReRenderingHandler}
-      // color={
-      //   topTabs.items[topTabs.selectedIndex] ? topTabs.items[topTabs.selectedIndex].label : "black"
-      // }
-    />
+    <>
+      <GameTurnTimer remainingPercent={65} />
+      {isDrawer && <AnswerBoard answer={displayedAnswer} />}
+      <Canvas
+        className="flex-1"
+        strokes={strokes}
+        onStroke={onStrokeHandler}
+        reRenderingSignal={reRenderingSignal}
+        afterReRendering={onReRenderingHandler}
+        // color={
+        //   topTabs.items[topTabs.selectedIndex] ? topTabs.items[topTabs.selectedIndex].label : "black"
+        // }
+      />
+    </>
   );
 }
