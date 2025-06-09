@@ -16,7 +16,7 @@ public class GameTurnCustomRepositoryImpl implements GameTurnCustomRepository {
     private final EntityManager em;
 
     @Override
-    public Optional<GameTurn> findLastTurn(Long gameSessionId) {
+    public Optional<GameTurn> findLatestTurn(Long gameSessionId) {
         try {
             String jpql = """
                     select      gt

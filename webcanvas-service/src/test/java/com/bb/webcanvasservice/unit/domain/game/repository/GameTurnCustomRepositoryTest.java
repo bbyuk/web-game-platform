@@ -23,8 +23,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
@@ -65,8 +63,8 @@ class GameTurnCustomRepositoryTest {
         GameTurn gameTurn = gameTurnRepository.save(new GameTurn(gameSession, user1, "정답"));
 
         // when
-        Assertions.assertThat(gameTurnRepository.findLastTurn(gameSession.getId())).isPresent();
-        Assertions.assertThat(gameTurnRepository.findLastTurn(gameSession.getId()).get()).isEqualTo(gameTurn);
+        Assertions.assertThat(gameTurnRepository.findLatestTurn(gameSession.getId())).isPresent();
+        Assertions.assertThat(gameTurnRepository.findLatestTurn(gameSession.getId()).get()).isEqualTo(gameTurn);
 
         // then
     }

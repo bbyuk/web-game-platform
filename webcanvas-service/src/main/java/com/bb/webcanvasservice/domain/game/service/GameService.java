@@ -5,7 +5,6 @@ import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
-import com.bb.webcanvasservice.domain.game.dto.response.GameLoadSuccessResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameSessionResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameTurnFindResponse;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.random.RandomGenerator;
@@ -142,19 +140,6 @@ public class GameService {
     }
 
     /**
-     * 게임 세션에 포함된 턴 목록을 조회한다.
-     *
-     * @param gameSessionId
-     * @return
-     */
-    @Transactional(readOnly = true)
-    public List<GameTurn> findTurnsInGameSession(Long gameSessionId) {
-        return gameSessionRepository.findById(gameSessionId)
-                .orElseThrow(GameSessionNotFoundException::new)
-                .getGameTurns();
-    }
-
-    /**
      * 게임 세션을 조회한다.
      *
      * @param gameSessionId
@@ -216,12 +201,16 @@ public class GameService {
      */
     @Transactional(readOnly = true)
     public GameTurnFindResponse findCurrentGameTurn(Long gameSessionId, Long userId) {
-        GameSession gameSession = findGameSession(gameSessionId);
-        GameTurn gameTurn = gameSession.getGameTurns()
-                .stream()
-                .filter(GameTurn::isActive)
-                .min(Comparator.comparing(GameTurn::getId)).orElseThrow(GameTurnNotFoundException::new);
-        return new GameTurnFindResponse(gameTurn.getDrawer().getId(),
+        GameTurn gameTurn = gameTurnRepository.findLatestTurn(gameSessionId)
+                .orElseThrow(GameTurnNotFoundException::new);
+
+        if (!gameTurn.isActive()) {
+            log.debug("활성화된 게임 턴이 아닙니다.");
+            throw new GameTurnNotFoundException();
+        }
+
+        return new GameTurnFindResponse(
+                gameTurn.getDrawer().getId(),
                 gameTurn.getDrawer().getId().equals(userId) ? gameTurn.getAnswer() : null,
                 gameTurn.getExpiration());
     }
@@ -250,7 +239,7 @@ public class GameService {
             throw new GameSessionIsOverException();
         }
 
-        List<GameTurn> gameTurns = gameSession.getGameTurns();
+        List<GameTurn> gameTurns = gameTurnRepository.findTurnsByGameSessionId(gameSession.getId());
         if (gameSession.getTurnCount() <= gameTurns.size()) {
             log.debug("현재 세션에 준비된 턴이 모두 끝났습니다.");
             log.debug("현재 사용된 턴 = {}", gameTurns.size());
@@ -321,13 +310,11 @@ public class GameService {
         /**
          * 지난 턴이 아직 ACTIVE로 존재할 경우 pass한다.
          */
-        gameSession.getLastTurn()
-                .ifPresent(lastTurn -> {
-                    log.error("{}", lastTurn);
-                    lastTurn.pass();
-                });
+        gameTurnRepository.findLatestTurn(
+                gameSession.getId())
+                .ifPresent(GameTurn::pass);
 
-        if (gameSession.shouldEnd()) {
+        if (shouldEnd(gameSession)) {
             log.debug("모든 턴이 진행되었습니다.");
             log.debug("게임 세션 종료");
 
@@ -357,6 +344,16 @@ public class GameService {
                         gameTurn.getId()
                 )
         );
+    }
+
+    /**
+     * 게임 턴이 모두 진행되어 게임을 종료상태로 변경해야하는지 체크한다.
+     * @return 게임을 종료해야되는지 여부
+     */
+    @Transactional(readOnly = true)
+    public boolean shouldEnd(GameSession gameSession) {
+        List<GameTurn> turnsInSession = gameTurnRepository.findTurnsByGameSessionId(gameSession.getId());
+        return turnsInSession.size() >= gameSession.getTurnCount();
     }
 
     /**

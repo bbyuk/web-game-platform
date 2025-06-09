@@ -11,8 +11,6 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 게임 세션에 종속된 게임 턴
@@ -62,15 +60,8 @@ public class GameTurn extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private GameTurnState state;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "scoredTurn")
-    /**
-     * 이번 턴에 획득한 점수 목록
-     */
-    private List<Score> scores = new ArrayList<>();
-
     public GameTurn(GameSession gameSession, User drawer, String answer) {
         this.gameSession = gameSession;
-        this.gameSession.getGameTurns().add(this);
         this.drawer = drawer;
         this.answer = answer;
         this.state = GameTurnState.ACTIVE;
