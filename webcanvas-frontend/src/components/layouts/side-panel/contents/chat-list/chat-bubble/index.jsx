@@ -1,4 +1,4 @@
-import { useAuthentication } from '@/contexts/authentication/index.jsx';
+import { useAuthentication } from "@/contexts/authentication/index.jsx";
 
 /**
  * 말풍선 컴포넌트
