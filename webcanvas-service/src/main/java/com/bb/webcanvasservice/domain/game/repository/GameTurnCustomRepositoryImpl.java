@@ -22,7 +22,7 @@ public class GameTurnCustomRepositoryImpl implements GameTurnCustomRepository {
                     select      gt
                     from        GameTurn gt
                     where       gt.gameSession.id =: gameSessionId
-                    order by    gt.id asc
+                    order by    gt.id desc
                     """;
 
             return em.createQuery(jpql, GameTurn.class)
