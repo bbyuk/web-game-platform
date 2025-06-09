@@ -29,4 +29,19 @@ public class GameRoomEntranceCustomRepositoryImpl implements GameRoomEntranceCus
                 .setParameter("userId", userId)
                 .getSingleResult();
     }
+
+    @Override
+    public int findEnteredUserCount(Long gameRoomId) {
+
+        String jpql = """
+                        select  count(gre)
+                        from    GameRoomEntrance gre
+                        where   gre.gameRoom.id = :gameRoomId
+                        and     gre.state in :enteredStates
+                    """;
+        return em.createQuery(jpql, Integer.class)
+                .setParameter("gameRoomId", gameRoomId)
+                .setParameter("enteredStates", GameRoomEntranceState.entered)
+                .getSingleResult().intValue();
+    }
 }

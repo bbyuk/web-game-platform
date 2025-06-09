@@ -87,8 +87,6 @@ public class GameRoomEntrance extends BaseEntity {
      */
     public void exit() {
         this.state = GameRoomEntranceState.EXITED;
-        this.gameRoom.getEntrances()
-                .removeIf(entrance -> entrance.id.equals(this.id));
     }
 
     /**

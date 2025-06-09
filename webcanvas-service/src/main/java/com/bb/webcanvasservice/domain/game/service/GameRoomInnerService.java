@@ -182,4 +182,13 @@ public class GameRoomInnerService {
         return ready;
     }
 
+    /**
+     * 게임 방에 입장해있는 유저 수를 조회한다.
+     * @param gameRoomId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public int findEnteredUserCount(Long gameRoomId) {
+        return gameRoomEntranceRepository.findEnteredUserCount(gameRoomId);
+    }
 }

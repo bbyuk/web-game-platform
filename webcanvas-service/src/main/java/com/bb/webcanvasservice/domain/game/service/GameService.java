@@ -172,8 +172,7 @@ public class GameService {
     @Transactional(readOnly = true)
     public boolean inGameSession(Long gameSessionId, Long userId) {
         GameSession gameSession = findGameSession(gameSessionId);
-        return gameSession.getGameRoom().getEntrances().stream()
-                .anyMatch(gameRoomEntrance -> gameRoomEntrance.getUser().getId().equals(userId) && GameRoomEntranceState.entered.contains(gameRoomEntrance.getState()));
+        return gameRoomFacade.isEnteredRoom(gameSession.getGameRoom().getId(), userId);
     }
 
 
@@ -311,7 +310,7 @@ public class GameService {
          * 지난 턴이 아직 ACTIVE로 존재할 경우 pass한다.
          */
         gameTurnRepository.findLatestTurn(
-                gameSession.getId())
+                        gameSession.getId())
                 .ifPresent(GameTurn::pass);
 
         if (shouldEnd(gameSession)) {
@@ -348,6 +347,7 @@ public class GameService {
 
     /**
      * 게임 턴이 모두 진행되어 게임을 종료상태로 변경해야하는지 체크한다.
+     *
      * @return 게임을 종료해야되는지 여부
      */
     @Transactional(readOnly = true)
@@ -405,16 +405,15 @@ public class GameService {
 
         GameRoom gameRoom = gameSession.getGameRoom();
 
-        log.debug("gameRoom.entrances = {}", gameRoom.getEntrances().toString());
-
-        int enteredUserCount = gameRoom.getEnteredUserCount();
+        int enteredUserCount = gameRoomFacade.findEnteredUserCount(gameRoom.getId());
         gameSessionLoadRegistry.register(gameSessionId, userId);
 
         if (gameSessionLoadRegistry.isAllLoaded(gameSessionId, enteredUserCount)) {
             gameSession.start();
-            gameRoom.getEntrances()
+
+            gameRoomFacade
+                    .findGameRoomEntrancesByGameRoomIdAndState(gameRoom.getId(), GameRoomEntranceState.WAITING)
                     .stream()
-                    .filter(entrance -> entrance.getState().equals(GameRoomEntranceState.WAITING))
                     .forEach(entrance -> entrance.changeState(GameRoomEntranceState.PLAYING));
 
             applicationEventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSessionId, gameRoom.getId()));

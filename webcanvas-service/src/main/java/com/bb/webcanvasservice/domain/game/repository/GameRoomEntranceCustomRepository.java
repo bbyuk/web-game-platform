@@ -16,4 +16,10 @@ public interface GameRoomEntranceCustomRepository {
      */
     boolean existsActiveEntrance(Long gameRoomId, Long userId);
 
+    /**
+     * 게임 방에 현재 입장해있는 입장 유저 수를 조회한다.
+     * @return 입장해 있는 유저 수
+     */
+    int findEnteredUserCount(Long gameRoomId);
+
 }

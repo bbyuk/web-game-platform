@@ -1,16 +1,11 @@
 package com.bb.webcanvasservice.domain.game.entity;
 
 import com.bb.webcanvasservice.common.entity.BaseEntity;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * 게임 방을 나타내는 엔티티 클래스
@@ -43,12 +38,6 @@ public class GameRoom extends BaseEntity {
      */
     private String joinCode;
 
-    @OneToMany(mappedBy = "gameRoom", fetch = FetchType.EAGER)
-    /**
-     * 게임 방의 입장 목록
-     */
-    private List<GameRoomEntrance> entrances = new ArrayList<>();
-
     public GameRoom(GameRoomState state, String joinCode) {
         this.state = state;
         this.joinCode = joinCode;
@@ -56,10 +45,6 @@ public class GameRoom extends BaseEntity {
 
     public GameRoom(String joinCode) {
         this(GameRoomState.WAITING, joinCode);
-    }
-
-    public void addEntrance(GameRoomEntrance... entrance) {
-        entrances.addAll(Arrays.stream(entrance).toList());
     }
 
     public void changeStateToPlay() {
@@ -80,14 +65,4 @@ public class GameRoom extends BaseEntity {
         this.state = GameRoomState.CLOSED;
     }
 
-    /**
-     * 게임 방에 현재 입장해있는 입장 정보 목록을 가져온다.
-     * @return
-     */
-    public int getEnteredUserCount() {
-        return (int) entrances
-                .stream()
-                .filter(entrance
-                        -> GameRoomEntranceState.entered.contains(entrance.getState())).count();
-    }
 }

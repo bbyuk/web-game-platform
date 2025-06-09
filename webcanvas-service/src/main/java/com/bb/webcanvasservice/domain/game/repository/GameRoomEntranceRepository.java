@@ -103,6 +103,19 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             """)
     List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomEntranceState") GameRoomEntranceState gameRoomEntranceState);
 
+    @Query(
+            """
+            select      count(gre)
+            from        GameRoomEntrance gre
+            join fetch  User u on gre.user = u
+            join fetch  GameRoom gr on gre.gameRoom = gr
+            where       gre.gameRoom.id = :gameRoomId
+            and         gre.state = :gameRoomEntranceState
+            order by    gre.id asc
+            """
+    )
+    int findGameRoomEntranceCountByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomEntranceState") GameRoomEntranceState gameRoomEntranceState);
+
     /**
      * 게임 방 ID와 상태들로 GameRoomEntrance 목록을 조회한다.
      * @param gameRoomId

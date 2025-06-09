@@ -10,7 +10,6 @@ import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse
 import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
 import com.bb.webcanvasservice.domain.game.entity.GameRoom;
 import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.event.GameRoomEntranceEvent;
@@ -32,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState.WAITING;
 import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
 
 @Slf4j
@@ -147,7 +147,7 @@ public class LobbyService {
             throw new IllegalGameRoomStateException();
         }
 
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, GameRoomEntranceState.WAITING);
+        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, WAITING);
         int enteredUserCounts = gameRoomEntrances.size();
 
         if (enteredUserCounts >= gameProperties.gameRoomCapacity()) {
@@ -164,7 +164,6 @@ public class LobbyService {
                 );
 
         GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
-        targetGameRoom.addEntrance(newGameRoomEntrance);
 
         userService.changeUserState(userId, UserStateCode.IN_ROOM);
 
@@ -196,16 +195,15 @@ public class LobbyService {
         }
 
 
+
         return new GameRoomListResponse(
-                gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), GameRoomState.enterable(), GameRoomEntranceState.WAITING)
+                gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), GameRoomState.enterable(), WAITING)
                         .stream()
                         .map(gameRoom ->
                                 new GameRoomListResponse.GameRoomSummary(
                                         gameRoom.getId(),
                                         gameProperties.gameRoomCapacity(),
-                                        (int) gameRoom.getEntrances().stream()
-                                                .filter(entrance -> entrance.getState().equals(GameRoomEntranceState.WAITING))
-                                                .count(),
+                                        gameRoomEntranceRepository.findGameRoomEntranceCountByGameRoomIdAndState(gameRoom.getId(), WAITING),
                                         gameRoom.getJoinCode()
                                 )
                         )
