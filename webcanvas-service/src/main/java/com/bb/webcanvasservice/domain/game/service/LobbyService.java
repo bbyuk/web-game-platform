@@ -203,7 +203,7 @@ public class LobbyService {
                                 new GameRoomListResponse.GameRoomSummary(
                                         gameRoom.getId(),
                                         gameProperties.gameRoomCapacity(),
-                                        gameRoomEntranceRepository.findGameRoomEntranceCountByGameRoomIdAndState(gameRoom.getId(), WAITING),
+                                        (int) gameRoomEntranceRepository.findGameRoomEntranceCountByGameRoomIdAndState(gameRoom.getId(), WAITING),
                                         gameRoom.getJoinCode()
                                 )
                         )

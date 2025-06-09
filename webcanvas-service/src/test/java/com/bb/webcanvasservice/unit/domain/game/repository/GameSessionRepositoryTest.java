@@ -41,28 +41,6 @@ class GameSessionRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Test
-    @DisplayName("현재 라운드 조회 - 현재 라운드를 조회한다.")
-    void testFindCurrentRound() throws Exception {
-        // given
-        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
-        User user3 = userRepository.save(new User(FingerprintGenerator.generate()));
-        User user4 = userRepository.save(new User(FingerprintGenerator.generate()));
 
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
-
-        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "유저1", HOST));
-        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "유저2", GUEST));
-        GameRoomEntrance gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user3, "유저3", GUEST));
-        GameRoomEntrance gameRoomEntrance4 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user4, "유저4", GUEST));
-
-        GameSession gameSession = gameSessionRepository.save(new GameSession(gameRoom, 6, 90));
-        // when
-        int currentRound = gameSessionRepository.findCurrentRound(gameSession.getId());
-
-        // then
-        Assertions.assertThat(currentRound).isEqualTo(1);
-    }
 
 }

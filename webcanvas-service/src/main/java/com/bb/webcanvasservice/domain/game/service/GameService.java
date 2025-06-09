@@ -152,17 +152,6 @@ public class GameService {
     }
 
     /**
-     * 현재 라운드를 조회한다.
-     *
-     * @param gameSessionId
-     * @return 현재 게임 세션의 라운드
-     */
-    @Transactional(readOnly = true)
-    public int findCurrentRound(Long gameSessionId) {
-        return gameSessionRepository.findCurrentRound(gameSessionId);
-    }
-
-    /**
      * 게임 세션에 유저가 참여해 있는지 여부를 체크한다.
      *
      * @param gameSessionId

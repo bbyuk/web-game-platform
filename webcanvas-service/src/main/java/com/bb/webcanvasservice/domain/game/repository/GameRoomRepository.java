@@ -72,7 +72,6 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
                     ) < :gameRoomCapacity
             """
     )
-    @EntityGraph(attributePaths = "entrances")
     List<GameRoom> findGameRoomsByCapacityAndStateWithEntranceState(@Param("gameRoomCapacity") int gameRoomCapacity,
                                                                     @Param("enterableStates") List<GameRoomState> enterableStates,
                                                                     @Param("activeEntranceState")GameRoomEntranceState activeEntranceState);

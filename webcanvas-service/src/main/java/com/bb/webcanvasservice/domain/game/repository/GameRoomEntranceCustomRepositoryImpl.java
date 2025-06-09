@@ -39,7 +39,7 @@ public class GameRoomEntranceCustomRepositoryImpl implements GameRoomEntranceCus
                         where   gre.gameRoom.id = :gameRoomId
                         and     gre.state in :enteredStates
                     """;
-        return em.createQuery(jpql, Integer.class)
+        return em.createQuery(jpql, Long.class)
                 .setParameter("gameRoomId", gameRoomId)
                 .setParameter("enteredStates", GameRoomEntranceState.entered)
                 .getSingleResult().intValue();
