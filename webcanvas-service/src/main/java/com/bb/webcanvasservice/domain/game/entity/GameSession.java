@@ -72,8 +72,20 @@ public class GameSession extends BaseEntity {
         state = GameSessionState.PLAYING;
     }
 
+    /**
+     * 게임 세션이 현재 플레이 중인지 확인한다.
+     * @return 게임 세션 현재 플레이 여부
+     */
     public boolean isPlaying() {
         return state == GameSessionState.PLAYING;
+    }
+
+    /**
+     * 게임 세션이 활성상태인지 확인한다.
+     * @return 게임 세션 현재 활성 여부
+     */
+    public boolean isActive() {
+        return state == GameSessionState.PLAYING || state == GameSessionState.LOADING;
     }
 
     /**

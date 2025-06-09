@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
-import static com.bb.webcanvasservice.domain.game.enums.GameSessionState.LOADING;
 import static com.bb.webcanvasservice.domain.game.enums.GameSessionState.PLAYING;
 
 /**
@@ -175,10 +174,18 @@ public class GameService {
     public GameSessionResponse findCurrentGameSession(Long gameRoomId) {
         GameSession gameSession = gameSessionRepository.findGameSessionsByGameRoomId(gameRoomId)
                 .stream()
-                .filter(gs -> gs.getState() == PLAYING || gs.getState() == LOADING)
+                .filter(GameSession::isActive)
                 .findFirst()
                 .orElseThrow(GameSessionNotFoundException::new);
-        return new GameSessionResponse(gameSession.getId(), gameSession.getState());
+
+        gameTurnRepository.findTurnCountByGameSessionId(gameSession.getId());
+        return new GameSessionResponse(
+                gameSession.getId(),
+                gameSession.getState(),
+                gameSession.getTimePerTurn(),
+                (int) gameTurnRepository.findTurnCountByGameSessionId(gameSession.getId()),
+                gameSession.getTurnCount()
+        );
     }
 
     /**
@@ -402,7 +409,6 @@ public class GameService {
 
             gameRoomFacade
                     .findGameRoomEntrancesByGameRoomIdAndState(gameRoom.getId(), GameRoomEntranceState.WAITING)
-                    .stream()
                     .forEach(entrance -> entrance.changeState(GameRoomEntranceState.PLAYING));
 
             applicationEventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSessionId, gameRoom.getId()));

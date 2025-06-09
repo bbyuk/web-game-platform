@@ -10,6 +10,15 @@ public record GameSessionResponse(
         Long gameSessionId,
 
         @Schema(description = "게임 세션 상태")
-        GameSessionState state
+        GameSessionState state,
+
+        @Schema(description = "게임 세션 turn 별 타임")
+        int timePerTurn,
+
+        @Schema(description = "게임 세션의 현재 진행된 턴 수")
+        int currentTurnIndex,
+
+        @Schema(description = "게임 세션의 총 턴 수")
+        int turnCount
 ) {
 }
