@@ -46,6 +46,12 @@ export const getWebSocketClient = ({ onConnect, onError }) => {
         clientWrapper.subscribeTopicQueue.push(...topics);
       }
     },
+    send: (destination, data) => {
+      clientWrapper.client.publish({
+        destination: destination,
+        body: JSON.stringify(data)
+      })
+    }
   };
 
   clientWrapper.client.activate();

@@ -1,23 +1,23 @@
-import { Outlet, useNavigate, useParams } from "react-router-dom";
-import React, { useEffect, useRef, useState } from "react";
-import { game } from "@/api/index.js";
-import { getApiClient } from "@/client/http/index.jsx";
-import { pages } from "@/router/index.jsx";
-import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
-import { ArrowLeft, MessageCircle } from 'lucide-react';
-import { getWebSocketClient } from "@/client/stomp/index.jsx";
-import { useAuthentication } from "@/contexts/authentication/index.jsx";
-import { useApiLock } from "@/api/lock/index.jsx";
-import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
+import {Outlet, useNavigate, useParams} from "react-router-dom";
+import React, {useEffect, useRef, useState} from "react";
+import {game} from "@/api/index.js";
+import {getApiClient} from "@/client/http/index.jsx";
+import {pages} from "@/router/index.jsx";
+import {EMPTY_MESSAGES, REDIRECT_MESSAGES} from "@/constants/message.js";
+import {ArrowLeft, MessageCircle} from 'lucide-react';
+import {getWebSocketClient} from "@/client/stomp/index.jsx";
+import {useAuthentication} from "@/contexts/authentication/index.jsx";
+import {useApiLock} from "@/api/lock/index.jsx";
+import {useLeftSideStore} from "@/stores/layout/leftSideStore.jsx";
 import ItemList from "@/components/layouts/side-panel/contents/item-list/index.jsx";
-import { useRightSideStore } from "@/stores/layout/rightSideStore.jsx";
+import {useRightSideStore} from "@/stores/layout/rightSideStore.jsx";
 import ChatList from "@/components/layouts/side-panel/contents/chat-list/index.jsx";
 import SidePanelFooterInput from "@/components/layouts/side-panel/footer/input/index.jsx";
 
 export default function GameRoomPage() {
-  const { roomId } = useParams();
-  const { authenticatedUserId } = useAuthentication();
-  const { apiLock } = useApiLock();
+  const {roomId} = useParams();
+  const {authenticatedUserId} = useAuthentication();
+  const {apiLock} = useApiLock();
   const apiClient = getApiClient();
   const navigate = useNavigate();
   const webSocketClientRef = useRef(null);
@@ -39,7 +39,7 @@ export default function GameRoomPage() {
   const [chats, setChats] = useState([]);
 
   const changeReadyState = (ready) => {
-    setMyInfo({ ...myInfo, ready });
+    setMyInfo({...myInfo, ready});
   };
 
   /**
@@ -67,10 +67,10 @@ export default function GameRoomPage() {
         }
 
         if (response.gameRoomState === "WAITING") {
-          navigate(pages.gameRoom.waiting.url(response.gameRoomId), { replace: true });
+          navigate(pages.gameRoom.waiting.url(response.gameRoomId), {replace: true});
           return null;
         } else if (response.gameRoomState === "PLAYING") {
-          navigate(pages.gameRoom.playing.url(response.gameRoomId), { replace: true });
+          navigate(pages.gameRoom.playing.url(response.gameRoomId), {replace: true});
           return null;
         }
 
@@ -81,7 +81,7 @@ export default function GameRoomPage() {
         if (error.code === "R003") {
           // 로비로 이동
           alert(REDIRECT_MESSAGES.TO_LOBBY);
-          navigate(pages.lobby.url, { replace: true });
+          navigate(pages.lobby.url, {replace: true});
           return null;
         }
       });
@@ -96,7 +96,7 @@ export default function GameRoomPage() {
       leftSideStore.setContents({
         slot: ItemList,
         props: {
-          value: response.enteredUsers.map(({ nickname, ...rest }) => ({
+          value: response.enteredUsers.map(({nickname, ...rest}) => ({
             label: nickname,
             ...rest,
           })),
@@ -128,7 +128,7 @@ export default function GameRoomPage() {
     );
 
     if (response.success) {
-      navigate(pages.lobby.url, { replace: true });
+      navigate(pages.lobby.url, {replace: true});
     }
   };
 
@@ -142,8 +142,10 @@ export default function GameRoomPage() {
       webSocketClientRef.current.deactivate();
     }
     const options = {
-      onConnect: (frame) => {},
-      onError: (frame) => {},
+      onConnect: (frame) => {
+      },
+      onError: (frame) => {
+      },
     };
     webSocketClientRef.current = getWebSocketClient(options);
   };
@@ -205,6 +207,7 @@ export default function GameRoomPage() {
      */
     const gameRoomChatHandler = (frame) => {
       console.log(frame);
+      setChats((prevItems) => [...prevItems, frame]);
     };
 
     const topics = [
@@ -228,7 +231,7 @@ export default function GameRoomPage() {
   useEffect(() => {
     leftSideStore.setTitle({
       label: "exit",
-      icon: <ArrowLeft size={20} className="text-gray-400" />,
+      icon: <ArrowLeft size={20} className="text-gray-400"/>,
       button: true,
       onClick: () => {
         exitGameRoom(myInfo.gameRoomEntranceId);
@@ -244,9 +247,10 @@ export default function GameRoomPage() {
   useEffect(() => {
     rightSideStore.setTitle({
       label: "chat",
-      icon: <MessageCircle size={20} className="text-gray-400" />,
+      icon: <MessageCircle size={20} className="text-gray-400"/>,
       button: false,
-      onClick: () => {},
+      onClick: () => {
+      },
     });
 
     rightSideStore.setContents({
@@ -256,13 +260,7 @@ export default function GameRoomPage() {
       },
     });
     rightSideStore.setFooter({
-      slot: SidePanelFooterInput,
-      props: {
-        onSubmit: (message) => {
-          console.log(message);
-          setChats((prevItems) => [...prevItems, { sender: authenticatedUserId, message: message }]);
-        },
-      },
+      slot: SidePanelFooterInput
     });
 
     return () => {
@@ -304,7 +302,7 @@ export default function GameRoomPage() {
       leftSideStore.setContents({
         slot: ItemList,
         props: {
-          value: enteredUsers.map(({ nickname, ready, role, ...rest }) => ({
+          value: enteredUsers.map(({nickname, ready, role, ...rest}) => ({
             label: nickname,
             highlight: ready,
             theme: getLeftSideItemTheme(role, ready),
@@ -317,11 +315,24 @@ export default function GameRoomPage() {
 
   /**
    * 웹소켓 토픽 구독 및 메세지 핸들러 등록 useEffect
+   *
+   * 토픽 구독
+   * 채팅 입력 핸들러 셋팅
    */
   useEffect(() => {
     if (!webSocketClientRef.current || !authenticatedUserId) {
       return;
     }
+
+    rightSideStore.setFooter({
+      slot: SidePanelFooterInput,
+      props: {
+        onSubmit: (message) => {
+          webSocketClientRef.current.send(`/room/${roomId}/chat/send`, {senderId: authenticatedUserId, value: message});
+        },
+      },
+    });
+
     subscribeTopics();
   }, [authenticatedUserId, webSocketClientRef.current]);
 

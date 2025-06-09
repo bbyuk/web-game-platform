@@ -7,9 +7,9 @@ import { useAuthentication } from '@/contexts/authentication/index.jsx';
  * @returns {JSX.Element}
  * @constructor
  */
-export default function ChatBubble({ sender, message }) {
+export default function ChatBubble({ senderId, value }) {
   const { authenticatedUserId } = useAuthentication();
-  const isMe = authenticatedUserId === sender;
+  const isMe = authenticatedUserId === senderId;
 
   return (
     <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
@@ -17,7 +17,7 @@ export default function ChatBubble({ sender, message }) {
         className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm whitespace-pre-line
           ${isMe ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-100"}`}
       >
-        {message}
+        {value}
       </div>
     </div>
   );
