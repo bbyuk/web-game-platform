@@ -29,6 +29,6 @@ public class ChatService {
             log.debug("message sender id : {}", message.getSenderId());
             log.debug("requester id : {}", userId);
         }
-        simpMessagingTemplate.convertAndSend("/session/" + gameRoomId + "/chat", message);
+        simpMessagingTemplate.convertAndSend("/room/" + gameRoomId + "/chat", message);
     }
 }
