@@ -12,7 +12,7 @@ export default function GameRoomWaitingPage() {
   const { roomId } = useParams();
 
   // Outlet context
-  const { enteredUsers, myInfo, changeReadyState, webSocketClientRef } = useOutletContext();
+  const { enteredUsers, myInfo, changeReadyState, timePerTurn } = useOutletContext();
   const leftSideStore = useLeftSideStore();
   const { apiLock } = useApiLock();
   const apiClient = getApiClient();
@@ -38,7 +38,7 @@ export default function GameRoomWaitingPage() {
           .post(game.startGame, {
             gameRoomId: roomId,
             turnCount: enteredUsers.length,
-            timePerTurn: 15,
+            timePerTurn: 20,
           })
           .then((response) => {
             navigate(pages.gameRoom.playing.url(roomId), { replace: true });

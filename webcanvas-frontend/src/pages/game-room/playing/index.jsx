@@ -11,24 +11,22 @@ import ItemList from "@/components/layouts/side-panel/contents/item-list/index.j
 import { pages } from "@/router/index.jsx";
 
 export default function GameRoomPlayingPage() {
+
+// ===============================================================
+// 상태 정의
+// ===============================================================
+
   // 현재 캔버스의 획 모음
   const [strokes, setStrokes] = useState([]);
-
   //캔버스 온디맨드 리렌더링 시그널
   const [reRenderingSignal, setReRenderingSignal] = useState(false);
-
+  // 유저ID
   const { authenticatedUserId } = useAuthentication();
-
+  // apiLock
   const { apiLock } = useApiLock();
-
   const apiClient = getApiClient();
-
-  const location = useLocation();
-
   const navigate = useNavigate();
-
   const { roomId } = useParams();
-
   const { webSocketClientRef } = useOutletContext();
 
   const { enteredUsers } = useOutletContext();
@@ -36,10 +34,11 @@ export default function GameRoomPlayingPage() {
 
   const [currentDrawerId, setCurrentDrawerId] = useState(null);
   const [gameSessionId, setGameSessionId] = useState(null);
+  const [timePerTurn, setTimePerTurn] = useState(0);
 
-  /**
-   * =========================== 이벤트 핸들러 =============================
-   */
+// ===============================================================
+// 유저 정의 함수
+// ===============================================================
 
   /**
    * 캔버스 컴포넌트 stroke 이벤트 핸들러
@@ -55,6 +54,9 @@ export default function GameRoomPlayingPage() {
     }
   };
 
+  /**
+   * 웹소켓을 통해 구독할 토픽과 콜백을 정의하고 구독한다.
+   */
   const subscribeTopics = () => {
     console.log("게임 세션 이벤트브로커 구독");
     /**
@@ -101,9 +103,10 @@ export default function GameRoomPlayingPage() {
     setReRenderingSignal(false);
   };
 
-  /**
-   * =========================== 이벤트 핸들러 =============================
-   */
+
+// ===============================================================
+// useEffect 훅
+// ===============================================================
 
   useEffect(() => {
     setTitle({
