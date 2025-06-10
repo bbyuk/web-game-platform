@@ -120,6 +120,5 @@ public class GameRoomEntrance extends BaseEntity {
      */
     public void resetGameRoomEntranceInfo() {
         this.state = GameRoomEntranceState.WAITING;
-        user.endGameAndResetToRoom();
     }
 }

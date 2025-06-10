@@ -376,7 +376,10 @@ public class GameService {
 
         List<GameRoomEntrance> currentPlayingEntrances = gameRoomFacade.findGameRoomEntrancesByGameRoomIdAndState(gameRoom.getId(), GameRoomEntranceState.PLAYING);
         currentPlayingEntrances.stream()
-                .forEach(GameRoomEntrance::resetGameRoomEntranceInfo);
+                .forEach(gameRoomEntrance -> {
+                    gameRoomEntrance.resetGameRoomEntranceInfo();
+                    gameRoomEntrance.getUser().endGameAndResetToRoom();
+                });
 
         gameSession.end();
 

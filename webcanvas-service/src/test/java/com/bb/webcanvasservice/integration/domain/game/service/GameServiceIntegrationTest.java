@@ -127,8 +127,10 @@ class GameServiceIntegrationTest {
         // when
         GameStartRequest gameStartRequest = new GameStartRequest(gameRoomId, 3, 70);
         Long gameSessionId = gameService.startGame(gameStartRequest, user1.getId());
+        gameService.successSubscription(gameSessionId, user1.getId());
+        gameService.successSubscription(gameSessionId, user2.getId());
+        gameService.successSubscription(gameSessionId, user3.getId());
 
-        // when
         gameService.endGame(gameSessionId);
 
         // then
