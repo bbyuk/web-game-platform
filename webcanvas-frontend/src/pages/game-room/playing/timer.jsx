@@ -33,7 +33,6 @@ export function useTimer() {
       const percent = Math.max(0, 100 - progress * 100);
 
       setRemainingPercent(percent);
-      console.log(percent);
 
       if (percent <= 0 || now >= expirationTime) {
         clearInterval(timerRef.current);
