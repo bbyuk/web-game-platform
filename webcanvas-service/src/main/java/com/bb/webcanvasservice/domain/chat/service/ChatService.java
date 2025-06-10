@@ -1,10 +1,12 @@
 package com.bb.webcanvasservice.domain.chat.service;
 
-import com.bb.webcanvasservice.domain.chat.dto.ChatMessage;
+import com.bb.webcanvasservice.domain.chat.event.MessageSentEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 /**
  * 채팅 서비스
@@ -15,20 +17,33 @@ import org.springframework.stereotype.Service;
 public class ChatService {
 
 
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final ApplicationEventPublisher eventPublisher;
+
+    /**
+     * destination을 만들어 가져온다.
+     * @param gameRoomId
+     * @return
+     */
+    private String getDestination(Long gameRoomId) {
+        return "/room/" + gameRoomId + "/chat";
+    }
 
     /**
      * 동일한 gameRoomId 대상 메세지 브로커를 구독중인 클라이언트로 채팅 메세지를 전송한다.
-     * @param gameRoomId
-     * @param message
-     * @param userId
+     * @param gameRoomId 브로드캐스팅 대상 게임 방 ID
+     * @param senderId 전송자 ID
+     * @param message 메세지 내용
+     * @param timestamp 메세지 전송 시간 timestamp
      */
-    public void sendChatMessage(Long gameRoomId, ChatMessage message, Long userId) {
-        if (!message.getSenderId().equals(userId)) {
-            log.debug("메세지 전송자와 요청자 ID가 서로 다릅니다.");
-            log.debug("message sender id : {}", message.getSenderId());
-            log.debug("requester id : {}", userId);
-        }
-        simpMessagingTemplate.convertAndSend("/room/" + gameRoomId + "/chat", message);
+    public void sendChatMessage(Long gameRoomId, Long senderId, String message, LocalDateTime timestamp) {
+
+        /**
+         * TODO 채팅방에 메세지 임시저장
+         */
+
+        // 도메인 이벤트 발행
+        eventPublisher.publishEvent(new MessageSentEvent(getDestination(gameRoomId), senderId, message, timestamp));
     }
+
+
 }

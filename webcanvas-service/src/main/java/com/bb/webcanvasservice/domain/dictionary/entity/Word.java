@@ -29,7 +29,7 @@ public class Word extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Language language;
 
-    @Column(name = "value")
+    @Column(name = "message")
     /**
      * 단어 값
      */

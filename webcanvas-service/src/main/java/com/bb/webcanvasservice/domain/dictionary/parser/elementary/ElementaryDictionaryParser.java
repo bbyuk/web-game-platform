@@ -101,7 +101,7 @@ public class ElementaryDictionaryParser extends DictionaryParser {
                                                 .orElseThrow(() -> new DictionaryFileParseFailedException("값을 찾지 못했습니다."));
                                         String value = originalValue;
                                         /**
-                                         * 형용사일 경우 value converting 작업 수행
+                                         * 형용사일 경우 message converting 작업 수행
                                          */
                                         if ("형용사".equals(strPos)) {
                                             value = KoreanAdjectiveConverter.toModifierForm(originalValue);

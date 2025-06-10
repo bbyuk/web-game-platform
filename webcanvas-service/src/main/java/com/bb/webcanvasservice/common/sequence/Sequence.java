@@ -23,7 +23,7 @@ public class Sequence {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
-    @Column(name = "value")
+    @Column(name = "message")
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PACKAGE)
     private Long value = 0L;

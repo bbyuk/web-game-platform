@@ -88,7 +88,7 @@ public class KoreanSamDictionaryParser extends DictionaryParser {
                                 String value = koreanSamParseItem.wordinfo().word();
 
                                 /**
-                                 * 형용사일 경우 value converting 작업 수행
+                                 * 형용사일 경우 message converting 작업 수행
                                  */
                                 if ("형용사".equals(strPos)) {
                                     value = KoreanAdjectiveConverter.toModifierForm(value);
@@ -117,7 +117,7 @@ public class KoreanSamDictionaryParser extends DictionaryParser {
                                 /**
                                  * item.wordinfo.word_unit (어휘) -> Word.unit
                                  * item.wordinfo.word_type -> Word.type
-                                 * item.wordinfo.word (target value)
+                                 * item.wordinfo.word (target message)
                                  *
                                  * item.senseinfo.cat_info[0]
                                  * item.senseinfo.type (일반어)

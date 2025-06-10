@@ -30,7 +30,7 @@ public record GameProperties(
         List<String> gameRoomUserNicknameNouns
 ) {
     /**
-     * default value setting을 위한 기본 생성자
+     * default message setting을 위한 기본 생성자
      * @param gameRoomCapacity
      * @param joinCodeMaxConflictCount
      * @param joinCodeLength

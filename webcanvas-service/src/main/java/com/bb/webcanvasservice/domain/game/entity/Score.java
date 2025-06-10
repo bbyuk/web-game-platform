@@ -38,7 +38,7 @@ public class Score extends BaseEntity {
      */
     private GameTurn scoredTurn;
 
-    @Column(name = "value")
+    @Column(name = "message")
     /**
      * 스코어 값
      */
