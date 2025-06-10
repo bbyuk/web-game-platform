@@ -216,18 +216,20 @@ export default function Canvas({
   }, [resizing]);
 
   return (
-    <div
-      className={`relative w-full bg-white rounded shadow-lg flex justify-center items-center`}
-      style={{ aspectRatio: "4 / 3" }}
-    >
-      <canvas
-        id={elementId}
-        ref={canvasRef}
-        onMouseMove={(e) => onMouseMove(e)}
-        onMouseDown={startPainting}
-        onMouseUp={stopPainting}
-        onMouseLeave={stopPainting}
-      />
+    <div className="flex justify-center items-center flex-1 overflow-hidden bg-gray-800">
+      <div
+        className="relative aspect-[4/3] w-full max-w-[calc(100vh*4/3)] max-h-[80vh] bg-white rounded shadow-lg"
+      >
+        <canvas
+          id={elementId}
+          ref={canvasRef}
+          onMouseMove={onMouseMove}
+          onMouseDown={startPainting}
+          onMouseUp={stopPainting}
+          onMouseLeave={stopPainting}
+          className="w-full h-full"
+        />
+      </div>
     </div>
   );
 }
