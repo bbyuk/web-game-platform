@@ -38,7 +38,7 @@ export default function GameRoomWaitingPage() {
           .post(game.startGame, {
             gameRoomId: roomId,
             turnCount: enteredUsers.length,
-            timePerTurn: 10,
+            timePerTurn: 150,
           })
           .then((response) => {
             navigate(pages.gameRoom.playing.url(roomId), { replace: true });

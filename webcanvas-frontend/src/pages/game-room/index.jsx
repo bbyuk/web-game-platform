@@ -350,7 +350,6 @@ export default function GameRoomPage() {
       props: {
         onSubmit: (message) => {
           webSocketClientRef.current.send(`/room/${roomId}/chat/send`, {
-            senderId: authenticatedUserId,
             value: message,
           });
         },

@@ -13,7 +13,7 @@ export default function ChatList({ chats, removeOldChat }) {
   return (
     <div className="flex flex-col h-full space-y-2 pr-1 overflow-y-auto custom-scrollbar">
       {chats.map((chat, index) => (
-        <ChatBubble key={`chat-${index}`} senderId={chat.senderId} value={chat.value} />
+        <ChatBubble key={`chat-${index}`} senderId={chat.senderId} message={chat.message} />
       ))}
     </div>
   );
