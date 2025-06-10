@@ -110,9 +110,6 @@ class GameRoomFacadeUnitTest {
         long testGameRoomId = random.nextLong();
         setId(testGameRoom, testGameRoomId);
 
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser1, "테스트 늑대", GUEST));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, alreadyEnteredUser2, "테스트 수달", GUEST));
-
         when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
 
@@ -179,19 +176,9 @@ class GameRoomFacadeUnitTest {
         when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
                 .thenReturn(Boolean.FALSE);
         GameRoom testGameRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 여우", HOST));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 수달", GUEST));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 늑대", GUEST));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 고양이", GUEST));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 부엉이", GUEST));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 다람쥐", GUEST));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 호랑이", GUEST));
-        testGameRoom.addEntrance(new GameRoomEntrance(testGameRoom, new User(UUID.randomUUID().toString()), "테스트 너구리", GUEST));
 
         when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
-        when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(anyLong(), any()))
-                .thenReturn(testGameRoom.getEntrances());
 
         long gameRoomId = random.nextLong();
         long userId = random.nextLong();
@@ -248,14 +235,9 @@ class GameRoomFacadeUnitTest {
         setId(gameRoomEntrance2, 2L);
         setId(gameRoomEntrance3, 3L);
 
-        gameRoom.addEntrance(gameRoomEntrance1);
-        gameRoom.addEntrance(gameRoomEntrance2);
-        gameRoom.addEntrance(gameRoomEntrance3);
-
         // 이러면 gameRoom에 둘
         // state만 변경하고 다시 add
         gameRoomEntrance3.exit();
-        gameRoom.addEntrance(gameRoomEntrance3);
 
         when(gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(anyInt(), any(), any()))
                 .thenReturn(List.of(gameRoom));

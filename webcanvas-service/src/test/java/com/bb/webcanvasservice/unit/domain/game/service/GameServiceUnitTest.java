@@ -16,6 +16,7 @@ import com.bb.webcanvasservice.domain.game.repository.*;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.game.service.GameService;
 import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
 import com.bb.webcanvasservice.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
@@ -102,8 +103,12 @@ class GameServiceUnitTest {
         Assertions.assertThat(gameService.startGame(gameStartRequest, user1.getId())).isNotNull();
 
         // then
+
         Assertions.assertThat(gameRoom.getState()).isEqualTo(GameRoomState.PLAYING);
-        entrances.stream().forEach(entrance -> Assertions.assertThat(entrance.getState()).isEqualTo(PLAYING));
+        entrances.stream().forEach(entrance -> {
+            Assertions.assertThat(entrance.getUser().getState()).isEqualTo(UserStateCode.IN_GAME);
+            Assertions.assertThat(entrance.isReady()).isEqualTo(entrance.getRole() == GameRoomRole.HOST);
+        });
     }
 
 

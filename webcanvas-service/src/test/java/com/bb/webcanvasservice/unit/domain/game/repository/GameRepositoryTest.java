@@ -68,8 +68,6 @@ class GameRepositoryTest {
         GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(enteredRoom, testUser, "테스트 호랑이", GameRoomRole.GUEST);
         gameRoomEntranceRepository.save(gameRoomEntrance);
 
-        enteredRoom.addEntrance(gameRoomEntrance);
-
         // when
         Optional<GameRoom> queryResult = gameRoomRepository.findNotClosedGameRoomByUserId(testUser.getId());
 
