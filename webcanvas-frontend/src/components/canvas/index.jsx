@@ -217,9 +217,7 @@ export default function Canvas({
 
   return (
     <div className="flex justify-center items-center flex-1 overflow-hidden bg-gray-800">
-      <div
-        className="relative aspect-[4/3] w-full max-w-[calc(100vh*4/3)] max-h-[80vh] bg-white rounded shadow-lg"
-      >
+      <div className="relative aspect-[4/3] w-full max-w-[calc(100vh*4/3)] max-h-[80vh] bg-white rounded shadow-lg">
         <canvas
           id={elementId}
           ref={canvasRef}
