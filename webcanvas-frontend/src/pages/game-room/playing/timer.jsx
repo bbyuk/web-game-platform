@@ -1,51 +1,66 @@
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-/**
- * @param {number} durationSec - 총 지속 시간 (초)
- * @param {boolean} isRunning - 타이머 실행 여부
- * @param {() => void} onExpire - 시간 종료 시 실행되는 콜백
- */
-export function useTimer({ durationSec, isRunning, onExpire }) {
-  const [remainingTime, setRemainingTime] = useState(durationSec);
-  const intervalRef = useRef(null);
+export function useTimer() {
+  const [remainingPercent, setRemainingPercent] = useState(100);
+  const timerRef = useRef(null);
+  const startTimeRef = useRef(null);
+  const durationRef = useRef(null);
 
-  // 🔁 durationSec이 바뀌면 초기화 (단, isRunning 상태에서만)
-  useEffect(() => {
-    if (isRunning) {
-      setRemainingTime(durationSec);
-    }
-  }, [durationSec, isRunning]);
+  const ready = useCallback((durationSec) => {
+    durationRef.current = durationSec;
+  }, []);
 
-  useEffect(() => {
-    if (!isRunning) {
-      clearInterval(intervalRef.current);
-      return;
+  const start = useCallback((expiration) => {
+    // 기존 타이머 정리
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     }
 
-    console.log("타이머 새로 시작");
+    // expiration을 기준으로 시작 시각 계산
+    const expirationTime = new Date(expiration).getTime(); // ms
+    const durationMs = durationRef.current * 1000;
+    const startTime = expirationTime - durationMs;
 
-    // 타이머 새로 시작
-    clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      setRemainingTime((prev) => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current);
-          onExpire?.();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    startTimeRef.current = startTime;
+    // 초기화
+    setRemainingPercent(100);
 
-    return () => clearInterval(intervalRef.current);
-  }, [isRunning]);
+    timerRef.current = setInterval(() => {
+      const now = Date.now();
+      console.log("now : " + now);
+      const elapsed = now - startTimeRef.current;
+      console.log("elapsed : " + elapsed);
+      const progress = elapsed / durationMs;
+      const percent = Math.max(0, 100 - progress * 100);
 
-  const percent = (remainingTime / durationSec) * 100;
+      setRemainingPercent(percent);
+      console.log(percent);
+
+      if (percent <= 0 || now >= expirationTime) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }, 100);
+  }, []);
+
+  const stop = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stop();
+    };
+  }, [stop]);
 
   return {
-    remainingTime,
-    remainingPercent: percent,
-    stop: () => clearInterval(intervalRef.current),
-    reset: () => setRemainingTime(durationSec),
+    remainingPercent,
+    ready,
+    start,
+    stop,
   };
 }
