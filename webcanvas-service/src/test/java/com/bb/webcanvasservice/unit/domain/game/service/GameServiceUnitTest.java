@@ -168,6 +168,10 @@ class GameServiceUnitTest {
         GameStartRequest gameStartRequest = new GameStartRequest(gameRoom.getId(), 3, 90);
         Long gameSessionId = gameService.startGame(gameStartRequest, user1.getId());
 
+        gameService.successSubscription(gameSessionId, user1.getId());
+        gameService.successSubscription(gameSessionId, user2.getId());
+        gameService.successSubscription(gameSessionId, user3.getId());
+
         // when
         Assertions.assertThat(gameService.findNextDrawerId(gameSessionId)).isNotNull();
 
@@ -194,10 +198,12 @@ class GameServiceUnitTest {
         GameRoomEntrance gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user3, "유저3", GameRoomRole.GUEST));
         gameRoomEntrance3.changeReady(true);
 
-        List<GameRoomEntrance> entrances = List.of(gameRoomEntrance1, gameRoomEntrance2, gameRoomEntrance3);
-
         GameStartRequest gameStartRequest = new GameStartRequest(gameRoom.getId(), 5, 90);
         Long gameSessionId = gameService.startGame(gameStartRequest, user1.getId());
+
+        gameService.successSubscription(gameSessionId, user1.getId());
+        gameService.successSubscription(gameSessionId, user2.getId());
+        gameService.successSubscription(gameSessionId, user3.getId());
 
         GameSession gameSession = gameSessionRepository.findById(gameSessionId).get();
 

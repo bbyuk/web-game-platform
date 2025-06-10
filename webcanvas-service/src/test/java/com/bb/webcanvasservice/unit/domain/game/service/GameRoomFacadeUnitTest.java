@@ -31,12 +31,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 import static com.bb.webcanvasservice.common.code.ErrorCode.GAME_ROOM_HAS_ILLEGAL_STATUS;
+import static com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState.WAITING;
 import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.GUEST;
 import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
 import static org.mockito.ArgumentMatchers.*;
@@ -171,7 +169,7 @@ class GameRoomFacadeUnitTest {
 
     @Test
     @DisplayName("GameRoom 입장 - 유저가 입장하려는 방의 현재 입장 정원이 모두 찬 경우 실패")
-    public void enterGameRoomFailedWhenGameRoomLimitationIsOver() {
+    public void enterGameRoomFailedWhenGameRoomLimitationIsOver() throws Exception {
         // given
         when(gameRoomEntranceRepository.existsGameRoomEntranceByUserId(any(Long.class)))
                 .thenReturn(Boolean.FALSE);
@@ -179,6 +177,19 @@ class GameRoomFacadeUnitTest {
 
         when(gameRoomRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(testGameRoom));
+
+        List entrances = new ArrayList();
+        GameRoomEntrance hostEntrance = new GameRoomEntrance(testGameRoom, new User(FingerprintGenerator.generate()), "nickname", HOST);
+        entrances.add(hostEntrance);
+        setId(hostEntrance, 0L);
+        for (int i = 1; i < 8; i++) {
+            GameRoomEntrance guestEntrance = new GameRoomEntrance(testGameRoom, new User(FingerprintGenerator.generate()), "nickname", GUEST);
+            setId(guestEntrance, Long.valueOf(String.valueOf(i)));
+            entrances.add(guestEntrance);
+        }
+
+        when(gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(any(), any()))
+                .thenReturn(entrances);
 
         long gameRoomId = random.nextLong();
         long userId = random.nextLong();
@@ -245,6 +256,8 @@ class GameRoomFacadeUnitTest {
                 .thenReturn(false);
 //        when(gameProperties.gameRoomCapacity())
 //                .thenReturn(8);
+        when(gameRoomEntranceRepository.findGameRoomEntranceCountByGameRoomIdAndState(any(), any()))
+                .thenReturn(2L);
 
         // when
         GameRoomListResponse enterableGameRooms = gameRoomFacade.findEnterableGameRooms(4L);
