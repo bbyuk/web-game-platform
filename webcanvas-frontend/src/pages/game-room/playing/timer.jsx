@@ -28,9 +28,7 @@ export function useTimer() {
 
     timerRef.current = setInterval(() => {
       const now = Date.now();
-      console.log("now : " + now);
       const elapsed = now - startTimeRef.current;
-      console.log("elapsed : " + elapsed);
       const progress = elapsed / durationMs;
       const percent = Math.max(0, 100 - progress * 100);
 
