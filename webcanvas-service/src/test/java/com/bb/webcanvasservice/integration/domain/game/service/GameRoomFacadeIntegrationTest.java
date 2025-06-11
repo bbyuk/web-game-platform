@@ -13,8 +13,8 @@ import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateExcepti
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.entity.User;
-import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
-import com.bb.webcanvasservice.domain.user.repository.UserRepository;
+import com.bb.webcanvasservice.domain.user.model.UserStateCode;
+import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +42,7 @@ class GameRoomFacadeIntegrationTest {
     private GameRoomFacade gameRoomFacade;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Autowired
     private GameRoomRepository gameRoomRepository;
@@ -62,9 +62,9 @@ class GameRoomFacadeIntegrationTest {
     @BeforeEach
     public void beforeEach() {
         // 테스트 공통 유저 저장
-        testUser = userRepository.save(new User(UUID.randomUUID().toString()));
-        waitingRoomHost = userRepository.save(new User(UUID.randomUUID().toString()));
-        playingRoomHost = userRepository.save(new User(UUID.randomUUID().toString()));
+        testUser = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        waitingRoomHost = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        playingRoomHost = userJpaRepository.save(new User(UUID.randomUUID().toString()));
 
         // 테스트 공통 게임 방 저장
         waitingRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(10)));
@@ -89,7 +89,7 @@ class GameRoomFacadeIntegrationTest {
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomId()).isEqualTo(waitingRoom.getId());
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomEntranceId()).isNotNull();
 
-        Assertions.assertThat(userRepository.findUserState(testUser.getId())).isEqualTo(UserStateCode.IN_ROOM);
+        Assertions.assertThat(userJpaRepository.findUserState(testUser.getId())).isEqualTo(UserStateCode.IN_ROOM);
     }
 
     @Test
@@ -181,8 +181,8 @@ class GameRoomFacadeIntegrationTest {
     @DisplayName("게임 방 퇴장 - 게임 방에서 모든 유저가 나가면 game room이 closed 된다.")
     void gameRoomClosedWhenAllUserExit() throws Exception {
         // given
-        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(6)));
 
@@ -201,8 +201,8 @@ class GameRoomFacadeIntegrationTest {
     @DisplayName("게임 방 퇴장 - 게임 방에서 퇴장한 유저의 상태는 IN_LOBBY로 변경된다.")
     void testUserStateWhenExitFromRoom() throws Exception {
         // given
-        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(6)));
 
@@ -215,16 +215,16 @@ class GameRoomFacadeIntegrationTest {
         gameRoomFacade.exitFromRoom(gameRoomEntrance1.getId(), user1.getId());
 
         // then
-        Assertions.assertThat(userRepository.findUserState(user1.getId())).isEqualTo(UserStateCode.IN_LOBBY);
-        Assertions.assertThat(userRepository.findUserState(user2.getId())).isEqualTo(UserStateCode.IN_LOBBY);
+        Assertions.assertThat(userJpaRepository.findUserState(user1.getId())).isEqualTo(UserStateCode.IN_LOBBY);
+        Assertions.assertThat(userJpaRepository.findUserState(user2.getId())).isEqualTo(UserStateCode.IN_LOBBY);
     }
 
     @Test
     @DisplayName("게임 방 퇴장 - 게임 방에서 HOST가 나가면 남은 유저 중 입장한지 가장 오래된 유저가 HOST가 된다.")
     void gameRoomHostChangedWhenHostExit() throws Exception {
         // given
-        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
 
@@ -243,8 +243,8 @@ class GameRoomFacadeIntegrationTest {
     @DisplayName("게임 방 레디 - 레디 상태 JPA 변경 감지 테스트")
     void testGameRoomEntranceReadyDirtyCheck() throws Exception {
         // given
-        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(6)));
 

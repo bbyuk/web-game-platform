@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.user.enums;
+package com.bb.webcanvasservice.domain.user.model;
 
 /**
  * 유저 상태 코드

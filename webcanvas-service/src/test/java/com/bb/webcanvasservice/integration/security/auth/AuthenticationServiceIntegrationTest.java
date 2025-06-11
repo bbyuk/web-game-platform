@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.integration.security.auth;
 
 import com.bb.webcanvasservice.domain.user.entity.User;
-import com.bb.webcanvasservice.domain.user.repository.UserRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import com.bb.webcanvasservice.domain.auth.service.AuthenticationService;
 import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.domain.auth.dto.response.AuthenticationInnerResponse;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 class AuthenticationServiceIntegrationTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Autowired
     AuthenticationService authenticationService;
@@ -31,11 +31,11 @@ class AuthenticationServiceIntegrationTest {
     void loginSuccessWhenFingerprintRegistered() {
         // given
         String fingerprint = "asdwqujdqwi12j3b1jbsd";
-        User savedUser = userRepository.save(new User(fingerprint));
+        User savedUser = userJpaRepository.save(new User(fingerprint));
 
         // when
         AuthenticationInnerResponse authenticationApiResponse = authenticationService.login(fingerprint);
-        User findUser = userRepository.findById(savedUser.getId()).get();
+        User findUser = userJpaRepository.findById(savedUser.getId()).get();
 
         // then
         Assertions.assertThat(jwtManager.getFingerprintFromToken(authenticationApiResponse.accessToken())).isEqualTo(fingerprint);
@@ -58,7 +58,7 @@ class AuthenticationServiceIntegrationTest {
         Assertions.assertThat(jwtManager.getFingerprintFromToken(authenticationApiResponse.refreshToken())).isEqualTo(fingerprint);
 
 
-        userRepository.findByFingerprint(fingerprint)
+        userJpaRepository.findByFingerprint(fingerprint)
                 .ifPresentOrElse(
                         user -> Assertions.assertThat(user.getRefreshToken()).isEqualTo(authenticationApiResponse.refreshToken()),
                         org.junit.jupiter.api.Assertions::fail

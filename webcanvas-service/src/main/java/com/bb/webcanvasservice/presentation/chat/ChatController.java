@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.presentation.chat;
 import com.bb.webcanvasservice.application.chat.ChatApplicationService;
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
-import com.bb.webcanvasservice.presentation.chat.dto.SendMessageRequest;
+import com.bb.webcanvasservice.presentation.chat.request.SendMessageRequest;
 import com.bb.webcanvasservice.presentation.chat.mapper.SendMessageRequestMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

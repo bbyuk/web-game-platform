@@ -1,41 +1,40 @@
 package com.bb.webcanvasservice.domain.user.repository;
 
 import com.bb.webcanvasservice.domain.user.entity.User;
-import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 
 import java.util.Optional;
 
 /**
- * 게임 유저의 persitence layer를 담당하는 레포지토리 클래스
+ * user domain repository
  */
-@Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository {
 
     /**
-     * 클라이언트 fingerprint로 등록된 유저 조회
-     * @param fingerprint
-     * @return
+     * 유저 ID로 유저를 조회한다.
+     * @param userId 유저 ID
+     * @return 유저
      */
-    @Query("""
-            select  u
-            from    User u
-            where   u.fingerprint = :fingerprint
-            """)
-    Optional<User> findByFingerprint(@Param("fingerprint") String fingerprint);
+    Optional<User> findById(Long userId);
+
+    /**
+     * 유저를 저장한다.
+     * @param user
+     * @return 저장된 유저
+     */
+    User save(User user);
+    
+    /**
+     * 클라이언트 fingerprint로 등록된 유저 조회
+     * @param fingerprint 서버에서 생성된 유저 fingerprint
+     * @return 유저
+     */
+    Optional<User> findByFingerprint(String fingerprint);
 
     /**
      * 유저 상태를 조회한다.
-     * @param userId
-     * @return
+     * @param userId 유저 ID
+     * @return 유저 상태 코드
      */
-    @Query("""
-            select  u.state
-            from    User u
-            where   u.id = :userId
-            """)
-    UserStateCode findUserState(@Param("userId") Long userId);
+    UserStateCode findUserState(Long userId);
 }

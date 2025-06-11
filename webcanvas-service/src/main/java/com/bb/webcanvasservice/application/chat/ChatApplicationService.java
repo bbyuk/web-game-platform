@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.application.chat;
 
 import com.bb.webcanvasservice.application.chat.command.SendMessageCommand;
-import com.bb.webcanvasservice.domain.chat.service.ChatService;
+import com.bb.webcanvasservice.domain.chat.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

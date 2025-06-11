@@ -1,19 +1,15 @@
 package com.bb.webcanvasservice.domain.user.service;
 
-import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.user.entity.User;
-import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
-import com.bb.webcanvasservice.domain.user.repository.UserRepository;
 import com.bb.webcanvasservice.domain.user.exception.AlreadyRegisteredUserException;
 import com.bb.webcanvasservice.domain.user.exception.UserNotFoundException;
+import com.bb.webcanvasservice.domain.user.model.UserStateCode;
+import com.bb.webcanvasservice.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 게임 유저에 대한 비즈니스 로직을 처리하는 서비스 클래스
  */
-@Service
 @RequiredArgsConstructor
 public class UserService {
 
@@ -25,7 +21,6 @@ public class UserService {
      * @param fingerprint
      * @return
      */
-    @Transactional
     public User findOrCreateUser(String fingerprint) {
         return userRepository.findByFingerprint(fingerprint)
                 .orElseGet(() -> createUser(fingerprint));
@@ -39,7 +34,6 @@ public class UserService {
      * @param userId User 엔티티의 ID
      * @return User
      */
-    @Transactional(readOnly = true)
     public User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
@@ -52,7 +46,6 @@ public class UserService {
      * @param fingerprint
      * @return
      */
-    @Transactional
     public User createUser(String fingerprint) {
         userRepository.findByFingerprint(fingerprint)
                 .ifPresent(
@@ -69,7 +62,6 @@ public class UserService {
      * @param userId
      * @param state
      */
-    @Transactional
     public void changeUserState(Long userId, UserStateCode state) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
@@ -82,7 +74,6 @@ public class UserService {
      * @param userId
      * @return
      */
-    @Transactional(readOnly = true)
     public UserStateCode findUserState(Long userId) {
         return userRepository.findUserState(userId);
     }

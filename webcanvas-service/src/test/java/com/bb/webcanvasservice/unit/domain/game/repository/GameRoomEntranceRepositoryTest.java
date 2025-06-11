@@ -11,7 +11,7 @@ import com.bb.webcanvasservice.domain.game.exception.GameRoomEntranceNotFoundExc
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.entity.User;
-import com.bb.webcanvasservice.domain.user.repository.UserRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +38,7 @@ class GameRoomEntranceRepositoryTest {
     private GameRoomEntranceRepository gameRoomEntranceRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Autowired
     private GameRoomRepository gameRoomRepository;
@@ -47,7 +47,7 @@ class GameRoomEntranceRepositoryTest {
 
     @BeforeEach
     void setup() {
-        testUser = userRepository.save(new User(UUID.randomUUID().toString()));
+        testUser = userJpaRepository.save(new User(UUID.randomUUID().toString()));
     }
 
     @Test
@@ -120,10 +120,10 @@ class GameRoomEntranceRepositoryTest {
     @DisplayName("유저 ID로 현재 입장한 게임 방의 입장 정보 조회")
     void findGameRoomEntrancesByUserId() {
         // given
-        User otherUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
-        User otherUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
-        User otherUser3 = userRepository.save(new User(UUID.randomUUID().toString()));
-        User otherUser4 = userRepository.save(new User(UUID.randomUUID().toString()));
+        User otherUser1 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        User otherUser2 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        User otherUser3 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        User otherUser4 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
 
         enterTestRoom(otherUser1, testUser, otherUser2, otherUser3, otherUser4);
         // when
@@ -152,8 +152,8 @@ class GameRoomEntranceRepositoryTest {
          */
         GameRoom testGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
 
-        User testUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
-        User testUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
+        User testUser1 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        User testUser2 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
 
         gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1, "테스트 여우", GameRoomRole.HOST));
 

@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.unit.domain.user;
 
 import com.bb.webcanvasservice.domain.user.entity.User;
-import com.bb.webcanvasservice.domain.user.repository.UserRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import com.bb.webcanvasservice.domain.user.service.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 @DisplayName("[unit] [service] 유저 서비스 단위테스트")
 class UserServiceTest {
     @Mock
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
     @InjectMocks
     private UserService userService;
 
@@ -40,9 +40,9 @@ class UserServiceTest {
 
         User mockUser = createMockUser(fingerprint);
 
-        Mockito.when(userRepository.findByFingerprint(fingerprint))
+        Mockito.when(userJpaRepository.findByFingerprint(fingerprint))
                 .thenReturn(Optional.empty());
-        Mockito.when(userRepository.save(any())).thenReturn(mockUser);
+        Mockito.when(userJpaRepository.save(any())).thenReturn(mockUser);
 
         // when
         User createdUser = userService.findOrCreateUser(fingerprint);

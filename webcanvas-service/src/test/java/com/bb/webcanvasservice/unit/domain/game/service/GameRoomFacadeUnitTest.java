@@ -34,7 +34,6 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 import static com.bb.webcanvasservice.common.code.ErrorCode.GAME_ROOM_HAS_ILLEGAL_STATUS;
-import static com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState.WAITING;
 import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.GUEST;
 import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
 import static org.mockito.ArgumentMatchers.*;

@@ -9,7 +9,7 @@ import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.entity.User;
-import com.bb.webcanvasservice.domain.user.repository.UserRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +37,7 @@ class GameRepositoryTest {
     private GameRoomRepository gameRoomRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Autowired
     private GameRoomEntranceRepository gameRoomEntranceRepository;
@@ -48,7 +48,7 @@ class GameRepositoryTest {
 
     @BeforeEach
     public void setTestData() {
-        testUser = userRepository.save(new User(testUserToken));
+        testUser = userJpaRepository.save(new User(testUserToken));
     }
 
 

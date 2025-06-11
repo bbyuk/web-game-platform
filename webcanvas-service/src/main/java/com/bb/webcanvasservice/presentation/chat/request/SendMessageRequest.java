@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.presentation.chat.dto;
+package com.bb.webcanvasservice.presentation.chat.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

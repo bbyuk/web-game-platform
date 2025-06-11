@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.presentation.chat.mapper;
 
 import com.bb.webcanvasservice.application.chat.command.SendMessageCommand;
-import com.bb.webcanvasservice.presentation.chat.dto.SendMessageRequest;
+import com.bb.webcanvasservice.presentation.chat.request.SendMessageRequest;
 
 import java.time.LocalDateTime;
 

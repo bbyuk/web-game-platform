@@ -13,7 +13,7 @@ import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameTurnRepository;
 import com.bb.webcanvasservice.domain.user.entity.User;
-import com.bb.webcanvasservice.domain.user.repository.UserRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class GameTurnCustomRepositoryTest {
     GameRoomEntranceRepository gameRoomEntranceRepository;
 
     @Autowired
-    UserRepository userRepository;
+    UserJpaRepository userJpaRepository;
 
     @Autowired
     GameSessionRepository gameSessionRepository;
@@ -49,8 +49,8 @@ class GameTurnCustomRepositoryTest {
     @DisplayName("현재 턴 찾기 - 없을 경우 Optional null 리턴")
     void testFindLastTurn() throws Exception {
         // given
-        User user1 = userRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userRepository.save(new User(FingerprintGenerator.generate()));
+        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
 

@@ -21,7 +21,7 @@ import com.bb.webcanvasservice.domain.game.registry.GameSessionLoadRegistry;
 import com.bb.webcanvasservice.domain.game.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameTurnRepository;
-import com.bb.webcanvasservice.domain.user.enums.UserStateCode;
+import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 import com.bb.webcanvasservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

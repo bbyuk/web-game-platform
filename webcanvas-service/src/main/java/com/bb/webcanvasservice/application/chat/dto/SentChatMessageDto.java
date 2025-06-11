@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "애플리케이션 계층 -> 인프라스트럭처 계층 전달 chat message")
+@Schema(description = "application layer -> infrastructure layer 전달 chat message")
 public record SentChatMessageDto(
 
         @Schema(description = "메세지 값")

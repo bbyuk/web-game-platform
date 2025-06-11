@@ -1,7 +1,6 @@
-package com.bb.webcanvasservice.domain.user.entity;
+package com.bb.webcanvasservice.domain.user.model;
 
 import com.bb.webcanvasservice.common.entity.BaseEntity;
-import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,18 +10,9 @@ import lombok.NoArgsConstructor;
  * webcanvas 게임 내에서의 유저 정보 엔티티
  * 유저의 기준 정보는 플랫폼 서비스에서 관리하며, 게임 플레이에 필요한 유저 식별 정보만을 담당한다.
  */
-@Entity
-@Getter
-@Table(name = "users")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseEntity {
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
-    /**
-     * 유저 id
-     */
+public class User {
+
     private Long id;
 
     @Column(name = "fingerprint", updatable = false, nullable = false, unique = true)

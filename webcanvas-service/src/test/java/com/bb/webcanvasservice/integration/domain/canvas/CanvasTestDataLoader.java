@@ -5,11 +5,10 @@ import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.entity.GameRoom;
 import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.user.entity.User;
-import com.bb.webcanvasservice.domain.user.repository.UserRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
@@ -25,7 +24,7 @@ import java.util.UUID;
 public class CanvasTestDataLoader {
 
     @Autowired
-    UserRepository userRepository;
+    UserJpaRepository userJpaRepository;
     @Autowired
     GameRoomRepository gameRoomRepository;
     @Autowired
@@ -43,9 +42,9 @@ public class CanvasTestDataLoader {
 
     @EventListener(ApplicationReadyEvent.class)
     public void setupTestData() {
-        testUser1 = userRepository.save(new User(UUID.randomUUID().toString()));
-        testUser2 = userRepository.save(new User(UUID.randomUUID().toString()));
-        testUser3 = userRepository.save(new User(UUID.randomUUID().toString()));
+        testUser1 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        testUser2 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        testUser3 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
 
         System.out.println("testUser1 = " + testUser1.getId());
         System.out.println("testUser2 = " + testUser2.getId());
@@ -60,7 +59,7 @@ public class CanvasTestDataLoader {
 
     @EventListener(ContextClosedEvent.class)
     public void clearTestData() {
-        userRepository.deleteAll();
+        userJpaRepository.deleteAll();
         gameRoomRepository.deleteAll();
         gameRoomEntranceRepository.deleteAll();
     }

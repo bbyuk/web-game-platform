@@ -2,9 +2,8 @@ package com.bb.webcanvasservice.domain.game.controller;
 
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
-import com.bb.webcanvasservice.domain.chat.service.ChatService;
+import com.bb.webcanvasservice.domain.chat.ChatService;
 import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
-import com.bb.webcanvasservice.domain.game.dto.response.GameLoadSuccessResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameSessionResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameStartResponse;
 import com.bb.webcanvasservice.domain.game.dto.response.GameTurnFindResponse;

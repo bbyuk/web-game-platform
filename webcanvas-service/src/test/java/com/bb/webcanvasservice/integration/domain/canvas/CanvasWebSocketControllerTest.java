@@ -5,7 +5,7 @@ import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.user.entity.User;
-import com.bb.webcanvasservice.domain.user.repository.UserRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.websocket.registry.SessionRegistry;
 import org.assertj.core.api.Assertions;
@@ -71,7 +71,7 @@ class CanvasWebSocketControllerTest {
     @Autowired
     private GameRoomFacade gameRoomFacade;
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
     @Autowired
     private CanvasTestDataLoader testDataLoader;
     @Autowired
@@ -101,7 +101,7 @@ class CanvasWebSocketControllerTest {
     void testWebSocketSubscriptionValidation() throws Exception {
         // given
         // 게임 방에 접속해있지 않으나, 다른 게임방의 웹소켓 이벤트를 구독하려는 악의적인 유저
-        User maliciousUser = userRepository.save(new User(UUID.randomUUID().toString()));
+        User maliciousUser = userJpaRepository.save(new User(UUID.randomUUID().toString()));
         StompSession maliciousUserSession = testWebSocketClientFactory.connect(maliciousUser, port);
         
         

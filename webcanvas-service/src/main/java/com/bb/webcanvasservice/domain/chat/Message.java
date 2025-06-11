@@ -1,10 +1,8 @@
-package com.bb.webcanvasservice.domain.chat.model;
+package com.bb.webcanvasservice.domain.chat;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
