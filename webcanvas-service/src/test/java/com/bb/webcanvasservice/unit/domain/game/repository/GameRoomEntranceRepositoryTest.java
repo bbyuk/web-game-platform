@@ -2,16 +2,16 @@ package com.bb.webcanvasservice.unit.domain.game.repository;
 
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.config.JpaConfig;
-import com.bb.webcanvasservice.domain.game.entity.GameRoom;
-import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState;
+import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
+import com.bb.webcanvasservice.domain.game.model.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomEntranceNotFoundException;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,13 +35,13 @@ import java.util.UUID;
 class GameRoomEntranceRepositoryTest {
 
     @Autowired
-    private GameRoomEntranceRepository gameRoomEntranceRepository;
+    private GameRoomEntranceJpaRepository gameRoomEntranceRepository;
 
     @Autowired
     private UserJpaRepository userJpaRepository;
 
     @Autowired
-    private GameRoomRepository gameRoomRepository;
+    private GameRoomJpaRepository gameRoomRepository;
 
     private UserJpaEntity testUser;
 
@@ -80,7 +80,7 @@ class GameRoomEntranceRepositoryTest {
     void existsGameRoomEntranceByUserIdFalseWhenNoActive() {
         // given
         enterTestRoom(testUser);
-        GameRoomEntrance gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING)).orElseThrow(() -> new GameRoomEntranceNotFoundException("왜 여기서,,?"));
+        GameRoomEntranceJpaEntity gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING)).orElseThrow(() -> new GameRoomEntranceNotFoundException("왜 여기서,,?"));
         exit(gameRoomEntrance);
 
         // when
@@ -127,11 +127,11 @@ class GameRoomEntranceRepositoryTest {
 
         enterTestRoom(otherUser1JpaEntity, testUser, otherUser2JpaEntity, otherUser3JpaEntity, otherUser4JpaEntity);
         // when
-        Optional<GameRoomEntrance> gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING));
+        Optional<GameRoomEntranceJpaEntity> gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING));
 
         // then
         Assertions.assertThat(gameRoomEntrance).isPresent();
-        List<GameRoomEntrance> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomEntrance.get().getGameRoom().getId(), GameRoomEntranceState.WAITING);
+        List<GameRoomEntranceJpaEntity> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomEntrance.get().getGameRoom().getId(), GameRoomEntranceState.WAITING);
         Assertions.assertThat(entrances)
                 .hasSize(5);
 
@@ -150,12 +150,12 @@ class GameRoomEntranceRepositoryTest {
         /**
          * testUser1은 입장, testUser2는 입장하지 않음
          */
-        GameRoom testGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
+        GameRoomJpaEntity testGameRoom = gameRoomRepository.save(new GameRoomJpaEntity(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
 
         UserJpaEntity testUser1JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
         UserJpaEntity testUser2JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
 
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1JpaEntity, "테스트 여우", GameRoomRole.HOST));
+        gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(testGameRoom, testUser1JpaEntity, "테스트 여우", GameRoomEntranceRole.HOST));
 
         // when
         boolean isTestUser1EnteredTestGameRoom = gameRoomEntranceRepository.existsActiveEntrance(testGameRoom.getId(), testUser1JpaEntity.getId());
@@ -167,11 +167,11 @@ class GameRoomEntranceRepositoryTest {
     }
 
     private void enterTestRoom(UserJpaEntity... enteredUserJpaEntities) {
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
-        Arrays.stream(enteredUserJpaEntities).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, enteredUser, "테스트 수달", GameRoomRole.GUEST)));
+        GameRoomJpaEntity gameRoom = gameRoomRepository.save(new GameRoomJpaEntity(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
+        Arrays.stream(enteredUserJpaEntities).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, enteredUser, "테스트 수달", GameRoomEntranceRole.GUEST)));
     }
 
-    public void exit(GameRoomEntrance entrance) {
+    public void exit(GameRoomEntranceJpaEntity entrance) {
         entrance.exit();
     }
 

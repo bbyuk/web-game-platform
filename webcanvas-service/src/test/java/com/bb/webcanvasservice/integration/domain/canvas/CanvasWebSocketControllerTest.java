@@ -5,7 +5,7 @@ import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.websocket.registry.SessionRegistry;
 import org.assertj.core.api.Assertions;

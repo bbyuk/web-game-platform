@@ -4,20 +4,20 @@ import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.config.JpaConfig;
-import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
-import com.bb.webcanvasservice.domain.game.entity.GameRoom;
-import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.entity.GameSession;
-import com.bb.webcanvasservice.domain.game.entity.GameTurn;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.*;
+import com.bb.webcanvasservice.presentation.game.request.GameStartRequest;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameSessionJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameTurnJpaEntity;
+import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
+import com.bb.webcanvasservice.domain.game.model.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.GameSessionIsOverException;
-import com.bb.webcanvasservice.domain.game.repository.*;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.game.service.GameService;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
-import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -41,22 +41,22 @@ class GameServiceUnitTest {
     GameRoomFacade gameRoomFacade;
 
     @Autowired
-    GameSessionRepository gameSessionRepository;
+    GameSessionJpaRepository gameSessionRepository;
 
     @Autowired
     UserJpaRepository userJpaRepository;
 
     @Autowired
-    GameRoomRepository gameRoomRepository;
+    GameRoomJpaRepository gameRoomRepository;
 
     @Autowired
-    GameRoomEntranceRepository gameRoomEntranceRepository;
+    GameRoomEntranceJpaRepository gameRoomEntranceRepository;
 
     @Autowired
-    GamePlayHistoryRepository gamePlayHistoryRepository;
+    GamePlayHistoryJpaRepository gamePlayHistoryJpaRepository;
 
     @Autowired
-    GameTurnRepository gameTurnRepository;
+    GameTurnJpaRepository gameTurnRepository;
 
     @Autowired
     EntityManager em;
@@ -80,18 +80,18 @@ class GameServiceUnitTest {
         UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
         UserJpaEntity user3 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
+        GameRoomJpaEntity gameRoom = gameRoomRepository.save(new GameRoomJpaEntity(JoinCodeGenerator.generate(6)));
 
-        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "유저1", GameRoomRole.HOST));
+        GameRoomEntranceJpaEntity gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user1, "유저1", GameRoomEntranceRole.HOST));
         gameRoomEntrance1.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "유저2", GameRoomRole.GUEST));
+        GameRoomEntranceJpaEntity gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user2, "유저2", GameRoomEntranceRole.GUEST));
         gameRoomEntrance2.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user3, "유저3", GameRoomRole.GUEST));
+        GameRoomEntranceJpaEntity gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user3, "유저3", GameRoomEntranceRole.GUEST));
         gameRoomEntrance3.changeReady(true);
 
-        List<GameRoomEntrance> entrances = List.of(gameRoomEntrance1, gameRoomEntrance2, gameRoomEntrance3);
+        List<GameRoomEntranceJpaEntity> entrances = List.of(gameRoomEntrance1, gameRoomEntrance2, gameRoomEntrance3);
 
         GameStartRequest gameStartRequest = new GameStartRequest(gameRoom.getId(), 3, 90);
 
@@ -105,7 +105,7 @@ class GameServiceUnitTest {
         Assertions.assertThat(gameRoom.getState()).isEqualTo(GameRoomState.PLAYING);
         entrances.stream().forEach(entrance -> {
             Assertions.assertThat(entrance.getUser().getState()).isEqualTo(UserStateCode.IN_GAME);
-            Assertions.assertThat(entrance.isReady()).isEqualTo(entrance.getRole() == GameRoomRole.HOST);
+            Assertions.assertThat(entrance.isReady()).isEqualTo(entrance.getRole() == GameRoomEntranceRole.HOST);
         });
     }
 
@@ -118,18 +118,18 @@ class GameServiceUnitTest {
         UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
         UserJpaEntity user3 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
+        GameRoomJpaEntity gameRoom = gameRoomRepository.save(new GameRoomJpaEntity(JoinCodeGenerator.generate(6)));
 
-        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "유저1", GameRoomRole.HOST));
+        GameRoomEntranceJpaEntity gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user1, "유저1", GameRoomEntranceRole.HOST));
         gameRoomEntrance1.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "유저2", GameRoomRole.GUEST));
+        GameRoomEntranceJpaEntity gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user2, "유저2", GameRoomEntranceRole.GUEST));
         gameRoomEntrance2.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user3, "유저3", GameRoomRole.GUEST));
+        GameRoomEntranceJpaEntity gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user3, "유저3", GameRoomEntranceRole.GUEST));
         gameRoomEntrance3.changeReady(true);
 
-        List<GameRoomEntrance> entrances = List.of(gameRoomEntrance1, gameRoomEntrance2, gameRoomEntrance3);
+        List<GameRoomEntranceJpaEntity> entrances = List.of(gameRoomEntrance1, gameRoomEntrance2, gameRoomEntrance3);
 
         GameStartRequest gameStartRequest = new GameStartRequest(gameRoom.getId(), 3, 90);
 
@@ -150,18 +150,18 @@ class GameServiceUnitTest {
         UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
         UserJpaEntity user3 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
+        GameRoomJpaEntity gameRoom = gameRoomRepository.save(new GameRoomJpaEntity(JoinCodeGenerator.generate(6)));
 
-        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "유저1", GameRoomRole.HOST));
+        GameRoomEntranceJpaEntity gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user1, "유저1", GameRoomEntranceRole.HOST));
         gameRoomEntrance1.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "유저2", GameRoomRole.GUEST));
+        GameRoomEntranceJpaEntity gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user2, "유저2", GameRoomEntranceRole.GUEST));
         gameRoomEntrance2.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user3, "유저3", GameRoomRole.GUEST));
+        GameRoomEntranceJpaEntity gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user3, "유저3", GameRoomEntranceRole.GUEST));
         gameRoomEntrance3.changeReady(true);
 
-        List<GameRoomEntrance> entrances = List.of(gameRoomEntrance1, gameRoomEntrance2, gameRoomEntrance3);
+        List<GameRoomEntranceJpaEntity> entrances = List.of(gameRoomEntrance1, gameRoomEntrance2, gameRoomEntrance3);
 
         GameStartRequest gameStartRequest = new GameStartRequest(gameRoom.getId(), 3, 90);
         Long gameSessionId = gameService.startGame(gameStartRequest, user1.getId());
@@ -185,15 +185,15 @@ class GameServiceUnitTest {
         UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
         UserJpaEntity user3 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
+        GameRoomJpaEntity gameRoom = gameRoomRepository.save(new GameRoomJpaEntity(JoinCodeGenerator.generate(6)));
 
-        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "유저1", GameRoomRole.HOST));
+        GameRoomEntranceJpaEntity gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user1, "유저1", GameRoomEntranceRole.HOST));
         gameRoomEntrance1.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "유저2", GameRoomRole.GUEST));
+        GameRoomEntranceJpaEntity gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user2, "유저2", GameRoomEntranceRole.GUEST));
         gameRoomEntrance2.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user3, "유저3", GameRoomRole.GUEST));
+        GameRoomEntranceJpaEntity gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user3, "유저3", GameRoomEntranceRole.GUEST));
         gameRoomEntrance3.changeReady(true);
 
         GameStartRequest gameStartRequest = new GameStartRequest(gameRoom.getId(), 5, 90);
@@ -203,15 +203,15 @@ class GameServiceUnitTest {
         gameService.successSubscription(gameSessionId, user2.getId());
         gameService.successSubscription(gameSessionId, user3.getId());
 
-        GameSession gameSession = gameSessionRepository.findById(gameSessionId).get();
+        GameSessionJpaEntity gameSession = gameSessionRepository.findById(gameSessionId).get();
 
         /**
          * 현재 게임세션의 제한 턴을 모두 사용
          */
-        gameTurnRepository.save(new GameTurn(gameSession, user1, "랜덤 명사"));
-        gameTurnRepository.save(new GameTurn(gameSession, user2, "랜덤 명사2"));
-        gameTurnRepository.save(new GameTurn(gameSession, user3, "핸덤 명사3"));
-        gameTurnRepository.save(new GameTurn(gameSession, user3, "핸덤 명사123"));
+        gameTurnRepository.save(new GameTurnJpaEntity(gameSession, user1, "랜덤 명사"));
+        gameTurnRepository.save(new GameTurnJpaEntity(gameSession, user2, "랜덤 명사2"));
+        gameTurnRepository.save(new GameTurnJpaEntity(gameSession, user3, "핸덤 명사3"));
+        gameTurnRepository.save(new GameTurnJpaEntity(gameSession, user3, "핸덤 명사123"));
 
 
         // when
@@ -232,30 +232,30 @@ class GameServiceUnitTest {
         UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
         UserJpaEntity user3 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
+        GameRoomJpaEntity gameRoom = gameRoomRepository.save(new GameRoomJpaEntity(JoinCodeGenerator.generate(6)));
 
-        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "유저1", GameRoomRole.HOST));
+        GameRoomEntranceJpaEntity gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user1, "유저1", GameRoomEntranceRole.HOST));
         gameRoomEntrance1.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user2, "유저2", GameRoomRole.GUEST));
+        GameRoomEntranceJpaEntity gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user2, "유저2", GameRoomEntranceRole.GUEST));
         gameRoomEntrance2.changeReady(true);
 
-        GameRoomEntrance gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user3, "유저3", GameRoomRole.GUEST));
+        GameRoomEntranceJpaEntity gameRoomEntrance3 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user3, "유저3", GameRoomEntranceRole.GUEST));
         gameRoomEntrance3.changeReady(true);
 
-        List<GameRoomEntrance> entrances = List.of(gameRoomEntrance1, gameRoomEntrance2, gameRoomEntrance3);
+        List<GameRoomEntranceJpaEntity> entrances = List.of(gameRoomEntrance1, gameRoomEntrance2, gameRoomEntrance3);
 
         GameStartRequest gameStartRequest = new GameStartRequest(gameRoom.getId(), 3, 90);
         Long gameSessionId = gameService.startGame(gameStartRequest, user1.getId());
 
-        GameSession gameSession = gameSessionRepository.findById(gameSessionId).get();
+        GameSessionJpaEntity gameSession = gameSessionRepository.findById(gameSessionId).get();
 
         /**
          * 현재 게임세션의 제한 턴을 모두 사용
          */
-        gameTurnRepository.save(new GameTurn(gameSession, user1, "랜덤 명사"));
-        gameTurnRepository.save(new GameTurn(gameSession, user2, "랜덤 명사2"));
-        gameTurnRepository.save(new GameTurn(gameSession, user3, "핸덤 명사3"));
+        gameTurnRepository.save(new GameTurnJpaEntity(gameSession, user1, "랜덤 명사"));
+        gameTurnRepository.save(new GameTurnJpaEntity(gameSession, user2, "랜덤 명사2"));
+        gameTurnRepository.save(new GameTurnJpaEntity(gameSession, user3, "핸덤 명사3"));
 
         // when
         Assertions.assertThatThrownBy(() -> gameService.findNextDrawerId(gameSessionId))

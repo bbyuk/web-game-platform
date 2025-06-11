@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.integration.security.auth;
 
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import com.bb.webcanvasservice.domain.auth.service.AuthenticationService;
 import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.domain.auth.dto.response.AuthenticationInnerResponse;

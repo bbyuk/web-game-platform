@@ -2,13 +2,13 @@ package com.bb.webcanvasservice.integration.domain.canvas;
 
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
-import com.bb.webcanvasservice.domain.game.entity.GameRoom;
-import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
@@ -26,14 +26,14 @@ public class CanvasTestDataLoader {
     @Autowired
     UserJpaRepository userJpaRepository;
     @Autowired
-    GameRoomRepository gameRoomRepository;
+    GameRoomJpaRepository gameRoomRepository;
     @Autowired
-    GameRoomEntranceRepository gameRoomEntranceRepository;
+    GameRoomEntranceJpaRepository gameRoomEntranceRepository;
 
     UserJpaEntity testUser1JpaEntity;
     UserJpaEntity testUser2JpaEntity;
     UserJpaEntity testUser3JpaEntity;
-    GameRoom testGameRoom;
+    GameRoomJpaEntity testGameRoom;
     final Stroke testStroke =
             new Stroke("FF5733", 5, List.of(
                     new Stroke.Point(0.46895640686922063, 0.24273767605633803),
@@ -50,11 +50,11 @@ public class CanvasTestDataLoader {
         System.out.println("testUser2 = " + testUser2JpaEntity.getId());
         System.out.println("testUser3 = " + testUser3JpaEntity.getId());
 
-        testGameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
+        testGameRoom = gameRoomRepository.save(new GameRoomJpaEntity(JoinCodeGenerator.generate(6)));
 
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1JpaEntity, "테스트 여우", GameRoomRole.HOST));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser2JpaEntity, "테스트 수달", GameRoomRole.GUEST));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser3JpaEntity,"테스트 늑대", GameRoomRole.GUEST));
+        gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(testGameRoom, testUser1JpaEntity, "테스트 여우", GameRoomEntranceRole.HOST));
+        gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(testGameRoom, testUser2JpaEntity, "테스트 수달", GameRoomEntranceRole.GUEST));
+        gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(testGameRoom, testUser3JpaEntity,"테스트 늑대", GameRoomEntranceRole.GUEST));
     }
 
     @EventListener(ContextClosedEvent.class)

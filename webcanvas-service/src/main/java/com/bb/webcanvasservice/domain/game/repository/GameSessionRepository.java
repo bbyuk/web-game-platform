@@ -1,46 +1,51 @@
 package com.bb.webcanvasservice.domain.game.repository;
 
-import com.bb.webcanvasservice.domain.game.entity.GameSession;
-import com.bb.webcanvasservice.domain.game.entity.GameTurn;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.bb.webcanvasservice.domain.game.model.GameSession;
+import com.bb.webcanvasservice.domain.game.model.GameTurn;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameTurnJpaEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
- * 게임 세션 레포지토리
+ * 게임 플레이 및 세션, 턴 관련 도메인 레포지토리
  */
-public interface GameSessionRepository extends JpaRepository<GameSession, Long> {
-
+public interface GameSessionRepository {
     /**
      * 현재 라운드를 조회한다.
+     * @param gameSessionId 게임 세션 ID
+     * @return 현재 라운드
+     */
+    int findCurrentRound(Long gameSessionId);
+
+
+    /**
+     * 조회 대상 게임 방에서 진행된 GameSession 목록을 조회한다.
+     * @param gameRoomId 게임 방 ID
+     * @return 게임 세션 목록
+     */
+    List<GameSession> findGameSessionsByGameRoomId(Long gameRoomId);
+
+    /**
+     * 가장 최신의 턴을 조회한다.
      * @param gameSessionId
      * @return
      */
-    @Query("""
-            select  count(gt) + 1
-            from    GameTurn gt
-            where   gt.gameSession.id = :gameSessionId
-            """)
-    int findCurrentRound(@Param("gameSessionId") Long gameSessionId);
+    Optional<GameTurn> findLatestTurn(Long gameSessionId);
 
     /**
-     * 세션에 포함되어 있는 GameTurn 목록을 조회한다.
-     * @param gameSessionId
-     * @return 타겟 세션에서 진행된 turn 목록
+     * 게임 세션 ID로 해당 세션에 포함된 게임 턴 목록을 조회한다.
+     * @param gameSessionId 게임 세션 ID
+     * @return 턴 목록
      */
-    @Query("""
-            select  gt
-            from    GameTurn gt
-            where   gt.gameSession.id = :gameSessionId
-            """)
-    List<GameTurn> findTurnsByGameSessionId(@Param("gameSessionId") Long gameSessionId);
+    List<GameTurn> findTurnsByGameSessionId(Long gameSessionId);
 
-    @Query("""
-          select  gs
-          from    GameSession gs
-          where   gs.gameRoom.id = :gameRoomId
-          """)
-    List<GameSession> findGameSessionsByGameRoomId(@Param("gameRoomId") Long gameRoomId);
+    /**
+     * 게임 세션 ID로 해당 세션에 포함된 게임 턴 수를 조회한다.
+     * @param gameSessionId 게임 세션 ID
+     * @return 턴 수
+     */
+    long findTurnCountByGameSessionId(Long gameSessionId);
 }

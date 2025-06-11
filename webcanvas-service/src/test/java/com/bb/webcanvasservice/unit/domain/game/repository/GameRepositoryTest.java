@@ -2,14 +2,14 @@ package com.bb.webcanvasservice.unit.domain.game.repository;
 
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.config.JpaConfig;
-import com.bb.webcanvasservice.domain.game.entity.GameRoom;
-import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
+import com.bb.webcanvasservice.domain.game.model.GameRoomState;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,13 +34,13 @@ import java.util.concurrent.Executors;
 class GameRepositoryTest {
 
     @Autowired
-    private GameRoomRepository gameRoomRepository;
+    private GameRoomJpaRepository gameRoomRepository;
 
     @Autowired
     private UserJpaRepository userJpaRepository;
 
     @Autowired
-    private GameRoomEntranceRepository gameRoomEntranceRepository;
+    private GameRoomEntranceJpaRepository gameRoomEntranceRepository;
 
     private final String testUserToken = UUID.randomUUID().toString();
 
@@ -59,17 +59,17 @@ class GameRepositoryTest {
         String enteredRoomCode = JoinCodeGenerator.generate(10);
         String otherRoomCode = JoinCodeGenerator.generate(10);
 
-        GameRoom enteredRoom = new GameRoom(GameRoomState.WAITING, enteredRoomCode);
-        GameRoom otherRoom = new GameRoom(GameRoomState.WAITING, otherRoomCode);
+        GameRoomJpaEntity enteredRoom = new GameRoomJpaEntity(GameRoomState.WAITING, enteredRoomCode);
+        GameRoomJpaEntity otherRoom = new GameRoomJpaEntity(GameRoomState.WAITING, otherRoomCode);
 
         gameRoomRepository.save(enteredRoom);
         gameRoomRepository.save(otherRoom);
 
-        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(enteredRoom, testUser, "테스트 호랑이", GameRoomRole.GUEST);
+        GameRoomEntranceJpaEntity gameRoomEntrance = new GameRoomEntranceJpaEntity(enteredRoom, testUser, "테스트 호랑이", GameRoomEntranceRole.GUEST);
         gameRoomEntranceRepository.save(gameRoomEntrance);
 
         // when
-        Optional<GameRoom> queryResult = gameRoomRepository.findNotClosedGameRoomByUserId(testUser.getId());
+        Optional<GameRoomJpaEntity> queryResult = gameRoomRepository.findNotClosedGameRoomByUserId(testUser.getId());
 
         // then
         Assertions.assertThat(queryResult.isPresent()).isTrue();
@@ -81,7 +81,7 @@ class GameRepositoryTest {
     public void returnTrueWhenJoinCodeConflict() {
         // given
         String testRoomCode = JoinCodeGenerator.generate(10);
-        GameRoom playingGameRoom = new GameRoom(GameRoomState.PLAYING, testRoomCode);
+        GameRoomJpaEntity playingGameRoom = new GameRoomJpaEntity(GameRoomState.PLAYING, testRoomCode);
 
         gameRoomRepository.save(playingGameRoom);
 
@@ -108,7 +108,7 @@ class GameRepositoryTest {
             try {
                 // 비관적 락 획득
                 if (!gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(joinCode)) {
-                    GameRoom lockTakenGameRoom = new GameRoom(GameRoomState.WAITING, joinCode);
+                    GameRoomJpaEntity lockTakenGameRoom = new GameRoomJpaEntity(GameRoomState.WAITING, joinCode);
                     gameRoomRepository.save(lockTakenGameRoom);
                 }
 
@@ -139,8 +139,8 @@ class GameRepositoryTest {
         // given
         Long testUserId = testUser.getId();
 
-        GameRoom waitingRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
-        GameRoom playingRoom = new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(10));
+        GameRoomJpaEntity waitingRoom = new GameRoomJpaEntity(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
+        GameRoomJpaEntity playingRoom = new GameRoomJpaEntity(GameRoomState.PLAYING, JoinCodeGenerator.generate(10));
 
         gameRoomRepository.save(waitingRoom);
         gameRoomRepository.save(playingRoom);
@@ -158,13 +158,13 @@ class GameRepositoryTest {
         // given
         Long testUserId = testUser.getId();
 
-        GameRoom waitingRoom = new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
-        GameRoom playingRoom = new GameRoom(GameRoomState.PLAYING, JoinCodeGenerator.generate(10));
+        GameRoomJpaEntity waitingRoom = new GameRoomJpaEntity(GameRoomState.WAITING, JoinCodeGenerator.generate(10));
+        GameRoomJpaEntity playingRoom = new GameRoomJpaEntity(GameRoomState.PLAYING, JoinCodeGenerator.generate(10));
 
         gameRoomRepository.save(waitingRoom);
         gameRoomRepository.save(playingRoom);
 
-        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(waitingRoom, testUser, "테스트 여우", GameRoomRole.GUEST);
+        GameRoomEntranceJpaEntity gameRoomEntrance = new GameRoomEntranceJpaEntity(waitingRoom, testUser, "테스트 여우", GameRoomEntranceRole.GUEST);
         gameRoomEntranceRepository.save(gameRoomEntrance);
 
         // when

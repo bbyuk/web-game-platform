@@ -1,12 +1,12 @@
 package com.bb.webcanvasservice.domain.game.service;
 
-import com.bb.webcanvasservice.domain.game.entity.GameRoom;
-import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState;
+import com.bb.webcanvasservice.domain.game.model.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomNotFoundException;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GameRoomCrossDomainService {
 
-    private final GameRoomEntranceRepository gameRoomEntranceRepository;
-    private final GameRoomRepository gameRoomRepository;
+    private final GameRoomEntranceJpaRepository gameRoomEntranceRepository;
+    private final GameRoomJpaRepository gameRoomRepository;
 
     /**
      * 게임 방 ID와 게임 방 입장 상태에 맞는 게임 방 입장 목록을 조회해온다.
@@ -33,7 +33,7 @@ public class GameRoomCrossDomainService {
      * @return
      */
     @Transactional(readOnly = true)
-    public List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndState(Long gameRoomId, GameRoomEntranceState gameRoomEntranceState) {
+    public List<GameRoomEntranceJpaEntity> findGameRoomEntrancesByGameRoomIdAndState(Long gameRoomId, GameRoomEntranceState gameRoomEntranceState) {
         return gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, gameRoomEntranceState);
     }
 
@@ -44,7 +44,7 @@ public class GameRoomCrossDomainService {
      * @return gameRoomList 게임 방 Entity List
      */
     @Transactional(readOnly = true)
-    public List<GameRoom> findRoomsOnState(GameRoomState state) {
+    public List<GameRoomJpaEntity> findRoomsOnState(GameRoomState state) {
         return gameRoomRepository.findByState(state);
     }
 
@@ -55,7 +55,7 @@ public class GameRoomCrossDomainService {
      * @return
      */
     @Transactional
-    public List<GameRoomEntrance> findCurrentGameRoomEntrancesWithLock(Long gameRoomId) {
+    public List<GameRoomEntranceJpaEntity> findCurrentGameRoomEntrancesWithLock(Long gameRoomId) {
         return gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdWithLock(gameRoomId);
     }
 
@@ -78,7 +78,7 @@ public class GameRoomCrossDomainService {
      * @return
      */
     @Transactional(readOnly = true)
-    public GameRoom findGameRoom(Long gameRoomId) {
+    public GameRoomJpaEntity findGameRoom(Long gameRoomId) {
         return gameRoomRepository.findById(gameRoomId)
                 .orElseThrow(GameRoomNotFoundException::new);
     }

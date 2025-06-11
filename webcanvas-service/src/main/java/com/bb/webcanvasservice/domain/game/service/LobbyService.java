@@ -6,24 +6,23 @@ import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 import com.bb.webcanvasservice.domain.game.GameProperties;
-import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
-import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
-import com.bb.webcanvasservice.domain.game.entity.GameRoom;
-import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.event.GameRoomEntranceEvent;
 import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
 import com.bb.webcanvasservice.domain.game.exception.JoinCodeNotGeneratedException;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
+import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
+import com.bb.webcanvasservice.domain.game.model.GameRoomState;
 import com.bb.webcanvasservice.domain.user.model.User;
-import com.bb.webcanvasservice.infrastructure.persistence.user.UserModelMapper;
-import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 import com.bb.webcanvasservice.domain.user.service.UserService;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.UserModelMapper;
+import com.bb.webcanvasservice.presentation.game.response.GameRoomEntranceResponse;
+import com.bb.webcanvasservice.presentation.game.response.GameRoomListResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,8 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState.WAITING;
-import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
+import static com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole.HOST;
+import static com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState.WAITING;
 
 @Slf4j
 @Service
@@ -46,8 +45,8 @@ public class LobbyService {
     private final UserService userService;
     private final DictionaryService dictionaryService;
 
-    private final GameRoomRepository gameRoomRepository;
-    private final GameRoomEntranceRepository gameRoomEntranceRepository;
+    private final GameRoomJpaRepository gameRoomRepository;
+    private final GameRoomEntranceJpaRepository gameRoomEntranceRepository;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -110,7 +109,7 @@ public class LobbyService {
         /**
          * GameRoom 생성
          */
-        GameRoom newGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, joinCode));
+        GameRoomJpaEntity newGameRoom = gameRoomRepository.save(new GameRoomJpaEntity(GameRoomState.WAITING, joinCode));
 
         return newGameRoom.getId();
     }
@@ -139,17 +138,17 @@ public class LobbyService {
      * @return gameRoomEntranceId
      */
     @Transactional
-    public GameRoomEntranceResponse enterGameRoom(Long gameRoomId, Long userId, GameRoomRole role) {
+    public GameRoomEntranceResponse enterGameRoom(Long gameRoomId, Long userId, GameRoomEntranceRole role) {
         if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
             throw new AlreadyEnteredRoomException();
         }
 
-        GameRoom targetGameRoom = gameRoomRepository.findById(gameRoomId).orElseThrow(GameRoomNotFoundException::new);
+        GameRoomJpaEntity targetGameRoom = gameRoomRepository.findById(gameRoomId).orElseThrow(GameRoomNotFoundException::new);
         if (!targetGameRoom.getState().equals(GameRoomState.WAITING)) {
             throw new IllegalGameRoomStateException();
         }
 
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, WAITING);
+        List<GameRoomEntranceJpaEntity> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, WAITING);
         int enteredUserCounts = gameRoomEntrances.size();
 
         if (enteredUserCounts >= gameProperties.gameRoomCapacity()) {
@@ -157,15 +156,15 @@ public class LobbyService {
         }
 
         String koreanAdjective = dictionaryService.drawRandomWordValue(Language.KOREAN, PartOfSpeech.ADJECTIVE);
-        GameRoomEntrance gameRoomEntrance =
-                new GameRoomEntrance(
+        GameRoomEntranceJpaEntity gameRoomEntrance =
+                new GameRoomEntranceJpaEntity(
                         targetGameRoom
                         , UserModelMapper.toUserJpaEntity(userService.findUser(userId))
                         , String.format("%s %s", koreanAdjective, gameProperties.gameRoomUserNicknameNouns().get(enteredUserCounts))
                         , role
                 );
 
-        GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
+        GameRoomEntranceJpaEntity newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
 
         userService.changeUserState(userId, UserStateCode.IN_ROOM);
 
@@ -222,9 +221,9 @@ public class LobbyService {
      */
     @Transactional
     public GameRoomEntranceResponse enterGameRoomWithJoinCode(String joinCode, Long userId) {
-        GameRoom targetGameRoom = gameRoomRepository.findRoomWithJoinCodeForEnter(joinCode)
+        GameRoomJpaEntity targetGameRoom = gameRoomRepository.findRoomWithJoinCodeForEnter(joinCode)
                 .orElseThrow(() -> new GameRoomNotFoundException(String.format("입장 코드가 %s인 방을 찾지 못했습니다.", joinCode)));
 
-        return enterGameRoom(targetGameRoom.getId(), userId, GameRoomRole.GUEST);
+        return enterGameRoom(targetGameRoom.getId(), userId, GameRoomEntranceRole.GUEST);
     }
 }

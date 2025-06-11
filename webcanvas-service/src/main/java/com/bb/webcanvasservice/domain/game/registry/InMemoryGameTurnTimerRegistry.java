@@ -1,12 +1,11 @@
 package com.bb.webcanvasservice.domain.game.registry;
 
-import com.bb.webcanvasservice.domain.game.dto.inner.GameTurnTimerEntry;
+import com.bb.webcanvasservice.application.game.dto.GameTurnTimerEntry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
 
 @Repository
 @RequiredArgsConstructor

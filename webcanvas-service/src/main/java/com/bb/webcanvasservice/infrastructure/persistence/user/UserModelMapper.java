@@ -4,7 +4,7 @@ import com.bb.webcanvasservice.domain.user.model.User;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 
 /**
- * entity -> domain model
+ * entity <-> domain model
  * User
  */
 public class UserModelMapper {

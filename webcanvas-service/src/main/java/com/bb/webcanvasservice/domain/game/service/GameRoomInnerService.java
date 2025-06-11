@@ -2,17 +2,17 @@ package com.bb.webcanvasservice.domain.game.service;
 
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.domain.game.GameProperties;
-import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
-import com.bb.webcanvasservice.domain.game.entity.GameRoom;
-import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
+import com.bb.webcanvasservice.presentation.game.response.GameRoomEntranceInfoResponse;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.event.GameRoomExitEvent;
 import com.bb.webcanvasservice.domain.game.event.GameRoomHostChangedEvent;
 import com.bb.webcanvasservice.domain.game.event.UserReadyChanged;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomEntranceNotFoundException;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomHostCanNotChangeReadyException;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 import com.bb.webcanvasservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
+import static com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole.HOST;
 
 /**
  * 게임 방과 관련된 비즈니스 로직을 처리하는 서비스 클래스
@@ -38,8 +38,8 @@ public class GameRoomInnerService {
     /**
      * 레포지토리
      */
-    private final GameRoomRepository gameRoomRepository;
-    private final GameRoomEntranceRepository gameRoomEntranceRepository;
+    private final GameRoomJpaRepository gameRoomRepository;
+    private final GameRoomEntranceJpaRepository gameRoomEntranceRepository;
 
     /**
      * 서비스
@@ -68,15 +68,15 @@ public class GameRoomInnerService {
      */
     @Transactional(readOnly = true)
     public GameRoomEntranceInfoResponse findEnteredGameRoomInfo(Long userId) {
-        GameRoomEntrance userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId, List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING))
+        GameRoomEntranceJpaEntity userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId, List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING))
                 .orElseThrow(GameRoomEntranceNotFoundException::new);
 
 
-        GameRoom gameRoom = userEntrance.getGameRoom();
+        GameRoomJpaEntity gameRoom = userEntrance.getGameRoom();
 
         AtomicInteger index = new AtomicInteger(0);
 
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository
+        List<GameRoomEntranceJpaEntity> gameRoomEntrances = gameRoomEntranceRepository
                 .findGameRoomEntrancesByGameRoomIdAndStates(gameRoom.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING));
 
         List<GameRoomEntranceInfoResponse.EnteredUserSummary> enteredUserSummaries = gameRoomEntrances
@@ -110,7 +110,7 @@ public class GameRoomInnerService {
      */
     @Transactional
     public void exitFromRoom(Long gameRoomEntranceId, Long userId) {
-        GameRoomEntrance targetEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
+        GameRoomEntranceJpaEntity targetEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
                 .orElseThrow(GameRoomEntranceNotFoundException::new);
 
         if (!targetEntrance.getUser().getId().equals(userId)) {
@@ -120,8 +120,8 @@ public class GameRoomInnerService {
 
         targetEntrance.exit();
 
-        GameRoom gameRoom = targetEntrance.getGameRoom();
-        List<GameRoomEntrance> entrances = gameRoomEntranceRepository
+        GameRoomJpaEntity gameRoom = targetEntrance.getGameRoom();
+        List<GameRoomEntranceJpaEntity> entrances = gameRoomEntranceRepository
                 .findGameRoomEntrancesByGameRoomIdAndState(gameRoom.getId(), GameRoomEntranceState.WAITING);
 
         if (entrances.isEmpty()) {
@@ -162,7 +162,7 @@ public class GameRoomInnerService {
      */
     @Transactional
     public boolean updateReady(Long gameRoomEntranceId, Long userId, boolean ready) {
-        GameRoomEntrance targetEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
+        GameRoomEntranceJpaEntity targetEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
                 .orElseThrow(GameRoomEntranceNotFoundException::new);
 
         if (!targetEntrance.getUser().getId().equals(userId)) {

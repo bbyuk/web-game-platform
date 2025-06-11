@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.domain.game.listener;
 
-import com.bb.webcanvasservice.domain.game.entity.GameSession;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameSessionJpaEntity;
 import com.bb.webcanvasservice.domain.game.event.AllUserInGameSessionLoadedEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;
@@ -8,7 +8,6 @@ import com.bb.webcanvasservice.domain.game.service.GameService;
 import com.bb.webcanvasservice.domain.game.service.GameTurnTimerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -35,7 +34,7 @@ public class GameSessionEventListener {
     public void handleAllUserInGameSessionLoaded(AllUserInGameSessionLoadedEvent event) {
         messagingTemplate.convertAndSend("/session/" + event.getGameSessionId(), event);
 
-        GameSession gameSession = gameService.findGameSession(event.getGameSessionId());
+        GameSessionJpaEntity gameSession = gameService.findGameSession(event.getGameSessionId());
         gameTurnTimerService.registerTurnTimer(
                 event.getGameRoomId(),
                 event.getGameSessionId(),

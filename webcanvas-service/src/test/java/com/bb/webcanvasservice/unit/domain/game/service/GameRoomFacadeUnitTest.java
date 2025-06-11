@@ -4,17 +4,17 @@
 //import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 //import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 //import com.bb.webcanvasservice.domain.game.GameProperties;
-//import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceInfoResponse;
-//import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
-//import com.bb.webcanvasservice.domain.game.dto.response.GameRoomListResponse;
+//import com.bb.webcanvasservice.presentation.game.response.GameRoomEntranceInfoResponse;
+//import com.bb.webcanvasservice.presentation.game.response.GameRoomEntranceResponse;
+//import com.bb.webcanvasservice.presentation.game.response.GameRoomListResponse;
 //import com.bb.webcanvasservice.domain.game.entity.GameRoom;
 //import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-//import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
+//import com.bb.webcanvasservice.domain.game.model.GameRoomState;
 //import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
 //import com.bb.webcanvasservice.domain.game.exception.GameRoomHostCanNotChangeReadyException;
 //import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
-//import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
-//import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
+//import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceRepository;
+//import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomRepository;
 //import com.bb.webcanvasservice.domain.game.service.GameRoomCrossDomainService;
 //import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 //import com.bb.webcanvasservice.domain.game.service.GameRoomInnerService;
@@ -36,8 +36,8 @@
 //import java.util.*;
 //
 //import static com.bb.webcanvasservice.common.code.ErrorCode.GAME_ROOM_HAS_ILLEGAL_STATUS;
-//import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.GUEST;
-//import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.HOST;
+//import static com.bb.webcanvasservice.domain.game.model.GameRoomRole.GUEST;
+//import static com.bb.webcanvasservice.domain.game.model.GameRoomRole.HOST;
 //import static org.mockito.ArgumentMatchers.*;
 //import static org.mockito.Mockito.when;
 //

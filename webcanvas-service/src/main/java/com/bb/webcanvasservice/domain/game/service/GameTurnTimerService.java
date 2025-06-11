@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.domain.game.service;
 
-import com.bb.webcanvasservice.domain.game.dto.inner.GameTurnTimerEntry;
+import com.bb.webcanvasservice.application.game.dto.GameTurnTimerEntry;
 import com.bb.webcanvasservice.domain.game.exception.GameTurnTimerNotFoundException;
 import com.bb.webcanvasservice.domain.game.registry.GameTurnTimerRegistry;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @Slf4j
 @Service

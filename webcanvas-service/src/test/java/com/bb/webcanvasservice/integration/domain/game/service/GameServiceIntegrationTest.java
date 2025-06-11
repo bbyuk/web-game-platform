@@ -3,18 +3,18 @@ package com.bb.webcanvasservice.integration.domain.game.service;
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
-import com.bb.webcanvasservice.domain.game.dto.request.GameStartRequest;
-import com.bb.webcanvasservice.domain.game.dto.response.GameRoomEntranceResponse;
-import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.entity.GameSession;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
-import com.bb.webcanvasservice.domain.game.enums.GameSessionState;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
+import com.bb.webcanvasservice.presentation.game.request.GameStartRequest;
+import com.bb.webcanvasservice.presentation.game.response.GameRoomEntranceResponse;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameSessionJpaEntity;
+import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState;
+import com.bb.webcanvasservice.domain.game.model.GameSessionState;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.game.service.GameService;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
-import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bb.webcanvasservice.domain.game.enums.GameRoomRole.GUEST;
+import static com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole.GUEST;
 import static org.mockito.ArgumentMatchers.any;
 
 @Transactional
@@ -43,7 +43,7 @@ class GameServiceIntegrationTest {
     UserJpaRepository userJpaRepository;
 
     @Autowired
-    GameRoomEntranceRepository gameRoomEntranceRepository;
+    GameRoomEntranceJpaRepository gameRoomEntranceRepository;
 
     @MockitoBean
     DictionaryService dictionaryService;
@@ -136,16 +136,16 @@ class GameServiceIntegrationTest {
         Assertions.assertThat(user2.getState()).isEqualTo(UserStateCode.IN_ROOM);
         Assertions.assertThat(user3.getState()).isEqualTo(UserStateCode.IN_ROOM);
 
-        GameRoomEntrance user1EntranceEntity = gameRoomEntranceRepository.findById(user1Entrance.gameRoomEntranceId()).get();
+        GameRoomEntranceJpaEntity user1EntranceEntity = gameRoomEntranceRepository.findById(user1Entrance.gameRoomEntranceId()).get();
         Assertions.assertThat(user1EntranceEntity.getState()).isEqualTo(GameRoomEntranceState.WAITING);
 
-        GameRoomEntrance user2EntranceEntity = gameRoomEntranceRepository.findById(user2Entrance.gameRoomEntranceId()).get();
+        GameRoomEntranceJpaEntity user2EntranceEntity = gameRoomEntranceRepository.findById(user2Entrance.gameRoomEntranceId()).get();
         Assertions.assertThat(user2EntranceEntity.getState()).isEqualTo(GameRoomEntranceState.WAITING);
 
-        GameRoomEntrance user3EntranceEntity = gameRoomEntranceRepository.findById(user3Entrance.gameRoomEntranceId()).get();
+        GameRoomEntranceJpaEntity user3EntranceEntity = gameRoomEntranceRepository.findById(user3Entrance.gameRoomEntranceId()).get();
         Assertions.assertThat(user3EntranceEntity.getState()).isEqualTo(GameRoomEntranceState.WAITING);
 
-        GameSession gameSession = gameService.findGameSession(gameSessionId);
+        GameSessionJpaEntity gameSession = gameService.findGameSession(gameSessionId);
         Assertions.assertThat(gameSession.getState()).isEqualTo(GameSessionState.COMPLETED);
     }
 }

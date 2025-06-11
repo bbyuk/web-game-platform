@@ -3,17 +3,17 @@ package com.bb.webcanvasservice.unit.domain.game.repository;
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.config.JpaConfig;
-import com.bb.webcanvasservice.domain.game.entity.GameRoom;
-import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
-import com.bb.webcanvasservice.domain.game.entity.GameSession;
-import com.bb.webcanvasservice.domain.game.entity.GameTurn;
-import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameTurnRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameSessionJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameTurnJpaEntity;
+import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameSessionJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameTurnJpaRepository;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,19 +31,19 @@ import org.springframework.transaction.annotation.Transactional;
 class GameTurnCustomRepositoryTest {
 
     @Autowired
-    GameTurnRepository gameTurnRepository;
+    GameTurnJpaRepository gameTurnRepository;
 
     @Autowired
-    GameRoomRepository gameRoomRepository;
+    GameRoomJpaRepository gameRoomRepository;
 
     @Autowired
-    GameRoomEntranceRepository gameRoomEntranceRepository;
+    GameRoomEntranceJpaRepository gameRoomEntranceRepository;
 
     @Autowired
     UserJpaRepository userJpaRepository;
 
     @Autowired
-    GameSessionRepository gameSessionRepository;
+    GameSessionJpaRepository gameSessionRepository;
 
     @Test
     @DisplayName("현재 턴 찾기 - 없을 경우 Optional null 리턴")
@@ -52,15 +52,15 @@ class GameTurnCustomRepositoryTest {
         UserJpaEntity user1 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
         UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
-        GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
+        GameRoomJpaEntity gameRoom = gameRoomRepository.save(new GameRoomJpaEntity(JoinCodeGenerator.generate(6)));
 
-        GameRoomEntrance gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "닉네임1", GameRoomRole.HOST));
-        GameRoomEntrance gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, user1, "닉네임1", GameRoomRole.GUEST));
+        GameRoomEntranceJpaEntity gameRoomEntrance1 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user1, "닉네임1", GameRoomEntranceRole.HOST));
+        GameRoomEntranceJpaEntity gameRoomEntrance2 = gameRoomEntranceRepository.save(new GameRoomEntranceJpaEntity(gameRoom, user1, "닉네임1", GameRoomEntranceRole.GUEST));
 
         gameRoomEntrance2.changeReady(true);
 
-        GameSession gameSession = gameSessionRepository.save(new GameSession(gameRoom, 2, 90));
-        GameTurn gameTurn = gameTurnRepository.save(new GameTurn(gameSession, user1, "정답"));
+        GameSessionJpaEntity gameSession = gameSessionRepository.save(new GameSessionJpaEntity(gameRoom, 2, 90));
+        GameTurnJpaEntity gameTurn = gameTurnRepository.save(new GameTurnJpaEntity(gameSession, user1, "정답"));
 
         // when
         Assertions.assertThat(gameTurnRepository.findLatestTurn(gameSession.getId())).isPresent();

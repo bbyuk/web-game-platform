@@ -1,10 +1,10 @@
 package com.bb.webcanvasservice.unit.domain.game.repository;
 
 import com.bb.webcanvasservice.config.JpaConfig;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
-import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameSessionJpaRepository;
+import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -20,13 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 class GameSessionRepositoryTest {
 
     @Autowired
-    private GameSessionRepository gameSessionRepository;
+    private GameSessionJpaRepository gameSessionRepository;
 
     @Autowired
-    private GameRoomRepository gameRoomRepository;
+    private GameRoomJpaRepository gameRoomRepository;
 
     @Autowired
-    private GameRoomEntranceRepository gameRoomEntranceRepository;
+    private GameRoomEntranceJpaRepository gameRoomEntranceRepository;
 
     @Autowired
     private UserJpaRepository userJpaRepository;
