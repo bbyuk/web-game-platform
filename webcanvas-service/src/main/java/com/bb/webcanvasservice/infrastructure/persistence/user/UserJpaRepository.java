@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.infrastructure.persistence.user;
 
-import com.bb.webcanvasservice.domain.user.entity.User;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,7 +13,7 @@ import java.util.Optional;
  * 게임 유저의 persitence layer를 담당하는 JPA 레포지토리 클래스
  */
 @Repository
-public interface UserJpaRepository extends JpaRepository<User, Long> {
+public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long> {
 
     /**
      * 클라이언트 fingerprint로 등록된 유저 조회
@@ -22,10 +22,10 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
      */
     @Query("""
             select  u
-            from    User u
+            from    UserJpaEntity u
             where   u.fingerprint = :fingerprint
             """)
-    Optional<User> findByFingerprint(@Param("fingerprint") String fingerprint);
+    Optional<UserJpaEntity> findByFingerprint(@Param("fingerprint") String fingerprint);
 
     /**
      * 유저 상태를 조회한다.
@@ -34,7 +34,7 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
      */
     @Query("""
             select  u.state
-            from    User u
+            from    UserJpaEntity u
             where   u.id = :userId
             """)
     UserStateCode findUserState(@Param("userId") Long userId);

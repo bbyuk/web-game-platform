@@ -7,7 +7,7 @@ import com.bb.webcanvasservice.domain.game.entity.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -30,9 +30,9 @@ public class CanvasTestDataLoader {
     @Autowired
     GameRoomEntranceRepository gameRoomEntranceRepository;
 
-    User testUser1;
-    User testUser2;
-    User testUser3;
+    UserJpaEntity testUser1JpaEntity;
+    UserJpaEntity testUser2JpaEntity;
+    UserJpaEntity testUser3JpaEntity;
     GameRoom testGameRoom;
     final Stroke testStroke =
             new Stroke("FF5733", 5, List.of(
@@ -42,19 +42,19 @@ public class CanvasTestDataLoader {
 
     @EventListener(ApplicationReadyEvent.class)
     public void setupTestData() {
-        testUser1 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
-        testUser2 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
-        testUser3 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        testUser1JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
+        testUser2JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
+        testUser3JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
 
-        System.out.println("testUser1 = " + testUser1.getId());
-        System.out.println("testUser2 = " + testUser2.getId());
-        System.out.println("testUser3 = " + testUser3.getId());
+        System.out.println("testUser1 = " + testUser1JpaEntity.getId());
+        System.out.println("testUser2 = " + testUser2JpaEntity.getId());
+        System.out.println("testUser3 = " + testUser3JpaEntity.getId());
 
         testGameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
 
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1, "테스트 여우", GameRoomRole.HOST));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser2, "테스트 수달", GameRoomRole.GUEST));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser3,"테스트 늑대", GameRoomRole.GUEST));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1JpaEntity, "테스트 여우", GameRoomRole.HOST));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser2JpaEntity, "테스트 수달", GameRoomRole.GUEST));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser3JpaEntity,"테스트 늑대", GameRoomRole.GUEST));
     }
 
     @EventListener(ContextClosedEvent.class)

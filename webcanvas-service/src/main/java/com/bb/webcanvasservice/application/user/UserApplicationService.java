@@ -1,6 +1,5 @@
 package com.bb.webcanvasservice.application.user;
 
-import com.bb.webcanvasservice.application.user.UserApplicationDtoMapper;
 import com.bb.webcanvasservice.application.user.dto.UserDto;
 import com.bb.webcanvasservice.application.user.dto.UserStateDto;
 import com.bb.webcanvasservice.domain.user.service.UserService;

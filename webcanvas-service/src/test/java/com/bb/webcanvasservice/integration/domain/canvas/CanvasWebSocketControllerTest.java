@@ -4,7 +4,7 @@ import com.bb.webcanvasservice.TestWebSocketClientFactory;
 import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.websocket.registry.SessionRegistry;
@@ -88,7 +88,7 @@ class CanvasWebSocketControllerTest {
         /**
          * WebSocket Session 연결
          */
-        testUserSession = testWebSocketClientFactory.connect(testDataLoader.testUser1, port);
+        testUserSession = testWebSocketClientFactory.connect(testDataLoader.testUser1JpaEntity, port);
     }
 
     @AfterEach
@@ -101,7 +101,7 @@ class CanvasWebSocketControllerTest {
     void testWebSocketSubscriptionValidation() throws Exception {
         // given
         // 게임 방에 접속해있지 않으나, 다른 게임방의 웹소켓 이벤트를 구독하려는 악의적인 유저
-        User maliciousUser = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        UserJpaEntity maliciousUser = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
         StompSession maliciousUserSession = testWebSocketClientFactory.connect(maliciousUser, port);
         
         
@@ -127,7 +127,7 @@ class CanvasWebSocketControllerTest {
     void testWebSocketDrawMessage() throws Exception {
         // given
         // 방에 접속해 있어야한다.
-        StompSession subUserSession = testWebSocketClientFactory.connect(testDataLoader.testUser2, port);
+        StompSession subUserSession = testWebSocketClientFactory.connect(testDataLoader.testUser2JpaEntity, port);
         CompletableFuture<Stroke> subscribeFuture = testWebSocketClientFactory.subscribe(
                 subUserSession,
                 testWebSocketClientFactory.getTopic
@@ -157,7 +157,7 @@ class CanvasWebSocketControllerTest {
         /**
          * 클라이언트에서 처리해야 할 웹소켓 접속 시나리오 로직
          */
-        StompSession otherUser1Session = testWebSocketClientFactory.connect(testDataLoader.testUser2, port);
+        StompSession otherUser1Session = testWebSocketClientFactory.connect(testDataLoader.testUser2JpaEntity, port);
         CompletableFuture<Stroke> otherUser1CompletableFuture = testWebSocketClientFactory.subscribe(
                 otherUser1Session,
                 testWebSocketClientFactory.getTopic
@@ -168,7 +168,7 @@ class CanvasWebSocketControllerTest {
                 Stroke.class
         );
 
-        StompSession otherUser2Session = testWebSocketClientFactory.connect(testDataLoader.testUser3, port);
+        StompSession otherUser2Session = testWebSocketClientFactory.connect(testDataLoader.testUser3JpaEntity, port);
         CompletableFuture<Stroke> otherUser2CompletableFuture = testWebSocketClientFactory.subscribe(
                 otherUser2Session,
                 testWebSocketClientFactory.getTopic

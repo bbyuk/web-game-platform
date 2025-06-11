@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.unit.security.auth;
 
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.domain.user.service.UserService;
 import com.bb.webcanvasservice.web.security.SecurityProperties;
 import com.bb.webcanvasservice.domain.auth.service.AuthenticationService;
@@ -129,9 +129,9 @@ class AuthenticationControllerTest {
         JwtManager realJwtManager = new JwtManager(securityProperties);
         long refreshTokenExpiration = 24 * 3600000; // 1시간 (ms)
         String token = realJwtManager.generateToken(userId, fingerprint, refreshTokenExpiration);
-        User user = new User(fingerprint);
+        UserJpaEntity user = new UserJpaEntity(fingerprint);
         user.updateRefreshToken(token);
-        Field userIdField = User.class.getDeclaredField("id");
+        Field userIdField = UserJpaEntity.class.getDeclaredField("id");
         userIdField.setAccessible(true);
         userIdField.set(user, userId);
 
@@ -169,9 +169,9 @@ class AuthenticationControllerTest {
         JwtManager realJwtManager = new JwtManager(securityProperties);
         long accessTokenExpiration = 24 * 3600000; // 1시간 (ms)
         String token = realJwtManager.generateToken(userId, fingerprint, accessTokenExpiration);
-        User user = new User(fingerprint);
+        UserJpaEntity user = new UserJpaEntity(fingerprint);
         user.updateRefreshToken(token);
-        Field userIdField = User.class.getDeclaredField("id");
+        Field userIdField = UserJpaEntity.class.getDeclaredField("id");
         userIdField.setAccessible(true);
         userIdField.set(user, userId);
 

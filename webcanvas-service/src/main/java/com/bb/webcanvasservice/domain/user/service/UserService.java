@@ -1,19 +1,20 @@
 package com.bb.webcanvasservice.domain.user.service;
 
-import com.bb.webcanvasservice.domain.user.entity.User;
 import com.bb.webcanvasservice.domain.user.exception.AlreadyRegisteredUserException;
 import com.bb.webcanvasservice.domain.user.exception.UserNotFoundException;
+import com.bb.webcanvasservice.domain.user.model.User;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 import com.bb.webcanvasservice.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 게임 유저에 대한 비즈니스 로직을 처리하는 서비스 클래스
  */
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     /**
      * 클라이언트 fingerprint로 등록된 유저를 조회 후 없을 시 유저 생성 후 리턴
@@ -54,7 +55,7 @@ public class UserService {
                         }
                 );
 
-        return userRepository.save(new User(fingerprint));
+        return userRepository.save(new User(null, fingerprint, null));
     }
 
     /**

@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.domain.game.entity;
 
 import com.bb.webcanvasservice.common.entity.BaseEntity;
 import com.bb.webcanvasservice.domain.game.enums.GameTurnState;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -41,7 +41,7 @@ public class GameTurn extends BaseEntity {
     /**
      * 해당 턴에 그림을 그릴 차례인 유저
      */
-    private User drawer;
+    private UserJpaEntity drawer;
 
     @Column(name = "answer")
     /**
@@ -54,13 +54,13 @@ public class GameTurn extends BaseEntity {
     /**
      * 정답을 맞힌 유저
      */
-    private User correctAnswerer;
+    private UserJpaEntity correctAnswerer;
 
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     private GameTurnState state;
 
-    public GameTurn(GameSession gameSession, User drawer, String answer) {
+    public GameTurn(GameSession gameSession, UserJpaEntity drawer, String answer) {
         this.gameSession = gameSession;
         this.drawer = drawer;
         this.answer = answer;
@@ -71,7 +71,7 @@ public class GameTurn extends BaseEntity {
      * 정답을 맞혔을을 때 호출
      * @param user
      */
-    public void answeredCorrectlyBy(User user) {
+    public void answeredCorrectlyBy(UserJpaEntity user) {
         correctAnswerer = user;
         this.state = GameTurnState.ANSWERED;
     }

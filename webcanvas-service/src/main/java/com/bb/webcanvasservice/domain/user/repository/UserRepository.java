@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.domain.user.repository;
 
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.model.User;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 
 import java.util.Optional;
@@ -19,7 +19,7 @@ public interface UserRepository {
 
     /**
      * 유저를 저장한다.
-     * @param user
+     * @param user 유저 객체
      * @return 저장된 유저
      */
     User save(User user);

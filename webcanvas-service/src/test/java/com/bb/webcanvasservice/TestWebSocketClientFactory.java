@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice;
 
 import com.bb.webcanvasservice.common.util.JwtManager;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
-import com.bb.webcanvasservice.domain.user.entity.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;
@@ -50,7 +50,7 @@ public class TestWebSocketClientFactory {
      * @return
      * @throws Exception
      */
-    public StompSession connect(User user, int port) throws Exception {
+    public StompSession connect(UserJpaEntity user, int port) throws Exception {
         WebSocketStompClient client = createClient();
         String jwt = jwtManager.generateToken(user.getId(), user.getFingerprint(), tokenExpiration);
 

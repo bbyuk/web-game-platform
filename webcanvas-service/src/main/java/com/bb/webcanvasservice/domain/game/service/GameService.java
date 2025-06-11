@@ -23,6 +23,7 @@ import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameTurnRepository;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 import com.bb.webcanvasservice.domain.user.service.UserService;
+import com.bb.webcanvasservice.infrastructure.persistence.user.UserModelMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -325,7 +326,7 @@ public class GameService {
         GameTurn gameTurn = gameTurnRepository.save(
                 new GameTurn(
                         gameSession,
-                        userService.findUser(findNextDrawerId(gameSessionId)),
+                        UserModelMapper.toUserJpaEntity(userService.findUser(findNextDrawerId(gameSessionId))),
                         dictionaryService.drawRandomWordValue(Language.KOREAN, PartOfSpeech.NOUN)
                 ));
 

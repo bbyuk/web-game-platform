@@ -15,7 +15,7 @@ import com.bb.webcanvasservice.domain.game.exception.GameSessionIsOverException;
 import com.bb.webcanvasservice.domain.game.repository.*;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.game.service.GameService;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import jakarta.persistence.EntityManager;
@@ -76,9 +76,9 @@ class GameServiceUnitTest {
     @DisplayName("게임 시작 - 게임 시작 테스트")
     void testStartGame() throws Exception {
         // given
-        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user3 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        UserJpaEntity user1 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user3 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
 
@@ -114,9 +114,9 @@ class GameServiceUnitTest {
     @DisplayName("게임 시작 - HOST가 아닌 유저가 요청보낼 경우 비정상적인 접근 예외 발생")
     void startGameFailedWhenNotHostUserRequestToStartGame() throws Exception {
         // given
-        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user3 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        UserJpaEntity user1 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user3 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
 
@@ -146,9 +146,9 @@ class GameServiceUnitTest {
     void findNextDrawer() throws Exception {
         // given
         // given
-        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user3 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        UserJpaEntity user1 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user3 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
 
@@ -181,9 +181,9 @@ class GameServiceUnitTest {
     @DisplayName("다음 턴 그림 그릴 사람 조회 - 그림 그린 턴 집계해 골고루 분배 되도록 처리")
     void findNextDrawerBalancedCheck() throws Exception {
         // given
-        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user3 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        UserJpaEntity user1 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user3 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
 
@@ -228,9 +228,9 @@ class GameServiceUnitTest {
     @DisplayName("다음 턴 그림 그릴 사람 조회 - 턴 리밋을 넘으면 실패")
     void findNextDrawerFailedWhenTurnLimitOver() throws Exception {
         // given
-        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user3 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        UserJpaEntity user1 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user3 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
 

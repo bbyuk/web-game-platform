@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.infrastructure.persistence.user;
 
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.model.User;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 import com.bb.webcanvasservice.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +16,21 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findById(Long userId) {
-        return userJpaRepository.findById(userId);
+        return userJpaRepository.findById(userId)
+                .map(UserModelMapper::toUser);
     }
 
     @Override
     public User save(User user) {
-        return userJpaRepository.save(user);
+        return UserModelMapper.toUser(
+                userJpaRepository.save(UserModelMapper.toUserJpaEntity(user))
+        );
     }
 
     @Override
     public Optional<User> findByFingerprint(String fingerprint) {
-        return userJpaRepository.findByFingerprint(fingerprint);
+        return userJpaRepository.findByFingerprint(fingerprint)
+                .map(UserModelMapper::toUser);
     }
 
     @Override

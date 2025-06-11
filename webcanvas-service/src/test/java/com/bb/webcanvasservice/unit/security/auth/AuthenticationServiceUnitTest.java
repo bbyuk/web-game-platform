@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.unit.security.auth;
 
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.domain.user.service.UserService;
 import com.bb.webcanvasservice.web.security.SecurityProperties;
 import com.bb.webcanvasservice.domain.auth.service.AuthenticationService;
@@ -58,8 +58,8 @@ class AuthenticationServiceUnitTest {
         // given
         String fingerprint = "asdwqujdqwi12j3b1jbsd";
 
-        User user = new User(fingerprint);
-        Field idField = User.class.getDeclaredField("id");
+        UserJpaEntity user = new UserJpaEntity(fingerprint);
+        Field idField = UserJpaEntity.class.getDeclaredField("id");
         idField.setAccessible(true);
         long userId = 1L;
         idField.set(user, userId);
@@ -96,8 +96,8 @@ class AuthenticationServiceUnitTest {
         // given
         Long userId = 1L;
         String fingerprint = FingerprintGenerator.generate();
-        User user = new User(fingerprint);
-        Field idField = User.class.getDeclaredField("id");
+        UserJpaEntity user = new UserJpaEntity(fingerprint);
+        Field idField = UserJpaEntity.class.getDeclaredField("id");
         idField.setAccessible(true);
         long expiration = 3600000; // 1시간 (m)
         idField.set(user, userId);
@@ -134,11 +134,11 @@ class AuthenticationServiceUnitTest {
         // given
         JwtManager realJwtManagerObject = new JwtManager(securityProperties);
         Long userId = 1L;
-        User user = new User(FingerprintGenerator.generate());
+        UserJpaEntity user = new UserJpaEntity(FingerprintGenerator.generate());
         String userRefreshToken = realJwtManagerObject.generateToken(userId, FingerprintGenerator.generate(), 20000);
         user.updateRefreshToken(userRefreshToken);
 
-        Field idField = User.class.getDeclaredField("id");
+        Field idField = UserJpaEntity.class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(user, userId);
 

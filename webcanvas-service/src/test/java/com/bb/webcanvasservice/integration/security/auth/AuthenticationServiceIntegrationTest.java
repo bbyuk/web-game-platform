@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.integration.security.auth;
 
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import com.bb.webcanvasservice.domain.auth.service.AuthenticationService;
 import com.bb.webcanvasservice.common.util.JwtManager;
@@ -31,11 +31,11 @@ class AuthenticationServiceIntegrationTest {
     void loginSuccessWhenFingerprintRegistered() {
         // given
         String fingerprint = "asdwqujdqwi12j3b1jbsd";
-        User savedUser = userJpaRepository.save(new User(fingerprint));
+        UserJpaEntity savedUser = userJpaRepository.save(new UserJpaEntity(fingerprint));
 
         // when
         AuthenticationInnerResponse authenticationApiResponse = authenticationService.login(fingerprint);
-        User findUser = userJpaRepository.findById(savedUser.getId()).get();
+        UserJpaEntity findUser = userJpaRepository.findById(savedUser.getId()).get();
 
         // then
         Assertions.assertThat(jwtManager.getFingerprintFromToken(authenticationApiResponse.accessToken())).isEqualTo(fingerprint);

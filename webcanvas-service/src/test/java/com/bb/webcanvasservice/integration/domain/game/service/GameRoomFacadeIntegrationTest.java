@@ -12,7 +12,7 @@ import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException
 import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import org.assertj.core.api.Assertions;
@@ -53,18 +53,18 @@ class GameRoomFacadeIntegrationTest {
     @MockitoBean
     private DictionaryService dictionaryService;
 
-    private User testUser;
-    private User waitingRoomHost;
-    private User playingRoomHost;
+    private UserJpaEntity testUser;
+    private UserJpaEntity waitingRoomHost;
+    private UserJpaEntity playingRoomHost;
     private GameRoom waitingRoom;
     private GameRoom playingRoom;
 
     @BeforeEach
     public void beforeEach() {
         // 테스트 공통 유저 저장
-        testUser = userJpaRepository.save(new User(UUID.randomUUID().toString()));
-        waitingRoomHost = userJpaRepository.save(new User(UUID.randomUUID().toString()));
-        playingRoomHost = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        testUser = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
+        waitingRoomHost = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
+        playingRoomHost = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
 
         // 테스트 공통 게임 방 저장
         waitingRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(10)));
@@ -181,8 +181,8 @@ class GameRoomFacadeIntegrationTest {
     @DisplayName("게임 방 퇴장 - 게임 방에서 모든 유저가 나가면 game room이 closed 된다.")
     void gameRoomClosedWhenAllUserExit() throws Exception {
         // given
-        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        UserJpaEntity user1 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(6)));
 
@@ -201,8 +201,8 @@ class GameRoomFacadeIntegrationTest {
     @DisplayName("게임 방 퇴장 - 게임 방에서 퇴장한 유저의 상태는 IN_LOBBY로 변경된다.")
     void testUserStateWhenExitFromRoom() throws Exception {
         // given
-        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        UserJpaEntity user1 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(6)));
 
@@ -223,8 +223,8 @@ class GameRoomFacadeIntegrationTest {
     @DisplayName("게임 방 퇴장 - 게임 방에서 HOST가 나가면 남은 유저 중 입장한지 가장 오래된 유저가 HOST가 된다.")
     void gameRoomHostChangedWhenHostExit() throws Exception {
         // given
-        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        UserJpaEntity user1 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(JoinCodeGenerator.generate(6)));
 
@@ -243,8 +243,8 @@ class GameRoomFacadeIntegrationTest {
     @DisplayName("게임 방 레디 - 레디 상태 JPA 변경 감지 테스트")
     void testGameRoomEntranceReadyDirtyCheck() throws Exception {
         // given
-        User user1 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
-        User user2 = userJpaRepository.save(new User(FingerprintGenerator.generate()));
+        UserJpaEntity user1 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
+        UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(FingerprintGenerator.generate()));
 
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(WAITING, JoinCodeGenerator.generate(6)));
 

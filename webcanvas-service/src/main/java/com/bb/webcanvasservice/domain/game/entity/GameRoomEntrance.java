@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.domain.game.entity;
 import com.bb.webcanvasservice.common.entity.BaseEntity;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -40,7 +40,7 @@ public class GameRoomEntrance extends BaseEntity {
     /**
      * 입장한 유저
      */
-    private User user;
+    private UserJpaEntity user;
 
     @Column(name = "user_nickname")
     /**
@@ -73,7 +73,7 @@ public class GameRoomEntrance extends BaseEntity {
         return ready;
     }
 
-    public GameRoomEntrance(GameRoom gameRoom, User user, String nickname, GameRoomRole role) {
+    public GameRoomEntrance(GameRoom gameRoom, UserJpaEntity user, String nickname, GameRoomRole role) {
         this.gameRoom = gameRoom;
         this.user = user;
         this.state = GameRoomEntranceState.WAITING;

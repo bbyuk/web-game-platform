@@ -9,7 +9,7 @@ import com.bb.webcanvasservice.domain.game.enums.GameRoomRole;
 import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
@@ -60,22 +60,22 @@ class GameRoomRepositoryTest {
     @DisplayName("유저 입장 기록이 있는 방 중 현재 방 상태가 CLOSED가 아닌 방 조회")
     void findNotClosedGameRoomByUserId() {
         // given
-        User testUser = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        UserJpaEntity testUser = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
         GameRoom savedGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
         gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser, "테스트 부엉이", GameRoomRole.GUEST));
 
 
-        User testUser1 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser1, "테스트 다람쥐", GameRoomRole.GUEST));
+        UserJpaEntity testUser1JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser1JpaEntity, "테스트 다람쥐", GameRoomRole.GUEST));
 
-        User testUser2 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser2, "테스트 고양이", GameRoomRole.GUEST));
+        UserJpaEntity testUser2JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(savedGameRoom, testUser2JpaEntity, "테스트 고양이", GameRoomRole.GUEST));
 
 
         // when
         GameRoom findGameRoom = gameRoomRepository.findNotClosedGameRoomByUserId(testUser.getId())
                 .get();
-        GameRoom findTestUser1GameRoom = gameRoomRepository.findNotClosedGameRoomByUserId(testUser1.getId()).get();
+        GameRoom findTestUser1GameRoom = gameRoomRepository.findNotClosedGameRoomByUserId(testUser1JpaEntity.getId()).get();
 
         // then
         Assertions.assertThat(savedGameRoom.getId()).isEqualTo(findGameRoom.getId());
@@ -135,10 +135,10 @@ class GameRoomRepositoryTest {
          * 입장가능 room1 ~ room3
          */
         GameRoom room1 = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
-        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, userJpaRepository.save(new User(UUID.randomUUID().toString())), "여우", GameRoomRole.GUEST));
-        User user2 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(room1, userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString())), "여우", GameRoomRole.GUEST));
+        UserJpaEntity user2 = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
         gameRoomEntranceRepository.save(new GameRoomEntrance(room1, user2, "여우", GameRoomRole.GUEST));
-        User user3 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        UserJpaEntity user3 = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
         gameRoomEntranceRepository.save(new GameRoomEntrance(room1, user3, "여우", GameRoomRole.GUEST));
 
         // when

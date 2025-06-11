@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.user.entity;
+package com.bb.webcanvasservice.infrastructure.persistence.user.entity;
 
 import com.bb.webcanvasservice.common.entity.BaseEntity;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseEntity {
+public class UserJpaEntity extends BaseEntity {
 
     @Id
     @GeneratedValue
@@ -44,9 +44,11 @@ public class User extends BaseEntity {
      */
     private UserStateCode state;
 
-    public User(String fingerprint) {
+    public UserJpaEntity(Long id, String fingerprint, String refreshToken, UserStateCode state) {
+        this.id = id;
         this.fingerprint = fingerprint;
-        state = UserStateCode.IN_LOBBY;
+        this.refreshToken = refreshToken;
+        this.state = state;
     }
 
     /**

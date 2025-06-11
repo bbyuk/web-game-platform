@@ -10,7 +10,7 @@ import com.bb.webcanvasservice.domain.game.enums.GameRoomState;
 import com.bb.webcanvasservice.domain.game.exception.GameRoomEntranceNotFoundException;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.infrastructure.persistence.user.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,11 +43,11 @@ class GameRoomEntranceRepositoryTest {
     @Autowired
     private GameRoomRepository gameRoomRepository;
 
-    private User testUser;
+    private UserJpaEntity testUser;
 
     @BeforeEach
     void setup() {
-        testUser = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        testUser = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
     }
 
     @Test
@@ -120,12 +120,12 @@ class GameRoomEntranceRepositoryTest {
     @DisplayName("유저 ID로 현재 입장한 게임 방의 입장 정보 조회")
     void findGameRoomEntrancesByUserId() {
         // given
-        User otherUser1 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
-        User otherUser2 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
-        User otherUser3 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
-        User otherUser4 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        UserJpaEntity otherUser1JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
+        UserJpaEntity otherUser2JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
+        UserJpaEntity otherUser3JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
+        UserJpaEntity otherUser4JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
 
-        enterTestRoom(otherUser1, testUser, otherUser2, otherUser3, otherUser4);
+        enterTestRoom(otherUser1JpaEntity, testUser, otherUser2JpaEntity, otherUser3JpaEntity, otherUser4JpaEntity);
         // when
         Optional<GameRoomEntrance> gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING));
 
@@ -136,11 +136,11 @@ class GameRoomEntranceRepositoryTest {
                 .hasSize(5);
 
         // 250430 입장한 순서대로 enteredUsers sorting 추가
-        Assertions.assertThat(entrances.get(0).getUser()).isEqualTo(otherUser1);
+        Assertions.assertThat(entrances.get(0).getUser()).isEqualTo(otherUser1JpaEntity);
         Assertions.assertThat(entrances.get(1).getUser()).isEqualTo(testUser);
-        Assertions.assertThat(entrances.get(2).getUser()).isEqualTo(otherUser2);
-        Assertions.assertThat(entrances.get(3).getUser()).isEqualTo(otherUser3);
-        Assertions.assertThat(entrances.get(4).getUser()).isEqualTo(otherUser4);
+        Assertions.assertThat(entrances.get(2).getUser()).isEqualTo(otherUser2JpaEntity);
+        Assertions.assertThat(entrances.get(3).getUser()).isEqualTo(otherUser3JpaEntity);
+        Assertions.assertThat(entrances.get(4).getUser()).isEqualTo(otherUser4JpaEntity);
     }
 
     @Test
@@ -152,23 +152,23 @@ class GameRoomEntranceRepositoryTest {
          */
         GameRoom testGameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
 
-        User testUser1 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
-        User testUser2 = userJpaRepository.save(new User(UUID.randomUUID().toString()));
+        UserJpaEntity testUser1JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
+        UserJpaEntity testUser2JpaEntity = userJpaRepository.save(new UserJpaEntity(UUID.randomUUID().toString()));
 
-        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1, "테스트 여우", GameRoomRole.HOST));
+        gameRoomEntranceRepository.save(new GameRoomEntrance(testGameRoom, testUser1JpaEntity, "테스트 여우", GameRoomRole.HOST));
 
         // when
-        boolean isTestUser1EnteredTestGameRoom = gameRoomEntranceRepository.existsActiveEntrance(testGameRoom.getId(), testUser1.getId());
-        boolean isTestUser2EnteredTestGameRoom = gameRoomEntranceRepository.existsActiveEntrance(testGameRoom.getId(), testUser2.getId());
+        boolean isTestUser1EnteredTestGameRoom = gameRoomEntranceRepository.existsActiveEntrance(testGameRoom.getId(), testUser1JpaEntity.getId());
+        boolean isTestUser2EnteredTestGameRoom = gameRoomEntranceRepository.existsActiveEntrance(testGameRoom.getId(), testUser2JpaEntity.getId());
 
         // then
         Assertions.assertThat(isTestUser1EnteredTestGameRoom).isTrue();
         Assertions.assertThat(isTestUser2EnteredTestGameRoom).isFalse();
     }
 
-    private void enterTestRoom(User... enteredUsers) {
+    private void enterTestRoom(UserJpaEntity... enteredUserJpaEntities) {
         GameRoom gameRoom = gameRoomRepository.save(new GameRoom(GameRoomState.WAITING, JoinCodeGenerator.generate(6)));
-        Arrays.stream(enteredUsers).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, enteredUser, "테스트 수달", GameRoomRole.GUEST)));
+        Arrays.stream(enteredUserJpaEntities).forEach(enteredUser -> gameRoomEntranceRepository.save(new GameRoomEntrance(gameRoom, enteredUser, "테스트 수달", GameRoomRole.GUEST)));
     }
 
     public void exit(GameRoomEntrance entrance) {

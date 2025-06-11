@@ -19,7 +19,9 @@ import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateExcepti
 import com.bb.webcanvasservice.domain.game.exception.JoinCodeNotGeneratedException;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.domain.user.model.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.UserModelMapper;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.domain.user.model.UserStateCode;
 import com.bb.webcanvasservice.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -158,7 +160,7 @@ public class LobbyService {
         GameRoomEntrance gameRoomEntrance =
                 new GameRoomEntrance(
                         targetGameRoom
-                        , userService.findUser(userId)
+                        , UserModelMapper.toUserJpaEntity(userService.findUser(userId))
                         , String.format("%s %s", koreanAdjective, gameProperties.gameRoomUserNicknameNouns().get(enteredUserCounts))
                         , role
                 );

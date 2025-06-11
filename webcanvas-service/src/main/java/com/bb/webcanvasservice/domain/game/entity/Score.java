@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.domain.game.entity;
 
 import com.bb.webcanvasservice.common.entity.BaseEntity;
 import com.bb.webcanvasservice.domain.game.enums.ScoreType;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -29,7 +29,7 @@ public class Score extends BaseEntity {
     /**
      * 점수 엔티티의 오너
      */
-    private User owner;
+    private UserJpaEntity owner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scored_turn_id")
@@ -48,7 +48,7 @@ public class Score extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ScoreType type;
 
-    public Score(User scorer, GameTurn scoredTurn, int value, ScoreType type) {
+    public Score(UserJpaEntity scorer, GameTurn scoredTurn, int value, ScoreType type) {
         this.owner = scorer;
         this.scoredTurn = scoredTurn;
         this.value = value;

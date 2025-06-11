@@ -25,7 +25,7 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             select exists(
                 select  1
                 from    GameRoomEntrance gre
-                join    User u
+                join    UserJpaEntity u
                 on      gre.user = u
                 where   gre.user.id = :userId
                 and     gre.state = 'WAITING'
@@ -41,7 +41,7 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
     @Query("""
            select  gre
            from    GameRoomEntrance gre
-           join    User u
+           join    UserJpaEntity u
            on      gre.user = u
            where   gre.user.id = :userId
            and     gre.state = 'WAITING'
@@ -59,7 +59,7 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             """
             select      gre
             from        GameRoomEntrance gre
-            join fetch  User u on gre.user = u
+            join fetch  UserJpaEntity u on gre.user = u
             join fetch  GameRoom gr on gre.gameRoom = gr
             where       gre.gameRoom.id = :gameRoomId
             and         gre.state = 'WAITING'
@@ -78,7 +78,7 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
             """
             select  gre
             from    GameRoomEntrance gre
-            join    fetch User u on gre.user = u
+            join    fetch UserJpaEntity u on gre.user = u
             join    fetch GameRoom gr on gre.gameRoom = gr
             where   gre.user.id = :userId
             and     gre.state in :gameRoomEntranceStates
@@ -95,7 +95,7 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
     @Query("""
             select      gre
             from        GameRoomEntrance gre
-            join fetch  User u on gre.user = u
+            join fetch  UserJpaEntity u on gre.user = u
             join fetch  GameRoom gr on gre.gameRoom = gr
             where       gre.gameRoom.id = :gameRoomId
             and         gre.state = :gameRoomEntranceState
@@ -123,7 +123,7 @@ public interface GameRoomEntranceRepository extends JpaRepository<GameRoomEntran
     @Query("""
             select      gre
             from        GameRoomEntrance gre
-            join fetch  User u on gre.user = u
+            join fetch  UserJpaEntity u on gre.user = u
             join fetch  GameRoom gr on gre.gameRoom = gr
             where       gre.gameRoom.id = :gameRoomId
             and         gre.state in :gameRoomEntranceStates

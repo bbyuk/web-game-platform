@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.domain.game.entity;
 
 import com.bb.webcanvasservice.common.entity.BaseEntity;
-import com.bb.webcanvasservice.domain.user.entity.User;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class GamePlayHistory extends BaseEntity {
     /**
      * 게임을 플레이한 유저
      */
-    private User user;
+    private UserJpaEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_session_id")
@@ -36,7 +36,7 @@ public class GamePlayHistory extends BaseEntity {
      */
     private GameSession gameSession;
 
-    public GamePlayHistory(User user, GameSession gameSession) {
+    public GamePlayHistory(UserJpaEntity user, GameSession gameSession) {
         this.user = user;
         this.gameSession = gameSession;
     }
