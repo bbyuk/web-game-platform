@@ -1,10 +1,12 @@
-package com.bb.webcanvasservice.domain.game.listener;
+package com.bb.webcanvasservice.application.game.listener;
 
-import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameSessionJpaEntity;
+import com.bb.webcanvasservice.application.game.GameApplicationService;
 import com.bb.webcanvasservice.domain.game.event.AllUserInGameSessionLoadedEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;
-import com.bb.webcanvasservice.domain.game.service.GameService;
+import com.bb.webcanvasservice.domain.game.exception.GameSessionNotFoundException;
+import com.bb.webcanvasservice.domain.game.model.GameSession;
+import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 import com.bb.webcanvasservice.domain.game.service.GameTurnTimerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +25,16 @@ public class GameSessionEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    private final GameService gameService;
+    /**
+     * 도메인 서비스
+     */
+    private final GameApplicationService gameApplicationService;
     private final GameTurnTimerService gameTurnTimerService;
 
+    /**
+     * 도메인 레포지토리
+     */
+    private final GameSessionRepository gameSessionRepository;
 
     /**
      * 게임 세션이 시작되고 모든 유저가 게임 세션 브로커 토픽을 구독완료하고 로딩 되었을 때 발행되는 이벤트를 핸들링한다.
@@ -34,12 +43,14 @@ public class GameSessionEventListener {
     public void handleAllUserInGameSessionLoaded(AllUserInGameSessionLoadedEvent event) {
         messagingTemplate.convertAndSend("/session/" + event.getGameSessionId(), event);
 
-        GameSessionJpaEntity gameSession = gameService.findGameSession(event.getGameSessionId());
+        GameSession gameSession = gameSessionRepository.findById(event.getGameSessionId())
+                .orElseThrow(GameSessionNotFoundException::new);
+
         gameTurnTimerService.registerTurnTimer(
                 event.getGameRoomId(),
                 event.getGameSessionId(),
                 gameSession.getTimePerTurn(),
-                gameService::processToNextTurn
+                gameApplicationService::processToNextTurn
         );
     }
 

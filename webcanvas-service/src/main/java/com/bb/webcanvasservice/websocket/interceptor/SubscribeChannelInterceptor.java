@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.websocket.interceptor;
 
+import com.bb.webcanvasservice.application.game.GameApplicationService;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
-import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
-import com.bb.webcanvasservice.domain.game.service.GameService;
+import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.web.security.exception.BadAccessException;
 import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +24,8 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class SubscribeChannelInterceptor implements ChannelInterceptor {
 
-    private final GameRoomFacade gameRoomFacade;
-    private final GameService gameService;
+    private final GameRoomService gameRoomService;
+    private final GameApplicationService gameApplicationService;
 
     private final WebSocketProperties webSocketProperties;
 
@@ -56,7 +56,7 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
                  */
                 Long gameRoomId = extractId(destination);
 
-                if (!gameRoomFacade.isEnteredRoom(gameRoomId, userId)) {
+                if (!gameRoomService.isEnteredRoom(gameRoomId, userId)) {
                     log.debug("현재 게임 방에 입장된 정보가 없음.");
                     log.debug("gameRoomId : {}", gameRoomId);
                     log.debug("userId : {}", userId);
@@ -68,7 +68,7 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
             if (destination.startsWith(webSocketProperties.topic().main().gameSession())) {
                 Long gameSessionId = extractId(destination);
 
-                if (!gameService.inGameSession(gameSessionId, userId)) {
+                if (!gameApplicationService.inGameSession(gameSessionId, userId)) {
                     log.debug("현재 게임 세션에 참여한 정보가 없음.");
                     log.debug("gameSessionId : {}", gameSessionId);
                     log.debug("userId : {}", userId);

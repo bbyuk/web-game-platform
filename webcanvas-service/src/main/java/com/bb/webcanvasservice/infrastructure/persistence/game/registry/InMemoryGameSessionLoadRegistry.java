@@ -1,5 +1,6 @@
-package com.bb.webcanvasservice.domain.game.registry;
+package com.bb.webcanvasservice.infrastructure.persistence.game.registry;
 
+import com.bb.webcanvasservice.domain.game.registry.GameSessionLoadRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

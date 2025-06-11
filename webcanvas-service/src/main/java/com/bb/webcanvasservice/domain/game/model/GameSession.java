@@ -13,7 +13,7 @@ public class GameSession {
     /**
      * 게임 방
      */
-    private final GameRoom gameRoom;
+    private final Long gameRoomId;
 
     /**
      * 게임 턴 수
@@ -32,12 +32,22 @@ public class GameSession {
 
 
 
-    public GameSession(Long id, GameRoom gameRoom, int turnCount, int timePerTurn, GameSessionState state) {
+    public GameSession(Long id, Long gameRoomId, int turnCount, int timePerTurn, GameSessionState state) {
         this.id = id;
-        this.gameRoom = gameRoom;
+        this.gameRoomId = gameRoomId;
         this.turnCount = turnCount;
         this.timePerTurn = timePerTurn;
         this.state = state;
+    }
+
+    /**
+     * 게임 세션이 새로 생성 된 시점엔 LOADING 상태로 생성된다.
+     * @param turnCount 턴 수
+     * @param timePerTurn 턴별 시간
+     * @return 새로 생성된 게임 세션 객체
+     */
+    public static GameSession createNewGameSession(Long gameRoomId, int turnCount, int timePerTurn) {
+        return new GameSession(null, gameRoomId, turnCount, timePerTurn, GameSessionState.LOADING);
     }
 
     /**
@@ -45,7 +55,6 @@ public class GameSession {
      */
     public void end() {
         state = GameSessionState.COMPLETED;
-        gameRoom.resetGameRoomState();
     }
 
     /**
@@ -79,6 +88,11 @@ public class GameSession {
         return state == GameSessionState.COMPLETED;
     }
 
+
+    public Long getGameRoomId() {
+        return gameRoomId;
+    }
+
     /**
      * 해당 세션에 할당된 턴 갯수
      * @return
@@ -93,5 +107,13 @@ public class GameSession {
      */
     public int getTimePerTurn() {
         return timePerTurn;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public GameSessionState getState() {
+        return state;
     }
 }

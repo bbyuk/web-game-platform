@@ -18,6 +18,11 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     private final GameRoomJpaRepository gameRoomJpaRepository;
 
     @Override
+    public Optional<GameRoom> findById(Long gameRoomId) {
+        return gameRoomJpaRepository.findById(gameRoomId).map(GameModelMapper::toModel);
+    }
+
+    @Override
     public Optional<GameRoom> findNotClosedGameRoomByUserId(Long userId) {
         return gameRoomJpaRepository.findNotClosedGameRoomByUserId(userId)
                 .map(GameModelMapper::toModel);

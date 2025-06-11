@@ -29,19 +29,17 @@ public class GameTurnJpaEntity extends BaseEntity {
      */
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "game_session_id")
+    @Column(name = "game_session_id")
     /**
      *
      */
-    private GameSessionJpaEntity gameSession;
+    private Long gameSessionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "drawer_id")
+    @Column(name = "drawer_id")
     /**
      * 해당 턴에 그림을 그릴 차례인 유저
      */
-    private UserJpaEntity drawer;
+    private Long drawerId;
 
     @Column(name = "answer")
     /**
@@ -49,65 +47,21 @@ public class GameTurnJpaEntity extends BaseEntity {
      */
     private String answer;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "correct_answerer_id", nullable = true)
+    @Column(name = "correct_answerer_id", nullable = true)
     /**
      * 정답을 맞힌 유저
      */
-    private UserJpaEntity correctAnswerer;
+    private Long correctAnswererId;
 
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     private GameTurnState state;
 
-    public GameTurnJpaEntity(GameSessionJpaEntity gameSession, UserJpaEntity drawer, String answer) {
-        this.gameSession = gameSession;
-        this.drawer = drawer;
+    public GameTurnJpaEntity(Long gameSessionId, Long drawerId, String answer) {
+        this.gameSessionId = gameSessionId;
+        this.drawerId = drawerId;
         this.answer = answer;
         this.state = GameTurnState.ACTIVE;
     }
 
-    /**
-     * 정답을 맞혔을을 때 호출
-     * @param user
-     */
-    public void answeredCorrectlyBy(UserJpaEntity user) {
-        correctAnswerer = user;
-        this.state = GameTurnState.ANSWERED;
-    }
-
-    /**
-     * 정답을 맟히지 못하고 제한 시간이 넘은 경우 호출
-     */
-    public void pass() {
-        if (isActive()) {
-            this.state = GameTurnState.PASSED;
-        }
-    }
-
-    /**
-     * 현재 활성화 되어 있는 턴인지 여부를 체크한다.
-     * @return 활성화 여부
-     */
-    public boolean isActive() {
-        return this.state == GameTurnState.ACTIVE;
-    }
-
-    /**
-     * 대상 턴의 정답이 맞는지 체크한다.
-     * @param answer
-     * @return
-     */
-    public boolean isAnswer(String answer) {
-        return this.answer.equals(answer);
-    }
-
-    /**
-     * 종료 시각을 계산해 리턴한다.
-     * Seconds
-     * @return 게임 턴 Entity의 만료 시각
-     */
-    public LocalDateTime getExpiration() {
-        return createdAt.plus(gameSession.getTimePerTurn(), ChronoUnit.SECONDS);
-    }
 }

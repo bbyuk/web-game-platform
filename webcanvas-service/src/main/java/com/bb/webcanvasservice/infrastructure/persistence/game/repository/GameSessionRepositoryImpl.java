@@ -25,6 +25,16 @@ public class GameSessionRepositoryImpl implements GameSessionRepository {
     private final EntityManager em;
 
     @Override
+    public Optional<GameSession> findById(Long gameSessionId) {
+        return gameSessionJpaRepository.findById(gameSessionId).map(GameModelMapper::toModel);
+    }
+
+    @Override
+    public GameSession save(GameSession newGameSession) {
+        return GameModelMapper.toModel(gameSessionJpaRepository.save(GameModelMapper.toEntity(newGameSession)));
+    }
+
+    @Override
     public int findCurrentRound(Long gameSessionId) {
         return gameSessionJpaRepository.findCurrentRound(gameSessionId);
     }
@@ -71,5 +81,11 @@ public class GameSessionRepositoryImpl implements GameSessionRepository {
     @Override
     public long findTurnCountByGameSessionId(Long gameSessionId) {
         return gameTurnJpaRepository.findTurnCountByGameSessionId(gameSessionId);
+    }
+
+    @Override
+    public GameTurn saveGameTurn(GameTurn gameTurn) {
+        gameTurnJpaRepository.save(GameModelMapper.toEntity(gameTurn));
+        return null;
     }
 }

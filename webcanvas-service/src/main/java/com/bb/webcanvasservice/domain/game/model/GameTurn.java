@@ -1,7 +1,6 @@
 package com.bb.webcanvasservice.domain.game.model;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 /**
  * 게임 세션에 종속된 게임 턴 도메인 모델
@@ -16,7 +15,7 @@ public class GameTurn {
     /**
      * 게임 세션
      */
-    private final GameSession gameSession;
+    private final Long gameSessionId;
 
     /**
      * 해당 턴에 그림을 그릴 차례인 유저 ID
@@ -37,14 +36,18 @@ public class GameTurn {
 
     private GameTurnState state;
 
-    public GameTurn(Long id, GameSession gameSession, Long drawerId, String answer, LocalDateTime startedAt, Long correctAnswererId, GameTurnState state) {
+    public GameTurn(Long id, Long gameSessionId, Long drawerId, String answer, LocalDateTime startedAt, Long correctAnswererId, GameTurnState state) {
         this.id = id;
-        this.gameSession = gameSession;
+        this.gameSessionId = gameSessionId;
         this.drawerId = drawerId;
         this.answer = answer;
         this.correctAnswererId = correctAnswererId;
         this.state = state;
         this.startedAt = startedAt;
+    }
+
+    public static GameTurn createNewGameTurn(Long gameSessionId, Long drawerId, String answer) {
+        return new GameTurn(null, gameSessionId, drawerId, answer, LocalDateTime.now(), null, GameTurnState.ACTIVE);
     }
 
     /**
@@ -82,12 +85,27 @@ public class GameTurn {
         return this.answer.equals(answer);
     }
 
-    /**
-     * 종료 시간을 계산해 리턴한다.
-     * Seconds
-     * @return 게임 턴의 만료 시간
-     */
-    public LocalDateTime getExpiration() {
-        return startedAt.plus(gameSession.getTimePerTurn(), ChronoUnit.SECONDS);
+    public Long getId() {
+        return id;
+    }
+
+    public Long getGameSessionId() {
+        return gameSessionId;
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public Long getDrawerId() {
+        return drawerId;
+    }
+
+    public LocalDateTime getStartedAt() {
+        return startedAt;
+    }
+
+    public GameTurnState getState() {
+        return state;
     }
 }

@@ -1,13 +1,15 @@
 package com.bb.webcanvasservice.domain.game.service;
 
+import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
-import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
-import com.bb.webcanvasservice.domain.game.exception.JoinCodeNotGeneratedException;
-import com.bb.webcanvasservice.domain.game.model.GameRoom;
-import com.bb.webcanvasservice.domain.game.model.GameRoomState;
+import com.bb.webcanvasservice.domain.game.exception.*;
+import com.bb.webcanvasservice.domain.game.model.*;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
+
+import java.util.List;
+
+import static com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState.WAITING;
 
 /**
  * 게임 방 관련 도메인 서비스
@@ -21,16 +23,6 @@ public class GameRoomService {
                            GameRoomEntranceRepository gameRoomEntranceRepository) {
         this.gameRoomRepository = gameRoomRepository;
         this.gameRoomEntranceRepository = gameRoomEntranceRepository;
-    }
-
-    public void checkCanEnterTheRoom(Long userId) {
-        /**
-         * 유저가 새로 게임을 생성할 수 있는 상태인지 확인한다.
-         * - 유저가 현재 아무 방에도 입장하지 않은 상태여야 한다.
-         */
-        if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
-            throw new AlreadyEnteredRoomException();
-        }
     }
 
     /**
@@ -58,9 +50,7 @@ public class GameRoomService {
          * 유저가 새로 게임을 생성할 수 있는 상태인지 확인한다.
          * - 유저가 현재 아무 방에도 입장하지 않은 상태여야 한다.
          */
-        if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
-            throw new AlreadyEnteredRoomException();
-        }
+        checkUserCanEnterGameRoom(userId);
 
         /**
          * join code 생성
@@ -82,4 +72,87 @@ public class GameRoomService {
         return gameRoomRepository.save(new GameRoom(null ,joinCode, GameRoomState.WAITING));
     }
 
+    public void checkGameRoomCanEnter(Long gameRoomId, Long userId, GameRoomEntranceRole role, int gameRoomCapacity) {
+        /**
+         * 요청한 유저가 새로운 게임 방에 입장할 수 있는 상태인지 체크한다.
+         */
+        checkUserCanEnterGameRoom(userId);
+
+        GameRoom targetGameRoom = gameRoomRepository.findById(gameRoomId).orElseThrow(GameRoomNotFoundException::new);
+        if (!targetGameRoom.isWaiting()) {
+            throw new IllegalGameRoomStateException();
+        }
+
+        List<GameRoomEntrance> targetGameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, WAITING);
+
+        int enteredUserCounts = targetGameRoomEntrances.size();
+
+        if (enteredUserCounts >= gameRoomCapacity) {
+            throw new IllegalGameRoomStateException("방의 정원이 모두 찼습니다.");
+        }
+    }
+
+    /**
+     * 유저가 게임 방에 입장할 수 있는 상태인지 확인한다.
+     * @param userId 대상 유저 ID
+     */
+    public void checkUserCanEnterGameRoom(Long userId) {
+        if (gameRoomEntranceRepository.existsGameRoomEntranceByUserId(userId)) {
+            throw new AlreadyEnteredRoomException();
+        }
+    }
+
+    /**
+     * 게임 방 ID와 게임 방 입장 상태에 맞는 게임 방 입장 목록을 조회해온다.
+     *
+     * @param gameRoomId 대상 게임 방 ID
+     * @param gameRoomEntranceState 게임 방 입장 상태
+     * @return 게임 방 입장 목록
+     */
+    public List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndState(Long gameRoomId, GameRoomEntranceState gameRoomEntranceState) {
+        return gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, gameRoomEntranceState);
+    }
+
+    /**
+     * 파라미터로 전달 받은 state에 있는 GameRoom 목록을 조회한다.
+     *
+     * @param state 게임 방의 상태
+     * @return gameRoomList 게임 방 Entity List
+     */
+    public List<GameRoom> findRoomsOnState(GameRoomState state) {
+        return gameRoomRepository.findByState(state);
+    }
+
+    /**
+     * 게임 방 입장 여부를 확인한다.
+     *
+     * @param gameRoomId 대상 게임 방 ID
+     * @param userId 유저 ID
+     * @return 게임 방 입장 여부
+     */
+    public boolean isEnteredRoom(Long gameRoomId, Long userId) {
+        return gameRoomEntranceRepository.existsActiveEntrance(gameRoomId, userId);
+    }
+
+    /**
+     * 게임 방을 찾는다.
+     *
+     * @param gameRoomId 게임 방 ID
+     * @return 게임 방
+     */
+    public GameRoom findGameRoom(Long gameRoomId) {
+        return gameRoomRepository.findById(gameRoomId)
+                .orElseThrow(GameRoomNotFoundException::new);
+    }
+
+    public void validateIsHost(Long gameRoomId, Long userId) {
+        GameRoomEntrance userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId, GameRoomEntranceState.entered)
+                .orElseThrow(GameRoomEntranceNotFoundException::new);
+
+        if (!userEntrance.isHost()) {
+            throw new AbnormalAccessException();
+        }
+    }
+
 }
+

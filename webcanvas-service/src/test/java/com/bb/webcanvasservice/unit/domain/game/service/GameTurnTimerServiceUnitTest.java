@@ -1,8 +1,7 @@
 package com.bb.webcanvasservice.unit.domain.game.service;
 
-import com.bb.webcanvasservice.domain.game.registry.InMemoryGameTurnTimerRegistry;
+import com.bb.webcanvasservice.infrastructure.persistence.game.registry.InMemoryGameTurnTimerRegistry;
 import com.bb.webcanvasservice.domain.game.service.GameTurnTimerService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +13,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("[unit] [service] 게임 턴 타이머 단위테스트")

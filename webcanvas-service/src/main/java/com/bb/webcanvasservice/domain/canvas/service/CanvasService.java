@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.domain.canvas.service;
 
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
-import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
+import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CanvasService {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final GameRoomFacade gameRoomFacade;
+    private final GameRoomService gameRoomService;
     private final WebSocketProperties webSocketProperties;
 
     /**
@@ -36,7 +36,7 @@ public class CanvasService {
         /**
          * validation
          */
-        if (!gameRoomFacade.isEnteredRoom(gameRoomId, userId)) {
+        if (!gameRoomService.isEnteredRoom(gameRoomId, userId)) {
             log.error("비정상적인 접근 감지 ::: userId = {} => gameRoomId ={}}", userId, gameRoomId);
             throw new AbnormalAccessException();
         }

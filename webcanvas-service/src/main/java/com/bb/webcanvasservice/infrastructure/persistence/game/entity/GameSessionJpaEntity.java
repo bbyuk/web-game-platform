@@ -43,15 +43,14 @@ public class GameSessionJpaEntity extends BaseEntity {
      */
     private GameSessionState state;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_room_id")
+    @Column(name = "game_room_id")
     /**
-     * 게임 방
+     * 게임 방 ID
      */
-    private GameRoomJpaEntity gameRoom;
+    private Long gameRoomId;
 
-    public GameSessionJpaEntity(GameRoomJpaEntity gameRoom, int turnCount, int timePerTurn) {
-        this.gameRoom = gameRoom;
+    public GameSessionJpaEntity(Long gameRoomId, int turnCount, int timePerTurn) {
+        this.gameRoomId = gameRoomId;
         this.state = GameSessionState.LOADING;
         this.turnCount = turnCount;
         this.timePerTurn = timePerTurn;
@@ -62,7 +61,6 @@ public class GameSessionJpaEntity extends BaseEntity {
      */
     public void end() {
         state = GameSessionState.COMPLETED;
-        gameRoom.resetGameRoomState();
     }
 
     /**

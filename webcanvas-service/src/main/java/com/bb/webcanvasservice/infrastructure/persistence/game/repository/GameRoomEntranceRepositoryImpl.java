@@ -21,13 +21,23 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
     private final GameRoomEntranceJpaRepository jpaRepository;
 
     @Override
+    public Optional<GameRoomEntrance> findById(Long gameRoomEntranceId) {
+        return jpaRepository.findById(gameRoomEntranceId).map(GameModelMapper::toModel);
+    }
+
+    @Override
+    public GameRoomEntrance save(GameRoomEntrance gameRoomEntrance) {
+        return GameModelMapper.toModel(jpaRepository.save(GameModelMapper.toEntity(gameRoomEntrance)));
+    }
+
+    @Override
     public boolean existsActiveEntrance(Long gameRoomId, Long userId) {
         String jpql = """
                 select exists (
                      select 1
                      from   GameRoomEntranceJpaEntity gre
-                     where  gre.gameRoom.id = :gameRoomId
-                     and    gre.user.id = :userId
+                     where  gre.gameRoomId = :gameRoomId
+                     and    gre.userId = :userId
                      and    gre.state in :enteredStates
                 )
                 """;

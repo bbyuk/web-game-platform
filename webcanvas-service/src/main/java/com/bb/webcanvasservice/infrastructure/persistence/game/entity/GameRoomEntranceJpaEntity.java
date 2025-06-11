@@ -28,19 +28,17 @@ public class GameRoomEntranceJpaEntity extends BaseEntity {
      */
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_room_id")
+    @Column(name = "game_room_id")
     /**
      * 입장한 게임 방
      */
-    private GameRoomJpaEntity gameRoom;
+    private Long gameRoomId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @Column(name = "user_id")
     /**
      * 입장한 유저
      */
-    private UserJpaEntity user;
+    private Long userId;
 
     @Column(name = "user_nickname")
     /**
@@ -73,10 +71,10 @@ public class GameRoomEntranceJpaEntity extends BaseEntity {
         return ready;
     }
 
-    public GameRoomEntranceJpaEntity(GameRoomJpaEntity gameRoom, UserJpaEntity user, String nickname, GameRoomEntranceRole role) {
-        this.gameRoom = gameRoom;
-        this.user = user;
-        this.state = GameRoomEntranceState.WAITING;
+    public GameRoomEntranceJpaEntity(Long gameRoomId, Long userId, GameRoomEntranceState state, String nickname, GameRoomEntranceRole role) {
+        this.gameRoomId = gameRoomId;
+        this.userId = userId;
+        this.state = state;
         this.nickname = nickname;
         this.role = role;
         this.ready = role == HOST;

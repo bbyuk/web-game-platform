@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.game.listener;
+package com.bb.webcanvasservice.application.game.listener;
 
 import com.bb.webcanvasservice.domain.game.event.*;
 import lombok.RequiredArgsConstructor;

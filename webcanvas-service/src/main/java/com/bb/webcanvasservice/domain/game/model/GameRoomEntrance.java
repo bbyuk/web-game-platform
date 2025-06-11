@@ -13,9 +13,9 @@ public class GameRoomEntrance {
     private final Long id;
 
     /**
-     * 입장한 게임 방
+     * 입장한 게임 방 ID
      */
-    private final GameRoom gameRoom;
+    private final Long gameRoomId;
 
     /**
      * 입장한 유저
@@ -50,9 +50,9 @@ public class GameRoomEntrance {
         return ready;
     }
 
-    public GameRoomEntrance(Long id, GameRoom gameRoom, Long userId, GameRoomEntranceState state, String nickname, GameRoomEntranceRole role, boolean ready) {
+    public GameRoomEntrance(Long id, Long gameRoomId, Long userId, GameRoomEntranceState state, String nickname, GameRoomEntranceRole role, boolean ready) {
         this.id = id;
-        this.gameRoom = gameRoom;
+        this.gameRoomId = gameRoomId;
         this.userId = userId;
         this.state = state;
         this.nickname = nickname;
@@ -69,7 +69,7 @@ public class GameRoomEntrance {
 
     /**
      * 역할을 변경한다.
-     * @param gameRoomEntranceRole
+     * @param gameRoomEntranceRole 게임 방 입장 역할
      */
     public void changeRole(GameRoomEntranceRole gameRoomEntranceRole) {
         this.role = gameRoomEntranceRole;
@@ -99,4 +99,37 @@ public class GameRoomEntrance {
     public void resetGameRoomEntranceInfo() {
         this.state = GameRoomEntranceState.WAITING;
     }
+
+    /**
+     * 유저가 호스트인지 체크한다.
+     * @return
+     */
+    public boolean isHost() {
+        return this.role == HOST;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getGameRoomId() {
+        return gameRoomId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public GameRoomEntranceState getState() {
+        return state;
+    }
+
+    public GameRoomEntranceRole getRole() {
+        return role;
+    }
+
 }

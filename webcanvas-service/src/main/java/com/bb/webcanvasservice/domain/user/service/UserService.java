@@ -59,15 +59,34 @@ public class UserService {
     }
 
     /**
-     * 유저 상태를 변경한다.
-     * @param userId
-     * @param state
+     * 유저 상태를 게임 방으로 옮긴다.
+     * @param userId 유저 ID
      */
-    public void changeUserState(Long userId, UserStateCode state) {
+    public void moveUserToRoom(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        user.changeState(UserStateCode.IN_ROOM);
+    }
+
+    /**
+     * 유저 상태를 로비로 옮긴다.
+     * @param userId 유저 ID
+     */
+    public void moveUserToLobby(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        user.changeState(UserStateCode.IN_LOBBY);
+    }
+
+    /**
+     * 유저 상태를 게임중으로 변경한다.
+     * @param userId 유저 ID
+     */
+    public void moveUserToGameSession(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
-        user.changeState(state);
+        user.changeState(UserStateCode.IN_GAME);
     }
 
     /**

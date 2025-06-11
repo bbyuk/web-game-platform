@@ -1,12 +1,11 @@
-package com.bb.webcanvasservice.presentation.game.response;
+package com.bb.webcanvasservice.application.game.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "게임 턴 조회 API의 응답 DTO")
-public record GameTurnFindResponse(
-
+@Schema(description = "application layer -> presentation layer 게임 턴 DTO")
+public record GameTurnDto(
         @Schema(description = "해당 턴의 그림을 그릴 유저의 ID")
         Long drawerId,
 

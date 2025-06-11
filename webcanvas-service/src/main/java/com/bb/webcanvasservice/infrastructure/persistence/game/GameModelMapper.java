@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class GameModelMapper {
 
     public static GamePlayHistory toModel(GamePlayHistoryJpaEntity entity) {
-        return new GamePlayHistory(entity.getUser().getId(), entity.getGameSession().getId());
+        return new GamePlayHistory(entity.getUserId(), entity.getGameSessionId());
     }
 
     public static GameRoom toModel(GameRoomJpaEntity entity) {
@@ -28,8 +28,8 @@ public class GameModelMapper {
 
     public static GameRoomEntrance toModel(GameRoomEntranceJpaEntity entity) {
         return new GameRoomEntrance(entity.getId(),
-                toModel(entity.getGameRoom()),
-                entity.getUser().getId(),
+                entity.getGameRoomId(),
+                entity.getUserId(),
                 entity.getState(),
                 entity.getNickname(),
                 entity.getRole(),
@@ -40,7 +40,7 @@ public class GameModelMapper {
     public static GameSession toModel(GameSessionJpaEntity entity) {
         return new GameSession(
                 entity.getId(),
-                toModel(entity.getGameRoom()),
+                entity.getGameRoomId(),
                 entity.getTurnCount(),
                 entity.getTimePerTurn(),
                 entity.getState()
@@ -50,16 +50,37 @@ public class GameModelMapper {
     public static GameTurn toModel(GameTurnJpaEntity entity) {
         return new GameTurn(
                 entity.getId(),
-                toModel(entity.getGameSession()),
-                entity.getDrawer().getId(),
+                entity.getGameSessionId(),
+                entity.getDrawerId(),
                 entity.getAnswer(),
                 entity.getCreatedAt(),
-                entity.getCorrectAnswerer() == null ? null : entity.getCorrectAnswerer().getId(),
+                entity.getCorrectAnswererId(),
                 entity.getState()
         );
     }
 
     public static GameRoomJpaEntity toEntity(GameRoom gameRoom) {
         return new GameRoomJpaEntity(gameRoom.getId(), gameRoom.getJoinCode(), gameRoom.getState());
+    }
+
+    public static GameRoomEntranceJpaEntity toEntity(GameRoomEntrance gameRoomEntrance) {
+        return new GameRoomEntranceJpaEntity(
+                gameRoomEntrance.getGameRoomId(),
+                gameRoomEntrance.getUserId(),
+                gameRoomEntrance.getState(),
+                gameRoomEntrance.getNickname(),
+                gameRoomEntrance.getRole());
+    }
+
+    public static GameSessionJpaEntity toEntity(GameSession newGameSession) {
+        return new GameSessionJpaEntity(newGameSession.getGameRoomId(), newGameSession.getTurnCount(), newGameSession.getTimePerTurn());
+    }
+
+    public static GamePlayHistoryJpaEntity toEntity(GamePlayHistory gamePlayHistory) {
+        return new GamePlayHistoryJpaEntity(gamePlayHistory.getUserId(), gamePlayHistory.getGameSessionId());
+    }
+
+    public static GameTurnJpaEntity toEntity(GameTurn gameTurn) {
+        return new GameTurnJpaEntity(gameTurn.getGameSessionId(), gameTurn.getDrawerId(), gameTurn.getAnswer());
     }
 }

@@ -1,16 +1,15 @@
-package com.bb.webcanvasservice.presentation.game.response;
+package com.bb.webcanvasservice.application.game.dto;
 
 import com.bb.webcanvasservice.domain.game.model.GameSessionState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "현재 게임 세션 조회 API의 응답 DTO")
-public record GameSessionResponse(
-
+@Schema(description = "application layer -> presentation layer GameSession 정보 DTO")
+public record GameSessionDto(
         @Schema(description = "게임 세션 ID")
         Long gameSessionId,
 
         @Schema(description = "게임 세션 상태")
-        String state,
+        GameSessionState state,
 
         @Schema(description = "게임 세션 turn 별 타임")
         int timePerTurn,

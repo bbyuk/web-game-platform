@@ -21,7 +21,7 @@ public enum GameRoomState {
      */
     PLAYING;
 
-    public static final List<GameRoomState> enterable() {
+    public static List<GameRoomState> enterable() {
         return List.of(WAITING);
     };
 }

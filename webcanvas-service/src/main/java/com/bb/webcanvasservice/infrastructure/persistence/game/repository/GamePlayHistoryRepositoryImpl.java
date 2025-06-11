@@ -22,4 +22,12 @@ public class GamePlayHistoryRepositoryImpl implements GamePlayHistoryRepository 
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void saveAll(List<GamePlayHistory> gamePlayHistories) {
+        gamePlayHistoryJpaRepository.saveAll(
+                gamePlayHistories.stream()
+                        .map(GameModelMapper::toEntity)
+                        .toList()
+        );
+    }
 }

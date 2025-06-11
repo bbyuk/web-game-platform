@@ -44,14 +44,6 @@ public class GameRoomJpaEntity extends BaseEntity {
         this.state = state;
     }
 
-    public GameRoomJpaEntity(GameRoomState state, String joinCode) {
-        this.state = state;
-        this.joinCode = joinCode;
-    }
-
-    public GameRoomJpaEntity(String joinCode) {
-        this(GameRoomState.WAITING, joinCode);
-    }
 
     public void changeStateToPlay() {
         this.state = GameRoomState.PLAYING;

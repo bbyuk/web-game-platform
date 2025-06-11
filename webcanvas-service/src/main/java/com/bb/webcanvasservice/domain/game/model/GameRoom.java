@@ -27,6 +27,9 @@ public class GameRoom {
         this.state = state;
     }
 
+    /**
+     * 게임 방을 플레이 상태로 변경한다.
+     */
     public void changeStateToPlay() {
         this.state = GameRoomState.PLAYING;
     }
@@ -36,6 +39,10 @@ public class GameRoom {
      */
     public void resetGameRoomState() {
         this.state = GameRoomState.WAITING;
+    }
+
+    public boolean isWaiting() {
+        return this.state == GameRoomState.WAITING;
     }
 
     /**

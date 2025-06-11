@@ -11,6 +11,14 @@ import java.util.Optional;
  * 게임 방과 관련된 도메인 Repository
  */
 public interface GameRoomRepository {
+
+    /**
+     * 게임 방 ID로 게임 방을 찾는다.
+     * @param gameRoomId
+     * @return 게임 방
+     */
+    Optional<GameRoom> findById(Long gameRoomId);
+
     /**
      * 현재 입장해있는 방을 조회한다.
      * @param userId 유저ID

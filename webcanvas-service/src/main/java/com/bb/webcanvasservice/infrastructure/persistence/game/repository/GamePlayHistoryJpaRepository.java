@@ -21,7 +21,7 @@ public interface GamePlayHistoryJpaRepository extends JpaRepository<GamePlayHist
     @Query("""
             select  gph
             from    GamePlayHistoryJpaEntity gph
-            where   gph.gameSession.id = :gameSessionId
+            where   gph.gameSessionId = :gameSessionId
             """)
     List<GamePlayHistoryJpaEntity> findByGameSessionId(@Param("gameSessionId") Long gameSessionId);
 }
