@@ -318,6 +318,8 @@ public class GameRoomApplicationService {
         targetEntrance.changeReady(ready);
         gameRoomEntranceRepository.save(targetEntrance);
 
+        log.debug("게임 방 레디 변경 저장 = {}", targetEntrance.getId());
+
         eventPublisher.publishEvent(new UserReadyChanged(targetEntrance.getGameRoomId(), userId, ready));
 
         return ready;
