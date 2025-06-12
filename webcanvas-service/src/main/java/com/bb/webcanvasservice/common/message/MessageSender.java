@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.infrastructure.message;
+package com.bb.webcanvasservice.common.message;
 
 public interface MessageSender {
     void send(String destination, Object payload);

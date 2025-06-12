@@ -1,9 +1,8 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 
-import com.bb.webcanvasservice.common.entity.BaseEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
-import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

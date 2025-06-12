@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.common.entity;
+package com.bb.webcanvasservice.infrastructure.persistence.common;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

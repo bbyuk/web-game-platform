@@ -1,7 +1,6 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 
-import com.bb.webcanvasservice.common.entity.BaseEntity;
-import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

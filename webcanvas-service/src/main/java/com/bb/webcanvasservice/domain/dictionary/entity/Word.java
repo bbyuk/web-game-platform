@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.domain.dictionary.entity;
 
-import com.bb.webcanvasservice.common.entity.BaseEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import jakarta.persistence.*;

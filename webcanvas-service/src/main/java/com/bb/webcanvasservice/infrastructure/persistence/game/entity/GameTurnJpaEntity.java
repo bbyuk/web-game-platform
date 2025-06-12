@@ -1,16 +1,12 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 
-import com.bb.webcanvasservice.common.entity.BaseEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.domain.game.model.GameTurnState;
-import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 /**
  * 게임 세션에 종속된 게임 턴

@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.presentation.game;
+package com.bb.webcanvasservice.presentation.game.mapper;
 
 
 import com.bb.webcanvasservice.application.game.dto.*;

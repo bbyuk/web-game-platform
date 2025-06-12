@@ -8,9 +8,9 @@ import com.bb.webcanvasservice.domain.game.exception.GameSessionNotFoundExceptio
 import com.bb.webcanvasservice.domain.game.model.GameSession;
 import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 import com.bb.webcanvasservice.domain.game.service.GameTurnTimerService;
+import com.bb.webcanvasservice.common.message.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -23,7 +23,10 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 public class GameSessionEventListener {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    /**
+     * common component
+     */
+    private final MessageSender messageSender;
 
     /**
      * 도메인 서비스
@@ -41,7 +44,7 @@ public class GameSessionEventListener {
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAllUserInGameSessionLoaded(AllUserInGameSessionLoadedEvent event) {
-        messagingTemplate.convertAndSend("/session/" + event.getGameSessionId(), event);
+        messageSender.send("/session/" + event.getGameSessionId(), event);
 
         GameSession gameSession = gameSessionRepository.findById(event.getGameSessionId())
                 .orElseThrow(GameSessionNotFoundException::new);
@@ -62,7 +65,7 @@ public class GameSessionEventListener {
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameTurnProgressed(GameTurnProgressedEvent event) {
-        messagingTemplate.convertAndSend("/session/" + event.getGameSessionId(), event);
+        messageSender.send("/session/" + event.getGameSessionId(), event);
     }
 
     /**
@@ -72,7 +75,7 @@ public class GameSessionEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameSessionEnd(GameSessionEndEvent event) {
         gameTurnTimerService.stopTurnTimer(event.getGameRoomId());
-        messagingTemplate.convertAndSend("/session/" + event.getGameSessionId(), event);
+        messageSender.send("/session/" + event.getGameSessionId(), event);
 
         /**
          * TODO - 게임 결과 리턴할 수 있도록 변경

@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.application.chat;
 
 import com.bb.webcanvasservice.application.chat.dto.SentChatMessageDto;
 import com.bb.webcanvasservice.domain.chat.event.MessageSentEvent;
-import com.bb.webcanvasservice.infrastructure.message.MessageSender;
+import com.bb.webcanvasservice.common.message.MessageSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;

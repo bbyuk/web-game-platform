@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 
-import com.bb.webcanvasservice.common.entity.BaseEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.domain.game.model.ScoreType;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import jakarta.persistence.*;
