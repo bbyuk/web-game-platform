@@ -1,12 +1,10 @@
 package com.bb.webcanvasservice.domain.game.event;
 
 import com.bb.webcanvasservice.common.event.ApplicationEvent;
-import lombok.Getter;
 
 /**
  * 게임이 시작될 때 발행되는 이벤트
  */
-@Getter
 public class GameSessionStartEvent extends ApplicationEvent {
 
     /**
@@ -22,5 +20,13 @@ public class GameSessionStartEvent extends ApplicationEvent {
         super("ROOM/SESSION_STARTED");
         this.gameRoomId = gameRoomId;
         this.gameSessionId = gameSessionId;
+    }
+
+    public Long getGameRoomId() {
+        return gameRoomId;
+    }
+
+    public Long getGameSessionId() {
+        return gameSessionId;
     }
 }

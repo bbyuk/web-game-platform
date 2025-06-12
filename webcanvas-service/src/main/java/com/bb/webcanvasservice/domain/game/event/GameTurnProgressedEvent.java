@@ -1,12 +1,10 @@
 package com.bb.webcanvasservice.domain.game.event;
 
 import com.bb.webcanvasservice.common.event.ApplicationEvent;
-import lombok.Getter;
 
 /**
  * 게임 턴이 넘어갔을 때 발행되는 이벤트
  */
-@Getter
 public class GameTurnProgressedEvent extends ApplicationEvent {
 
     /**
@@ -28,5 +26,17 @@ public class GameTurnProgressedEvent extends ApplicationEvent {
         this.gameRoomId = gameRoomId;
         this.gameSessionId = gameSessionId;
         this.gameTurnId = gameTurnId;
+    }
+
+    public Long getGameRoomId() {
+        return gameRoomId;
+    }
+
+    public Long getGameSessionId() {
+        return gameSessionId;
+    }
+
+    public Long getGameTurnId() {
+        return gameTurnId;
     }
 }

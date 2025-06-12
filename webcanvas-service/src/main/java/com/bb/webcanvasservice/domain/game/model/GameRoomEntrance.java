@@ -1,7 +1,5 @@
 package com.bb.webcanvasservice.domain.game.model;
 
-import static com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole.HOST;
-
 /**
  * 유저의 게임 방 입장을 나타내는 도메인 모델
  */
@@ -43,7 +41,7 @@ public class GameRoomEntrance {
     private boolean ready;
 
     public boolean isReady() {
-        if (this.role == HOST) {
+        if (this.role == GameRoomEntranceRole.HOST) {
             return true;
         }
 
@@ -73,7 +71,7 @@ public class GameRoomEntrance {
      */
     public void changeRole(GameRoomEntranceRole gameRoomEntranceRole) {
         this.role = gameRoomEntranceRole;
-        if (this.role == HOST) {
+        if (this.role == GameRoomEntranceRole.HOST) {
             this.ready = true;
         }
     }
@@ -105,7 +103,7 @@ public class GameRoomEntrance {
      * @return
      */
     public boolean isHost() {
-        return this.role == HOST;
+        return this.role == GameRoomEntranceRole.HOST;
     }
 
     public Long getId() {

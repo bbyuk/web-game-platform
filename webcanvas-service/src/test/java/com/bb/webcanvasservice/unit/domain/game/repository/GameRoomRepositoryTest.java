@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.unit.domain.game.repository;
 
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.config.JpaConfig;
-import com.bb.webcanvasservice.domain.game.GameProperties;
+import com.bb.webcanvasservice.application.GameProperties;
 import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
 import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;

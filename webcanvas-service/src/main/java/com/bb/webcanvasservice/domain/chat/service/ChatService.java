@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.chat;
+package com.bb.webcanvasservice.domain.chat.service;
 
 import com.bb.webcanvasservice.domain.chat.event.MessageSentEvent;
 import lombok.RequiredArgsConstructor;

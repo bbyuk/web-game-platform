@@ -3,7 +3,7 @@
 //import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 //import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 //import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
-//import com.bb.webcanvasservice.domain.game.GameProperties;
+//import com.bb.webcanvasservice.application.GameProperties;
 //import com.bb.webcanvasservice.presentation.game.response.GameRoomEntranceInfoResponse;
 //import com.bb.webcanvasservice.presentation.game.response.GameRoomEntranceResponse;
 //import com.bb.webcanvasservice.presentation.game.response.GameRoomListResponse;

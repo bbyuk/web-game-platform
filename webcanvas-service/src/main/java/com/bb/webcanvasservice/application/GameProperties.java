@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.game;
+package com.bb.webcanvasservice.application;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

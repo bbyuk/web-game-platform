@@ -1,12 +1,10 @@
 package com.bb.webcanvasservice.domain.game.event;
 
 import com.bb.webcanvasservice.common.event.ApplicationEvent;
-import lombok.Getter;
 
 /**
  * 게임 방 퇴장 이벤트 발생시 pub 이벤트
  */
-@Getter
 public class GameRoomExitEvent extends ApplicationEvent {
 
     /**
@@ -23,5 +21,13 @@ public class GameRoomExitEvent extends ApplicationEvent {
         super("ROOM/EXIT");
         this.gameRoomId = gameRoomId;
         this.userId = userId;
+    }
+
+    public Long getGameRoomId() {
+        return gameRoomId;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 }

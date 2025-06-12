@@ -2,9 +2,6 @@ package com.bb.webcanvasservice.domain.game.repository;
 
 import com.bb.webcanvasservice.domain.game.model.GameSession;
 import com.bb.webcanvasservice.domain.game.model.GameTurn;
-import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameTurnJpaEntity;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
