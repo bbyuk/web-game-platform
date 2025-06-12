@@ -68,7 +68,9 @@ public class GameModelMapper {
                 userEntity,
                 gameRoomEntrance.getState(),
                 gameRoomEntrance.getNickname(),
-                gameRoomEntrance.getRole());
+                gameRoomEntrance.getRole(),
+                gameRoomEntrance.isReady()
+        );
     }
 
     public static GamePlayHistoryJpaEntity toEntity(GamePlayHistory gamePlayHistory, UserJpaEntity userEntity, GameSessionJpaEntity gameSessionEntity) {

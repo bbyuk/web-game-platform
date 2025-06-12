@@ -73,16 +73,16 @@ public class GameRoomEntranceJpaEntity extends BaseEntity {
         return ready;
     }
 
-    public GameRoomEntranceJpaEntity(Long id, GameRoomJpaEntity gameRoomEntity, UserJpaEntity userEntity, GameRoomEntranceState state, String nickname, GameRoomEntranceRole role) {
+
+    public GameRoomEntranceJpaEntity(Long id, GameRoomJpaEntity gameRoomEntity, UserJpaEntity userEntity, GameRoomEntranceState state, String nickname, GameRoomEntranceRole role, boolean ready) {
         this.id = id;
         this.gameRoomEntity = gameRoomEntity;
         this.userEntity = userEntity;
         this.state = state;
         this.nickname = nickname;
         this.role = role;
-        this.ready = role == HOST;
+        this.ready = role == HOST || ready;
     }
-
     /**
      * 게임 입장 Entity를 exit 처리한다.
      */

@@ -143,7 +143,7 @@ public class GameRoomApplicationService {
          */
         eventPublisher.publishEvent(new GameRoomEntranceEvent(command.gameRoomId(), command.userId()));
 
-        return new GameRoomEntranceDto(newGameRoomEntrance.getGameRoomId(), .newGameRoomEntrance.getId());
+        return new GameRoomEntranceDto(newGameRoomEntrance.getGameRoomId(), newGameRoomEntrance.getId());
     }
 
     /**
