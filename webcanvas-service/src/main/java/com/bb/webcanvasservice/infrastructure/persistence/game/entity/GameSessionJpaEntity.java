@@ -48,7 +48,7 @@ public class GameSessionJpaEntity extends BaseEntity {
      * 게임 방 JpaEntity
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_room_id", insertable = false, updatable = false)
+    @JoinColumn(name = "game_room_id")
     private GameRoomJpaEntity gameRoomEntity;
 
     public GameSessionJpaEntity(Long id, GameRoomJpaEntity gameRoomEntity, int turnCount, int timePerTurn) {

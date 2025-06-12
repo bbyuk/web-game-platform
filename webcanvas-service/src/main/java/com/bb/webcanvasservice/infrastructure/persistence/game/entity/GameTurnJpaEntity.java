@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 
-import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.domain.game.model.GameTurnState;
+import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,7 +25,7 @@ public class GameTurnJpaEntity extends BaseEntity {
      */
     private Long id;
 
-    @JoinColumn(name = "game_session_id", insertable = false, updatable = false)
+    @JoinColumn(name = "game_session_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private GameSessionJpaEntity gameSessionEntity;
 

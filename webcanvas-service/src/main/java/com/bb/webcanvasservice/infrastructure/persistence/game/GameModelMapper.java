@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.infrastructure.persistence.game;
 
 import com.bb.webcanvasservice.domain.game.model.*;
 import com.bb.webcanvasservice.infrastructure.persistence.game.entity.*;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 
 /**
  * entity <-> domain model
@@ -16,7 +17,7 @@ import com.bb.webcanvasservice.infrastructure.persistence.game.entity.*;
 public class GameModelMapper {
 
     public static GamePlayHistory toModel(GamePlayHistoryJpaEntity entity) {
-        return new GamePlayHistory(entity.getUserId(), entity.getGameSessionId());
+        return new GamePlayHistory(entity.getUserEntity().getId(), entity.getGameSessionEntity().getId());
     }
 
     public static GameRoom toModel(GameRoomJpaEntity entity) {
@@ -25,8 +26,8 @@ public class GameModelMapper {
 
     public static GameRoomEntrance toModel(GameRoomEntranceJpaEntity entity) {
         return new GameRoomEntrance(entity.getId(),
-                entity.getGameRoomId(),
-                entity.getUserId(),
+                entity.getGameRoomEntity().getId(),
+                entity.getUserEntity().getId(),
                 entity.getState(),
                 entity.getNickname(),
                 entity.getRole(),
@@ -37,7 +38,7 @@ public class GameModelMapper {
     public static GameSession toModel(GameSessionJpaEntity entity) {
         return new GameSession(
                 entity.getId(),
-                entity.getGameRoomId(),
+                entity.getGameRoomEntity().getId(),
                 entity.getTurnCount(),
                 entity.getTimePerTurn(),
                 entity.getState()
@@ -47,7 +48,7 @@ public class GameModelMapper {
     public static GameTurn toModel(GameTurnJpaEntity entity) {
         return new GameTurn(
                 entity.getId(),
-                entity.getGameSessionId(),
+                entity.getGameSessionEntity().getId(),
                 entity.getDrawerId(),
                 entity.getAnswer(),
                 entity.getCreatedAt(),
@@ -60,25 +61,26 @@ public class GameModelMapper {
         return new GameRoomJpaEntity(gameRoom.getId(), gameRoom.getJoinCode(), gameRoom.getState());
     }
 
-    public static GameRoomEntranceJpaEntity toEntity(GameRoomEntrance gameRoomEntrance) {
+    public static GameRoomEntranceJpaEntity toEntity(GameRoomEntrance gameRoomEntrance, GameRoomJpaEntity gameRoomEntity, UserJpaEntity userEntity) {
         return new GameRoomEntranceJpaEntity(
                 gameRoomEntrance.getId(),
-                gameRoomEntrance.getGameRoomId(),
-                gameRoomEntrance.getUserId(),
+                gameRoomEntity,
+                userEntity,
                 gameRoomEntrance.getState(),
                 gameRoomEntrance.getNickname(),
                 gameRoomEntrance.getRole());
     }
 
-    public static GameSessionJpaEntity toEntity(GameSession newGameSession) {
-        return new GameSessionJpaEntity(newGameSession.getId(), newGameSession.getGameRoomId(), newGameSession.getTurnCount(), newGameSession.getTimePerTurn());
+    public static GamePlayHistoryJpaEntity toEntity(GamePlayHistory gamePlayHistory, UserJpaEntity userEntity, GameSessionJpaEntity gameSessionEntity) {
+        return new GamePlayHistoryJpaEntity(userEntity, gameSessionEntity);
     }
 
-    public static GamePlayHistoryJpaEntity toEntity(GamePlayHistory gamePlayHistory) {
-        return new GamePlayHistoryJpaEntity(gamePlayHistory.getUserId(), gamePlayHistory.getGameSessionId());
+    public static GameSessionJpaEntity toEntity(GameSession gameSession, GameRoomJpaEntity gameRoomEntity) {
+        return new GameSessionJpaEntity(gameSession.getId(), gameRoomEntity, gameSession.getTurnCount(), gameSession.getTimePerTurn());
     }
 
-    public static GameTurnJpaEntity toEntity(GameTurn gameTurn) {
-        return new GameTurnJpaEntity(gameTurn.getId(), gameTurn.getGameSessionId(), gameTurn.getDrawerId(), gameTurn.getAnswer());
+
+    public static GameTurnJpaEntity toEntity(GameTurn gameTurn, GameSessionJpaEntity gameSessionEntity) {
+        return new GameTurnJpaEntity(gameTurn.getId(), gameSessionEntity, gameTurn.getDrawerId(), gameTurn.getAnswer());
     }
 }

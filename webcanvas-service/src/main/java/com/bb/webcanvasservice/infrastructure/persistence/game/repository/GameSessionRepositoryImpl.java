@@ -1,5 +1,7 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.repository;
 
+import com.bb.webcanvasservice.domain.game.exception.GameRoomNotFoundException;
+import com.bb.webcanvasservice.domain.game.exception.GameSessionNotFoundException;
 import com.bb.webcanvasservice.domain.game.model.GameSession;
 import com.bb.webcanvasservice.domain.game.model.GameTurn;
 import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class GameSessionRepositoryImpl implements GameSessionRepository {
 
     private final GameSessionJpaRepository gameSessionJpaRepository;
+    private final GameRoomJpaRepository gameRoomJpaRepository;
     private final GameTurnJpaRepository gameTurnJpaRepository;
 
     private final EntityManager em;
@@ -30,8 +33,15 @@ public class GameSessionRepositoryImpl implements GameSessionRepository {
     }
 
     @Override
-    public GameSession save(GameSession newGameSession) {
-        return GameModelMapper.toModel(gameSessionJpaRepository.save(GameModelMapper.toEntity(newGameSession)));
+    public GameSession save(GameSession gameSession) {
+        return GameModelMapper.toModel(
+                gameSessionJpaRepository.save(
+                        GameModelMapper.toEntity(
+                                gameSession,
+                                gameRoomJpaRepository.findById(gameSession.getGameRoomId()).orElseThrow(GameRoomNotFoundException::new)
+                        )
+                )
+        );
     }
 
     @Override
@@ -53,7 +63,7 @@ public class GameSessionRepositoryImpl implements GameSessionRepository {
             String jpql = """
                     select      gt
                     from        GameTurnJpaEntity gt
-                    where       gt.gameSession.id =: gameSessionId
+                    where       gt.gameSessionEntity.id =: gameSessionId
                     order by    gt.id desc
                     """;
 
@@ -85,7 +95,13 @@ public class GameSessionRepositoryImpl implements GameSessionRepository {
 
     @Override
     public GameTurn saveGameTurn(GameTurn gameTurn) {
-        gameTurnJpaRepository.save(GameModelMapper.toEntity(gameTurn));
-        return null;
+        return GameModelMapper.toModel(
+                gameTurnJpaRepository.save(
+                        GameModelMapper.toEntity(
+                                gameTurn,
+                                gameSessionJpaRepository.findById(gameTurn.getGameSessionId()).orElseThrow(GameSessionNotFoundException::new)
+                        )
+                )
+        );
     }
 }

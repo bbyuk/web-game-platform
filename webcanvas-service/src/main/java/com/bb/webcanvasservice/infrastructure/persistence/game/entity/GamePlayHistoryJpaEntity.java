@@ -1,6 +1,5 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 
-import com.bb.webcanvasservice.domain.user.model.User;
 import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import jakarta.persistence.*;
@@ -27,13 +26,13 @@ public class GamePlayHistoryJpaEntity extends BaseEntity {
      * 게임을 플레이한 유저
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id")
     private UserJpaEntity userEntity;
 
     /**
      * 게임을 플레이한 세션
      */
-    @JoinColumn(name = "game_session_id", insertable = false, updatable = false)
+    @JoinColumn(name = "game_session_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private GameSessionJpaEntity gameSessionEntity;
 

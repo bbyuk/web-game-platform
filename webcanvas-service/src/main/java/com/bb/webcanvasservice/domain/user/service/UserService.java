@@ -66,6 +66,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
         user.changeState(UserStateCode.IN_ROOM);
+        userRepository.save(user);
     }
 
     /**
@@ -76,6 +77,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
         user.changeState(UserStateCode.IN_LOBBY);
+        userRepository.save(user);
     }
 
     /**
@@ -85,8 +87,8 @@ public class UserService {
     public void moveUserToGameSession(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-
         user.changeState(UserStateCode.IN_GAME);
+        userRepository.save(user);
     }
 
     /**

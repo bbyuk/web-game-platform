@@ -97,6 +97,7 @@ public class GameRoomApplicationService {
         GameRoom gameRoom = createGameRoom(userId);
         return enterGameRoom(new EnterGameRoomCommand(gameRoom.getId(), userId, HOST));
     }
+
     /**
      * 게임 방에 유저를 입장시킨다.
      * <p>
@@ -121,17 +122,18 @@ public class GameRoomApplicationService {
          * HOST로 입장한다면 entrance의 ready상태를 true로 초기 설정
          */
         String koreanAdjective = dictionaryService.drawRandomWordValue(Language.KOREAN, PartOfSpeech.ADJECTIVE);
-        GameRoomEntrance gameRoomEntrance = new GameRoomEntrance(
-                null
-                , command.gameRoomId()
-                , command.userId()
-                , GameRoomEntranceState.WAITING
-                , String.format("%s %s", koreanAdjective, "플레이어")
-                , command.role()
-                , command.role() == GameRoomEntranceRole.HOST
-        );
 
-        GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(gameRoomEntrance);
+        GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(
+                new GameRoomEntrance(
+                        null
+                        , command.gameRoomId()
+                        , command.userId()
+                        , GameRoomEntranceState.WAITING
+                        , String.format("%s %s", koreanAdjective, "플레이어")
+                        , command.role()
+                        , command.role() == GameRoomEntranceRole.HOST
+                )
+        );
 
         userService.moveUserToRoom(command.userId());
 
@@ -242,7 +244,7 @@ public class GameRoomApplicationService {
      * HOST 퇴장 시 입장한 지 가장 오래된 유저가 HOST로 변경
      *
      * @param gameRoomEntranceId 대상 게임 방 입장 ID
-     * @param userId 유저 ID
+     * @param userId             유저 ID
      */
     @Transactional
     public void exitFromRoom(Long gameRoomEntranceId, Long userId) {

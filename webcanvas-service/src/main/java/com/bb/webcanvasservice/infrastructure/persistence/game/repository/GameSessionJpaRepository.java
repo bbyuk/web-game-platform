@@ -21,7 +21,7 @@ public interface GameSessionJpaRepository extends JpaRepository<GameSessionJpaEn
     @Query("""
             select  count(gt) + 1
             from    GameTurnJpaEntity gt
-            where   gt.gameSession.id = :gameSessionId
+            where   gt.gameSessionEntity.id = :gameSessionId
             """)
     int findCurrentRound(@Param("gameSessionId") Long gameSessionId);
 
@@ -34,15 +34,15 @@ public interface GameSessionJpaRepository extends JpaRepository<GameSessionJpaEn
             select  gt
             from    GameTurnJpaEntity gt
             join fetch GameSessionJpaEntity gs
-            on      gt.gameSession = gs
-            where   gt.gameSession.id = :gameSessionId
+            on      gt.gameSessionEntity = gs
+            where   gt.gameSessionEntity.id = :gameSessionId
             """)
     List<GameTurnJpaEntity> findTurnsByGameSessionId(@Param("gameSessionId") Long gameSessionId);
 
     @Query("""
           select  gs
           from    GameSessionJpaEntity gs
-          where   gs.gameRoom.id = :gameRoomId
+          where   gs.gameRoomEntity.id = :gameRoomId
           """)
     List<GameSessionJpaEntity> findGameSessionsByGameRoomId(@Param("gameRoomId") Long gameRoomId);
 }

@@ -1,10 +1,13 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.repository;
 
+import com.bb.webcanvasservice.domain.game.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.domain.game.model.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
+import com.bb.webcanvasservice.domain.user.exception.UserNotFoundException;
 import com.bb.webcanvasservice.infrastructure.persistence.game.GameModelMapper;
 import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,8 @@ import java.util.stream.Collectors;
 public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepository {
     private final EntityManager em;
     private final GameRoomEntranceJpaRepository jpaRepository;
+    private final GameRoomJpaRepository gameRoomJpaRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Override
     public Optional<GameRoomEntrance> findById(Long gameRoomEntranceId) {
@@ -28,7 +33,15 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
 
     @Override
     public GameRoomEntrance save(GameRoomEntrance gameRoomEntrance) {
-        return GameModelMapper.toModel(jpaRepository.save(GameModelMapper.toEntity(gameRoomEntrance)));
+        return GameModelMapper.toModel(
+                jpaRepository.save(
+                        GameModelMapper.toEntity(
+                                gameRoomEntrance,
+                                gameRoomJpaRepository.findById(gameRoomEntrance.getGameRoomId()).orElseThrow(GameRoomNotFoundException::new),
+                                userJpaRepository.findById(gameRoomEntrance.getUserId()).orElseThrow(UserNotFoundException::new)
+                        )
+                )
+        );
     }
 
     @Override
@@ -37,8 +50,8 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
                 select exists (
                      select 1
                      from   GameRoomEntranceJpaEntity gre
-                     where  gre.gameRoomId = :gameRoomId
-                     and    gre.userId = :userId
+                     where  gre.gameRoomEntity.id = :gameRoomId
+                     and    gre.userEntity.id = :userId
                      and    gre.state in :enteredStates
                 )
                 """;
@@ -54,11 +67,11 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
     public int findEnteredUserCount(Long gameRoomId) {
 
         String jpql = """
-                        select  count(gre)
-                        from    GameRoomEntranceJpaEntity gre
-                        where   gre.gameRoom.id = :gameRoomId
-                        and     gre.state in :enteredStates
-                    """;
+                    select  count(gre)
+                    from    GameRoomEntranceJpaEntity gre
+                    where   gre.gameRoomEntity.id = :gameRoomId
+                    and     gre.state in :enteredStates
+                """;
         return em.createQuery(jpql, Long.class)
                 .setParameter("gameRoomId", gameRoomId)
                 .setParameter("enteredStates", GameRoomEntranceState.entered)
@@ -89,7 +102,7 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
         String jpql = """
                 select  gre
                 from    GameRoomEntranceJpaEntity gre
-                where   gre.user.id = :userId
+                where   gre.userEntity.id = :userId
                 and     gre.state in :enteredStates
                 """;
 

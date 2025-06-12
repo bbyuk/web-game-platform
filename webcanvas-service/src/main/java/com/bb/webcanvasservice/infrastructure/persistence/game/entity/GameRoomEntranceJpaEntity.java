@@ -1,9 +1,8 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 
-import com.bb.webcanvasservice.domain.game.model.GameRoom;
-import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
-import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
+import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState;
+import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -33,14 +32,14 @@ public class GameRoomEntranceJpaEntity extends BaseEntity {
      * 게임 방
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_room_id", insertable = false, updatable = false)
+    @JoinColumn(name = "game_room_id")
     private GameRoomJpaEntity gameRoomEntity;
 
     /**
      * 입장한 유저
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id")
     private UserJpaEntity userEntity;
 
     @Column(name = "user_nickname")
