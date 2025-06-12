@@ -3,7 +3,6 @@ package com.bb.webcanvasservice.domain.dictionary.repository;
 import com.bb.webcanvasservice.domain.dictionary.entity.Word;
 import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
-import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -12,5 +11,5 @@ import java.util.Optional;
  */
 public interface WordCustomRepository {
 
-    Optional<Word> findRandomWordByLanguageAndPos(@Param("language") Language language, @Param("pos") PartOfSpeech pos);
+    Optional<Word> findRandomWordByLanguageAndPos(Language language, PartOfSpeech pos);
 }

@@ -202,7 +202,7 @@ public class GameRoomApplicationService {
      */
     @Transactional(readOnly = true)
     public GameRoomEntranceDetailInfoDto findEnteredGameRoomInfo(Long userId) {
-        GameRoomEntrance userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId, GameRoomEntranceState.entered)
+        GameRoomEntrance userEntrance = gameRoomEntranceRepository.findCurrentEnteredGameRoomEntranceByUserId(userId)
                 .orElseThrow(GameRoomEntranceNotFoundException::new);
 
         AtomicInteger index = new AtomicInteger(0);

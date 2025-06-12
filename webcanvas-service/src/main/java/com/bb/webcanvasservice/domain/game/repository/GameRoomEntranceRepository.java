@@ -67,7 +67,7 @@ public interface GameRoomEntranceRepository {
      * @param userId 조회 대상 유저 ID
      * @return 현재 입장한 게임 방의 입장 객체
      */
-    Optional<GameRoomEntrance> findGameRoomEntranceByUserId(Long userId, List<GameRoomEntranceState> gameRoomEntranceStates);
+    Optional<GameRoomEntrance> findCurrentEnteredGameRoomEntranceByUserId(Long userId);
 
     /**
      * 게임 방 ID와 상태로 GameRoomEntrance 목록을 조회한다.

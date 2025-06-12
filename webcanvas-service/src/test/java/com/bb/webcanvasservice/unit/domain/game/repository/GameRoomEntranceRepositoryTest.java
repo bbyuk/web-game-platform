@@ -80,7 +80,7 @@ class GameRoomEntranceRepositoryTest {
     void existsGameRoomEntranceByUserIdFalseWhenNoActive() {
         // given
         enterTestRoom(testUser);
-        GameRoomEntranceJpaEntity gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING)).orElseThrow(() -> new GameRoomEntranceNotFoundException("왜 여기서,,?"));
+        GameRoomEntranceJpaEntity gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserIdAndGameRoomStates(testUser.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING)).orElseThrow(() -> new GameRoomEntranceNotFoundException("왜 여기서,,?"));
         exit(gameRoomEntrance);
 
         // when
@@ -127,7 +127,7 @@ class GameRoomEntranceRepositoryTest {
 
         enterTestRoom(otherUser1JpaEntity, testUser, otherUser2JpaEntity, otherUser3JpaEntity, otherUser4JpaEntity);
         // when
-        Optional<GameRoomEntranceJpaEntity> gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(testUser.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING));
+        Optional<GameRoomEntranceJpaEntity> gameRoomEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserIdAndGameRoomStates(testUser.getId(), List.of(GameRoomEntranceState.WAITING, GameRoomEntranceState.PLAYING));
 
         // then
         Assertions.assertThat(gameRoomEntrance).isPresent();

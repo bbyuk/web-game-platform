@@ -1,8 +1,7 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 
-import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.domain.game.model.ScoreType;
-import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -24,19 +23,17 @@ public class ScoreJpaEntity extends BaseEntity {
      */
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
+    @Column(name = "owner_id")
     /**
      * 점수 엔티티의 오너
      */
-    private UserJpaEntity owner;
+    private Long ownerId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scored_turn_id")
+    @Column(name = "scored_turn_id")
     /**
      * 스코어 집계 대상 게임 턴
      */
-    private GameTurnJpaEntity scoredTurn;
+    private Long scoredTurnId;
 
     @Column(name = "message")
     /**
@@ -48,9 +45,9 @@ public class ScoreJpaEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ScoreType type;
 
-    public ScoreJpaEntity(UserJpaEntity scorer, GameTurnJpaEntity scoredTurn, int value, ScoreType type) {
-        this.owner = scorer;
-        this.scoredTurn = scoredTurn;
+    public ScoreJpaEntity(Long scorerId, Long scoredTurnId, int value, ScoreType type) {
+        this.ownerId = scorerId;
+        this.scoredTurnId = scoredTurnId;
         this.value = value;
         this.type = type;
     }

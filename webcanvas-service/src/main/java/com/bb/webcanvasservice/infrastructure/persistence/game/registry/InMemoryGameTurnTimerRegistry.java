@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.registry;
 
-import com.bb.webcanvasservice.application.game.dto.GameTurnTimerEntry;
+import com.bb.webcanvasservice.domain.game.model.GameTurnTimer;
 import com.bb.webcanvasservice.domain.game.registry.GameTurnTimerRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -12,15 +12,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class InMemoryGameTurnTimerRegistry implements GameTurnTimerRegistry {
 
-    private final Map<Long, GameTurnTimerEntry> timerMap = new ConcurrentHashMap<>();
+    private final Map<Long, GameTurnTimer> timerMap = new ConcurrentHashMap<>();
 
     @Override
-    public void register(Long gameRoomId, GameTurnTimerEntry future) {
+    public void register(Long gameRoomId, GameTurnTimer future) {
         timerMap.put(gameRoomId, future);
     }
 
     @Override
-    public GameTurnTimerEntry get(Long gameRoomId) {
+    public GameTurnTimer get(Long gameRoomId) {
         return timerMap.get(gameRoomId);
     }
 

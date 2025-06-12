@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.repository;
 
 import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameTurnJpaEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,7 +21,7 @@ public interface GameTurnJpaRepository extends JpaRepository<GameTurnJpaEntity, 
     @Query("""
             select  gt
             from    GameTurnJpaEntity gt
-            where   gt.gameSessionId = :gameSessionId
+            where   gt.gameSession.id = :gameSessionId
             """)
     List<GameTurnJpaEntity> findTurnsByGameSessionId(@Param("gameSessionId") Long gameSessionId);
 
@@ -32,7 +33,7 @@ public interface GameTurnJpaRepository extends JpaRepository<GameTurnJpaEntity, 
     @Query("""
             select  count(gt)
             from    GameTurnJpaEntity gt
-            where   gt.gameSessionId = :gameSessionId
+            where   gt.gameSession.id = :gameSessionId
             """)
     long findTurnCountByGameSessionId(@Param("gameSessionId") Long gameSessionId);
 }

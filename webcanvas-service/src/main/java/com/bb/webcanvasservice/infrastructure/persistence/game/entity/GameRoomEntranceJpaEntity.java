@@ -1,8 +1,10 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 
+import com.bb.webcanvasservice.domain.game.model.GameRoom;
 import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
+import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,17 +29,34 @@ public class GameRoomEntranceJpaEntity extends BaseEntity {
      */
     private Long id;
 
-    @Column(name = "game_room_id")
     /**
-     * 입장한 게임 방
+     * 입장한 게임 방 ID
      */
+    @Column(name = "game_room_id")
     private Long gameRoomId;
 
+    /**
+     * 게임 방
+     * 조회 전용 연관관계 매핑
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_room_id", insertable = false, updatable = false)
+    private GameRoomJpaEntity gameRoom;
+
+    /**
+     * 입장한 유저 ID
+     * 저장 필드
+     */
     @Column(name = "user_id")
+    private Long userId;
+
     /**
      * 입장한 유저
+     * 조회 전용 연관관계 매핑
      */
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private UserJpaEntity user;
 
     @Column(name = "user_nickname")
     /**
@@ -70,7 +89,8 @@ public class GameRoomEntranceJpaEntity extends BaseEntity {
         return ready;
     }
 
-    public GameRoomEntranceJpaEntity(Long gameRoomId, Long userId, GameRoomEntranceState state, String nickname, GameRoomEntranceRole role) {
+    public GameRoomEntranceJpaEntity(Long id, Long gameRoomId, Long userId, GameRoomEntranceState state, String nickname, GameRoomEntranceRole role) {
+        this.id = id;
         this.gameRoomId = gameRoomId;
         this.userId = userId;
         this.state = state;

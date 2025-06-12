@@ -3,9 +3,6 @@ package com.bb.webcanvasservice.infrastructure.persistence.game;
 import com.bb.webcanvasservice.domain.game.model.*;
 import com.bb.webcanvasservice.infrastructure.persistence.game.entity.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * entity <-> domain model
  *
@@ -65,6 +62,7 @@ public class GameModelMapper {
 
     public static GameRoomEntranceJpaEntity toEntity(GameRoomEntrance gameRoomEntrance) {
         return new GameRoomEntranceJpaEntity(
+                gameRoomEntrance.getId(),
                 gameRoomEntrance.getGameRoomId(),
                 gameRoomEntrance.getUserId(),
                 gameRoomEntrance.getState(),
@@ -73,7 +71,7 @@ public class GameModelMapper {
     }
 
     public static GameSessionJpaEntity toEntity(GameSession newGameSession) {
-        return new GameSessionJpaEntity(newGameSession.getGameRoomId(), newGameSession.getTurnCount(), newGameSession.getTimePerTurn());
+        return new GameSessionJpaEntity(newGameSession.getId(), newGameSession.getGameRoomId(), newGameSession.getTurnCount(), newGameSession.getTimePerTurn());
     }
 
     public static GamePlayHistoryJpaEntity toEntity(GamePlayHistory gamePlayHistory) {
@@ -81,6 +79,6 @@ public class GameModelMapper {
     }
 
     public static GameTurnJpaEntity toEntity(GameTurn gameTurn) {
-        return new GameTurnJpaEntity(gameTurn.getGameSessionId(), gameTurn.getDrawerId(), gameTurn.getAnswer());
+        return new GameTurnJpaEntity(gameTurn.getId(), gameTurn.getGameSessionId(), gameTurn.getDrawerId(), gameTurn.getAnswer());
     }
 }

@@ -146,7 +146,7 @@ public class GameRoomService {
     }
 
     public void validateIsHost(Long gameRoomId, Long userId) {
-        GameRoomEntrance userEntrance = gameRoomEntranceRepository.findGameRoomEntranceByUserId(userId, GameRoomEntranceState.entered)
+        GameRoomEntrance userEntrance = gameRoomEntranceRepository.findCurrentEnteredGameRoomEntranceByUserId(userId)
                 .orElseThrow(GameRoomEntranceNotFoundException::new);
 
         if (!userEntrance.isHost()) {

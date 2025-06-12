@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 
+import com.bb.webcanvasservice.domain.game.model.GameRoom;
 import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.domain.game.model.GameSessionState;
 import jakarta.persistence.*;
@@ -43,13 +44,23 @@ public class GameSessionJpaEntity extends BaseEntity {
      */
     private GameSessionState state;
 
-    @Column(name = "game_room_id")
     /**
      * 게임 방 ID
+     * 저장 필드
      */
+    @Column(name = "game_room_id")
     private Long gameRoomId;
 
-    public GameSessionJpaEntity(Long gameRoomId, int turnCount, int timePerTurn) {
+    /**
+     * 게임 방 JpaEntity
+     * 조회 전용 연관관계 매핑
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_room_id", insertable = false, updatable = false)
+    private GameRoomJpaEntity gameRoom;
+
+    public GameSessionJpaEntity(Long id, Long gameRoomId, int turnCount, int timePerTurn) {
+        this.id = id;
         this.gameRoomId = gameRoomId;
         this.state = GameSessionState.LOADING;
         this.turnCount = turnCount;

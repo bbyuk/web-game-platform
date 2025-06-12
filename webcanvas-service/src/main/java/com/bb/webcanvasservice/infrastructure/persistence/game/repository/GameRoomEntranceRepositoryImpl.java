@@ -4,6 +4,7 @@ import com.bb.webcanvasservice.domain.game.model.GameRoomEntrance;
 import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceState;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.infrastructure.persistence.game.GameModelMapper;
+import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,8 +85,20 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
     }
 
     @Override
-    public Optional<GameRoomEntrance> findGameRoomEntranceByUserId(Long userId, List<GameRoomEntranceState> gameRoomEntranceStates) {
-        return jpaRepository.findGameRoomEntranceByUserId(userId, gameRoomEntranceStates).map(GameModelMapper::toModel);
+    public Optional<GameRoomEntrance> findCurrentEnteredGameRoomEntranceByUserId(Long userId) {
+        String jpql = """
+                select  gre
+                from    GameRoomEntranceJpaEntity gre
+                where   gre.user.id = :userId
+                and     gre.state in :enteredStates
+                """;
+
+        GameRoomEntranceJpaEntity gameRoomEntranceJpaEntity = em.createQuery(jpql, GameRoomEntranceJpaEntity.class)
+                .setParameter("userId", userId)
+                .setParameter("enteredStates", GameRoomEntranceState.entered)
+                .getSingleResult();
+
+        return Optional.of(GameModelMapper.toModel(gameRoomEntranceJpaEntity));
     }
 
     @Override

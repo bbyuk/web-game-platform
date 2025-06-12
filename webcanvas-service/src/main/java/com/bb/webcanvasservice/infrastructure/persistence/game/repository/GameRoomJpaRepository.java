@@ -26,9 +26,9 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
             select      gr
             from        GameRoomJpaEntity gr
             join fetch  GameRoomEntranceJpaEntity gre
-            on          gre.gameRoomId = gr.id
+            on          gre.gameRoom.id = gr.id
             where       gr.state != 'CLOSED'
-            and         gre.userId = :userId
+            and         gre.user.id = :userId
             """)
     Optional<GameRoomJpaEntity> findNotClosedGameRoomByUserId(@Param("userId") Long userId);
 
@@ -66,7 +66,7 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
             and     (
                         select  count(gre)
                         from    GameRoomEntranceJpaEntity gre
-                        where   gre.gameRoomId = gr.id
+                        where   gre.gameRoom.id = gr.id
                         and     gre.state = :activeEntranceState
                     ) < :gameRoomCapacity
             """
