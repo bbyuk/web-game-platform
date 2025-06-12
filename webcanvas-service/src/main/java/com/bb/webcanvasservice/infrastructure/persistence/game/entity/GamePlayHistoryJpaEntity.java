@@ -23,29 +23,23 @@ public class GamePlayHistoryJpaEntity extends BaseEntity {
      */
     private Long id;
 
-    @Column(name = "user_id")
     /**
-     * 게임을 플레이한 유저 ID
+     * 게임을 플레이한 유저
      */
-    private Long userId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    private UserJpaEntity userJpaEntity;
+    private UserJpaEntity userEntity;
 
-    @Column(name = "game_session_id")
     /**
-     * 게임을 플레이한 세션 ID
+     * 게임을 플레이한 세션
      */
-    private Long gameSessionId;
-
     @JoinColumn(name = "game_session_id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    private GameSessionJpaEntity gameSession;
+    private GameSessionJpaEntity gameSessionEntity;
 
-    public GamePlayHistoryJpaEntity(Long userId, Long gameSessionId) {
-        this.userId = userId;
-        this.gameSessionId = gameSessionId;
+    public GamePlayHistoryJpaEntity(UserJpaEntity userEntity, GameSessionJpaEntity gameSessionEntity) {
+        this.userEntity = userEntity;
+        this.gameSessionEntity = gameSessionEntity;
     }
 
 

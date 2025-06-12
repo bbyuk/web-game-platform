@@ -25,12 +25,9 @@ public class GameTurnJpaEntity extends BaseEntity {
      */
     private Long id;
 
-    @Column(name = "game_session_id")
-    private Long gameSessionId;
-
     @JoinColumn(name = "game_session_id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    private GameSessionJpaEntity gameSession;
+    private GameSessionJpaEntity gameSessionEntity;
 
     @Column(name = "drawer_id")
     /**
@@ -54,9 +51,9 @@ public class GameTurnJpaEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private GameTurnState state;
 
-    public GameTurnJpaEntity(Long id, Long gameSessionId, Long drawerId, String answer) {
+    public GameTurnJpaEntity(Long id, GameSessionJpaEntity gameSessionEntity, Long drawerId, String answer) {
         this.id = id;
-        this.gameSessionId = gameSessionId;
+        this.gameSessionEntity = gameSessionEntity;
         this.drawerId = drawerId;
         this.answer = answer;
         this.state = GameTurnState.ACTIVE;

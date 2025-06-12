@@ -1,8 +1,7 @@
 package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 
-import com.bb.webcanvasservice.domain.game.model.GameRoom;
-import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.domain.game.model.GameSessionState;
+import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,24 +43,17 @@ public class GameSessionJpaEntity extends BaseEntity {
      */
     private GameSessionState state;
 
-    /**
-     * 게임 방 ID
-     * 저장 필드
-     */
-    @Column(name = "game_room_id")
-    private Long gameRoomId;
 
     /**
      * 게임 방 JpaEntity
-     * 조회 전용 연관관계 매핑
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_room_id", insertable = false, updatable = false)
-    private GameRoomJpaEntity gameRoom;
+    private GameRoomJpaEntity gameRoomEntity;
 
-    public GameSessionJpaEntity(Long id, Long gameRoomId, int turnCount, int timePerTurn) {
+    public GameSessionJpaEntity(Long id, GameRoomJpaEntity gameRoomEntity, int turnCount, int timePerTurn) {
         this.id = id;
-        this.gameRoomId = gameRoomId;
+        this.gameRoomEntity = gameRoomEntity;
         this.state = GameSessionState.LOADING;
         this.turnCount = turnCount;
         this.timePerTurn = timePerTurn;
