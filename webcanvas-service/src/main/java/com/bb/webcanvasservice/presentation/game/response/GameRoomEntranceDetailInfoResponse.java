@@ -1,7 +1,5 @@
 package com.bb.webcanvasservice.presentation.game.response;
 
-import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
-import com.bb.webcanvasservice.domain.game.model.GameRoomState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;

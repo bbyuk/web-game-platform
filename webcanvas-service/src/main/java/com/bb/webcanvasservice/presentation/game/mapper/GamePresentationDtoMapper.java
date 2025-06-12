@@ -10,7 +10,7 @@ import com.bb.webcanvasservice.presentation.game.response.*;
  */
 public class GamePresentationDtoMapper {
     public static GameRoomEntranceResponse toGameRoomEntranceResponse(GameRoomEntranceDto dto) {
-        return new GameRoomEntranceResponse(dto.gameRoomEntranceId(), dto.gameRoomId());
+        return new GameRoomEntranceResponse(dto.gameRoomId(), dto.gameRoomEntranceId());
     }
 
     public static GameRoomListResponse toGameRoomListResponse(GameRoomListDto dto) {
