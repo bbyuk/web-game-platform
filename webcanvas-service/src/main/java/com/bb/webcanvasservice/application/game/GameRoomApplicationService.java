@@ -143,7 +143,7 @@ public class GameRoomApplicationService {
          */
         eventPublisher.publishEvent(new GameRoomEntranceEvent(command.gameRoomId(), command.userId()));
 
-        return new GameRoomEntranceDto(newGameRoomEntrance.getId(), newGameRoomEntrance.getId());
+        return new GameRoomEntranceDto(newGameRoomEntrance.getGameRoomId(), .newGameRoomEntrance.getId());
     }
 
     /**
@@ -255,8 +255,8 @@ public class GameRoomApplicationService {
             log.error("대상 게임 방 입장 기록과 요청 유저가 다릅니다.");
             throw new AbnormalAccessException();
         }
-
         targetEntrance.exit();
+        gameRoomEntranceRepository.save(targetEntrance);
 
         GameRoom gameRoom = gameRoomRepository.findById(targetEntrance.getGameRoomId()).orElseThrow(GameRoomNotFoundException::new);
 
@@ -265,6 +265,7 @@ public class GameRoomApplicationService {
 
         if (entrances.isEmpty()) {
             gameRoom.close();
+            gameRoomRepository.save(gameRoom);
         } else if (targetEntrance.getRole() == HOST) {
             /**
              * 250522
