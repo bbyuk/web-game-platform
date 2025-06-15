@@ -6,6 +6,7 @@ import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.model.*;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
+import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 
 import java.util.List;
 
@@ -153,6 +154,5 @@ public class GameRoomService {
             throw new AbnormalAccessException();
         }
     }
-
 }
 

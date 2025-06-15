@@ -84,8 +84,21 @@ public class GameApplicationService {
          * 게임 방 상태 확인
          */
         if (!gameRoom.isWaiting()) {
-            log.debug("게임 방의 상태가 게임을 시작할 수 없는 상태입니다. ====== {}", gameRoom.getState());
-            throw new IllegalGameRoomStateException();
+            String message = "게임 방의 상태가 게임을 시작할 수 없는 상태입니다.";
+            log.debug("{} ====== {}", message, gameRoom.getState());
+            throw new IllegalGameRoomStateException(message);
+        }
+        /**
+         * 현재 진행중인 게임 세션이 있는지 확인
+         */
+        boolean hasActiveGameSession = gameSessionRepository
+                .findGameSessionsByGameRoomId(command.gameRoomId())
+                .stream()
+                .anyMatch(GameSession::isActive);
+        if (hasActiveGameSession) {
+            String message = "이미 게임 세션이 진행중입니다.";
+            log.debug("{} ====== {}", message, command.gameRoomId());
+            throw new IllegalGameRoomStateException(message);
         }
 
         GameSession gameSession = gameSessionRepository.save(GameSession.createNewGameSession(gameRoom.getId(), command.turnCount(), command.timePerTurn()));
