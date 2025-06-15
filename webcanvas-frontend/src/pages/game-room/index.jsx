@@ -13,6 +13,7 @@ import ItemList from "@/components/layouts/side-panel/contents/item-list/index.j
 import { useRightSideStore } from "@/stores/layout/rightSideStore.jsx";
 import ChatList from "@/components/layouts/side-panel/contents/chat-list/index.jsx";
 import SidePanelFooterInput from "@/components/layouts/side-panel/footer/input/index.jsx";
+import { useClientStore } from '@/stores/client/clientStore.jsx';
 
 export default function GameRoomPage() {
   // ===============================================================
@@ -26,6 +27,7 @@ export default function GameRoomPage() {
   const webSocketClientRef = useRef(null);
   const leftSideStore = useLeftSideStore();
   const rightSideStore = useRightSideStore();
+  const { startLoading } = useClientStore();
 
   /**
    * 페이지 상태
@@ -202,13 +204,15 @@ export default function GameRoomPage() {
           });
           break;
         case "ROOM/SESSION_STARTED":
-          findCurrentGameRoomInfo().then((response) => {
-            if (!response) {
-              return;
-            }
-
-            setLeftSidebar(response);
-          });
+          startLoading();
+          navigate(pages.gameRoom.playing.url(roomId), {replace : true});
+          // findCurrentGameRoomInfo().then((response) => {
+          //   if (!response) {
+          //     return;
+          //   }
+          //
+          //   setLeftSidebar(response);
+          // });
           break;
       }
     };

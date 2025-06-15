@@ -12,6 +12,7 @@ import { pages } from "@/router/index.jsx";
 import GameTurnTimer from "@/components/game-turn-timer/index.jsx";
 import AnswerBoard from "@/components/answer-board/index.jsx";
 import { useTimer } from "@/pages/game-room/playing/timer.jsx";
+import { useClientStore } from '@/stores/client/clientStore.jsx';
 
 export default function GameRoomPlayingPage() {
   // ===============================================================
@@ -29,10 +30,10 @@ export default function GameRoomPlayingPage() {
   const apiClient = getApiClient();
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const { webSocketClientRef } = useOutletContext();
-
-  const { enteredUsers } = useOutletContext();
+  const { webSocketClientRef, enteredUsers } = useOutletContext();
   const { setTitle, setContents } = useLeftSideStore();
+  const { endLoading } = useClientStore();
+
 
   const [gameSessionId, setGameSessionId] = useState(null);
   const [currentDrawerId, setCurrentDrawerId] = useState(null);
@@ -83,6 +84,9 @@ export default function GameRoomPlayingPage() {
         case "SESSION/TURN_PROGRESSED":
           findCurrentGameTurnInfo(gameSessionId);
 
+          break;
+        case "SESSION/ALL_USER_LOADED":
+          endLoading();
           break;
         case "SESSION/END":
           // TODO 게임 종료 이벤트 클라이언트 핸들링
@@ -155,6 +159,7 @@ export default function GameRoomPlayingPage() {
   // ===============================================================
 
   useEffect(() => {
+    console.log("게임 플레잉 컴포넌트 렌더링");
     setTitle({
       label: "playing",
       icon: <Gamepad2 className="w-6 h-6 text-green-500" />,

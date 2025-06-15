@@ -2,7 +2,6 @@ import Index from "@/components/layouts/side-panel/contents/item-list/item/index
 
 const ItemList = ({ value, emptyPlaceholder }) => {
   const hasData = value && value.length > 0;
-  console.log(value);
   return (
     <ul className="space-y-2">
       {hasData ? (
