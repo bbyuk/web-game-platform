@@ -127,9 +127,8 @@ public class GameApplicationService {
                 .map(entrance -> {
                     userService.moveUserToGameSession(entrance.getUserId());
 
-                    if (entrance.getRole() == GameRoomEntranceRole.GUEST) {
-                        entrance.changeReady(false);
-                    }
+                    entrance.resetReady();
+                    gameRoomEntranceRepository.save(entrance);
 
                     return new GamePlayHistory(entrance.getUserId(), gameSession.getId());
                 })
@@ -287,10 +286,13 @@ public class GameApplicationService {
 
         /**
          * 내부에서만 요청되는 메소드로 클라이언트 validation 처리 없이 complete한다.
+         * TODO user 상태, 게임 방 입장 상태 update 처리 추가
          */
         gameRoomService.findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomEntranceState.PLAYING)
                 .forEach(gameRoomEntrance -> {
                     gameRoomEntrance.resetGameRoomEntranceInfo();
+                    gameRoomEntranceRepository.save(gameRoomEntrance);
+
                     userService.moveUserToRoom(gameRoomEntrance.getUserId());
                 });
 
@@ -299,6 +301,14 @@ public class GameApplicationService {
          */
         gameSession.end();
         gameSessionRepository.save(gameSession);
+
+        /**
+         * 게임 방 정상 상태로 리셋
+         */
+        GameRoom gameRoom = gameRoomService.findGameRoom(gameSession.getGameRoomId());
+        gameRoom.resetGameRoomState();
+        gameRoomRepository.save(gameRoom);
+
 
         applicationEventPublisher.publishEvent(new GameSessionEndEvent(gameSessionId, gameSession.getGameRoomId()));
     }
@@ -326,9 +336,11 @@ public class GameApplicationService {
 
 
         int enteredUserCount = gameRoomEntranceRepository.findEnteredUserCount(gameSession.getGameRoomId());
+
         gameSessionLoadRegistry.register(gameSessionId, userId);
 
         if (gameSessionLoadRegistry.isAllLoaded(gameSessionId, enteredUserCount)) {
+            log.debug("여기는 한 번만");
             gameSession.start();
             gameSessionRepository.save(gameSession);
 

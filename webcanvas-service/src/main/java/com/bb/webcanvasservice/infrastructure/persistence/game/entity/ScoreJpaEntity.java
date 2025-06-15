@@ -4,6 +4,7 @@ import com.bb.webcanvasservice.domain.game.model.ScoreType;
 import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "scores")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class ScoreJpaEntity extends BaseEntity {
 
     @Id @GeneratedValue
@@ -45,10 +47,4 @@ public class ScoreJpaEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ScoreType type;
 
-    public ScoreJpaEntity(Long scorerId, Long scoredTurnId, int value, ScoreType type) {
-        this.ownerId = scorerId;
-        this.scoredTurnId = scoredTurnId;
-        this.value = value;
-        this.type = type;
-    }
 }

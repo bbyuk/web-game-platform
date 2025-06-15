@@ -9,7 +9,7 @@ import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEnt
  */
 public class UserModelMapper {
     public static User toUser(UserJpaEntity entity) {
-        return new User(entity.getId(), entity.getFingerprint(), entity.getRefreshToken());
+        return new User(entity.getId(), entity.getFingerprint(), entity.getState(), entity.getRefreshToken());
     }
 
     public static UserJpaEntity toUserJpaEntity(User user) {

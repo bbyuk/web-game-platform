@@ -99,6 +99,13 @@ public class GameRoomEntrance {
     }
 
     /**
+     * 레디를 초기화한다.
+     */
+    public void resetReady() {
+        this.ready = GameRoomEntranceRole.HOST == this.role;
+    }
+
+    /**
      * 유저가 호스트인지 체크한다.
      * @return
      */

@@ -6,7 +6,6 @@ import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.domain.auth.dto.response.AuthenticationInnerResponse;
 import com.bb.webcanvasservice.domain.user.model.User;
 import com.bb.webcanvasservice.domain.user.service.UserService;
-import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.web.security.SecurityProperties;
 import com.bb.webcanvasservice.web.security.exception.ApplicationAuthenticationException;
 import io.micrometer.common.util.StringUtils;
@@ -47,7 +46,8 @@ public class AuthenticationService {
 
         String accessToken = jwtManager.generateToken(user.getId(), user.getFingerprint(), securityProperties.accessTokenExpiration());
         String refreshToken = jwtManager.generateToken(user.getId(), user.getFingerprint(), securityProperties.refreshTokenExpiration());
-        user.updateRefreshToken(refreshToken);
+
+        userService.updateRefreshToken(user.getId(), refreshToken);
 
         return new AuthenticationInnerResponse(user.getId(), user.getFingerprint(), accessToken, refreshToken, true);
     }
@@ -87,7 +87,8 @@ public class AuthenticationService {
          * refreshToken 재발급 및 rotate
          */
         if (jwtManager.calculateRemainingExpiration(token) <= securityProperties.refreshTokenReissueThreshold()) {
-            user.updateRefreshToken(jwtManager.generateToken(userId, user.getFingerprint(), securityProperties.refreshTokenExpiration()));
+            String reissuedRefreshToken = jwtManager.generateToken(userId, user.getFingerprint(), securityProperties.refreshTokenExpiration());
+            userService.updateRefreshToken(userId, reissuedRefreshToken);
             refreshTokenReissued = true;
         }
 

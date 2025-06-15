@@ -66,23 +66,22 @@ public class GameModelMapper {
                 gameRoomEntrance.getId(),
                 gameRoomEntity,
                 userEntity,
-                gameRoomEntrance.getState(),
                 gameRoomEntrance.getNickname(),
                 gameRoomEntrance.getRole(),
+                gameRoomEntrance.getState(),
                 gameRoomEntrance.isReady()
         );
     }
 
     public static GamePlayHistoryJpaEntity toEntity(GamePlayHistory gamePlayHistory, UserJpaEntity userEntity, GameSessionJpaEntity gameSessionEntity) {
-        return new GamePlayHistoryJpaEntity(userEntity, gameSessionEntity);
+        return new GamePlayHistoryJpaEntity(null, userEntity, gameSessionEntity);
     }
 
     public static GameSessionJpaEntity toEntity(GameSession gameSession, GameRoomJpaEntity gameRoomEntity) {
         return new GameSessionJpaEntity(gameSession.getId(), gameRoomEntity, gameSession.getState(), gameSession.getTurnCount(), gameSession.getTimePerTurn());
     }
 
-
     public static GameTurnJpaEntity toEntity(GameTurn gameTurn, GameSessionJpaEntity gameSessionEntity) {
-        return new GameTurnJpaEntity(gameTurn.getId(), gameSessionEntity, gameTurn.getDrawerId(), gameTurn.getAnswer());
+        return new GameTurnJpaEntity(gameTurn.getId(), gameSessionEntity, gameTurn.getDrawerId(), gameTurn.getAnswer(), gameTurn.getCorrectAnswererId(), gameTurn.getState());
     }
 }

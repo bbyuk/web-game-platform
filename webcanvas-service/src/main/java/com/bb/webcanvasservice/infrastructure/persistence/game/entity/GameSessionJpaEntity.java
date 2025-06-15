@@ -4,6 +4,7 @@ import com.bb.webcanvasservice.domain.game.model.GameSessionState;
 import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "game_sessions")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class GameSessionJpaEntity extends BaseEntity {
 
     @Id
@@ -23,6 +25,20 @@ public class GameSessionJpaEntity extends BaseEntity {
      * 게임 세션 ID
      */
     private Long id;
+
+    /**
+     * 게임 방 JpaEntity
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_room_id")
+    private GameRoomJpaEntity gameRoomEntity;
+
+    @Column(name = "state")
+    @Enumerated(EnumType.STRING)
+    /**
+     * 게임 세션의 상태
+     */
+    private GameSessionState state;
 
     @Column(name = "turn_count")
     /**
@@ -35,29 +51,6 @@ public class GameSessionJpaEntity extends BaseEntity {
      * 턴 당 시간
      */
     private int timePerTurn;
-
-    @Column(name = "state")
-    @Enumerated(EnumType.STRING)
-    /**
-     * 게임 세션의 상태
-     */
-    private GameSessionState state;
-
-
-    /**
-     * 게임 방 JpaEntity
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_room_id")
-    private GameRoomJpaEntity gameRoomEntity;
-
-    public GameSessionJpaEntity(Long id, GameRoomJpaEntity gameRoomEntity, GameSessionState state, int turnCount, int timePerTurn) {
-        this.id = id;
-        this.gameRoomEntity = gameRoomEntity;
-        this.state = state;
-        this.turnCount = turnCount;
-        this.timePerTurn = timePerTurn;
-    }
 
 
     /**

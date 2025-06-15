@@ -3,8 +3,7 @@ package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 /**
  * 유저별 게임 플레이 이력 entity
@@ -12,7 +11,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Entity
 @Table(name = "game_play_histories")
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class GamePlayHistoryJpaEntity extends BaseEntity {
 
     @Id @GeneratedValue
@@ -35,11 +35,4 @@ public class GamePlayHistoryJpaEntity extends BaseEntity {
     @JoinColumn(name = "game_session_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private GameSessionJpaEntity gameSessionEntity;
-
-    public GamePlayHistoryJpaEntity(UserJpaEntity userEntity, GameSessionJpaEntity gameSessionEntity) {
-        this.userEntity = userEntity;
-        this.gameSessionEntity = gameSessionEntity;
-    }
-
-
 }

@@ -55,7 +55,7 @@ public class UserService {
                         }
                 );
 
-        return userRepository.save(new User(null, fingerprint, null));
+        return userRepository.save(User.createNewUser(fingerprint));
     }
 
     /**
@@ -99,4 +99,16 @@ public class UserService {
     public UserStateCode findUserState(Long userId) {
         return userRepository.findUserState(userId);
     }
+
+    /**
+     * 유저의 리프레쉬 토큰을 변경한다.
+     * @param userId 대상 유저 ID
+     * @param refreshToken 리프레쉬 토큰
+     */
+    public void updateRefreshToken(Long userId, String refreshToken) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        user.updateRefreshToken(refreshToken);
+        userRepository.save(user);
+    }
+
 }

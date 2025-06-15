@@ -3,10 +3,7 @@ package com.bb.webcanvasservice.infrastructure.persistence.game.entity;
 import com.bb.webcanvasservice.domain.game.model.GameTurnState;
 import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * 게임 세션에 종속된 게임 턴
@@ -15,6 +12,7 @@ import lombok.ToString;
 @Entity
 @ToString
 @Table(name = "game_turns")
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameTurnJpaEntity extends BaseEntity {
 
@@ -50,13 +48,5 @@ public class GameTurnJpaEntity extends BaseEntity {
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     private GameTurnState state;
-
-    public GameTurnJpaEntity(Long id, GameSessionJpaEntity gameSessionEntity, Long drawerId, String answer) {
-        this.id = id;
-        this.gameSessionEntity = gameSessionEntity;
-        this.drawerId = drawerId;
-        this.answer = answer;
-        this.state = GameTurnState.ACTIVE;
-    }
 
 }

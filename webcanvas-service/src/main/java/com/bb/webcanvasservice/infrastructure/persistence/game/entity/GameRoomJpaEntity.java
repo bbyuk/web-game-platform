@@ -4,6 +4,7 @@ import com.bb.webcanvasservice.domain.game.model.GameRoomState;
 import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "game_rooms")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class GameRoomJpaEntity extends BaseEntity {
 
     @Id
@@ -25,24 +27,18 @@ public class GameRoomJpaEntity extends BaseEntity {
      */
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "state")
-    /**
-     * 게임 방 상태
-     */
-    private GameRoomState state;
-
     @Column(name = "join_code", length = 12)
     /**
      * 게임 방의 입장 코드
      */
     private String joinCode;
 
-    public GameRoomJpaEntity(Long id, String joinCode, GameRoomState state) {
-        this.id = id;
-        this.joinCode = joinCode;
-        this.state = state;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state")
+    /**
+     * 게임 방 상태
+     */
+    private GameRoomState state;
 
 
     public void changeStateToPlay() {

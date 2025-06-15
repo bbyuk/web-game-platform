@@ -19,27 +19,31 @@ public class User {
     /**
      * 발급된 accessToken이 만료될 경우 refresh를 위한 토큰
      */
-    private final String refreshToken;
-
+    private String refreshToken;
 
     /**
      * 유저 상태
      */
     private UserStateCode state;
 
-    public User(Long id, String fingerprint, String refreshToken) {
+    public User(Long id, String fingerprint, UserStateCode state, String refreshToken) {
         this.id = id;
         this.fingerprint = fingerprint;
-        this.state = UserStateCode.IN_LOBBY;
+        this.state = state;
         this.refreshToken = refreshToken;
+    }
+
+
+    public static User createNewUser(String fingerprint) {
+        return new User(null, fingerprint, UserStateCode.IN_LOBBY, null);
     }
 
     /**
      * 유저에게 할당된 refreshToken을 업데이트하여 리턴한다.
      * @param refreshToken
      */
-    public User updateRefreshToken(String refreshToken) {
-        return new User(this.id, this.fingerprint, refreshToken);
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     /**

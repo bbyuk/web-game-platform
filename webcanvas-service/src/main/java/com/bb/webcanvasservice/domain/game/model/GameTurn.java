@@ -97,6 +97,10 @@ public class GameTurn {
         return answer;
     }
 
+    public Long getCorrectAnswererId() {
+        return correctAnswererId;
+    }
+
     public Long getDrawerId() {
         return drawerId;
     }
