@@ -83,12 +83,12 @@ public class GameRoomEntrance {
         this.ready = ready;
     }
 
+
     /**
-     * GameRoomEntranceState를 변경한다.
-     * @param state
+     * 게임 방 상태를 게임 진행중으로 변경한다.
      */
-    public void changeState(GameRoomEntranceState state) {
-        this.state = state;
+    public void changeToPlaying() {
+        this.state = GameRoomEntranceState.PLAYING;
     }
 
     /**

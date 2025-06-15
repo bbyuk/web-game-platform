@@ -51,13 +51,14 @@ public class GameSessionJpaEntity extends BaseEntity {
     @JoinColumn(name = "game_room_id")
     private GameRoomJpaEntity gameRoomEntity;
 
-    public GameSessionJpaEntity(Long id, GameRoomJpaEntity gameRoomEntity, int turnCount, int timePerTurn) {
+    public GameSessionJpaEntity(Long id, GameRoomJpaEntity gameRoomEntity, GameSessionState state, int turnCount, int timePerTurn) {
         this.id = id;
         this.gameRoomEntity = gameRoomEntity;
-        this.state = GameSessionState.LOADING;
+        this.state = state;
         this.turnCount = turnCount;
         this.timePerTurn = timePerTurn;
     }
+
 
     /**
      * 게임 세션을 종료하고 게임 세션과 연관되어 있는 게임방 객체의 상태 리셋을 요청한다.

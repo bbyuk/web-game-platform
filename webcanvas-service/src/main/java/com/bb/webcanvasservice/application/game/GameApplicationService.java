@@ -18,6 +18,7 @@ import com.bb.webcanvasservice.domain.game.model.*;
 import com.bb.webcanvasservice.domain.game.registry.GameSessionLoadRegistry;
 import com.bb.webcanvasservice.domain.game.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
+import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.domain.game.service.GameService;
@@ -50,6 +51,7 @@ public class GameApplicationService {
     private final GameSessionRepository gameSessionRepository;
     private final GamePlayHistoryRepository gamePlayHistoryRepository;
     private final GameRoomEntranceRepository gameRoomEntranceRepository;
+    private final GameRoomRepository gameRoomRepository;
 
     /**
      * 크로스도메인 서비스
@@ -101,7 +103,18 @@ public class GameApplicationService {
             throw new IllegalGameRoomStateException(message);
         }
 
+        /**
+         * 새로운 게임 세션을 생성해 저장
+         */
         GameSession gameSession = gameSessionRepository.save(GameSession.createNewGameSession(gameRoom.getId(), command.turnCount(), command.timePerTurn()));
+        gameSessionRepository.save(gameSession);
+
+        /**
+         * 게임 방 상태를 변경 후 저장
+         */
+        gameRoom.changeStateToPlay();
+        gameRoomRepository.save(gameRoom);
+
         /**
          * 입장 정보의 state를 PLAYING으로 변경하고, GamePlayHistory entity로 매핑
          * 유저 상태 변경
@@ -121,20 +134,6 @@ public class GameApplicationService {
                     return new GamePlayHistory(entrance.getUserId(), gameSession.getId());
                 })
                 .toList();
-
-        /**
-         * 게임 방 상태를 변경
-         */
-        gameRoom.changeStateToPlay();
-
-        /**
-         * 새로 생성된 Entity 저장
-         *
-         * - GameSession
-         * - 방에 입력한 유저들의 게임 플레이 히스토리 저장
-         */
-        gameSessionRepository.save(gameSession);
-
         gamePlayHistoryRepository.saveAll(gamePlayHistories);
 
         /**
@@ -231,7 +230,10 @@ public class GameApplicationService {
          */
         gameSessionRepository.findLatestTurn(
                         gameSession.getId())
-                .ifPresent(GameTurn::pass);
+                .ifPresent(gameTurn -> {
+                    gameTurn.pass();
+                    gameSessionRepository.saveGameTurn(gameTurn);
+                });
 
         if (gameService.shouldEnd(gameSession)) {
             log.debug("모든 턴이 진행되었습니다.");
@@ -246,8 +248,7 @@ public class GameApplicationService {
          * @param User drawer
          * @Param String answer
          */
-        GameTurn gameTurn = gameSessionRepository
-                .saveGameTurn(
+        GameTurn gameTurn = gameSessionRepository.saveGameTurn(
                         GameTurn.createNewGameTurn(
                                 gameSessionId,
                                 gameService.findNextDrawerId(gameSessionId),
@@ -287,16 +288,17 @@ public class GameApplicationService {
         /**
          * 내부에서만 요청되는 메소드로 클라이언트 validation 처리 없이 complete한다.
          */
-
-        List<GameRoomEntrance> currentPlayingEntrances = gameRoomService.findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomEntranceState.PLAYING);
-        currentPlayingEntrances
-                .stream()
+        gameRoomService.findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomEntranceState.PLAYING)
                 .forEach(gameRoomEntrance -> {
                     gameRoomEntrance.resetGameRoomEntranceInfo();
                     userService.moveUserToRoom(gameRoomEntrance.getUserId());
                 });
 
+        /**
+         * 게임 세션 종료 처리
+         */
         gameSession.end();
+        gameSessionRepository.save(gameSession);
 
         applicationEventPublisher.publishEvent(new GameSessionEndEvent(gameSessionId, gameSession.getGameRoomId()));
     }
@@ -328,10 +330,14 @@ public class GameApplicationService {
 
         if (gameSessionLoadRegistry.isAllLoaded(gameSessionId, enteredUserCount)) {
             gameSession.start();
+            gameSessionRepository.save(gameSession);
 
             gameRoomEntranceRepository
                     .findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomEntranceState.WAITING)
-                    .forEach(entrance -> entrance.changeState(GameRoomEntranceState.PLAYING));
+                    .forEach(entrance -> {
+                        entrance.changeToPlaying();
+                        gameRoomEntranceRepository.save(entrance);
+                    });
 
             applicationEventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSessionId, gameSession.getGameRoomId()));
             gameSessionLoadRegistry.clear(gameSessionId);

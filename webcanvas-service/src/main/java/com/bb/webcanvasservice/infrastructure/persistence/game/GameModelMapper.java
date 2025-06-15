@@ -78,7 +78,7 @@ public class GameModelMapper {
     }
 
     public static GameSessionJpaEntity toEntity(GameSession gameSession, GameRoomJpaEntity gameRoomEntity) {
-        return new GameSessionJpaEntity(gameSession.getId(), gameRoomEntity, gameSession.getTurnCount(), gameSession.getTimePerTurn());
+        return new GameSessionJpaEntity(gameSession.getId(), gameRoomEntity, gameSession.getState(), gameSession.getTurnCount(), gameSession.getTimePerTurn());
     }
 
 
