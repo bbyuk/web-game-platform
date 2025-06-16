@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.unit.domain.user;
 
 import com.bb.webcanvasservice.domain.user.model.User;
-import com.bb.webcanvasservice.domain.user.model.UserStateCode;
+import com.bb.webcanvasservice.domain.user.model.UserState;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import com.bb.webcanvasservice.domain.user.service.UserService;
@@ -55,7 +55,7 @@ class UserServiceTest {
 
 
     private static UserJpaEntity createMockUser(String userToken) throws NoSuchFieldException, IllegalAccessException {
-        UserJpaEntity savedUser = new UserJpaEntity(1L, "fingerprint", "refreshToken", UserStateCode.IN_LOBBY);
+        UserJpaEntity savedUser = new UserJpaEntity(1L, "fingerprint", "refreshToken", UserState.IN_LOBBY);
         Field idField = UserJpaEntity.class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(savedUser, 1L);

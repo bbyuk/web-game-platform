@@ -13,7 +13,7 @@ import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateExcepti
 import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
 import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.domain.user.model.UserStateCode;
+import com.bb.webcanvasservice.domain.user.model.UserState;
 import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,7 +89,7 @@ class GameRoomFacadeIntegrationTest {
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomId()).isEqualTo(waitingRoom.getId());
         Assertions.assertThat(gameRoomEntranceResponse.gameRoomEntranceId()).isNotNull();
 
-        Assertions.assertThat(userJpaRepository.findUserState(testUser.getId())).isEqualTo(UserStateCode.IN_ROOM);
+        Assertions.assertThat(userJpaRepository.findUserState(testUser.getId())).isEqualTo(UserState.IN_ROOM);
     }
 
     @Test
@@ -215,8 +215,8 @@ class GameRoomFacadeIntegrationTest {
         gameRoomFacade.exitFromRoom(gameRoomEntrance1.getId(), user1.getId());
 
         // then
-        Assertions.assertThat(userJpaRepository.findUserState(user1.getId())).isEqualTo(UserStateCode.IN_LOBBY);
-        Assertions.assertThat(userJpaRepository.findUserState(user2.getId())).isEqualTo(UserStateCode.IN_LOBBY);
+        Assertions.assertThat(userJpaRepository.findUserState(user1.getId())).isEqualTo(UserState.IN_LOBBY);
+        Assertions.assertThat(userJpaRepository.findUserState(user2.getId())).isEqualTo(UserState.IN_LOBBY);
     }
 
     @Test

@@ -6,7 +6,6 @@ import com.bb.webcanvasservice.domain.game.exception.*;
 import com.bb.webcanvasservice.domain.game.model.*;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomRepository;
-import com.bb.webcanvasservice.domain.game.repository.GameSessionRepository;
 
 import java.util.List;
 
@@ -153,6 +152,24 @@ public class GameRoomService {
         if (!userEntrance.isHost()) {
             throw new AbnormalAccessException();
         }
+    }
+
+    /**
+     * 대상 게임 방 입장 정보의 상태를 초기화한다.
+     * @param gameRoomEntranceIds 게임 방 입장 정보 ID 목록
+     */
+    public void resetGameRoomEntrances(List<Long> gameRoomEntranceIds) {
+        gameRoomEntranceRepository.updateGameRoomEntrancesState(gameRoomEntranceIds, GameRoomEntranceState.WAITING);
+    }
+
+    /**
+     * 대상 게임 방 입장 정보의 레디 상태를 초기화한다.
+     * @param gameRoomEntranceIds
+     */
+    public void resetGameRoomEntrancesReady(List<Long> gameRoomEntranceIds) {
+        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByIds(gameRoomEntranceIds);
+        gameRoomEntrances.forEach(GameRoomEntrance::resetReady);
+        gameRoomEntranceRepository.saveAll(gameRoomEntrances);
     }
 }
 

@@ -24,9 +24,9 @@ public class User {
     /**
      * 유저 상태
      */
-    private UserStateCode state;
+    private UserState state;
 
-    public User(Long id, String fingerprint, UserStateCode state, String refreshToken) {
+    public User(Long id, String fingerprint, UserState state, String refreshToken) {
         this.id = id;
         this.fingerprint = fingerprint;
         this.state = state;
@@ -35,7 +35,7 @@ public class User {
 
 
     public static User createNewUser(String fingerprint) {
-        return new User(null, fingerprint, UserStateCode.IN_LOBBY, null);
+        return new User(null, fingerprint, UserState.IN_LOBBY, null);
     }
 
     /**
@@ -50,7 +50,7 @@ public class User {
      * 유저 상태를 변경한다.
      * @param state
      */
-    public void changeState(UserStateCode state) {
+    public void changeState(UserState state) {
         this.state = state;
     }
 
@@ -59,8 +59,8 @@ public class User {
      * 현재 플레이중인 게임을 완료하고 게임 방으로 돌아간다.
      */
     public void endGameAndResetToRoom() {
-        if (this.state == UserStateCode.IN_GAME) {
-            this.state = UserStateCode.IN_ROOM;
+        if (this.state == UserState.IN_GAME) {
+            this.state = UserState.IN_ROOM;
         }
     }
 
@@ -79,7 +79,7 @@ public class User {
         return refreshToken;
     }
 
-    public UserStateCode getState() {
+    public UserState getState() {
         return state;
     }
 }

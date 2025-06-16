@@ -22,19 +22,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepository {
     private final EntityManager em;
-    private final GameRoomEntranceJpaRepository jpaRepository;
+    private final GameRoomEntranceJpaRepository gameRoomEntranceJpaRepository;
     private final GameRoomJpaRepository gameRoomJpaRepository;
     private final UserJpaRepository userJpaRepository;
 
     @Override
     public Optional<GameRoomEntrance> findById(Long gameRoomEntranceId) {
-        return jpaRepository.findById(gameRoomEntranceId).map(GameModelMapper::toModel);
+        return gameRoomEntranceJpaRepository.findById(gameRoomEntranceId).map(GameModelMapper::toModel);
     }
 
     @Override
     public GameRoomEntrance save(GameRoomEntrance gameRoomEntrance) {
         return GameModelMapper.toModel(
-                jpaRepository.save(
+                gameRoomEntranceJpaRepository.save(
                         GameModelMapper.toEntity(
                                 gameRoomEntrance,
                                 gameRoomJpaRepository.findById(gameRoomEntrance.getGameRoomId()).orElseThrow(GameRoomNotFoundException::new),
@@ -80,18 +80,18 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
 
     @Override
     public boolean existsGameRoomEntranceByUserId(Long userId) {
-        return jpaRepository.existsGameRoomEntranceByUserId(userId);
+        return gameRoomEntranceJpaRepository.existsGameRoomEntranceByUserId(userId);
     }
 
     @Override
     public Optional<GameRoomEntrance> findByUserId(Long userId) {
-        return jpaRepository.findByUserId(userId)
+        return gameRoomEntranceJpaRepository.findByUserId(userId)
                 .map(GameModelMapper::toModel);
     }
 
     @Override
     public List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdWithLock(Long gameRoomId) {
-        return jpaRepository.findGameRoomEntrancesByGameRoomIdWithLock(gameRoomId)
+        return gameRoomEntranceJpaRepository.findGameRoomEntrancesByGameRoomIdWithLock(gameRoomId)
                 .stream()
                 .map(GameModelMapper::toModel)
                 .collect(Collectors.toList());
@@ -116,7 +116,7 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
 
     @Override
     public List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndState(Long gameRoomId, GameRoomEntranceState gameRoomEntranceState) {
-        return jpaRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, gameRoomEntranceState)
+        return gameRoomEntranceJpaRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, gameRoomEntranceState)
                 .stream()
                 .map(GameModelMapper::toModel)
                 .collect(Collectors.toList());
@@ -124,14 +124,56 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
 
     @Override
     public long findGameRoomEntranceCountByGameRoomIdAndState(Long gameRoomId, GameRoomEntranceState gameRoomEntranceState) {
-        return jpaRepository.findGameRoomEntranceCountByGameRoomIdAndState(gameRoomId, gameRoomEntranceState);
+        return gameRoomEntranceJpaRepository.findGameRoomEntranceCountByGameRoomIdAndState(gameRoomId, gameRoomEntranceState);
     }
 
     @Override
     public List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndStates(Long gameRoomId, List<GameRoomEntranceState> gameRoomEntranceStates) {
-        return jpaRepository.findGameRoomEntrancesByGameRoomIdAndStates(gameRoomId, gameRoomEntranceStates)
+        return gameRoomEntranceJpaRepository.findGameRoomEntrancesByGameRoomIdAndStates(gameRoomId, gameRoomEntranceStates)
                 .stream()
                 .map(GameModelMapper::toModel)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateGameRoomEntrancesState(List<Long> gameRoomEntranceIds, GameRoomEntranceState state) {
+        String jpql = """
+                update  GameRoomEntranceJpaEntity gre
+                set     gre.state = :state
+                where   gre.id in :ids
+                """;
+
+        em.createQuery(jpql)
+                .setParameter("state", state)
+                .setParameter("ids", gameRoomEntranceIds)
+                .executeUpdate();
+
+        em.clear();
+    }
+
+    @Override
+    public List<GameRoomEntrance> findGameRoomEntrancesByIds(List<Long> gameRoomEntranceIds) {
+        String jpql = """
+                select  gre
+                from    GameRoomEntranceJpaEntity gre
+                where   gre.id in :ids
+                """;
+        return em.createQuery(jpql, GameRoomEntranceJpaEntity.class)
+                .setParameter("ids", gameRoomEntranceIds)
+                .getResultStream()
+                .map(GameModelMapper::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void saveAll(List<GameRoomEntrance> gameRoomEntrances) {
+        gameRoomEntranceJpaRepository.saveAll(
+                gameRoomEntrances.stream().map(gameRoomEntrance -> GameModelMapper.toEntity(
+                                gameRoomEntrance,
+                                gameRoomJpaRepository.findById(gameRoomEntrance.getGameRoomId()).orElseThrow(GameRoomNotFoundException::new),
+                                userJpaRepository.findById(gameRoomEntrance.getUserId()).orElseThrow(UserNotFoundException::new)
+                        ))
+                        .collect(Collectors.toList())
+        );
     }
 }

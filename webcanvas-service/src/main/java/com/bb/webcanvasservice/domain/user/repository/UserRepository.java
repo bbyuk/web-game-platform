@@ -1,8 +1,9 @@
 package com.bb.webcanvasservice.domain.user.repository;
 
 import com.bb.webcanvasservice.domain.user.model.User;
-import com.bb.webcanvasservice.domain.user.model.UserStateCode;
+import com.bb.webcanvasservice.domain.user.model.UserState;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -36,5 +37,12 @@ public interface UserRepository {
      * @param userId 유저 ID
      * @return 유저 상태 코드
      */
-    UserStateCode findUserState(Long userId);
+    UserState findUserState(Long userId);
+
+    /**
+     * 유저들의 상태 코드를 일괄 업데이트한다.
+     * @param userIds 대상 유저 ID 목록
+     * @param state 상태
+     */
+    void updateUsersStates(List<Long> userIds, UserState state);
 }

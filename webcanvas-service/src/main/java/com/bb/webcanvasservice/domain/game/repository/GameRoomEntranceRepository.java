@@ -93,4 +93,24 @@ public interface GameRoomEntranceRepository {
      * @return 게임 방 입장 정보
      */
     List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndStates(Long gameRoomId, List<GameRoomEntranceState> gameRoomEntranceStates);
+
+    /**
+     * 게임 방 입장 상태를 일괄 업데이트한다.
+     * @param gameRoomEntranceIds 게임 방 입장 ID 목록
+     * @param state 변경하려는 상태 코드
+     */
+    void updateGameRoomEntrancesState(List<Long> gameRoomEntranceIds, GameRoomEntranceState state);
+
+    /**
+     * 게임 방 입장 정보 ID 목록에 해당하는 게임 방 입장 정보 조회
+     * @param gameRoomEntranceIds 게임 방 입장 정보 ID 목록
+     * @return 게임 방 입장 정보 목록
+     */
+    List<GameRoomEntrance> findGameRoomEntrancesByIds(List<Long> gameRoomEntranceIds);
+
+    /**
+     * 게임 방 입장 정보를 일괄 저장한다.
+     * @param gameRoomEntrances 게임 방 입장 정보 목록
+     */
+    void saveAll(List<GameRoomEntrance> gameRoomEntrances);
 }

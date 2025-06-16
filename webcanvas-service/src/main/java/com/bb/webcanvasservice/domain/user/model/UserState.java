@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.domain.user.model;
 /**
  * 유저 상태 코드
  */
-public enum UserStateCode {
+public enum UserState {
     /**
      * 로비에 존재
      */

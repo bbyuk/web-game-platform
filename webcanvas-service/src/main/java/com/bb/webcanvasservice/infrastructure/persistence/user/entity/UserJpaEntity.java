@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.infrastructure.persistence.user.entity;
 
 import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
-import com.bb.webcanvasservice.domain.user.model.UserStateCode;
+import com.bb.webcanvasservice.domain.user.model.UserState;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,9 +42,9 @@ public class UserJpaEntity extends BaseEntity {
     /**
      * 유저 상태
      */
-    private UserStateCode state;
+    private UserState state;
 
-    public UserJpaEntity(Long id, String fingerprint, String refreshToken, UserStateCode state) {
+    public UserJpaEntity(Long id, String fingerprint, String refreshToken, UserState state) {
         this.id = id;
         this.fingerprint = fingerprint;
         this.refreshToken = refreshToken;
@@ -63,7 +63,7 @@ public class UserJpaEntity extends BaseEntity {
      * 유저 상태를 변경한다.
      * @param state
      */
-    public void changeState(UserStateCode state) {
+    public void changeState(UserState state) {
         this.state = state;
     }
 
@@ -72,8 +72,8 @@ public class UserJpaEntity extends BaseEntity {
      * 현재 플레이중인 게임을 완료하고 게임 방으로 돌아간다.
      */
     public void endGameAndResetToRoom() {
-        if (this.state == UserStateCode.IN_GAME) {
-            this.state = UserStateCode.IN_ROOM;
+        if (this.state == UserState.IN_GAME) {
+            this.state = UserState.IN_ROOM;
         }
     }
 }

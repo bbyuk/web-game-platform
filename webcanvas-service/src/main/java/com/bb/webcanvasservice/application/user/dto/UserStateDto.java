@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.application.user.dto;
 
-import com.bb.webcanvasservice.domain.user.model.UserStateCode;
+import com.bb.webcanvasservice.domain.user.model.UserState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
@@ -8,6 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record UserStateDto(
         
         @Schema(description = "유저 상태 코드")
-        UserStateCode state
+        UserState state
 ) {
 }

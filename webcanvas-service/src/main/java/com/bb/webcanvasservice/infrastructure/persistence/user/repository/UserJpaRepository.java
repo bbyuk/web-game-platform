@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.infrastructure.persistence.user.repository;
 
-import com.bb.webcanvasservice.domain.user.model.UserStateCode;
+import com.bb.webcanvasservice.domain.user.model.UserState;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,5 +37,5 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long> {
             from    UserJpaEntity u
             where   u.id = :userId
             """)
-    UserStateCode findUserState(@Param("userId") Long userId);
+    UserState findUserState(@Param("userId") Long userId);
 }

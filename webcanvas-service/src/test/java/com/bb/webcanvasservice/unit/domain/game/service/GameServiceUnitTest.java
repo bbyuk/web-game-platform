@@ -16,7 +16,7 @@ import com.bb.webcanvasservice.domain.game.exception.GameSessionIsOverException;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.game.service.GameService;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.domain.user.model.UserStateCode;
+import com.bb.webcanvasservice.domain.user.model.UserState;
 import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
@@ -104,7 +104,7 @@ class GameServiceUnitTest {
 
         Assertions.assertThat(gameRoom.getState()).isEqualTo(GameRoomState.PLAYING);
         entrances.stream().forEach(entrance -> {
-            Assertions.assertThat(entrance.getUser().getState()).isEqualTo(UserStateCode.IN_GAME);
+            Assertions.assertThat(entrance.getUser().getState()).isEqualTo(UserState.IN_GAME);
             Assertions.assertThat(entrance.isReady()).isEqualTo(entrance.getRole() == GameRoomEntranceRole.HOST);
         });
     }

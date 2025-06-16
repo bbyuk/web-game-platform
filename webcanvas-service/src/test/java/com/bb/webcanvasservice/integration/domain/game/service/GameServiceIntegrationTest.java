@@ -13,7 +13,7 @@ import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRo
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.domain.game.service.GameService;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.domain.user.model.UserStateCode;
+import com.bb.webcanvasservice.domain.user.model.UserState;
 import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -65,7 +65,7 @@ class GameServiceIntegrationTest {
         gameRoomFacade.exitFromRoom(user2Entrance.gameRoomEntranceId(), user2.getId());
 
         // then
-        Assertions.assertThat(user2.getState()).isEqualTo(UserStateCode.IN_LOBBY);
+        Assertions.assertThat(user2.getState()).isEqualTo(UserState.IN_LOBBY);
     }
 
     @Test
@@ -98,9 +98,9 @@ class GameServiceIntegrationTest {
         Long gameSessionId = gameService.startGame(gameStartRequest, user1.getId());
         // then
         Assertions.assertThat(gameSessionId).isNotNull();
-        Assertions.assertThat(userJpaRepository.findUserState(user1.getId())).isEqualTo(UserStateCode.IN_GAME);
-        Assertions.assertThat(userJpaRepository.findUserState(user2.getId())).isEqualTo(UserStateCode.IN_GAME);
-        Assertions.assertThat(userJpaRepository.findUserState(user3.getId())).isEqualTo(UserStateCode.IN_GAME);
+        Assertions.assertThat(userJpaRepository.findUserState(user1.getId())).isEqualTo(UserState.IN_GAME);
+        Assertions.assertThat(userJpaRepository.findUserState(user2.getId())).isEqualTo(UserState.IN_GAME);
+        Assertions.assertThat(userJpaRepository.findUserState(user3.getId())).isEqualTo(UserState.IN_GAME);
     }
 
     @Test
@@ -132,9 +132,9 @@ class GameServiceIntegrationTest {
         gameService.endGame(gameSessionId);
 
         // then
-        Assertions.assertThat(user1.getState()).isEqualTo(UserStateCode.IN_ROOM);
-        Assertions.assertThat(user2.getState()).isEqualTo(UserStateCode.IN_ROOM);
-        Assertions.assertThat(user3.getState()).isEqualTo(UserStateCode.IN_ROOM);
+        Assertions.assertThat(user1.getState()).isEqualTo(UserState.IN_ROOM);
+        Assertions.assertThat(user2.getState()).isEqualTo(UserState.IN_ROOM);
+        Assertions.assertThat(user3.getState()).isEqualTo(UserState.IN_ROOM);
 
         GameRoomEntranceJpaEntity user1EntranceEntity = gameRoomEntranceRepository.findById(user1Entrance.gameRoomEntranceId()).get();
         Assertions.assertThat(user1EntranceEntity.getState()).isEqualTo(GameRoomEntranceState.WAITING);

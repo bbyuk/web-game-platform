@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 게임 세션 및 플레이 관련 application layer service
@@ -122,16 +123,13 @@ public class GameApplicationService {
          *
          * 250531 게임 시작시 레디상태 false로 모두 변경
          */
-        List<GamePlayHistory> gamePlayHistories = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdWithLock(gameRoom.getId())
+        List<GameRoomEntrance> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdWithLock(gameRoom.getId());
+        userService.moveUsersToGameSession(entrances.stream().map(GameRoomEntrance::getUserId).collect(Collectors.toList()));
+        gameRoomService.resetGameRoomEntrancesReady(entrances.stream().map(GameRoomEntrance::getId).collect(Collectors.toList()));
+
+        List<GamePlayHistory> gamePlayHistories = entrances
                 .stream()
-                .map(entrance -> {
-                    userService.moveUserToGameSession(entrance.getUserId());
-
-                    entrance.resetReady();
-                    gameRoomEntranceRepository.save(entrance);
-
-                    return new GamePlayHistory(entrance.getUserId(), gameSession.getId());
-                })
+                .map(entrance -> new GamePlayHistory(entrance.getUserId(), gameSession.getId()))
                 .toList();
         gamePlayHistoryRepository.saveAll(gamePlayHistories);
 
@@ -286,15 +284,12 @@ public class GameApplicationService {
 
         /**
          * 내부에서만 요청되는 메소드로 클라이언트 validation 처리 없이 complete한다.
-         * TODO user 상태, 게임 방 입장 상태 update 처리 추가
          */
-        gameRoomService.findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomEntranceState.PLAYING)
-                .forEach(gameRoomEntrance -> {
-                    gameRoomEntrance.resetGameRoomEntranceInfo();
-                    gameRoomEntranceRepository.save(gameRoomEntrance);
 
-                    userService.moveUserToRoom(gameRoomEntrance.getUserId());
-                });
+        List<GameRoomEntrance> gameRoomEntrances = gameRoomService.findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomEntranceState.PLAYING);
+        gameRoomService.resetGameRoomEntrances(gameRoomEntrances.stream().map(GameRoomEntrance::getId).collect(Collectors.toList()));
+        userService.moveUsersToRoom(gameRoomEntrances.stream().map(GameRoomEntrance::getUserId).collect(Collectors.toList()));
+
 
         /**
          * 게임 세션 종료 처리
