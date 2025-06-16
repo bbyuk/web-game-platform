@@ -1,10 +1,11 @@
-package com.bb.webcanvasservice.domain.dictionary.entity;
+package com.bb.webcanvasservice.infrastructure.persistence.dictionary.entity;
 
+import com.bb.webcanvasservice.domain.dictionary.model.Language;
+import com.bb.webcanvasservice.domain.dictionary.model.PartOfSpeech;
 import com.bb.webcanvasservice.infrastructure.persistence.common.BaseEntity;
-import com.bb.webcanvasservice.domain.dictionary.enums.Language;
-import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +16,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "words")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Word extends BaseEntity {
+@AllArgsConstructor
+public class WordJpaEntity extends BaseEntity {
 
     @Id
     @GeneratedValue
@@ -48,10 +50,4 @@ public class Word extends BaseEntity {
      */
     private PartOfSpeech pos;
 
-    public Word(Language language, String value, Long index, PartOfSpeech pos) {
-        this.language = language;
-        this.value = value;
-        this.index = index;
-        this.pos = pos;
-    }
 }

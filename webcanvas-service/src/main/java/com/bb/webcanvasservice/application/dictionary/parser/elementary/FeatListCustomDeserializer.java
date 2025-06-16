@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.dictionary.parser.elementary;
+package com.bb.webcanvasservice.application.dictionary.parser.elementary;
 
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileParseFailedException;
 import com.fasterxml.jackson.core.JsonParser;

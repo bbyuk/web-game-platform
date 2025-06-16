@@ -1,7 +1,6 @@
-package com.bb.webcanvasservice.domain.dictionary.util;
+package com.bb.webcanvasservice.application.dictionary.util;
 
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileDownloadFailedException;
-import com.bb.webcanvasservice.domain.dictionary.parser.DictionaryParser;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;

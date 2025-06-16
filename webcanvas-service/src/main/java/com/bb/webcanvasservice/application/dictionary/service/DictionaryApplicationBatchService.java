@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.dictionary.batch;
+package com.bb.webcanvasservice.application.dictionary.service;
 
 import com.bb.webcanvasservice.common.lock.DistributedLock;
 import com.bb.webcanvasservice.common.lock.LockAlreadyOccupiedException;
@@ -9,11 +9,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DictionaryBatchExecutor {
-
-    private final DictionaryBatchJob dictionaryBatchJob;
+public class DictionaryApplicationBatchService {
 
     private final DistributedLock distributedLock;
+    private final DictionaryBatchJob dictionaryBatchJob;
 
     public void batchInsertWordDataWithLock() {
         String batchId = "word-data-initial-insert";

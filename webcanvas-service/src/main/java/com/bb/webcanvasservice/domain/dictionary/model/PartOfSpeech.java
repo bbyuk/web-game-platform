@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.dictionary.enums;
+package com.bb.webcanvasservice.domain.dictionary.model;
 
 /**
  * 품사

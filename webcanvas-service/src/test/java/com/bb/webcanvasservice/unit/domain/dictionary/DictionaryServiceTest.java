@@ -1,11 +1,11 @@
 package com.bb.webcanvasservice.unit.domain.dictionary;
 
 import com.bb.webcanvasservice.common.sequence.SequenceRepositoryImpl;
-import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
-import com.bb.webcanvasservice.domain.dictionary.entity.Word;
-import com.bb.webcanvasservice.domain.dictionary.enums.Language;
-import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
+import com.bb.webcanvasservice.domain.dictionary.model.Language;
+import com.bb.webcanvasservice.domain.dictionary.model.PartOfSpeech;
+import com.bb.webcanvasservice.domain.dictionary.model.Word;
 import com.bb.webcanvasservice.domain.dictionary.repository.WordRepository;
+import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class DictionaryServiceTest {
     @DisplayName("랜덤 단어 뽑기 테스트")
     public void testDrawRandomWord() throws Exception {
         BDDMockito.given(sequenceRepository.getCurrentValue(any())).willReturn(2L);
-        BDDMockito.given(wordRepository.findRandomWordByLanguageAndPos(any(), any())).willReturn(Optional.of(new Word(
+        BDDMockito.given(wordRepository.findRandomWordByLanguageAndPos(any(), any())).willReturn(Optional.of(Word.createNewWord(
                 Language.KOREAN,
                 "행복한",
                 1234L,

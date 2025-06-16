@@ -1,11 +1,10 @@
 package com.bb.webcanvasservice.unit.domain.dictionary.util;
 
-import com.bb.webcanvasservice.domain.dictionary.util.KoreanAdjectiveConverter;
+import com.bb.webcanvasservice.application.dictionary.util.KoreanAdjectiveConverter;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

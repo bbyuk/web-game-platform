@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.dictionary.parser.koreansam;
+package com.bb.webcanvasservice.application.dictionary.parser.koreansam;
 
 
 import java.util.List;

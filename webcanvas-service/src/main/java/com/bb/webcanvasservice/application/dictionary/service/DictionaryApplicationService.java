@@ -1,12 +1,14 @@
-package com.bb.webcanvasservice.domain.dictionary.batch;
+package com.bb.webcanvasservice.application.dictionary.service;
 
-import com.bb.webcanvasservice.domain.dictionary.DictionarySourceProperties;
-import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
+import com.bb.webcanvasservice.application.dictionary.config.DictionarySourceProperties;
+import com.bb.webcanvasservice.application.dictionary.parser.DictionaryParser;
 import com.bb.webcanvasservice.domain.dictionary.exception.DictionaryFileParseFailedException;
+import com.bb.webcanvasservice.domain.dictionary.repository.WordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,19 +17,34 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import static com.bb.webcanvasservice.domain.dictionary.util.DictionaryDataFileUtils.*;
+import static com.bb.webcanvasservice.application.dictionary.util.DictionaryDataFileUtils.*;
 
 /**
- * Dictionary 관련 배치 Job
- * 이후에 배치 작업이 늘어나고 세밀한 트랜잭션 관리가 필요한 경우 Spring Batch 도입을 고려
+ * 사전 Application 서비스
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DictionaryBatchJob {
+public class DictionaryApplicationService {
 
     private final DictionarySourceProperties dictionarySourceProperties;
-    private final DictionaryService dictionaryService;
+
+    private final DictionaryParser dictionaryParser;
+    private final WordRepository wordRepository;
+
+
+
+    /**
+     * 파라미터로 주어진 파일 경로에 있는 파일을 파싱해 DB에 저장한다.
+     * @param path
+     * @return
+     */
+    @Transactional
+    public int parseFileAndSave(Path path) {
+        return wordRepository.saveInBatch(
+                dictionaryParser.parse(path)
+        );
+    }
 
     /**
      * 단일 file 단위 transaction 적용으로 BatchService에는 Transactional 붙이지 않는다.
@@ -35,6 +52,7 @@ public class DictionaryBatchJob {
      * @return
      */
     @Async("asyncBatchTaskExecutor")
+    @Transactional
     public CompletableFuture<Integer> batchInsertWordData() {
         AtomicInteger result = new AtomicInteger(0);
         /**
@@ -54,7 +72,7 @@ public class DictionaryBatchJob {
 
         try (Stream<Path> paths = Files.list(targetDirectory)) {
             paths.filter(Files::isRegularFile)
-                    .forEach(path -> result.addAndGet(dictionaryService.parseFileAndSave(path)));
+                    .forEach(path -> result.addAndGet(parseFileAndSave(path)));
         } catch (IOException e) {
             log.error("데이터 파일 디렉터리 순회중 오류 발생", e);
             throw new DictionaryFileParseFailedException();

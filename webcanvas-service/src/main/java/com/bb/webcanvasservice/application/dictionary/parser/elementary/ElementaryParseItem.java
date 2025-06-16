@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.dictionary.parser.elementary;
+package com.bb.webcanvasservice.application.dictionary.parser.elementary;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 

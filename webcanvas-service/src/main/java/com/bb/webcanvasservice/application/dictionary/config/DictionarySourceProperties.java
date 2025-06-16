@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.dictionary;
+package com.bb.webcanvasservice.application.dictionary.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

@@ -1,6 +1,4 @@
-package com.bb.webcanvasservice.domain.dictionary.util;
-
-import java.util.*;
+package com.bb.webcanvasservice.application.dictionary.util;
 
 public class KoreanAdjectiveConverter {
 

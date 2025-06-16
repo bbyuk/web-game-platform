@@ -1,17 +1,16 @@
-package com.bb.webcanvasservice.domain.dictionary.parser.koreansam;
+package com.bb.webcanvasservice.application.dictionary.parser.koreansam;
 
+import com.bb.webcanvasservice.application.dictionary.parser.DictionaryParser;
+import com.bb.webcanvasservice.application.dictionary.util.KoreanAdjectiveConverter;
 import com.bb.webcanvasservice.common.sequence.SequenceRepository;
-import com.bb.webcanvasservice.domain.dictionary.entity.Word;
-import com.bb.webcanvasservice.domain.dictionary.enums.Language;
-import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
-import com.bb.webcanvasservice.domain.dictionary.parser.DictionaryParser;
-import com.bb.webcanvasservice.domain.dictionary.util.KoreanAdjectiveConverter;
+import com.bb.webcanvasservice.domain.dictionary.model.Language;
+import com.bb.webcanvasservice.domain.dictionary.model.PartOfSpeech;
+import com.bb.webcanvasservice.domain.dictionary.model.Word;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +26,6 @@ import java.util.Set;
  * https://opendict.korean.go.kr/main
  */
 @Slf4j
-@Component
 public class KoreanSamDictionaryParser extends DictionaryParser {
 
     public KoreanSamDictionaryParser(ObjectMapper objectMapper, SequenceRepository sequenceRepository) {
@@ -124,7 +122,7 @@ public class KoreanSamDictionaryParser extends DictionaryParser {
                                  * item.senseinfo.strPos (명사)
                                  */
 
-                                Word word = new Word(
+                                Word word = Word.createNewWord(
                                         Language.KOREAN,
                                         value,
                                         index,
