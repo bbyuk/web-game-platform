@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.presentation.auth.util;
 
 import com.bb.webcanvasservice.common.code.ErrorCode;
-import com.bb.webcanvasservice.web.security.SecurityProperties;
-import com.bb.webcanvasservice.web.security.exception.ApplicationAuthenticationException;
+import com.bb.webcanvasservice.common.web.security.SecurityProperties;
+import com.bb.webcanvasservice.common.web.security.exception.ApplicationAuthenticationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;

@@ -4,7 +4,7 @@ import com.bb.webcanvasservice.application.chat.service.ChatApplicationService;
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import com.bb.webcanvasservice.presentation.chat.request.SendMessageRequest;
-import com.bb.webcanvasservice.presentation.chat.mapper.ChatRequestMapper;
+import com.bb.webcanvasservice.presentation.chat.mapper.ChatCommandMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class ChatController {
     public void sendChatMessage(@DestinationVariable("gameRoomId") Long gameRoomId,
                                 SendMessageRequest request,
                                 @Authenticated WebCanvasAuthentication authentication) {
-        chatApplicationService.sendChatMessage(ChatRequestMapper.toCommand(gameRoomId, authentication.getUserId(), request));
+        chatApplicationService.sendChatMessage(ChatCommandMapper.toCommand(gameRoomId, authentication.getUserId(), request));
     }
 
 }

@@ -2,7 +2,7 @@ package com.bb.webcanvasservice;
 
 import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.websocket.properties.WebSocketProperties;
+import com.bb.webcanvasservice.common.websocket.properties.WebSocketProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;

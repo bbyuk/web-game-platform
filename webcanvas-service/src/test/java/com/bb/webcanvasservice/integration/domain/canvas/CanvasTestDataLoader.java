@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.integration.domain.canvas;
 
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
-import com.bb.webcanvasservice.domain.canvas.dto.Stroke;
+import com.bb.webcanvasservice.domain.canvas.model.Stroke;
 import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
 import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
