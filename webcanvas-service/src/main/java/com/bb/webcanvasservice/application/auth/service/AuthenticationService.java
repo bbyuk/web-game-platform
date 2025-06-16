@@ -1,9 +1,11 @@
-package com.bb.webcanvasservice.domain.auth.service;
+package com.bb.webcanvasservice.application.auth.service;
 
+import com.bb.webcanvasservice.application.auth.command.LoginCommand;
+import com.bb.webcanvasservice.application.auth.dto.LoginSuccessDto;
+import com.bb.webcanvasservice.application.auth.dto.TokenRefreshSuccessDto;
 import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JwtManager;
-import com.bb.webcanvasservice.domain.auth.dto.response.AuthenticationInnerResponse;
 import com.bb.webcanvasservice.domain.user.model.User;
 import com.bb.webcanvasservice.domain.user.service.UserService;
 import com.bb.webcanvasservice.web.security.SecurityProperties;
@@ -33,23 +35,23 @@ public class AuthenticationService {
      * fingerprint로 등록된 유저가 없을 시 유저 생성 서비스 요청
      * User 엔티티에 refreshToken update
      *
-     * @param fingerprint 유저 fingerprint(username)
+     * @param command 로그인 요청 커맨드
      * @return (accessToken, refreshToken) 새로 발급받은 accessToken, refreshToken 튜플
      */
     @Transactional
-    public AuthenticationInnerResponse login(String fingerprint) {
+    public LoginSuccessDto login(LoginCommand command) {
 
         com.bb.webcanvasservice.domain.user.model.User user = userService.findOrCreateUser(
-                StringUtils.isBlank(fingerprint)
+                StringUtils.isBlank(command.fingerprint())
                         ? FingerprintGenerator.generate()
-                        : fingerprint);
+                        : command.fingerprint());
 
         String accessToken = jwtManager.generateToken(user.getId(), user.getFingerprint(), securityProperties.accessTokenExpiration());
         String refreshToken = jwtManager.generateToken(user.getId(), user.getFingerprint(), securityProperties.refreshTokenExpiration());
 
         userService.updateRefreshToken(user.getId(), refreshToken);
 
-        return new AuthenticationInnerResponse(user.getId(), user.getFingerprint(), accessToken, refreshToken, true);
+        return new LoginSuccessDto(user.getId(), user.getFingerprint(), accessToken, refreshToken, true);
     }
 
     /**
@@ -58,7 +60,7 @@ public class AuthenticationService {
      * @return
      */
     @Transactional
-    public AuthenticationInnerResponse refreshToken(String token) {
+    public TokenRefreshSuccessDto refreshToken(String token) {
         jwtManager.validateToken(token);
 
         /**
@@ -92,6 +94,6 @@ public class AuthenticationService {
             refreshTokenReissued = true;
         }
 
-        return new AuthenticationInnerResponse(user.getId(), user.getFingerprint(), reissuedAccessToken, user.getRefreshToken(), refreshTokenReissued);
+        return new TokenRefreshSuccessDto(user.getId(), user.getFingerprint(), reissuedAccessToken, user.getRefreshToken(), refreshTokenReissued);
     }
 }

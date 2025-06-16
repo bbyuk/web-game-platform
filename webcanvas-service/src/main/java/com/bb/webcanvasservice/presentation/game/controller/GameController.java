@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.presentation.game;
+package com.bb.webcanvasservice.presentation.game.controller;
 
 import com.bb.webcanvasservice.application.game.service.GameApplicationService;
 import com.bb.webcanvasservice.common.security.Authenticated;

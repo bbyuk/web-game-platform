@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.presentation.chat;
+package com.bb.webcanvasservice.presentation.chat.controller;
 
 import com.bb.webcanvasservice.application.chat.service.ChatApplicationService;
 import com.bb.webcanvasservice.common.security.Authenticated;

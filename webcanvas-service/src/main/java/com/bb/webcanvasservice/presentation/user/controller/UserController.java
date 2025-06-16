@@ -1,8 +1,9 @@
-package com.bb.webcanvasservice.presentation.user;
+package com.bb.webcanvasservice.presentation.user.controller;
 
 import com.bb.webcanvasservice.application.user.UserApplicationService;
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
+import com.bb.webcanvasservice.presentation.user.mapper.UserPresentationDtoMapper;
 import com.bb.webcanvasservice.presentation.user.request.UserCreateRequest;
 import com.bb.webcanvasservice.presentation.user.response.UserInfoResponse;
 import com.bb.webcanvasservice.presentation.user.response.UserStateInfoResponse;

@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.auth.dto.request;
+package com.bb.webcanvasservice.presentation.auth.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(description = "로그인 요청 DTO")
 public record LoginRequest(
-        @Schema(description = "fingerprint.js로 취득한 클라이언트 fingerprint")
+        @Schema(description = "서버에서 유저 생성시 함께 생성된 클라이언트 fingerprint")
         String fingerprint
 ) {
 }

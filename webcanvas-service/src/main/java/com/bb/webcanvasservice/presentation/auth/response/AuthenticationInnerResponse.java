@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.domain.auth.dto.response;
+package com.bb.webcanvasservice.presentation.auth.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

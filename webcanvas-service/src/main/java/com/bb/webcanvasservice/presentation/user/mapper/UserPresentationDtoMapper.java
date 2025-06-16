@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.presentation.user;
+package com.bb.webcanvasservice.presentation.user.mapper;
 
 import com.bb.webcanvasservice.application.user.dto.UserDto;
 import com.bb.webcanvasservice.application.user.dto.UserStateDto;
