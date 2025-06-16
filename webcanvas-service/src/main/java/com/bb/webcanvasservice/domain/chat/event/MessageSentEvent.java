@@ -1,23 +1,21 @@
 package com.bb.webcanvasservice.domain.chat.event;
 
 import com.bb.webcanvasservice.common.event.ApplicationEvent;
-import lombok.Getter;
+import com.bb.webcanvasservice.domain.chat.model.Message;
 
-import java.time.LocalDateTime;
-
-@Getter
+/**
+ * 메세지 전송시 발행할 이벤트
+ */
 public class MessageSentEvent extends ApplicationEvent {
 
-    private final String destination;
-    private final Long senderId;
-    private final String message;
-    private final LocalDateTime timestamp;
+    private final Message message;
 
-    public MessageSentEvent(String destination, Long senderId, String message, LocalDateTime timestamp) {
+    public MessageSentEvent(Message message) {
         super("CHAT/MESSAGE_SENT");
-        this.destination = destination;
-        this.senderId = senderId;
         this.message = message;
-        this.timestamp = timestamp;
+    }
+
+    public Message getMessage() {
+        return message;
     }
 }

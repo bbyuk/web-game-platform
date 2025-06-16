@@ -14,9 +14,6 @@ public record SendMessageCommand(
         Long senderId,
 
         @Schema(description = "메세지 값")
-        String message,
-
-        @Schema(description = "전송 시각 타임스탬프")
-        LocalDateTime timestamp
+        String message
 ) {
 }

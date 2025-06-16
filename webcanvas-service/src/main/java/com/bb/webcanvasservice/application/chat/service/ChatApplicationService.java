@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.application.chat;
+package com.bb.webcanvasservice.application.chat.service;
 
 import com.bb.webcanvasservice.application.chat.command.SendMessageCommand;
 import com.bb.webcanvasservice.domain.chat.service.ChatService;
@@ -20,6 +20,6 @@ public class ChatApplicationService {
      */
     @Transactional
     public void sendChatMessage(SendMessageCommand command) {
-        chatService.sendChatMessage(command.gameRoomId(), command.senderId(), command.message(), command.timestamp());
+        chatService.sendChatMessage(command.gameRoomId(), command.senderId(), command.message());
     }
 }

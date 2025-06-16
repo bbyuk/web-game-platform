@@ -1,8 +1,9 @@
-package com.bb.webcanvasservice.application.chat;
+package com.bb.webcanvasservice.application.chat.listener;
 
-import com.bb.webcanvasservice.application.chat.dto.SentChatMessageDto;
-import com.bb.webcanvasservice.domain.chat.event.MessageSentEvent;
+import com.bb.webcanvasservice.application.chat.ChatApplicationDtoMapper;
 import com.bb.webcanvasservice.common.message.MessageSender;
+import com.bb.webcanvasservice.domain.chat.event.MessageSentEvent;
+import com.bb.webcanvasservice.domain.chat.model.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -17,9 +18,14 @@ public class ChatEventListener {
 
     private final MessageSender messageSender;
 
+    /**
+     * TODO 성능 체크 후 phase 조절 필요
+     * @param event
+     */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleMessageSentEvent(MessageSentEvent event) {
-        messageSender.send(event.getDestination(), new SentChatMessageDto(event.getMessage(), event.getSenderId(), event.getTimestamp()));
+        Message message = event.getMessage();
+        messageSender.send(message.getDestination(), ChatApplicationDtoMapper.toDto(message));
     }
 
 }
