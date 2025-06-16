@@ -31,7 +31,7 @@ export default function GameRoomPlayingPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const { webSocketClientRef, enteredUsers } = useOutletContext();
-  const { setTitle, setContents } = useLeftSideStore();
+  const { setContents } = useLeftSideStore();
   const { endLoading } = useClientStore();
 
 
@@ -91,7 +91,7 @@ export default function GameRoomPlayingPage() {
         case "SESSION/END":
           // TODO 게임 종료 이벤트 클라이언트 핸들링
           alert("게임이 종료되었습니다. 대기실로 이동합니다.");
-          navigate(pages.gameRoom.waiting.url(roomId), { replace: true });
+          navigate(pages.gameRoom.waiting.url(roomId), { replace: true, state: { gameSessionEnd: true } });
           break;
       }
     };
@@ -159,13 +159,6 @@ export default function GameRoomPlayingPage() {
   // ===============================================================
 
   useEffect(() => {
-    console.log("게임 플레잉 컴포넌트 렌더링");
-    setTitle({
-      label: "playing",
-      icon: <Gamepad2 className="w-6 h-6 text-green-500" />,
-      button: false,
-    });
-
     findCurrentGameSessionInfo();
   }, []);
 

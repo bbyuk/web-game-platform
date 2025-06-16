@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { GameRoomWaitingPlaceholder } from "@/components/placeholder/game-room/waiting/index.jsx";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
+import {useEffect, useState} from "react";
+import {GameRoomWaitingPlaceholder} from "@/components/placeholder/game-room/waiting/index.jsx";
+import {useNavigate, useOutletContext, useParams} from "react-router-dom";
+import {useLeftSideStore} from "@/stores/layout/leftSideStore.jsx";
 import SidePanelFooterButton from "@/components/layouts/side-panel/footer/button/index.jsx";
-import { useApiLock } from "@/api/lock/index.jsx";
-import { getApiClient } from "@/client/http/index.jsx";
-import { game } from "@/api/index.js";
-import { pages } from "@/router/index.jsx";
+import {useApiLock} from "@/api/lock/index.jsx";
+import {getApiClient} from "@/client/http/index.jsx";
+import {game} from "@/api/index.js";
+import {pages} from "@/router/index.jsx";
 
 export default function GameRoomWaitingPage() {
   const { roomId } = useParams();
@@ -91,11 +91,11 @@ export default function GameRoomWaitingPage() {
     });
   }, [readyStatus, myInfo]);
 
-  useEffect(() => {
-    return () => {
-      leftSideStore.clear();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     leftSideStore.clear();
+  //   };
+  // }, []);
 
   /**
    * =========================== 이벤트 핸들러 =============================
