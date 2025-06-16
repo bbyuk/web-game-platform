@@ -1,12 +1,12 @@
-package com.bb.webcanvasservice.application.game;
+package com.bb.webcanvasservice.application.game.service;
 
 import com.bb.webcanvasservice.application.game.command.EnterGameRoomCommand;
+import com.bb.webcanvasservice.application.game.config.GameProperties;
 import com.bb.webcanvasservice.application.game.dto.*;
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.domain.dictionary.enums.Language;
 import com.bb.webcanvasservice.domain.dictionary.enums.PartOfSpeech;
 import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
-import com.bb.webcanvasservice.application.GameProperties;
 import com.bb.webcanvasservice.domain.game.event.GameRoomEntranceEvent;
 import com.bb.webcanvasservice.domain.game.event.GameRoomExitEvent;
 import com.bb.webcanvasservice.domain.game.event.GameRoomHostChangedEvent;

@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.presentation.game;
 
-import com.bb.webcanvasservice.application.game.GameApplicationService;
+import com.bb.webcanvasservice.application.game.service.GameApplicationService;
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import lombok.RequiredArgsConstructor;

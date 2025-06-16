@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.presentation.game;
 
-import com.bb.webcanvasservice.application.game.GameRoomApplicationService;
+import com.bb.webcanvasservice.application.game.service.GameRoomApplicationService;
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import com.bb.webcanvasservice.presentation.game.mapper.GameCommandMapper;

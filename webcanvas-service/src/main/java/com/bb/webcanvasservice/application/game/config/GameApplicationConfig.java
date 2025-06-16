@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.application.game;
+package com.bb.webcanvasservice.application.game.config;
 
 import com.bb.webcanvasservice.domain.game.registry.GameTurnTimerRegistry;
 import com.bb.webcanvasservice.domain.game.repository.GameRoomEntranceRepository;

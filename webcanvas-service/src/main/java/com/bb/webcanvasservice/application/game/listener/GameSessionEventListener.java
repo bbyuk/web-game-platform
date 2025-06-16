@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.application.game.listener;
 
-import com.bb.webcanvasservice.application.game.GameApplicationService;
+import com.bb.webcanvasservice.application.game.service.GameApplicationService;
 import com.bb.webcanvasservice.domain.game.event.AllUserInGameSessionLoadedEvent;
 import com.bb.webcanvasservice.domain.game.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.domain.game.event.GameTurnProgressedEvent;

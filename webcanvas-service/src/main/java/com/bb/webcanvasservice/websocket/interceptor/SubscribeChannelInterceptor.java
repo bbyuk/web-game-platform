@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.websocket.interceptor;
 
-import com.bb.webcanvasservice.application.game.GameApplicationService;
+import com.bb.webcanvasservice.application.game.service.GameApplicationService;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.web.security.exception.BadAccessException;

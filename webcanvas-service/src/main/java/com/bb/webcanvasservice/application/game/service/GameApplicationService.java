@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.application.game;
+package com.bb.webcanvasservice.application.game.service;
 
 import com.bb.webcanvasservice.application.game.command.StartGameCommand;
 import com.bb.webcanvasservice.application.game.dto.GameSessionDto;

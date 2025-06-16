@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.websocket.config;
 
-import com.bb.webcanvasservice.application.game.GameApplicationService;
+import com.bb.webcanvasservice.application.game.service.GameApplicationService;
 import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.domain.game.service.GameRoomService;
 import com.bb.webcanvasservice.websocket.interceptor.JwtAuthenticationChannelInterceptor;
