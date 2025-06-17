@@ -3,13 +3,14 @@ package com.bb.webcanvasservice.auth.application.service;
 import com.bb.webcanvasservice.auth.application.command.LoginCommand;
 import com.bb.webcanvasservice.auth.application.dto.LoginSuccessDto;
 import com.bb.webcanvasservice.auth.application.dto.TokenRefreshSuccessDto;
+import com.bb.webcanvasservice.auth.application.port.UserCommandPort;
+import com.bb.webcanvasservice.auth.application.port.UserQueryPort;
 import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JwtManager;
-import com.bb.webcanvasservice.user.domain.model.User;
-import com.bb.webcanvasservice.user.domain.service.UserService;
-import com.bb.webcanvasservice.infrastructure.web.config.SecurityProperties;
 import com.bb.webcanvasservice.infrastructure.security.web.exception.ApplicationAuthenticationException;
+import com.bb.webcanvasservice.infrastructure.web.config.SecurityProperties;
+import com.bb.webcanvasservice.user.domain.view.UserInfo;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthenticationService {
 
     private final JwtManager jwtManager;
-    private final UserService userService;
+    private final UserQueryPort userQueryPort;
+    private final UserCommandPort userCommandPort;
     private final SecurityProperties securityProperties;
 
     /**
@@ -40,22 +42,26 @@ public class AuthenticationService {
      */
     @Transactional
     public LoginSuccessDto login(LoginCommand command) {
+        String fingerprint = StringUtils.isBlank(command.fingerprint())
+                ? FingerprintGenerator.generate()
+                : command.fingerprint();
 
-        User user = userService.findOrCreateUser(
-                StringUtils.isBlank(command.fingerprint())
-                        ? FingerprintGenerator.generate()
-                        : command.fingerprint());
+        UserInfo userInfo = userQueryPort.findUserInfoWith(fingerprint);
+        if (userInfo == null) {
+            userInfo = userCommandPort.createUser(fingerprint);
+        }
 
-        String accessToken = jwtManager.generateToken(user.getId(), user.getFingerprint(), securityProperties.accessTokenExpiration());
-        String refreshToken = jwtManager.generateToken(user.getId(), user.getFingerprint(), securityProperties.refreshTokenExpiration());
+        String accessToken = jwtManager.generateToken(userInfo.id(), userInfo.fingerprint(), securityProperties.accessTokenExpiration());
+        String refreshToken = jwtManager.generateToken(userInfo.id(), userInfo.fingerprint(), securityProperties.refreshTokenExpiration());
 
-        userService.updateRefreshToken(user.getId(), refreshToken);
+        userCommandPort.updateUserRefreshToken(userInfo.id(), refreshToken);
 
-        return new LoginSuccessDto(user.getId(), user.getFingerprint(), accessToken, refreshToken, true);
+        return new LoginSuccessDto(userInfo.id(), userInfo.fingerprint(), accessToken, refreshToken, true);
     }
 
     /**
      * refreshToken을 받아 올바른 요청인지 확인 후 인증 토큰을 refresh한다.
+     *
      * @param token
      * @return
      */
@@ -67,9 +73,9 @@ public class AuthenticationService {
          * 이 토큰이 유저에게 할당된 refreshToken인지 validation
          */
         Long userId = jwtManager.getUserIdFromToken(token);
-        User user = userService.findUser(userId);
+        UserInfo userInfo = userQueryPort.findUserInfoWith(userId);
 
-        if (!user.getRefreshToken().equals(token)) {
+        if (!userInfo.refreshToken().equals(token)) {
             log.error("유저에게 할당되지 않은 refresh token 입니다.");
             log.error("유저 ID : {}", userId);
             log.error("요청된 refreshToken : {}", token);
@@ -79,7 +85,7 @@ public class AuthenticationService {
         /**
          * validation 통과시 Access Token 재발급
          */
-        String reissuedAccessToken = jwtManager.generateToken(userId, user.getFingerprint(), securityProperties.accessTokenExpiration());
+        String reissuedAccessToken = jwtManager.generateToken(userId, userInfo.fingerprint(), securityProperties.accessTokenExpiration());
 
         boolean refreshTokenReissued = false;
         /**
@@ -89,11 +95,11 @@ public class AuthenticationService {
          * refreshToken 재발급 및 rotate
          */
         if (jwtManager.calculateRemainingExpiration(token) <= securityProperties.refreshTokenReissueThreshold()) {
-            String reissuedRefreshToken = jwtManager.generateToken(userId, user.getFingerprint(), securityProperties.refreshTokenExpiration());
-            userService.updateRefreshToken(userId, reissuedRefreshToken);
+            String reissuedRefreshToken = jwtManager.generateToken(userId, userInfo.fingerprint(), securityProperties.refreshTokenExpiration());
+            userCommandPort.updateUserRefreshToken(userId, reissuedRefreshToken);
             refreshTokenReissued = true;
         }
 
-        return new TokenRefreshSuccessDto(user.getId(), user.getFingerprint(), reissuedAccessToken, user.getRefreshToken(), refreshTokenReissued);
+        return new TokenRefreshSuccessDto(userInfo.id(), userInfo.fingerprint(), reissuedAccessToken, userInfo.refreshToken(), refreshTokenReissued);
     }
 }

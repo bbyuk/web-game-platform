@@ -3,6 +3,10 @@ package com.bb.webcanvasservice.user.application.service;
 import com.bb.webcanvasservice.user.application.mapper.UserApplicationDtoMapper;
 import com.bb.webcanvasservice.user.application.dto.UserDto;
 import com.bb.webcanvasservice.user.application.dto.UserStateDto;
+import com.bb.webcanvasservice.user.domain.exception.AlreadyRegisteredUserException;
+import com.bb.webcanvasservice.user.domain.exception.UserNotFoundException;
+import com.bb.webcanvasservice.user.domain.model.User;
+import com.bb.webcanvasservice.user.application.repository.UserRepository;
 import com.bb.webcanvasservice.user.domain.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserApplicationService {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
     /**
      * 클라이언트 fingerprint로 등록된 유저를 조회 후 없을 시 유저 생성 후 리턴
@@ -25,9 +30,23 @@ public class UserApplicationService {
      */
     @Transactional
     public UserDto findOrCreateUser(String fingerprint) {
-        return UserApplicationDtoMapper.toUserDto(userService.findOrCreateUser(fingerprint));
+        return UserApplicationDtoMapper.toUserDto(
+                userRepository.findByFingerprint(fingerprint)
+                        .orElseGet(() -> User.createNewUser(fingerprint))
+        );
     }
 
+    /**
+     * 유저의 리프레쉬 토큰을 변경한다.
+     * @param userId 대상 유저 ID
+     * @param refreshToken 리프레쉬 토큰
+     */
+    @Transactional
+    public void updateRefreshToken(Long userId, String refreshToken) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        user.updateRefreshToken(refreshToken);
+        userRepository.save(user);
+    }
 
     /**
      * 유저 ID로 유저를 조회해 리턴한다.
@@ -38,7 +57,9 @@ public class UserApplicationService {
      */
     @Transactional(readOnly = true)
     public UserDto findUser(Long userId) {
-        return UserApplicationDtoMapper.toUserDto(userService.findUser(userId));
+        return UserApplicationDtoMapper.toUserDto(
+                userRepository.findById(userId).orElseThrow(UserNotFoundException::new)
+        );
     }
 
     /**
@@ -49,11 +70,19 @@ public class UserApplicationService {
      */
     @Transactional
     public UserDto createUser(String fingerprint) {
-        return UserApplicationDtoMapper.toUserDto(userService.createUser(fingerprint));
+        userRepository.findByFingerprint(fingerprint)
+                .ifPresent(
+                        user -> {
+                            throw new AlreadyRegisteredUserException();
+                        }
+                );
+
+        return UserApplicationDtoMapper.toUserDto(userRepository.save(User.createNewUser(fingerprint)));
     }
 
     /**
      * 유저 ID로 유저 상태 정보를 조회한다.
+     *
      * @param userId 유저 ID
      * @return 유저 상태 Application DTO
      */

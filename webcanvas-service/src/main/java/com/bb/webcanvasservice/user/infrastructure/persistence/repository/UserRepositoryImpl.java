@@ -2,8 +2,8 @@ package com.bb.webcanvasservice.user.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.user.domain.model.User;
 import com.bb.webcanvasservice.user.domain.model.UserState;
-import com.bb.webcanvasservice.user.domain.repository.UserRepository;
-import com.bb.webcanvasservice.user.infrastructure.persistence.mapper.UserModelMapper;
+import com.bb.webcanvasservice.user.application.repository.UserRepository;
+import com.bb.webcanvasservice.user.infrastructure.persistence.mapper.UserModelEntityMapper;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,20 +21,20 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findById(Long userId) {
         return userJpaRepository.findById(userId)
-                .map(UserModelMapper::toUser);
+                .map(UserModelEntityMapper::toUser);
     }
 
     @Override
     public User save(User user) {
-        return UserModelMapper.toUser(
-                userJpaRepository.save(UserModelMapper.toUserJpaEntity(user))
+        return UserModelEntityMapper.toUser(
+                userJpaRepository.save(UserModelEntityMapper.toUserJpaEntity(user))
         );
     }
 
     @Override
     public Optional<User> findByFingerprint(String fingerprint) {
         return userJpaRepository.findByFingerprint(fingerprint)
-                .map(UserModelMapper::toUser);
+                .map(UserModelEntityMapper::toUser);
     }
 
     @Override

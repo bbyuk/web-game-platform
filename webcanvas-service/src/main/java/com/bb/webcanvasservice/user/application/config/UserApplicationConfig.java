@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.user.application.config;
 
-import com.bb.webcanvasservice.user.domain.repository.UserRepository;
+import com.bb.webcanvasservice.user.application.repository.UserRepository;
 import com.bb.webcanvasservice.user.domain.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

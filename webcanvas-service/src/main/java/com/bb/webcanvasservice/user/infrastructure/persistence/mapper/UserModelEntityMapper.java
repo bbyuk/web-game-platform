@@ -7,7 +7,7 @@ import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEnt
  * entity <-> domain model
  * User
  */
-public class UserModelMapper {
+public class UserModelEntityMapper {
     public static User toUser(UserJpaEntity entity) {
         return new User(entity.getId(), entity.getFingerprint(), entity.getState(), entity.getRefreshToken());
     }
