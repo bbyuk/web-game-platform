@@ -24,20 +24,6 @@ public class UserApplicationService {
     private final UserRepository userRepository;
 
     /**
-     * 클라이언트 fingerprint로 등록된 유저를 조회 후 없을 시 유저 생성 후 리턴
-     *
-     * @param fingerprint
-     * @return
-     */
-    @Transactional
-    public UserDto findOrCreateUser(String fingerprint) {
-        return UserApplicationDtoMapper.toUserDto(
-                userRepository.findByFingerprint(fingerprint)
-                        .orElseGet(() -> User.createNewUser(fingerprint))
-        );
-    }
-
-    /**
      * 유저의 리프레쉬 토큰을 변경한다.
      * @param userId 대상 유저 ID
      * @param refreshToken 리프레쉬 토큰
