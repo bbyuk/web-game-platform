@@ -1,5 +1,8 @@
 package com.bb.webcanvasservice.common.lock;
 
+import com.bb.webcanvasservice.common.lock.callback.AsyncLockCallback;
+import com.bb.webcanvasservice.common.lock.callback.LockCallback;
+
 import java.util.concurrent.CompletableFuture;
 
 /**

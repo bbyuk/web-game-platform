@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.unit.common.sequence;
 
-import com.bb.webcanvasservice.common.sequence.SequenceCreateFailedException;
-import com.bb.webcanvasservice.common.sequence.SequenceNotFoundException;
-import com.bb.webcanvasservice.common.sequence.SequenceProperties;
+import com.bb.webcanvasservice.common.sequence.exception.SequenceCreateFailedException;
+import com.bb.webcanvasservice.common.sequence.exception.SequenceNotFoundException;
+import com.bb.webcanvasservice.common.sequence.config.SequenceProperties;
 import com.bb.webcanvasservice.common.sequence.SequenceRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

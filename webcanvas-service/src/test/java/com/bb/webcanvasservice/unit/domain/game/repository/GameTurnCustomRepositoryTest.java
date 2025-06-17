@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.unit.domain.game.repository;
 
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
-import com.bb.webcanvasservice.common.config.JpaConfig;
+import com.bb.webcanvasservice.config.JpaConfig;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomEntranceJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameSessionJpaEntity;

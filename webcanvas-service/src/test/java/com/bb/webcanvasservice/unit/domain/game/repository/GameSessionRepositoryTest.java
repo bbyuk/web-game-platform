@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.unit.domain.game.repository;
 
-import com.bb.webcanvasservice.common.config.JpaConfig;
+import com.bb.webcanvasservice.config.JpaConfig;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomEntranceJpaRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomJpaRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameSessionJpaRepository;

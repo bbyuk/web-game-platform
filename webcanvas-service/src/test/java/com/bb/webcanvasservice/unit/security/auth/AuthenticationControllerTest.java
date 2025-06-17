@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.unit.security.auth;
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;
 import com.bb.webcanvasservice.user.domain.service.UserService;
-import com.bb.webcanvasservice.common.web.security.SecurityProperties;
+import com.bb.webcanvasservice.infrastructure.web.config.SecurityProperties;
 import com.bb.webcanvasservice.auth.application.service.AuthenticationService;
 import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.auth.presentation.request.LoginRequest;

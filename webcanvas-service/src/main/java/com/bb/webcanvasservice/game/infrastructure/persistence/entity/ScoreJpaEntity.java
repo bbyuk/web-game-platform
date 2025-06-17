@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.entity;
 
 import com.bb.webcanvasservice.game.domain.model.ScoreType;
-import com.bb.webcanvasservice.common.infrastructure.persistence.BaseEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

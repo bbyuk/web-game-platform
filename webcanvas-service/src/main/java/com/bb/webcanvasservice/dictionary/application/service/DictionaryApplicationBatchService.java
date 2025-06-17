@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.dictionary.application.service;
 
 import com.bb.webcanvasservice.common.lock.DistributedLock;
-import com.bb.webcanvasservice.common.lock.LockAlreadyOccupiedException;
+import com.bb.webcanvasservice.common.lock.exception.LockAlreadyOccupiedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

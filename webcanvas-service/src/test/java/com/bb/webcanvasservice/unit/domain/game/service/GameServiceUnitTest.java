@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.unit.domain.game.service;
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
-import com.bb.webcanvasservice.common.config.JpaConfig;
+import com.bb.webcanvasservice.config.JpaConfig;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.*;
 import com.bb.webcanvasservice.infrastructure.persistence.game.repository.*;
 import com.bb.webcanvasservice.game.presentation.request.GameStartRequest;

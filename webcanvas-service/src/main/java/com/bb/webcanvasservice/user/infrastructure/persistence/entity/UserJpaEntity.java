@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.user.infrastructure.persistence.entity;
 
-import com.bb.webcanvasservice.common.infrastructure.persistence.BaseEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.BaseEntity;
 import com.bb.webcanvasservice.user.domain.model.UserState;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

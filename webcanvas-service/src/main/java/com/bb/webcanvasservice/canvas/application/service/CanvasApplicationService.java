@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.canvas.application.service;
 import com.bb.webcanvasservice.canvas.application.command.StrokeCommand;
 import com.bb.webcanvasservice.common.message.MessageSender;
 import com.bb.webcanvasservice.canvas.domain.model.Stroke;
-import com.bb.webcanvasservice.common.websocket.properties.WebSocketProperties;
+import com.bb.webcanvasservice.infrastructure.websocket.config.WebSocketProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

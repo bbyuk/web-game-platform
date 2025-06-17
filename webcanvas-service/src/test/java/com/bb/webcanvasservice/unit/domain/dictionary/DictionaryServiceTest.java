@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.unit.domain.dictionary;
 
-import com.bb.webcanvasservice.common.sequence.SequenceRepositoryImpl;
+import com.bb.webcanvasservice.infrastructure.persistence.sequence.SequenceRepositoryImpl;
 import com.bb.webcanvasservice.dictionary.domain.model.Language;
 import com.bb.webcanvasservice.dictionary.domain.model.PartOfSpeech;
 import com.bb.webcanvasservice.dictionary.domain.model.Word;

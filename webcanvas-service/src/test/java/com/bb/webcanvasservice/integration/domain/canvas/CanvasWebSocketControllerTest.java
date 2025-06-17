@@ -6,8 +6,8 @@ import com.bb.webcanvasservice.canvas.domain.model.Stroke;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;
 import com.bb.webcanvasservice.user.infrastructure.persistence.repository.UserJpaRepository;
-import com.bb.webcanvasservice.common.websocket.properties.WebSocketProperties;
-import com.bb.webcanvasservice.common.websocket.registry.SessionRegistry;
+import com.bb.webcanvasservice.infrastructure.websocket.config.WebSocketProperties;
+import com.bb.webcanvasservice.infrastructure.websocket.registry.WebSocketSessionRegistry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,7 +75,7 @@ class CanvasWebSocketControllerTest {
     @Autowired
     private CanvasTestDataLoader testDataLoader;
     @Autowired
-    private SessionRegistry sessionRegistry;
+    private WebSocketSessionRegistry webSocketSessionRegistry;
 
 
     @BeforeEach
@@ -93,7 +93,7 @@ class CanvasWebSocketControllerTest {
 
     @AfterEach
     void clearSession() {
-        sessionRegistry.clear();
+        webSocketSessionRegistry.clear();
     }
 
     @Test

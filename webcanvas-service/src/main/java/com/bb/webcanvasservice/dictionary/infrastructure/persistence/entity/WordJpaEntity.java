@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.dictionary.infrastructure.persistence.entity;
 
 import com.bb.webcanvasservice.dictionary.domain.model.Language;
 import com.bb.webcanvasservice.dictionary.domain.model.PartOfSpeech;
-import com.bb.webcanvasservice.common.infrastructure.persistence.BaseEntity;
+import com.bb.webcanvasservice.infrastructure.persistence.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

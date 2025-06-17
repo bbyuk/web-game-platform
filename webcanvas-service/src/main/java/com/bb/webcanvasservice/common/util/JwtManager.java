@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.common.util;
 
 import com.bb.webcanvasservice.common.code.ErrorCode;
-import com.bb.webcanvasservice.common.web.security.SecurityProperties;
-import com.bb.webcanvasservice.common.web.security.exception.ApplicationAuthenticationException;
+import com.bb.webcanvasservice.infrastructure.web.config.SecurityProperties;
+import com.bb.webcanvasservice.infrastructure.security.web.exception.ApplicationAuthenticationException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
