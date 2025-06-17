@@ -54,6 +54,12 @@ public class User {
         this.state = state;
     }
 
+    /**
+     * 유저 상태를 방 안으로 변경한다.
+     */
+    public void moveToRoom() {
+        this.state = UserState.IN_ROOM;
+    }
 
     /**
      * 현재 플레이중인 게임을 완료하고 게임 방으로 돌아간다.

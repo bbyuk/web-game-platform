@@ -6,6 +6,7 @@ import com.bb.webcanvasservice.dictionary.domain.service.DictionaryService;
 import com.bb.webcanvasservice.game.application.command.StartGameCommand;
 import com.bb.webcanvasservice.game.application.dto.GameSessionDto;
 import com.bb.webcanvasservice.game.application.dto.GameTurnDto;
+import com.bb.webcanvasservice.game.application.port.UserCommandPort;
 import com.bb.webcanvasservice.game.domain.event.AllUserInGameSessionLoadedEvent;
 import com.bb.webcanvasservice.game.domain.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.game.domain.event.GameSessionStartEvent;
@@ -22,7 +23,6 @@ import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
 import com.bb.webcanvasservice.game.domain.service.GameRoomService;
 import com.bb.webcanvasservice.game.domain.service.GameService;
-import com.bb.webcanvasservice.user.domain.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -55,10 +55,10 @@ public class GameApplicationService {
     private final GameRoomRepository gameRoomRepository;
 
     /**
-     * 크로스도메인 서비스
+     * 크로스도메인 포트
      */
+    private final UserCommandPort userCommandPort;
     private final DictionaryService dictionaryService;
-    private final UserService userService;
 
     /**
      * common
@@ -124,7 +124,7 @@ public class GameApplicationService {
          * 250531 게임 시작시 레디상태 false로 모두 변경
          */
         List<GameRoomEntrance> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdWithLock(gameRoom.getId());
-        userService.moveUsersToGameSession(entrances.stream().map(GameRoomEntrance::getUserId).collect(Collectors.toList()));
+        userCommandPort.moveUsersToGameSession(entrances.stream().map(GameRoomEntrance::getUserId).collect(Collectors.toList()));
         gameRoomService.resetGameRoomEntrancesReady(entrances.stream().map(GameRoomEntrance::getId).collect(Collectors.toList()));
 
         List<GamePlayHistory> gamePlayHistories = entrances
@@ -288,7 +288,7 @@ public class GameApplicationService {
 
         List<GameRoomEntrance> gameRoomEntrances = gameRoomService.findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomEntranceState.PLAYING);
         gameRoomService.resetGameRoomEntrances(gameRoomEntrances.stream().map(GameRoomEntrance::getId).collect(Collectors.toList()));
-        userService.moveUsersToRoom(gameRoomEntrances.stream().map(GameRoomEntrance::getUserId).collect(Collectors.toList()));
+        userCommandPort.moveUsersToRoom(gameRoomEntrances.stream().map(GameRoomEntrance::getUserId).collect(Collectors.toList()));
 
 
         /**

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
-public class UserCommandAdapter implements UserCommandPort {
+public class AuthUserCommandAdapter implements UserCommandPort {
 
     private final UserApplicationService userApplicationService;
     private final UserRepository userRepository;

@@ -7,6 +7,7 @@ import com.bb.webcanvasservice.dictionary.domain.service.DictionaryService;
 import com.bb.webcanvasservice.game.application.command.EnterGameRoomCommand;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
+import com.bb.webcanvasservice.game.application.port.UserCommandPort;
 import com.bb.webcanvasservice.game.domain.event.GameRoomEntranceEvent;
 import com.bb.webcanvasservice.game.domain.event.GameRoomExitEvent;
 import com.bb.webcanvasservice.game.domain.event.GameRoomHostChangedEvent;
@@ -18,7 +19,6 @@ import com.bb.webcanvasservice.game.domain.model.*;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.service.GameRoomService;
-import com.bb.webcanvasservice.user.domain.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -44,10 +44,10 @@ public class GameRoomApplicationService {
 
 
     /**
-     * 크로스 도메인 서비스
+     * 크로스 도메인 포트
      */
     private final DictionaryService dictionaryService;
-    private final UserService userService;
+    private final UserCommandPort userCommandPort;
 
     /**
      * 도메인 레포지토리
@@ -135,7 +135,7 @@ public class GameRoomApplicationService {
                 )
         );
 
-        userService.moveUserToRoom(command.userId());
+        userCommandPort.moveUserToRoom(command.userId());
 
         /**
          * 게임 방 입장 이벤트 pub ->
@@ -286,7 +286,7 @@ public class GameRoomApplicationService {
                     );
         }
 
-        userService.moveUserToLobby(userId);
+        userCommandPort.moveUserToLobby(userId);
 
         /**
          * 250519 게임방 퇴장시 event 발행
