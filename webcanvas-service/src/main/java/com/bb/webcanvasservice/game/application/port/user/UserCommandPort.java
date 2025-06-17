@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.game.application.port;
+package com.bb.webcanvasservice.game.application.port.user;
 
 import java.util.List;
 

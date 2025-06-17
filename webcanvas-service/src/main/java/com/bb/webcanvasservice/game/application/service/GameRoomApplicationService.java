@@ -1,13 +1,11 @@
 package com.bb.webcanvasservice.game.application.service;
 
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
-import com.bb.webcanvasservice.dictionary.domain.model.Language;
-import com.bb.webcanvasservice.dictionary.domain.model.PartOfSpeech;
-import com.bb.webcanvasservice.dictionary.domain.service.DictionaryService;
 import com.bb.webcanvasservice.game.application.command.EnterGameRoomCommand;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
-import com.bb.webcanvasservice.game.application.port.UserCommandPort;
+import com.bb.webcanvasservice.game.application.port.dictionary.DictionaryQueryPort;
+import com.bb.webcanvasservice.game.application.port.user.UserCommandPort;
 import com.bb.webcanvasservice.game.domain.event.GameRoomEntranceEvent;
 import com.bb.webcanvasservice.game.domain.event.GameRoomExitEvent;
 import com.bb.webcanvasservice.game.domain.event.GameRoomHostChangedEvent;
@@ -46,7 +44,7 @@ public class GameRoomApplicationService {
     /**
      * 크로스 도메인 포트
      */
-    private final DictionaryService dictionaryService;
+    private final DictionaryQueryPort dictionaryQueryPort;
     private final UserCommandPort userCommandPort;
 
     /**
@@ -121,7 +119,7 @@ public class GameRoomApplicationService {
          *
          * HOST로 입장한다면 entrance의 ready상태를 true로 초기 설정
          */
-        String koreanAdjective = dictionaryService.drawRandomWordValue(Language.KOREAN, PartOfSpeech.ADJECTIVE);
+        String koreanAdjective = dictionaryQueryPort.drawRandomKoreanAdjective();
 
         GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(
                 new GameRoomEntrance(

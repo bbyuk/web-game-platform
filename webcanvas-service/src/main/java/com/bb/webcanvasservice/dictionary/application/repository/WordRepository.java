@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.dictionary.domain.repository;
+package com.bb.webcanvasservice.dictionary.application.repository;
 
 import com.bb.webcanvasservice.dictionary.domain.model.Language;
 import com.bb.webcanvasservice.dictionary.domain.model.PartOfSpeech;

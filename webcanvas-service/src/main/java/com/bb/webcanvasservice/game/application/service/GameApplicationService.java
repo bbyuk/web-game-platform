@@ -1,12 +1,10 @@
 package com.bb.webcanvasservice.game.application.service;
 
-import com.bb.webcanvasservice.dictionary.domain.model.Language;
-import com.bb.webcanvasservice.dictionary.domain.model.PartOfSpeech;
-import com.bb.webcanvasservice.dictionary.domain.service.DictionaryService;
 import com.bb.webcanvasservice.game.application.command.StartGameCommand;
 import com.bb.webcanvasservice.game.application.dto.GameSessionDto;
 import com.bb.webcanvasservice.game.application.dto.GameTurnDto;
-import com.bb.webcanvasservice.game.application.port.UserCommandPort;
+import com.bb.webcanvasservice.game.application.port.dictionary.DictionaryQueryPort;
+import com.bb.webcanvasservice.game.application.port.user.UserCommandPort;
 import com.bb.webcanvasservice.game.domain.event.AllUserInGameSessionLoadedEvent;
 import com.bb.webcanvasservice.game.domain.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.game.domain.event.GameSessionStartEvent;
@@ -58,7 +56,7 @@ public class GameApplicationService {
      * 크로스도메인 포트
      */
     private final UserCommandPort userCommandPort;
-    private final DictionaryService dictionaryService;
+    private final DictionaryQueryPort dictionaryQueryPort;
 
     /**
      * common
@@ -249,7 +247,7 @@ public class GameApplicationService {
                         GameTurn.createNewGameTurn(
                                 gameSessionId,
                                 gameService.findNextDrawerId(gameSessionId),
-                                dictionaryService.drawRandomWordValue(Language.KOREAN, PartOfSpeech.NOUN)
+                                dictionaryQueryPort.drawRandomKoreanNoun()
                         )
                 );
 

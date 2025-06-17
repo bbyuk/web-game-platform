@@ -3,7 +3,10 @@ package com.bb.webcanvasservice.dictionary.application.service;
 import com.bb.webcanvasservice.dictionary.application.config.DictionarySourceProperties;
 import com.bb.webcanvasservice.dictionary.application.parser.DictionaryParser;
 import com.bb.webcanvasservice.dictionary.domain.exception.DictionaryFileParseFailedException;
-import com.bb.webcanvasservice.dictionary.domain.repository.WordRepository;
+import com.bb.webcanvasservice.dictionary.domain.exception.WordNotFoundException;
+import com.bb.webcanvasservice.dictionary.domain.model.Language;
+import com.bb.webcanvasservice.dictionary.domain.model.PartOfSpeech;
+import com.bb.webcanvasservice.dictionary.application.repository.WordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -25,10 +28,9 @@ import static com.bb.webcanvasservice.dictionary.application.util.DictionaryData
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DictionaryApplicationService {
+public class DictionaryService {
 
     private final DictionarySourceProperties dictionarySourceProperties;
-
     private final DictionaryParser dictionaryParser;
     private final WordRepository wordRepository;
 
@@ -96,4 +98,17 @@ public class DictionaryApplicationService {
         return CompletableFuture.completedFuture(result.intValue());
     }
 
+
+    /**
+     * 랜덤한 단어의 값을 조회해온다.
+     * @param language 대상 언어
+     * @param pos 품사
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public String drawRandomWordValue(Language language, PartOfSpeech pos) {
+        return wordRepository.findRandomWordByLanguageAndPos(language, pos)
+                .orElseThrow(WordNotFoundException::new)
+                .getValue();
+    }
 }

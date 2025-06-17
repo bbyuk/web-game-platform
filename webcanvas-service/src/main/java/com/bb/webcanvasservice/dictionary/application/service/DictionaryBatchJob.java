@@ -26,7 +26,7 @@ import static com.bb.webcanvasservice.dictionary.application.util.DictionaryData
 public class DictionaryBatchJob {
 
     private final DictionarySourceProperties dictionarySourceProperties;
-    private final DictionaryApplicationService dictionaryApplicationService;
+    private final DictionaryService dictionaryService;
 
     /**
      * 단일 file 단위 transaction 적용으로 BatchService에는 Transactional 붙이지 않는다.
@@ -53,7 +53,7 @@ public class DictionaryBatchJob {
 
         try (Stream<Path> paths = Files.list(targetDirectory)) {
             paths.filter(Files::isRegularFile)
-                    .forEach(path -> result.addAndGet(dictionaryApplicationService.parseFileAndSave(path)));
+                    .forEach(path -> result.addAndGet(dictionaryService.parseFileAndSave(path)));
         } catch (IOException e) {
             log.error("데이터 파일 디렉터리 순회중 오류 발생", e);
             throw new DictionaryFileParseFailedException();

@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.user.application.adapter.game;
 
-import com.bb.webcanvasservice.game.application.port.UserQueryPort;
+import com.bb.webcanvasservice.game.application.port.user.UserQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
