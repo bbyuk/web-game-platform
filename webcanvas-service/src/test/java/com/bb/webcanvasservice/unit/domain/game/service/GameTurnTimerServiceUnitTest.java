@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.unit.domain.game.service;
 
-import com.bb.webcanvasservice.infrastructure.persistence.game.registry.InMemoryGameTurnTimerRegistry;
-import com.bb.webcanvasservice.domain.game.service.GameTurnTimerService;
+import com.bb.webcanvasservice.game.infrastructure.persistence.registry.InMemoryGameTurnTimerRegistry;
+import com.bb.webcanvasservice.game.domain.service.GameTurnTimerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

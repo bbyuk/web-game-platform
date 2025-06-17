@@ -2,19 +2,19 @@ package com.bb.webcanvasservice.integration.domain.game.service;
 
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
-import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
-import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
-import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.dictionary.domain.service.DictionaryService;
+import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
+import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomEntranceJpaEntity;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
-import com.bb.webcanvasservice.presentation.game.response.GameRoomEntranceResponse;
-import com.bb.webcanvasservice.domain.game.model.GameRoomState;
-import com.bb.webcanvasservice.domain.game.exception.AlreadyEnteredRoomException;
-import com.bb.webcanvasservice.domain.game.exception.IllegalGameRoomStateException;
-import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
-import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
-import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.domain.user.model.UserState;
-import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
+import com.bb.webcanvasservice.game.presentation.response.GameRoomEntranceResponse;
+import com.bb.webcanvasservice.game.domain.model.GameRoomState;
+import com.bb.webcanvasservice.game.domain.exception.AlreadyEnteredRoomException;
+import com.bb.webcanvasservice.game.domain.exception.IllegalGameRoomStateException;
+import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomEntranceJpaRepository;
+import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomJpaRepository;
+import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;
+import com.bb.webcanvasservice.user.domain.model.UserState;
+import com.bb.webcanvasservice.user.infrastructure.persistence.repository.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,9 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 import java.util.concurrent.*;
 
-import static com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole.GUEST;
-import static com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole.HOST;
-import static com.bb.webcanvasservice.domain.game.model.GameRoomState.WAITING;
+import static com.bb.webcanvasservice.game.domain.model.GameRoomEntranceRole.GUEST;
+import static com.bb.webcanvasservice.game.domain.model.GameRoomEntranceRole.HOST;
+import static com.bb.webcanvasservice.game.domain.model.GameRoomState.WAITING;
 import static org.mockito.ArgumentMatchers.any;
 
 @Transactional

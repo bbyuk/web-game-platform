@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.unit.domain.dictionary.util;
 
-import com.bb.webcanvasservice.application.dictionary.util.KoreanAdjectiveConverter;
+import com.bb.webcanvasservice.dictionary.application.util.KoreanAdjectiveConverter;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

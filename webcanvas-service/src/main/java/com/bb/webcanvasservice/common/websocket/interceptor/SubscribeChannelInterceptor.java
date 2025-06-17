@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.common.websocket.interceptor;
 
-import com.bb.webcanvasservice.application.game.service.GameApplicationService;
+import com.bb.webcanvasservice.game.application.service.GameApplicationService;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
-import com.bb.webcanvasservice.domain.game.service.GameRoomService;
+import com.bb.webcanvasservice.game.domain.service.GameRoomService;
 import com.bb.webcanvasservice.common.web.security.exception.BadAccessException;
 import com.bb.webcanvasservice.common.websocket.properties.WebSocketProperties;
 import lombok.RequiredArgsConstructor;

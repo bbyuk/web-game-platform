@@ -2,10 +2,10 @@ package com.bb.webcanvasservice.integration.domain.canvas;
 
 import com.bb.webcanvasservice.TestWebSocketClientFactory;
 import com.bb.webcanvasservice.common.util.JwtManager;
-import com.bb.webcanvasservice.domain.canvas.model.Stroke;
+import com.bb.webcanvasservice.canvas.domain.model.Stroke;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
-import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
+import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;
+import com.bb.webcanvasservice.user.infrastructure.persistence.repository.UserJpaRepository;
 import com.bb.webcanvasservice.common.websocket.properties.WebSocketProperties;
 import com.bb.webcanvasservice.common.websocket.registry.SessionRegistry;
 import org.assertj.core.api.Assertions;

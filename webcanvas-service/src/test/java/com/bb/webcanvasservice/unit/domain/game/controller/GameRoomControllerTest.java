@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.unit.domain.game.controller;
 
 import com.bb.webcanvasservice.common.util.JwtManager;
-import com.bb.webcanvasservice.presentation.game.response.GameRoomEntranceResponse;
-import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
+import com.bb.webcanvasservice.game.presentation.response.GameRoomEntranceResponse;
+import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomJpaRepository;
 import com.bb.webcanvasservice.domain.game.service.GameRoomFacade;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;

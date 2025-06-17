@@ -1,12 +1,12 @@
 package com.bb.webcanvasservice.unit.security.auth;
 
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
-import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.domain.user.service.UserService;
+import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;
+import com.bb.webcanvasservice.user.domain.service.UserService;
 import com.bb.webcanvasservice.common.web.security.SecurityProperties;
-import com.bb.webcanvasservice.application.auth.service.AuthenticationService;
+import com.bb.webcanvasservice.auth.application.service.AuthenticationService;
 import com.bb.webcanvasservice.common.util.JwtManager;
-import com.bb.webcanvasservice.presentation.auth.response.AuthenticationInnerResponse;
+import com.bb.webcanvasservice.auth.presentation.response.AuthenticationInnerResponse;
 import com.bb.webcanvasservice.common.web.security.exception.ApplicationAuthenticationException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

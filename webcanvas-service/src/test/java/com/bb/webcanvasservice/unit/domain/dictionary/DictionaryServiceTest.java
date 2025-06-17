@@ -1,11 +1,11 @@
 package com.bb.webcanvasservice.unit.domain.dictionary;
 
 import com.bb.webcanvasservice.common.sequence.SequenceRepositoryImpl;
-import com.bb.webcanvasservice.domain.dictionary.model.Language;
-import com.bb.webcanvasservice.domain.dictionary.model.PartOfSpeech;
-import com.bb.webcanvasservice.domain.dictionary.model.Word;
-import com.bb.webcanvasservice.domain.dictionary.repository.WordRepository;
-import com.bb.webcanvasservice.domain.dictionary.service.DictionaryService;
+import com.bb.webcanvasservice.dictionary.domain.model.Language;
+import com.bb.webcanvasservice.dictionary.domain.model.PartOfSpeech;
+import com.bb.webcanvasservice.dictionary.domain.model.Word;
+import com.bb.webcanvasservice.dictionary.domain.repository.WordRepository;
+import com.bb.webcanvasservice.dictionary.domain.service.DictionaryService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

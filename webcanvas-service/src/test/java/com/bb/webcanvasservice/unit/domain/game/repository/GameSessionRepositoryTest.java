@@ -1,10 +1,10 @@
 package com.bb.webcanvasservice.unit.domain.game.repository;
 
 import com.bb.webcanvasservice.common.config.JpaConfig;
-import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
-import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
-import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameSessionJpaRepository;
-import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
+import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomEntranceJpaRepository;
+import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomJpaRepository;
+import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameSessionJpaRepository;
+import com.bb.webcanvasservice.user.infrastructure.persistence.repository.UserJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

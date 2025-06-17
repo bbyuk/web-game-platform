@@ -1,14 +1,14 @@
 package com.bb.webcanvasservice.integration.domain.canvas;
 
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
-import com.bb.webcanvasservice.domain.canvas.model.Stroke;
-import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomJpaEntity;
-import com.bb.webcanvasservice.infrastructure.persistence.game.entity.GameRoomEntranceJpaEntity;
-import com.bb.webcanvasservice.domain.game.model.GameRoomEntranceRole;
-import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomEntranceJpaRepository;
-import com.bb.webcanvasservice.infrastructure.persistence.game.repository.GameRoomJpaRepository;
-import com.bb.webcanvasservice.infrastructure.persistence.user.entity.UserJpaEntity;
-import com.bb.webcanvasservice.infrastructure.persistence.user.repository.UserJpaRepository;
+import com.bb.webcanvasservice.canvas.domain.model.Stroke;
+import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
+import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.game.domain.model.GameRoomEntranceRole;
+import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomEntranceJpaRepository;
+import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomJpaRepository;
+import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;
+import com.bb.webcanvasservice.user.infrastructure.persistence.repository.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
