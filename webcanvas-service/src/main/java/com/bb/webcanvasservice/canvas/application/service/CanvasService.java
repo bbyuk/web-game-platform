@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CanvasApplicationService {
+public class CanvasService {
     private final MessageSender messageSender;
     private final WebSocketProperties webSocketProperties;
 

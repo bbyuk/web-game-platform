@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.canvas.presentation.controller;
 
-import com.bb.webcanvasservice.canvas.application.service.CanvasApplicationService;
+import com.bb.webcanvasservice.canvas.application.service.CanvasService;
 import com.bb.webcanvasservice.canvas.presentation.request.StrokeRequest;
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class CanvasWebSocketController {
 
-    private final CanvasApplicationService canvasApplicationService;
+    private final CanvasService canvasService;
 
     /**
      * 요청 받은 Stroke 이벤트를 요청자가 입장해있는 방에 브로드캐스팅한다.
@@ -30,6 +30,6 @@ public class CanvasWebSocketController {
     public void broadcastStrokeOnRoom(@DestinationVariable("gameSessionId") Long gameSessionId, StrokeRequest request, @Authenticated WebCanvasAuthentication authentication) {
         log.info("클라이언트로부터 메세지 받음");
 
-        canvasApplicationService.broadcastStrokeOnRoom(CanvasCommandMapper.toCommand(authentication.getUserId(), gameSessionId, request));
+        canvasService.broadcastStrokeOnRoom(CanvasCommandMapper.toCommand(authentication.getUserId(), gameSessionId, request));
     }
 }

@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 import com.bb.webcanvasservice.game.domain.model.GameRoom;
 import com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState;
 import com.bb.webcanvasservice.game.domain.model.GameRoomState;
-import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
+import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.mapper.GameModelMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

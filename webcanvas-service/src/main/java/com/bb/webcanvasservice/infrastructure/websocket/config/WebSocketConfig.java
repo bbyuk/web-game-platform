@@ -1,12 +1,11 @@
 package com.bb.webcanvasservice.infrastructure.websocket.config;
 
 import com.bb.webcanvasservice.common.util.JwtManager;
-import com.bb.webcanvasservice.infrastructure.websocket.interceptor.JwtAuthenticationChannelInterceptor;
-import com.bb.webcanvasservice.infrastructure.websocket.interceptor.SubscribeChannelInterceptor;
-import com.bb.webcanvasservice.infrastructure.websocket.registry.WebSocketSessionRegistry;
+import com.bb.webcanvasservice.game.application.service.GameRoomService;
+import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.infrastructure.security.websocket.WebSocketAuthenticationArgumentResolver;
-import com.bb.webcanvasservice.game.application.service.GameApplicationService;
-import com.bb.webcanvasservice.game.domain.service.GameRoomService;
+import com.bb.webcanvasservice.infrastructure.websocket.interceptor.JwtAuthenticationChannelInterceptor;
+import com.bb.webcanvasservice.infrastructure.websocket.registry.WebSocketSessionRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
@@ -36,7 +35,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
      * 게임 방과 연관되어 있는 웹소켓 이벤트 브로커 구독 요청의 validation 처리를 위한 서비스 주입
      */
     private final GameRoomService gameRoomService;
-    private final GameApplicationService gameApplicationService;
+    private final GameService gameService;
 
     /**
      * 메세지 브로커 설정
@@ -76,8 +75,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(
-                new JwtAuthenticationChannelInterceptor(jwtManager, webSocketSessionRegistry),
-                new SubscribeChannelInterceptor(gameRoomService, gameApplicationService, webSocketProperties)
+                new JwtAuthenticationChannelInterceptor(jwtManager, webSocketSessionRegistry)
         );
     }
 

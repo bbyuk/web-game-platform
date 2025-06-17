@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.game.domain.repository;
+package com.bb.webcanvasservice.game.application.repository;
 
 import com.bb.webcanvasservice.game.domain.model.GameRoom;
 import com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState;

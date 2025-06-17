@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.presentation.controller;
 
-import com.bb.webcanvasservice.game.application.service.GameApplicationService;
+import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class GameSessionWebSocketController {
 
-    private final GameApplicationService gameApplicationService;
+    private final GameService gameService;
 
     /**
      * 요청 받은 Stroke 이벤트를 요청자가 입장해있는 방에 브로드캐스팅한다.
@@ -22,6 +22,6 @@ public class GameSessionWebSocketController {
      */
     @SubscribeMapping("session/{gameSessionId}")
     public void broadcastStrokeOnRoom(@DestinationVariable("gameSessionId") Long gameSessionId, @Authenticated WebCanvasAuthentication authentication) {
-        gameApplicationService.successSubscription(gameSessionId, authentication.getUserId());
+        gameService.successSubscription(gameSessionId, authentication.getUserId());
     }
 }

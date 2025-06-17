@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.game.domain.registry;
+package com.bb.webcanvasservice.game.application.registry;
 
 import com.bb.webcanvasservice.game.domain.model.GameTurnTimer;
 

@@ -1,13 +1,13 @@
 package com.bb.webcanvasservice.game.application.listener;
 
-import com.bb.webcanvasservice.game.application.service.GameApplicationService;
+import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.domain.event.AllUserInGameSessionLoadedEvent;
 import com.bb.webcanvasservice.game.domain.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.game.domain.event.GameTurnProgressedEvent;
 import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
 import com.bb.webcanvasservice.game.domain.model.GameSession;
-import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
-import com.bb.webcanvasservice.game.domain.service.GameTurnTimerService;
+import com.bb.webcanvasservice.game.application.repository.GameSessionRepository;
+import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;
 import com.bb.webcanvasservice.common.message.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class GameSessionEventListener {
     /**
      * 도메인 서비스
      */
-    private final GameApplicationService gameApplicationService;
+    private final GameService gameService;
     private final GameTurnTimerService gameTurnTimerService;
 
     /**
@@ -53,7 +53,7 @@ public class GameSessionEventListener {
                 event.getGameRoomId(),
                 event.getGameSessionId(),
                 gameSession.getTimePerTurn(),
-                gameApplicationService::processToNextTurn
+                gameService::processToNextTurn
         );
     }
 

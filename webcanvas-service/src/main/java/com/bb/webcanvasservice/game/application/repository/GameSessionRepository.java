@@ -1,7 +1,8 @@
-package com.bb.webcanvasservice.game.domain.repository;
+package com.bb.webcanvasservice.game.application.repository;
 
 import com.bb.webcanvasservice.game.domain.model.GameSession;
 import com.bb.webcanvasservice.game.domain.model.GameTurn;
+import com.bb.webcanvasservice.game.domain.model.GameTurnState;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +59,15 @@ public interface GameSessionRepository {
      * @param gameSessionId 게임 세션 ID
      * @return 턴 수
      */
-    long findTurnCountByGameSessionId(Long gameSessionId);
+    int findTurnCountByGameSessionId(Long gameSessionId);
+
+    /**
+     * 게임 세션 ID와 상태 코드 목록으로 필터된 게임 턴 수를 조회한다.
+     * @param gameSessionId 대상 게임 세션 ID
+     * @param states 턴 상태 코드 목록
+     * @return 턴수
+     */
+    int findTurnCountByGameSessionIdAndStates(Long gameSessionId, List<GameTurnState> states);
 
     /**
      * 게임 턴을 저장한다.

@@ -4,7 +4,8 @@ import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
 import com.bb.webcanvasservice.game.domain.model.GameSession;
 import com.bb.webcanvasservice.game.domain.model.GameTurn;
-import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
+import com.bb.webcanvasservice.game.domain.model.GameTurnState;
+import com.bb.webcanvasservice.game.application.repository.GameSessionRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.mapper.GameModelMapper;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameTurnJpaEntity;
 import jakarta.persistence.EntityManager;
@@ -89,8 +90,13 @@ public class GameSessionRepositoryImpl implements GameSessionRepository {
     }
 
     @Override
-    public long findTurnCountByGameSessionId(Long gameSessionId) {
-        return gameTurnJpaRepository.findTurnCountByGameSessionId(gameSessionId);
+    public int findTurnCountByGameSessionId(Long gameSessionId) {
+        return (int) gameTurnJpaRepository.findTurnCountByGameSessionId(gameSessionId);
+    }
+
+    @Override
+    public int findTurnCountByGameSessionIdAndStates(Long gameSessionId, List<GameTurnState> states) {
+        return (int) gameTurnJpaRepository.findTurnCountByGameSessionIdAndStates(gameSessionId, states);
     }
 
     @Override

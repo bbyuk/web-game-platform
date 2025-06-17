@@ -41,6 +41,15 @@ public class GameSession {
     }
 
     /**
+     * 해당 세션을 종료해야하는지 여부를 체크한다.
+     * @param completedTurnCount 완료된 턴 수
+     * @return 종료 여부
+     */
+    public boolean shouldEnd(int completedTurnCount) {
+        return this.turnCount <= completedTurnCount;
+    }
+
+    /**
      * 게임 세션이 새로 생성 된 시점엔 LOADING 상태로 생성된다.
      * @param turnCount 턴 수
      * @param timePerTurn 턴별 시간

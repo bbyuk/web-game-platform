@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.game.domain.registry;
+package com.bb.webcanvasservice.game.application.registry;
 
 /**
  * 게임 세션 구독 등록

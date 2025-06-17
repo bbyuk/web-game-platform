@@ -9,25 +9,24 @@ import com.bb.webcanvasservice.game.domain.event.AllUserInGameSessionLoadedEvent
 import com.bb.webcanvasservice.game.domain.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.game.domain.event.GameSessionStartEvent;
 import com.bb.webcanvasservice.game.domain.event.GameTurnProgressedEvent;
-import com.bb.webcanvasservice.game.domain.exception.GameSessionIsOverException;
-import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
-import com.bb.webcanvasservice.game.domain.exception.GameTurnNotFoundException;
-import com.bb.webcanvasservice.game.domain.exception.IllegalGameRoomStateException;
+import com.bb.webcanvasservice.game.domain.exception.*;
 import com.bb.webcanvasservice.game.domain.model.*;
-import com.bb.webcanvasservice.game.domain.registry.GameSessionLoadRegistry;
-import com.bb.webcanvasservice.game.domain.repository.GamePlayHistoryRepository;
-import com.bb.webcanvasservice.game.domain.repository.GameRoomEntranceRepository;
-import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
-import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
-import com.bb.webcanvasservice.game.domain.service.GameRoomService;
-import com.bb.webcanvasservice.game.domain.service.GameService;
+import com.bb.webcanvasservice.game.application.registry.GameSessionLoadRegistry;
+import com.bb.webcanvasservice.game.application.repository.GamePlayHistoryRepository;
+import com.bb.webcanvasservice.game.application.repository.GameRoomEntranceRepository;
+import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
+import com.bb.webcanvasservice.game.application.repository.GameSessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
 /**
@@ -36,14 +35,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GameApplicationService {
+public class GameService {
 
     /**
      * 도메인 서비스
      */
     private final GameRoomService gameRoomService;
-    private final GameService gameService;
-
     /**
      * 도메인 레포지토리
      */
@@ -170,7 +167,6 @@ public class GameApplicationService {
                 .findFirst()
                 .orElseThrow(GameSessionNotFoundException::new);
 
-        gameSessionRepository.findTurnCountByGameSessionId(gameSession.getId());
         return new GameSessionDto(
                 gameSession.getId(),
                 gameSession.getState(),
@@ -200,7 +196,7 @@ public class GameApplicationService {
         return new GameTurnDto(
                 gameTurn.getDrawerId(),
                 gameTurn.getDrawerId().equals(userId) ? gameTurn.getAnswer() : null,
-                gameService.calculateExpiration(gameTurn));
+                calculateExpiration(gameTurn));
     }
 
 
@@ -230,7 +226,9 @@ public class GameApplicationService {
                     gameSessionRepository.saveGameTurn(gameTurn);
                 });
 
-        if (gameService.shouldEnd(gameSession)) {
+        int completedTurnCount = gameSessionRepository.findTurnCountByGameSessionIdAndStates(gameSessionId, List.of(GameTurnState.ANSWERED, GameTurnState.PASSED));
+
+        if (gameSession.shouldEnd(completedTurnCount)) {
             log.debug("모든 턴이 진행되었습니다.");
             log.debug("게임 세션 종료");
 
@@ -246,7 +244,7 @@ public class GameApplicationService {
         GameTurn gameTurn = gameSessionRepository.saveGameTurn(
                         GameTurn.createNewGameTurn(
                                 gameSessionId,
-                                gameService.findNextDrawerId(gameSessionId),
+                                findNextDrawerId(gameSessionId),
                                 dictionaryQueryPort.drawRandomKoreanNoun()
                         )
                 );
@@ -347,5 +345,73 @@ public class GameApplicationService {
             applicationEventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSessionId, gameSession.getGameRoomId()));
             gameSessionLoadRegistry.clear(gameSessionId);
         }
+    }
+
+
+    /**
+     * 종료 시간을 계산해 리턴한다.
+     * Seconds
+     * @return 게임 턴의 만료 시간
+     */
+    @Transactional(readOnly = true)
+    public LocalDateTime calculateExpiration(GameTurn gameTurn) {
+        GameSession gameSession = gameSessionRepository.findById(gameTurn.getGameSessionId()).orElseThrow(GameSessionNotFoundException::new);
+        return gameTurn.getStartedAt().plusSeconds(gameSession.getTimePerTurn());
+    }
+
+    @Transactional(readOnly = true)
+    public Long findNextDrawerId(Long gameSessionId) {
+        GameSession gameSession = gameSessionRepository.findById(gameSessionId)
+                .orElseThrow(GameSessionNotFoundException::new);
+
+        if (!gameSession.isPlaying()) {
+            throw new GameSessionIsOverException();
+        }
+
+        List<GameTurn> gameTurns = gameSessionRepository.findTurnsByGameSessionId(gameSessionId);
+        if (gameSession.getTurnCount() <= gameTurns.size()) {
+            throw new GameSessionIsOverException();
+        }
+
+        /**
+         * 현재 게임중인 유저 목록
+         */
+        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomEntranceState.PLAYING);
+
+        // 유저별 턴 수 집계
+        Map<Long, Integer> drawerCountMap = gameTurns.stream()
+                .collect(Collectors.toMap(
+                        GameTurn::getDrawerId,
+                        gt -> 1,
+                        Integer::sum
+                ));
+
+        int minCount = Integer.MAX_VALUE;
+        List<Long> candidates = new ArrayList<>();
+
+        for (GameRoomEntrance entrance : gameRoomEntrances) {
+            Long userId = entrance.getUserId();
+            int count = drawerCountMap.getOrDefault(userId, 0);
+
+            if (count < minCount) {
+                candidates.clear();
+                candidates.add(userId);
+                minCount = count;
+            } else if (count == minCount) {
+                candidates.add(userId);
+            }
+        }
+
+        if (candidates.isEmpty()) {
+            throw new NextDrawerNotFoundException();
+        }
+
+        /**
+         * 후보 ID들 중 랜덤 Index를 뽑아 리턴한다.
+         */
+        RandomGenerator randomGenerator = RandomGenerator.getDefault();
+        int randomIndex = randomGenerator.nextInt(candidates.size());
+
+        return candidates.get(randomIndex);
     }
 }

@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.presentation.controller;
 
-import com.bb.webcanvasservice.game.application.service.GameRoomApplicationService;
+import com.bb.webcanvasservice.game.application.service.GameRoomService;
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
 import com.bb.webcanvasservice.game.presentation.mapper.GameCommandMapper;
@@ -23,14 +23,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class GameRoomController {
 
-    private final GameRoomApplicationService gameRoomApplicationService;
+    private final GameRoomService gameRoomService;
 
     @PostMapping
     @Operation(summary = "게임 방 생성", description = "게임 방을 생성하고 입장한다.")
     public ResponseEntity<GameRoomEntranceResponse> createGameRoom(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomEntranceResponse(
-                        gameRoomApplicationService.createGameRoomAndEnter(authentication.getUserId())
+                        gameRoomService.createGameRoomAndEnter(authentication.getUserId())
                 )
         );
     }
@@ -40,7 +40,7 @@ public class GameRoomController {
     public ResponseEntity<GameRoomListResponse> getEnterableGameRooms(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomListResponse(
-                    gameRoomApplicationService.findEnterableGameRooms(authentication.getUserId())
+                    gameRoomService.findEnterableGameRooms(authentication.getUserId())
                 )
         );
     }
@@ -50,7 +50,7 @@ public class GameRoomController {
     public ResponseEntity<GameRoomEntranceDetailInfoResponse> getEnteredGameRoom(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomEntranceDetailInfoResponse(
-                        gameRoomApplicationService.findEnteredGameRoomInfo(authentication.getUserId())
+                        gameRoomService.findEnteredGameRoomInfo(authentication.getUserId())
                 )
         );
     }
@@ -59,7 +59,7 @@ public class GameRoomController {
     @Operation(summary = "현재 입장한 게임 방에서 퇴장", description = "요청을 보낸 유저가 입장한 게임 방에서 퇴장한다.")
     @DeleteMapping("entrance/{gameRoomEntranceId}")
     public ResponseEntity<GameRoomExitResponse> exitGameRoom(@Authenticated WebCanvasAuthentication authentication, @PathVariable("gameRoomEntranceId") Long gameRoomEntranceId) {
-        gameRoomApplicationService.exitFromRoom(gameRoomEntranceId, authentication.getUserId());
+        gameRoomService.exitFromRoom(gameRoomEntranceId, authentication.getUserId());
         return ResponseEntity.ok(new GameRoomExitResponse(true));
     }
 
@@ -69,7 +69,7 @@ public class GameRoomController {
     public ResponseEntity<GameRoomEntranceResponse> enterGameRoom(@PathVariable("gameRoomId") Long gameRoomId, @Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomEntranceResponse(
-                        gameRoomApplicationService.enterGameRoom(GameCommandMapper.toEnterGameRoomCommand(gameRoomId, authentication.getUserId()))
+                        gameRoomService.enterGameRoom(GameCommandMapper.toEnterGameRoomCommand(gameRoomId, authentication.getUserId()))
                 )
         );
     }
@@ -80,7 +80,7 @@ public class GameRoomController {
                                                                               @Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomEntranceResponse(
-                        gameRoomApplicationService.enterGameRoomWithJoinCode(joinCode, authentication.getUserId())
+                        gameRoomService.enterGameRoomWithJoinCode(joinCode, authentication.getUserId())
                 )
         );
     }
@@ -91,6 +91,6 @@ public class GameRoomController {
             @PathVariable("gameRoomEntranceId") Long gameRoomEntranceId,
             @RequestBody GameRoomReadyUpdateRequest request,
             @Authenticated WebCanvasAuthentication authentication) {
-        return ResponseEntity.ok(gameRoomApplicationService.updateReady(gameRoomEntranceId, authentication.getUserId(), request.ready()));
+        return ResponseEntity.ok(gameRoomService.updateReady(gameRoomEntranceId, authentication.getUserId(), request.ready()));
     }
 }

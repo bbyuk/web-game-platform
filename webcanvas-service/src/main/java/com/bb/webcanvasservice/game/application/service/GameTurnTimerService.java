@@ -1,22 +1,21 @@
-package com.bb.webcanvasservice.game.domain.service;
+package com.bb.webcanvasservice.game.application.service;
 
+import com.bb.webcanvasservice.game.application.registry.GameTurnTimerRegistry;
 import com.bb.webcanvasservice.game.domain.exception.GameTurnTimerNotFoundException;
 import com.bb.webcanvasservice.game.domain.model.GameTurnTimer;
-import com.bb.webcanvasservice.game.domain.registry.GameTurnTimerRegistry;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+@Service
+@RequiredArgsConstructor
 public class GameTurnTimerService {
     private final GameTurnTimerRegistry gameTurnTimerRegistry;
     private final ScheduledExecutorService scheduler;
-
-    public GameTurnTimerService(GameTurnTimerRegistry gameTurnTimerRegistry, ScheduledExecutorService scheduler) {
-        this.gameTurnTimerRegistry = gameTurnTimerRegistry;
-        this.scheduler = scheduler;
-    }
 
     /**
      * 게임 턴 타이머를 스케줄러에 등록한다.

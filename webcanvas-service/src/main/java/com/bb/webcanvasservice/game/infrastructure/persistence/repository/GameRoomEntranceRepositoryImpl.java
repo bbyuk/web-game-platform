@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.game.domain.model.GameRoomEntrance;
 import com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState;
-import com.bb.webcanvasservice.game.domain.repository.GameRoomEntranceRepository;
+import com.bb.webcanvasservice.game.application.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomEntranceJpaEntity;
 import com.bb.webcanvasservice.user.domain.exception.UserNotFoundException;
 import com.bb.webcanvasservice.game.infrastructure.persistence.mapper.GameModelMapper;
