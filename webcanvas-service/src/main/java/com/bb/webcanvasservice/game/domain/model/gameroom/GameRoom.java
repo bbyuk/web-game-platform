@@ -317,7 +317,7 @@ public class GameRoom {
         getCurrentParticipants()
                 .forEach(GameRoomParticipant::changeStateToPlaying);
 
-        eventQueue.add(new AllUserInGameSessionLoadedEvent(gameSession.getId(), id));
+        eventQueue.add(new AllUserInGameSessionLoadedEvent(gameSession.getId(), id, gameSession.getTimePerTurn()));
     }
 
 

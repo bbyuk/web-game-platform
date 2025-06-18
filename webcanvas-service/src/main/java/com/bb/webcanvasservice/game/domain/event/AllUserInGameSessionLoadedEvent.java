@@ -8,11 +8,13 @@ import com.bb.webcanvasservice.common.event.ApplicationEvent;
 public class AllUserInGameSessionLoadedEvent extends ApplicationEvent {
     private final Long gameSessionId;
     private final Long gameRoomId;
+    private final int timePerTurn;
 
-    public AllUserInGameSessionLoadedEvent(Long gameSessionId, Long gameRoomId) {
+    public AllUserInGameSessionLoadedEvent(Long gameSessionId, Long gameRoomId, int timePerTurn) {
         super("SESSION/ALL_USER_LOADED");
         this.gameSessionId = gameSessionId;
         this.gameRoomId = gameRoomId;
+        this.timePerTurn = timePerTurn;
     }
 
     public Long getGameSessionId() {
@@ -21,5 +23,9 @@ public class AllUserInGameSessionLoadedEvent extends ApplicationEvent {
 
     public Long getGameRoomId() {
         return gameRoomId;
+    }
+
+    public int getTimePerTurn() {
+        return timePerTurn;
     }
 }

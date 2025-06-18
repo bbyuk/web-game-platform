@@ -27,12 +27,12 @@ public class GameModelMapper {
         return new GamePlayHistory(entity.getUserEntity().getId(), entity.getGameSessionEntity().getId());
     }
 
-    public static GameRoom toModel(GameRoomJpaEntity gameRoomEntity, GameSessionJpaEntity gameSessionEntity, List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities) {
+    public static GameRoom toModel(GameRoomJpaEntity gameRoomEntity, GameSessionJpaEntity gameSessionEntity, List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities, List<GameTurnJpaEntity> gameTurns) {
         return new GameRoom(
                 gameRoomEntity.getId(),
                 gameRoomEntity.getJoinCode(),
                 gameRoomEntity.getState(),
-                toModel(gameSessionEntity),
+                toModel(gameSessionEntity, gameTurns),
                 gameRoomParticipantEntities.stream().map(GameModelMapper::toModel).toList());
     }
 
@@ -52,13 +52,14 @@ public class GameModelMapper {
     }
 
 
-    public static GameSession toModel(GameSessionJpaEntity entity) {
+    public static GameSession toModel(GameSessionJpaEntity entity, List<GameTurnJpaEntity> gameTurns) {
         return new GameSession(
                 entity.getId(),
                 entity.getGameRoomEntity().getId(),
                 entity.getTurnCount(),
                 entity.getTimePerTurn(),
-                entity.getState()
+                entity.getState(),
+                gameTurns.stream().map(GameModelMapper::toModel).toList()
         );
     }
 

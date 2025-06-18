@@ -7,6 +7,7 @@ import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomParticipantJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameSessionJpaEntity;
+import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameTurnJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.mapper.GameModelMapper;
 import com.bb.webcanvasservice.user.domain.exception.UserNotFoundException;
 import com.bb.webcanvasservice.user.infrastructure.persistence.repository.UserJpaRepository;
@@ -28,6 +29,7 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     private final GameSessionJpaRepository gameSessionJpaRepository;
     private final GameRoomParticipantJpaRepository gameRoomParticipantJpaRepository;
     private final UserJpaRepository userJpaRepository;
+    private final GameTurnJpaRepository gameTurnJpaRepository;
 
     @Override
     public Optional<GameRoom> findGameRoomById(Long gameRoomId) {
@@ -37,12 +39,14 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
                 ? gameRoomJpaRepository.findById(gameRoomId).orElseThrow(GameRoomNotFoundException::new)
                 : gameSessionJpaEntity.getGameRoomEntity();
         List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRoomIdAndStates(gameRoomId, GameRoomParticipantState.joined);
+        List<GameTurnJpaEntity> gameTurnEntities = gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionJpaEntity.getId());
 
         return Optional.of(
                 GameModelMapper.toModel(
                         gameRoomJpaEntity,
                         gameSessionJpaEntity,
-                        gameRoomParticipantEntities
+                        gameRoomParticipantEntities,
+                        gameTurnEntities
                 )
         );
     }
@@ -54,12 +58,14 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
         GameRoomJpaEntity gameRoomEntity = gameRoomParticipantEntity.getGameRoomEntity();
         GameSessionJpaEntity gameSessionJpaEntity = gameSessionJpaRepository.findByGameRoomIdAndStates(gameRoomEntity.getId(), GameSessionState.active).orElse(null);
         List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRoomIdAndStates(gameRoomEntity.getId(), GameRoomParticipantState.joined);
+        List<GameTurnJpaEntity> gameTurnEntities = gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionJpaEntity.getId());
 
         return Optional.of(
                 GameModelMapper.toModel(
                         gameRoomEntity,
                         gameSessionJpaEntity,
-                        gameRoomParticipantEntities
+                        gameRoomParticipantEntities,
+                        gameTurnEntities
                 )
         );
     }
@@ -76,10 +82,11 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
         GameRoomJpaEntity gameRoomEntity = gameRoomParticipantJpaEntity.getGameRoomEntity();
         GameSessionJpaEntity gameSessionEntity = gameSessionJpaRepository.findByGameRoomIdAndStates(gameRoomEntity.getId(), GameSessionState.active).orElse(null);
         List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRoomIdAndStates(gameRoomEntity.getId(), GameRoomParticipantState.joined);
+        List<GameTurnJpaEntity> gameTurnEntities = gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionEntity.getId());
 
 
         return Optional.of(
-                GameModelMapper.toModel(gameRoomEntity, gameSessionEntity, gameRoomParticipantEntities)
+                GameModelMapper.toModel(gameRoomEntity, gameSessionEntity, gameRoomParticipantEntities, gameTurnEntities)
         );
     }
 
@@ -103,13 +110,18 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
 
         return gameRoomJpaEntities
                 .stream()
-                .map(gameRoomJpaEntity -> (
-                        GameModelMapper.toModel(
-                                gameRoomJpaEntity,
-                                gameSessionEntityPerGameRoomPerGameRoomId.get(gameRoomJpaEntity.getId()),
-                                gameRoomParticipantEntitiesPerGameRoomId.get(gameRoomJpaEntity.getId())
-                        )
-                )).collect(Collectors.toList());
+                .map(gameRoomJpaEntity -> {
+                    GameSessionJpaEntity gameSessionEntity = gameSessionEntityPerGameRoomPerGameRoomId.get(gameRoomJpaEntity.getId());
+                    List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomParticipantEntitiesPerGameRoomId.get(gameRoomJpaEntity.getId());
+                    return (
+                            GameModelMapper.toModel(
+                                    gameRoomJpaEntity,
+                                    gameSessionEntity,
+                                    gameRoomParticipantEntities,
+                                    gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionEntity.getId())
+                            )
+                    );
+                }).collect(Collectors.toList());
     }
 
     @Override
@@ -139,6 +151,9 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
 
             List<GameRoomParticipant> gameRoomParticipants = (List<GameRoomParticipant>) participantsField.get(gameRoom);
 
+            /**
+             * TODO N+1 문제 체크
+             */
             List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomParticipants
                     .stream()
                     .map(gameRoomParticipant
@@ -153,7 +168,7 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
             );
 
 
-            return GameModelMapper.toModel(gameRoomEntity, gameSessionEntity, gameRoomParticipantEntities);
+            return GameModelMapper.toModel(gameRoomEntity, gameSessionEntity, gameRoomParticipantEntities, gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionEntity.getId()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException("저장 실패");

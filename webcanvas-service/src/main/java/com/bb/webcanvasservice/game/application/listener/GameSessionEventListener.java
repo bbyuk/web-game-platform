@@ -1,14 +1,11 @@
 package com.bb.webcanvasservice.game.application.listener;
 
+import com.bb.webcanvasservice.common.message.MessageSender;
 import com.bb.webcanvasservice.game.application.service.GameService;
+import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;
 import com.bb.webcanvasservice.game.domain.event.AllUserInGameSessionLoadedEvent;
 import com.bb.webcanvasservice.game.domain.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.game.domain.event.GameTurnProgressedEvent;
-import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
-import com.bb.webcanvasservice.game.application.repository.GameSessionRepository;
-import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;
-import com.bb.webcanvasservice.common.message.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,10 +31,6 @@ public class GameSessionEventListener {
     private final GameService gameService;
     private final GameTurnTimerService gameTurnTimerService;
 
-    /**
-     * 도메인 레포지토리
-     */
-    private final GameSessionRepository gameSessionRepository;
 
     /**
      * 게임 세션이 시작되고 모든 유저가 게임 세션 브로커 토픽을 구독완료하고 로딩 되었을 때 발행되는 이벤트를 핸들링한다.
@@ -46,13 +39,10 @@ public class GameSessionEventListener {
     public void handleAllUserInGameSessionLoaded(AllUserInGameSessionLoadedEvent event) {
         messageSender.send("/session/" + event.getGameSessionId(), event);
 
-        GameSession gameSession = gameSessionRepository.findById(event.getGameSessionId())
-                .orElseThrow(GameSessionNotFoundException::new);
-
         gameTurnTimerService.registerTurnTimer(
                 event.getGameRoomId(),
                 event.getGameSessionId(),
-                gameSession.getTimePerTurn(),
+                event.getTimePerTurn(),
                 gameService::processToNextTurn
         );
     }

@@ -51,13 +51,12 @@ public class GameSession {
     private List<GameTurn> gameTurns;
 
 
-    public GameSession(Long id, Long gameRoomId, int turnCount, int timePerTurn, GameSessionState state) {
+    public GameSession(Long id, Long gameRoomId, int turnCount, int timePerTurn, GameSessionState state, List<GameTurn> gameTurns) {
         this.id = id;
         this.gameRoomId = gameRoomId;
         this.turnCount = turnCount;
         this.timePerTurn = timePerTurn;
         this.state = state;
-        this.gameTurns = new ArrayList<>();
     }
 
     /**
@@ -75,7 +74,7 @@ public class GameSession {
      * @return 새로 생성된 게임 세션 객체
      */
     public static GameSession create(Long gameRoomId, int turnCount, int timePerTurn) {
-        return new GameSession(null, gameRoomId, turnCount, timePerTurn, GameSessionState.LOADING);
+        return new GameSession(null, gameRoomId, turnCount, timePerTurn, GameSessionState.LOADING, new ArrayList<>());
     }
 
     /**
