@@ -28,7 +28,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
                 join        UserJpaEntity u
                 on          gre.userEntity.id = u.id
                 where       gre.userEntity.id = :userId
-                and         gre.state = com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState.WAITING
+                and         gre.state = com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.WAITING
             )
             """)
     boolean existsGameRoomEntranceByUserId(@Param("userId") Long userId);
@@ -62,7 +62,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
             join fetch  UserJpaEntity u on gre.userEntity.id = u.id
             join fetch  GameRoomJpaEntity gr on gre.gameRoomEntity.id = gr.id
             where       gre.gameRoomEntity.id = :gameRoomId
-            and         gre.state = com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState.WAITING
+            and         gre.state = com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.WAITING
             order by    gre.id asc
             """
     )
@@ -115,8 +115,8 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
             from        GameRoomParticipantJpaEntity gre
             where       gre.gameRoomEntity.id = :gameRoomId
             and         gre.state in (
-                                        com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState.WAITING,
-                                        com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState.PLAYING
+                                        com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.WAITING,
+                                        com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.PLAYING
                                      )
             order by    gre.id asc
             """

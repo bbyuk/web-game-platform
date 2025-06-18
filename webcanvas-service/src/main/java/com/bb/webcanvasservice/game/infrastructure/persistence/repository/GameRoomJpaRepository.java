@@ -66,10 +66,10 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
             from    GameRoomJpaEntity gr
             where   gr.state in :enterableStates
             and     (
-                        select  count(gre)
-                        from    GameRoomEntranceJpaEntity gre
-                        where   gre.gameRoomEntity.id = gr.id
-                        and     gre.state = :activeEntranceState
+                        select  count(grp)
+                        from    GameRoomParticipantJpaEntity grp
+                        where   grp.gameRoomEntity.id = gr.id
+                        and     grp.state = :activeEntranceState
                     ) < :gameRoomCapacity
             """
     )
