@@ -1,7 +1,8 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
-import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -102,4 +103,30 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
            and      gr.state = 'WAITING'
            """)
     Optional<GameRoomJpaEntity> findRoomWithJoinCodeForEnter(String joinCode);
+
+    /**
+     * 게임 방 입장자 ID로 게임 방을 조회한다.
+     * @param gameRoomParticipantId 게임 방 입장자 ID
+     * @return 게잉 방 JPA Entity
+     */
+    @Query("""
+            select  grp.gameRoomEntity
+            from    GameRoomParticipantJpaEntity grp
+            where   grp.id = :gameRoomParticipantId
+            """)
+    Optional<GameRoomJpaEntity> findByGameRoomParticipantId(@Param("gameRoomParticipantId") Long gameRoomParticipantId);
+
+    /**
+     * 게임 세션 ID로 해당 게임세션이 진행되는 게임 방 객체를 리턴한다.
+     * @param gameSessionId 게임 세션 ID
+     * @return 게임 방 객체
+     */
+    @Query(
+            """
+            select  gs.gameRoomEntity
+            from    GameSessionJpaEntity gs
+            where   gs.id = :gameSessionId
+            """
+    )
+    Optional<GameRoom> findByGameSessionId(@Param("gameSessionId") Long gameSessionId);
 }

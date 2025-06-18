@@ -1,4 +1,9 @@
-package com.bb.webcanvasservice.game.domain.model.participant;
+package com.bb.webcanvasservice.game.domain.model.gameroom;
+
+import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
+import com.bb.webcanvasservice.game.domain.exception.GameRoomHostCanNotChangeReadyException;
+
+import java.util.Objects;
 
 /**
  * 게임 방 입장 유저를 나타내는 도메인 모델
@@ -11,7 +16,7 @@ public class GameRoomParticipant {
     private final Long id;
 
     /**
-     * 입장한 게임 방 ID
+     * 입장한 게임 방
      */
     private final Long gameRoomId;
 
@@ -39,6 +44,25 @@ public class GameRoomParticipant {
      * 준비 여부
      */
     private boolean ready;
+
+    /**
+     * 새로운 입장자 도메인 객체를 생성해 리턴한다.
+     * @param gameRoomId 입장하는 게임 방 ID
+     * @param userId 입장하는 유저 ID
+     * @param nicknameAdjective 닉네임의 앞에 붙을 형용사
+     * @param role 입장자 role
+     * @return 입장자
+     */
+    public static GameRoomParticipant create(Long gameRoomId, Long userId, String nicknameAdjective, GameRoomParticipantRole role) {
+        return new GameRoomParticipant(
+                null,
+                gameRoomId,
+                userId,
+                GameRoomParticipantState.WAITING,
+                String.format("%s %s", nicknameAdjective, "플레이어"),
+                role,
+                role ==GameRoomParticipantRole.HOST);
+    }
 
     public boolean isReady() {
         if (this.role == GameRoomParticipantRole.HOST) {
@@ -80,15 +104,25 @@ public class GameRoomParticipant {
      * 레디 상태를 바꾼다.
      */
     public void changeReady(boolean ready) {
+        if (isHost()) {
+            throw new GameRoomHostCanNotChangeReadyException();
+        }
         this.ready = ready;
     }
 
 
     /**
-     * 게임 방 상태를 게임 진행중으로 변경한다.
+     * 게임 방 입장자 상태를 게임 진행중으로 변경한다.
      */
-    public void changeToPlaying() {
+    public void changeStateToPlaying() {
         this.state = GameRoomParticipantState.PLAYING;
+    }
+
+    /**
+     * 게임 방 상태를 대기중으로 변경한다.
+     */
+    public void changeStateToWaiting() {
+        this.state = GameRoomParticipantState.WAITING;
     }
 
     /**
@@ -130,4 +164,41 @@ public class GameRoomParticipant {
         return role;
     }
 
+    /**
+     * 게임 방 입장자는 자체 애그리거트로 id 로만 비교
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GameRoomParticipant that = (GameRoomParticipant) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    /**
+     * 유저 ID를 validate 한다
+     * @param targetUserId
+     */
+    public void validate(Long targetUserId) {
+        if (!userId.equals(targetUserId)) {
+            throw new AbnormalAccessException();
+        }
+    }
+
+    public boolean isActive() {
+        return this.state == GameRoomParticipantState.PLAYING
+                || this.state == GameRoomParticipantState.WAITING;
+    }
+
+    /**
+     * 게임 방 입장자 역할을 HOST로 변경한다.
+     */
+    public void changeRoleToHost() {
+        this.role = GameRoomParticipantRole.HOST;
+    }
 }

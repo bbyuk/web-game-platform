@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.application.dto;
 
-import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantRole;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**

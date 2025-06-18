@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.game.application.repository;
 
-import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipant;
-import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipant;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.game.domain.model.participant;
+package com.bb.webcanvasservice.game.domain.model.gameroom;
 
 import java.util.List;
 

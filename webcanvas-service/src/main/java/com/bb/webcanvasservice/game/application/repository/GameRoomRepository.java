@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.game.application.repository;
 
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
-import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
 
 import java.util.List;
@@ -17,7 +17,22 @@ public interface GameRoomRepository {
      * @param gameRoomId
      * @return 게임 방
      */
-    Optional<GameRoom> findById(Long gameRoomId);
+    Optional<GameRoom> findGameRoomById(Long gameRoomId);
+
+    /**
+     * 게임 입장자 ID로 대상 게임 방을 조회한다.
+     * @param gameRoomParticipantId 게임 입장자 ID
+     * @return 대상 게임 방 객체
+     */
+    Optional<GameRoom> findGameRoomByGameRoomParticipantId(Long gameRoomParticipantId);
+
+
+    /**
+     * 게임 세션 ID로 해당 게임 세션 ID가 진행되는 게임 방 객체를 조회한다.
+     * @param gameSessionId 게임 세션 ID
+     * @return 게임 방
+     */
+    Optional<GameRoom> findGameRoomByGameSessionId(Long gameSessionId);
 
     /**
      * 현재 입장해있는 방을 조회한다.
@@ -62,5 +77,11 @@ public interface GameRoomRepository {
      */
     Optional<GameRoom> findRoomWithJoinCodeForEnter(String joinCode);
 
+    /**
+     * 게임 방 애그리거트 루트를 저장한다.
+     * @param gameRoom 게임 방 객체
+     * @return 저장된 게임 방
+     */
     GameRoom save(GameRoom gameRoom);
+
 }

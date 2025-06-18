@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.game.domain.model.participant;
+package com.bb.webcanvasservice.game.domain.model.gameroom;
 
 /**
  * 게임 방에서의 유저 역할

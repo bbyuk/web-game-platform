@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.entity;
 
-import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantRole;
-import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantRole;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
 import com.bb.webcanvasservice.infrastructure.persistence.BaseEntity;
 import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;
 import jakarta.persistence.*;

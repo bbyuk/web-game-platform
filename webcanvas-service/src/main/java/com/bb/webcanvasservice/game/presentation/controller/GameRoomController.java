@@ -1,14 +1,14 @@
 package com.bb.webcanvasservice.game.presentation.controller;
 
-import com.bb.webcanvasservice.game.application.service.GameRoomService;
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
+import com.bb.webcanvasservice.game.application.service.GameRoomService;
 import com.bb.webcanvasservice.game.presentation.mapper.GameCommandMapper;
 import com.bb.webcanvasservice.game.presentation.mapper.GamePresentationDtoMapper;
-import com.bb.webcanvasservice.game.presentation.response.GameRoomJoinDetailInfoResponse;
-import com.bb.webcanvasservice.game.presentation.response.GameRoomJoinResponse;
 import com.bb.webcanvasservice.game.presentation.request.GameRoomReadyUpdateRequest;
 import com.bb.webcanvasservice.game.presentation.response.GameRoomExitResponse;
+import com.bb.webcanvasservice.game.presentation.response.GameRoomJoinDetailInfoResponse;
+import com.bb.webcanvasservice.game.presentation.response.GameRoomJoinResponse;
 import com.bb.webcanvasservice.game.presentation.response.GameRoomListResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,34 +37,36 @@ public class GameRoomController {
 
     @GetMapping
     @Operation(summary = "입장 가능한 방 목록 조회", description = "요청을 보낸 유저가 입장할 수 있는 webcanvas-service 방의 목록을 조회한다.")
-    public ResponseEntity<GameRoomListResponse> getEnterableGameRooms(@Authenticated WebCanvasAuthentication authentication) {
+    public ResponseEntity<GameRoomListResponse> getJoinableGameRooms(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomListResponse(
-                    gameRoomService.findEnterableGameRooms(authentication.getUserId())
+                        gameRoomService.findJoinableGameRooms(authentication.getUserId())
                 )
         );
     }
 
     @Operation(summary = "현재 입장한 게임 방 조회", description = "요청을 보낸 유저가 입장한 게임 방과 입장 정보를 조회한다.")
-    @GetMapping("entrance")
-    public ResponseEntity<GameRoomJoinDetailInfoResponse> getEnteredGameRoom(@Authenticated WebCanvasAuthentication authentication) {
+    @GetMapping("detail")
+    public ResponseEntity<GameRoomJoinDetailInfoResponse> getJoinedGameRoom(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomJoinDetailInfoResponse(
-                        gameRoomService.findEnteredGameRoomInfo(authentication.getUserId())
+                        gameRoomService.findJoinedGameRoomInfo(authentication.getUserId())
                 )
         );
     }
 
 
     @Operation(summary = "현재 입장한 게임 방에서 퇴장", description = "요청을 보낸 유저가 입장한 게임 방에서 퇴장한다.")
-    @DeleteMapping("entrance/{gameRoomParticipantId}")
+    @DeleteMapping("participant/{gameRoomParticipantId}")
     public ResponseEntity<GameRoomExitResponse> exitGameRoom(@Authenticated WebCanvasAuthentication authentication, @PathVariable("gameRoomParticipantId") Long gameRoomParticipantId) {
-        gameRoomService.exitFromRoom(gameRoomParticipantId, authentication.getUserId());
+        gameRoomService.exitFromRoom(
+                GameCommandMapper.toExitGameRoomCommand(gameRoomParticipantId, authentication.getUserId())
+        );
         return ResponseEntity.ok(new GameRoomExitResponse(true));
     }
 
 
-    @PostMapping("{gameRoomId}/entrance")
+    @PostMapping("{gameRoomId}/participant")
     @Operation(summary = "게임 방 입장", description = "입장 요청을 보낸 유저를 대상 게임 방에 입장시킨다.")
     public ResponseEntity<GameRoomJoinResponse> enterGameRoom(@PathVariable("gameRoomId") Long gameRoomId, @Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
@@ -74,7 +76,7 @@ public class GameRoomController {
         );
     }
 
-    @PostMapping("{joinCode}/enterance")
+    @PostMapping("{joinCode}/participant")
     @Operation(summary = "Join Code로 게임 방 입장", description = "Join Code로 입장 요청읇 보낸 유저를 대상 게임 방에 입장시킨다.")
     public ResponseEntity<GameRoomJoinResponse> enterGameRoomWithJoinCode(@PathVariable("joinCode") String joinCode,
                                                                           @Authenticated WebCanvasAuthentication authentication) {
@@ -85,12 +87,18 @@ public class GameRoomController {
         );
     }
 
-    @PatchMapping("entrance/{gameRoomParticipantId}/ready")
+    @PatchMapping("participant/{gameRoomParticipantId}/ready")
     @Operation(summary = "레디 상태 변경", description = "게임 방에 입장한 유저의 레디 상태를 업데이트한다.")
     public ResponseEntity<Boolean> updateReady(
             @PathVariable("gameRoomParticipantId") Long gameRoomParticipantId,
             @RequestBody GameRoomReadyUpdateRequest request,
             @Authenticated WebCanvasAuthentication authentication) {
-        return ResponseEntity.ok(gameRoomService.updateReady(gameRoomParticipantId, authentication.getUserId(), request.ready()));
+        return ResponseEntity.ok(
+                gameRoomService.updateReady(
+                        GameCommandMapper.toUpdateReadyCommand(
+                                gameRoomParticipantId, authentication.getUserId(), request.ready()
+                        )
+                )
+        );
     }
 }

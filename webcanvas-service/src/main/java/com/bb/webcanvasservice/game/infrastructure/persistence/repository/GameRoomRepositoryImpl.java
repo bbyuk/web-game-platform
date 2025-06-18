@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
-import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.mapper.GameModelMapper;
@@ -19,8 +19,18 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     private final GameSessionJpaRepository gameSessionJpaRepository;
 
     @Override
-    public Optional<GameRoom> findById(Long gameRoomId) {
+    public Optional<GameRoom> findGameRoomById(Long gameRoomId) {
         return gameRoomJpaRepository.findById(gameRoomId).map(GameModelMapper::toModel);
+    }
+
+    @Override
+    public Optional<GameRoom> findGameRoomByGameRoomParticipantId(Long gameRoomParticipantId) {
+        return gameRoomJpaRepository.findByGameRoomParticipantId(gameRoomParticipantId).map(GameModelMapper::toModel);
+    }
+
+    @Override
+    public Optional<GameRoom> findGameRoomByGameSessionId(Long gameSessionId) {
+        return gameRoomJpaRepository.findByGameSessionId(gameSessionId);
     }
 
     @Override

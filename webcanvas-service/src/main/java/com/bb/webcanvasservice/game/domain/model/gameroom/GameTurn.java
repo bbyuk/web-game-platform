@@ -36,7 +36,9 @@ public class GameTurn {
 
     private GameTurnState state;
 
-    public GameTurn(Long id, Long gameSessionId, Long drawerId, String answer, LocalDateTime startedAt, Long correctAnswererId, GameTurnState state) {
+    private int duration;
+
+    public GameTurn(Long id, Long gameSessionId, Long drawerId, String answer, LocalDateTime startedAt, Long correctAnswererId, GameTurnState state, int duration) {
         this.id = id;
         this.gameSessionId = gameSessionId;
         this.drawerId = drawerId;
@@ -44,10 +46,11 @@ public class GameTurn {
         this.correctAnswererId = correctAnswererId;
         this.state = state;
         this.startedAt = startedAt;
+        this.duration = duration;
     }
 
-    public static GameTurn createNewGameTurn(Long gameSessionId, Long drawerId, String answer) {
-        return new GameTurn(null, gameSessionId, drawerId, answer, LocalDateTime.now(), null, GameTurnState.ACTIVE);
+    public static GameTurn create(Long gameSessionId, Long drawerId, String answer, int duration) {
+        return new GameTurn(null, gameSessionId, drawerId, answer, LocalDateTime.now(), null, GameTurnState.ACTIVE, duration);
     }
 
     /**
@@ -111,5 +114,21 @@ public class GameTurn {
 
     public GameTurnState getState() {
         return state;
+    }
+
+    /**
+     * 게임 턴이 완료되었는지 여부를 리턴한다.
+     * @return
+     */
+    public boolean isCompleted() {
+        return state == GameTurnState.PASSED || state == GameTurnState.ANSWERED;
+    }
+
+    /**
+     * 턴의 만료 시간을 계산해 리턴한다.
+     * @return 만료 시간
+     */
+    public LocalDateTime calculateExpiration() {
+        return startedAt.plusSeconds(duration);
     }
 }

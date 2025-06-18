@@ -4,7 +4,7 @@ import com.bb.webcanvasservice.game.domain.model.*;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurn;
-import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipant;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipant;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.*;
 import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;
 
@@ -57,7 +57,8 @@ public class GameModelMapper {
                 entity.getAnswer(),
                 entity.getCreatedAt(),
                 entity.getCorrectAnswererId(),
-                entity.getState()
+                entity.getState(),
+                entity.getGameSessionEntity().getTimePerTurn()
         );
     }
 

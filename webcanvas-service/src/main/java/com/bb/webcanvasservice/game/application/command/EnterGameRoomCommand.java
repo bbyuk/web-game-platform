@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.application.command;
 
-import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantRole;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "presentation layer -> application layer 게임 방 입장 커맨드")
