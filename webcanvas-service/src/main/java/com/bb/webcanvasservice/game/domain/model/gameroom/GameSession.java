@@ -1,4 +1,6 @@
-package com.bb.webcanvasservice.game.domain.model;
+package com.bb.webcanvasservice.game.domain.model.gameroom;
+
+import java.util.List;
 
 /**
  * 게임의 세션을 나타내는 도메인 모델
@@ -30,6 +32,10 @@ public class GameSession {
      */
     private GameSessionState state;
 
+    /**
+     * 현재 세션에 포함된 게임 턴들
+     */
+    private List<GameTurn> gameTurns;
 
 
     public GameSession(Long id, Long gameRoomId, int turnCount, int timePerTurn, GameSessionState state) {

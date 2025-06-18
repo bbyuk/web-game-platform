@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.game.domain.model;
+package com.bb.webcanvasservice.game.domain.model.gameroom;
 
 /**
  * 게임 세션의 상태

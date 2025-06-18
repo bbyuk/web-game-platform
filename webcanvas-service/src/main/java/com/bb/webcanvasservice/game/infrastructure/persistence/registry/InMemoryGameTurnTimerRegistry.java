@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.registry;
 
-import com.bb.webcanvasservice.game.domain.model.GameTurnTimer;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurnTimer;
 import com.bb.webcanvasservice.game.application.registry.GameTurnTimerRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

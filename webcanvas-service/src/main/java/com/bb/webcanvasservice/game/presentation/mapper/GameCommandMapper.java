@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.game.presentation.mapper;
 
 import com.bb.webcanvasservice.game.application.command.EnterGameRoomCommand;
 import com.bb.webcanvasservice.game.application.command.StartGameCommand;
-import com.bb.webcanvasservice.game.domain.model.GameRoomEntranceRole;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantRole;
 
 /**
  * presentation layer -> application layer command mapper
@@ -10,7 +10,7 @@ import com.bb.webcanvasservice.game.domain.model.GameRoomEntranceRole;
 public class GameCommandMapper {
 
     public static EnterGameRoomCommand toEnterGameRoomCommand(Long gameRoomId, Long userId) {
-        return new EnterGameRoomCommand(gameRoomId, userId, GameRoomEntranceRole.GUEST);
+        return new EnterGameRoomCommand(gameRoomId, userId, GameRoomParticipantRole.GUEST);
     }
 
     public static StartGameCommand toStartGameCommand(Long gameRoomId, int turnCount, int timePerTurn, Long userId) {

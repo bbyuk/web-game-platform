@@ -5,13 +5,13 @@ import com.bb.webcanvasservice.common.event.ApplicationEvent;
 /**
  * 게임 방 입장 이벤트 발생시 pub 이벤트
  */
-public class GameRoomEntranceEvent extends ApplicationEvent {
+public class GameRoomJoinEvent extends ApplicationEvent {
 
     private final Long gameRoomId;
     private final Long userId;
 
-    public GameRoomEntranceEvent(Long gameRoomId, Long userId) {
-        super("ROOM/ENTRANCE");
+    public GameRoomJoinEvent(Long gameRoomId, Long userId) {
+        super("ROOM/JOIN");
         this.gameRoomId = gameRoomId;
         this.userId = userId;
     }

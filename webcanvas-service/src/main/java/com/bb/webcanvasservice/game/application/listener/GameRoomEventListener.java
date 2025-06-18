@@ -24,7 +24,7 @@ public class GameRoomEventListener {
      * @param event 게임 방 입장 이벤트
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleGameRoomEntrance(GameRoomEntranceEvent event) {
+    public void handleGameRoomEntrance(GameRoomJoinEvent event) {
         messageSender.send("/room/" + event.getGameRoomId(), event);
     }
 

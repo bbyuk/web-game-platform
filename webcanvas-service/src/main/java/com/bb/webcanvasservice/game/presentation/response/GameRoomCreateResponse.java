@@ -13,7 +13,7 @@ public record GameRoomCreateResponse(
         /**
          * 게임 방 입장 ID
          */
-        @Schema(description = "게임 방 입장 ID", example = "153")
-        Long gameRoomEntranceId
+        @Schema(description = "게임 방 입장자 ID", example = "153")
+        Long gameRoomParticipantId
 ) {
 }

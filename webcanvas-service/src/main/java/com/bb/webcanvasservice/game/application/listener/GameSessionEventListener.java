@@ -5,7 +5,7 @@ import com.bb.webcanvasservice.game.domain.event.AllUserInGameSessionLoadedEvent
 import com.bb.webcanvasservice.game.domain.event.GameSessionEndEvent;
 import com.bb.webcanvasservice.game.domain.event.GameTurnProgressedEvent;
 import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
-import com.bb.webcanvasservice.game.domain.model.GameSession;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
 import com.bb.webcanvasservice.game.application.repository.GameSessionRepository;
 import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;
 import com.bb.webcanvasservice.common.message.MessageSender;

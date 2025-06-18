@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.game.application.repository;
 
-import com.bb.webcanvasservice.game.domain.model.GameRoom;
-import com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState;
-import com.bb.webcanvasservice.game.domain.model.GameRoomState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +44,7 @@ public interface GameRoomRepository {
      */
     List<GameRoom> findGameRoomsByCapacityAndStateWithEntranceState(int gameRoomCapacity,
                                                                     List<GameRoomState> enterableStates,
-                                                                    GameRoomEntranceState activeEntranceState);
+                                                                    GameRoomParticipantState activeEntranceState);
 
     /**
      * GameRoom 상태로 게엠 방을 조회한다.

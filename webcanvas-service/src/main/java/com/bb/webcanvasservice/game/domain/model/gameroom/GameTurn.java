@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.game.domain.model;
+package com.bb.webcanvasservice.game.domain.model.gameroom;
 
 import java.time.LocalDateTime;
 

@@ -2,9 +2,9 @@ package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
-import com.bb.webcanvasservice.game.domain.model.GameSession;
-import com.bb.webcanvasservice.game.domain.model.GameTurn;
-import com.bb.webcanvasservice.game.domain.model.GameTurnState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurn;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurnState;
 import com.bb.webcanvasservice.game.application.repository.GameSessionRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.mapper.GameModelMapper;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameTurnJpaEntity;

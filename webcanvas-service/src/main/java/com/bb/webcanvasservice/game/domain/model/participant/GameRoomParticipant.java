@@ -1,12 +1,12 @@
-package com.bb.webcanvasservice.game.domain.model;
+package com.bb.webcanvasservice.game.domain.model.participant;
 
 /**
- * 유저의 게임 방 입장을 나타내는 도메인 모델
+ * 게임 방 입장 유저를 나타내는 도메인 모델
  */
-public class GameRoomEntrance {
+public class GameRoomParticipant {
 
     /**
-     * 게임 방 입장 ID
+     * 게임 방 입장 유저 ID
      */
     private final Long id;
 
@@ -16,7 +16,7 @@ public class GameRoomEntrance {
     private final Long gameRoomId;
 
     /**
-     * 입장한 유저
+     * 입장한 유저 ID
      */
     private final Long userId;
 
@@ -28,12 +28,12 @@ public class GameRoomEntrance {
     /**
      * 게임 방 내에서의 역할
      */
-    private GameRoomEntranceRole role;
+    private GameRoomParticipantRole role;
 
     /**
      * 게임 방 입장 기록 상태
      */
-    private GameRoomEntranceState state;
+    private GameRoomParticipantState state;
 
     /**
      * 준비 여부
@@ -41,14 +41,14 @@ public class GameRoomEntrance {
     private boolean ready;
 
     public boolean isReady() {
-        if (this.role == GameRoomEntranceRole.HOST) {
+        if (this.role == GameRoomParticipantRole.HOST) {
             return true;
         }
 
         return ready;
     }
 
-    public GameRoomEntrance(Long id, Long gameRoomId, Long userId, GameRoomEntranceState state, String nickname, GameRoomEntranceRole role, boolean ready) {
+    public GameRoomParticipant(Long id, Long gameRoomId, Long userId, GameRoomParticipantState state, String nickname, GameRoomParticipantRole role, boolean ready) {
         this.id = id;
         this.gameRoomId = gameRoomId;
         this.userId = userId;
@@ -62,16 +62,16 @@ public class GameRoomEntrance {
      * 게임 입장 Entity를 exit 처리한다.
      */
     public void exit() {
-        this.state = GameRoomEntranceState.EXITED;
+        this.state = GameRoomParticipantState.EXITED;
     }
 
     /**
      * 역할을 변경한다.
-     * @param gameRoomEntranceRole 게임 방 입장 역할
+     * @param gameRoomParticipantRole 게임 방 입장 역할
      */
-    public void changeRole(GameRoomEntranceRole gameRoomEntranceRole) {
-        this.role = gameRoomEntranceRole;
-        if (this.role == GameRoomEntranceRole.HOST) {
+    public void changeRole(GameRoomParticipantRole gameRoomParticipantRole) {
+        this.role = gameRoomParticipantRole;
+        if (this.role == GameRoomParticipantRole.HOST) {
             this.ready = true;
         }
     }
@@ -88,21 +88,14 @@ public class GameRoomEntrance {
      * 게임 방 상태를 게임 진행중으로 변경한다.
      */
     public void changeToPlaying() {
-        this.state = GameRoomEntranceState.PLAYING;
-    }
-
-    /**
-     * 게임 방 입장 정보 entity의 상태를 초기화하고, 유저 entity의 상태 초기화를 요청한다.
-     */
-    public void resetGameRoomEntranceInfo() {
-        this.state = GameRoomEntranceState.WAITING;
+        this.state = GameRoomParticipantState.PLAYING;
     }
 
     /**
      * 레디를 초기화한다.
      */
     public void resetReady() {
-        this.ready = GameRoomEntranceRole.HOST == this.role;
+        this.ready = GameRoomParticipantRole.HOST == this.role;
     }
 
     /**
@@ -110,7 +103,7 @@ public class GameRoomEntrance {
      * @return
      */
     public boolean isHost() {
-        return this.role == GameRoomEntranceRole.HOST;
+        return this.role == GameRoomParticipantRole.HOST;
     }
 
     public Long getId() {
@@ -129,11 +122,11 @@ public class GameRoomEntrance {
         return nickname;
     }
 
-    public GameRoomEntranceState getState() {
+    public GameRoomParticipantState getState() {
         return state;
     }
 
-    public GameRoomEntranceRole getRole() {
+    public GameRoomParticipantRole getRole() {
         return role;
     }
 

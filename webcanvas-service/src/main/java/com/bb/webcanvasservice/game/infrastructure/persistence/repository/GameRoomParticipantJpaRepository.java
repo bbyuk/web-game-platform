@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
-import com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState;
-import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomEntranceJpaEntity;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomParticipantJpaEntity;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * User - GameRoom 엔티티간 조인 테이블 Entity인 GameRoomEntrance Entity의 persitence layer를 담당하는 레포지토리 클래스
+ * User - GameRoom 엔티티간 조인 테이블 Entity인 GameRoomParticipant Entity의 persitence layer를 담당하는 레포지토리 클래스
  */
-public interface GameRoomEntranceJpaRepository extends JpaRepository<GameRoomEntranceJpaEntity, Long> {
+public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoomParticipantJpaEntity, Long> {
 
     /**
      * 게임 방 입장 여부 조회
@@ -24,7 +24,7 @@ public interface GameRoomEntranceJpaRepository extends JpaRepository<GameRoomEnt
     @Query("""
             select exists(
                 select      1
-                from        GameRoomEntranceJpaEntity gre
+                from        GameRoomParticipantJpaEntity gre
                 join        UserJpaEntity u
                 on          gre.userEntity.id = u.id
                 where       gre.userEntity.id = :userId
@@ -40,13 +40,13 @@ public interface GameRoomEntranceJpaRepository extends JpaRepository<GameRoomEnt
      */
     @Query("""
            select       gre
-           from         GameRoomEntranceJpaEntity gre
+           from         GameRoomParticipantJpaEntity gre
            join fetch   UserJpaEntity u
            on           gre.userEntity.id = u.id
            where        gre.userEntity.id = :userId
            and          gre.state = 'WAITING'
            """)
-    Optional<GameRoomEntranceJpaEntity> findByUserId(@Param("userId") Long userId);
+    Optional<GameRoomParticipantJpaEntity> findByUserId(@Param("userId") Long userId);
 
     /**
      * 게임 방 ID로 해당 게임 방에 입장한 정보 조회 (비관적 락 적용)
@@ -58,7 +58,7 @@ public interface GameRoomEntranceJpaRepository extends JpaRepository<GameRoomEnt
     @Query(
             """
             select      gre
-            from        GameRoomEntranceJpaEntity gre
+            from        GameRoomParticipantJpaEntity gre
             join fetch  UserJpaEntity u on gre.userEntity.id = u.id
             join fetch  GameRoomJpaEntity gr on gre.gameRoomEntity.id = gr.id
             where       gre.gameRoomEntity.id = :gameRoomId
@@ -67,7 +67,7 @@ public interface GameRoomEntranceJpaRepository extends JpaRepository<GameRoomEnt
             """
     )
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<GameRoomEntranceJpaEntity> findGameRoomEntrancesByGameRoomIdWithLock(@Param("gameRoomId") Long gameRoomId);
+    List<GameRoomParticipantJpaEntity> findGameRoomEntrancesByGameRoomIdWithLock(@Param("gameRoomId") Long gameRoomId);
 
     /**
      * 유저 ID로 현재 입장한 게임 방의 입장 정보 조회
@@ -77,42 +77,42 @@ public interface GameRoomEntranceJpaRepository extends JpaRepository<GameRoomEnt
     @Query(
             """
             select      gre
-            from        GameRoomEntranceJpaEntity gre
+            from        GameRoomParticipantJpaEntity gre
             join fetch  UserJpaEntity u on gre.userEntity.id = u.id
             join fetch  GameRoomJpaEntity gr on gre.gameRoomEntity.id = gr.id
             where       gre.userEntity.id = :userId
-            and         gre.state in :gameRoomEntranceStates
+            and         gre.state in :gameRoomParticipantStates
             """
     )
-    Optional<GameRoomEntranceJpaEntity> findGameRoomEntranceByUserIdAndGameRoomStates(@Param("userId") Long userId, @Param("gameRoomEntranceStates") List<GameRoomEntranceState> gameRoomEntranceStates);
+    Optional<GameRoomParticipantJpaEntity> findGameRoomEntranceByUserIdAndGameRoomStates(@Param("userId") Long userId, @Param("gameRoomParticipantStates") List<GameRoomParticipantState> gameRoomParticipantStates);
 
     /**
-     * 게임 방 ID와 상태로 GameRoomEntrance 목록을 조회한다.
+     * 게임 방 ID와 상태로 GameRoomParticipant 목록을 조회한다.
      * @param gameRoomId 게임 방 ID
-     * @param gameRoomEntranceState 조회 필터 게임 방 입장 상태
+     * @param gameRoomParticipantState 조회 필터 게임 방 입장 상태
      * @return 게임 방 입장 정보 목록
      */
     @Query("""
             select      gre
-            from        GameRoomEntranceJpaEntity gre
+            from        GameRoomParticipantJpaEntity gre
             join fetch  UserJpaEntity u on gre.userEntity.id = u.id
             join fetch  GameRoomJpaEntity gr on gre.gameRoomEntity.id = gr.id
             where       gre.gameRoomEntity.id = :gameRoomId
-            and         gre.state = :gameRoomEntranceState
+            and         gre.state = :gameRoomParticipantState
             order by    gre.id asc
             """)
-    List<GameRoomEntranceJpaEntity> findGameRoomEntrancesByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomEntranceState") GameRoomEntranceState gameRoomEntranceState);
+    List<GameRoomParticipantJpaEntity> findGameRoomEntrancesByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomParticipantState") GameRoomParticipantState gameRoomParticipantState);
 
     /**
      * 방에 입장한 수
      * @param gameRoomId 게임 방 ID
-     * @param gameRoomEntranceState 게임 방에 입장해있는 상태 코드
+     * @param gameRoomParticipantState 게임 방에 입장해있는 상태 코드
      * @return 게임 방 입장 수
      */
     @Query(
             """
             select      count(gre)
-            from        GameRoomEntranceJpaEntity gre
+            from        GameRoomParticipantJpaEntity gre
             where       gre.gameRoomEntity.id = :gameRoomId
             and         gre.state in (
                                         com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState.WAITING,
@@ -121,22 +121,22 @@ public interface GameRoomEntranceJpaRepository extends JpaRepository<GameRoomEnt
             order by    gre.id asc
             """
     )
-    long findGameRoomEntranceCountByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomEntranceState") GameRoomEntranceState gameRoomEntranceState);
+    long findGameRoomEntranceCountByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomParticipantState") GameRoomParticipantState gameRoomParticipantState);
 
     /**
-     * 게임 방 ID와 상태들로 GameRoomEntrance 목록을 조회한다.
+     * 게임 방 ID와 상태들로 GameRoomParticipant 목록을 조회한다.
      * @param gameRoomId 게임 방 ID
-     * @param gameRoomEntranceStates 조회 필터 - 게임 방 입장 상태 목록
+     * @param gameRoomParticipantStates 조회 필터 - 게임 방 입장 상태 목록
      * @return 게임 방 입장 목록
      */
     @Query("""
             select      gre
-            from        GameRoomEntranceJpaEntity gre
+            from        GameRoomParticipantJpaEntity gre
             join fetch  UserJpaEntity u on gre.userEntity.id = u.id
             join fetch  GameRoomJpaEntity gr on gre.gameRoomEntity.id = gr.id
             where       gre.gameRoomEntity.id = :gameRoomId
-            and         gre.state in :gameRoomEntranceStates
+            and         gre.state in :gameRoomParticipantStates
             order by    gre.id asc
             """)
-    List<GameRoomEntranceJpaEntity> findGameRoomEntrancesByGameRoomIdAndStates(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomEntranceStates") List<GameRoomEntranceState> gameRoomEntranceStates);
+    List<GameRoomParticipantJpaEntity> findGameRoomEntrancesByGameRoomIdAndStates(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomParticipantStates") List<GameRoomParticipantState> gameRoomParticipantStates);
 }

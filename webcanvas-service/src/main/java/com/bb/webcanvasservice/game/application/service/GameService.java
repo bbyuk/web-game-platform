@@ -16,6 +16,12 @@ import com.bb.webcanvasservice.game.application.repository.GamePlayHistoryReposi
 import com.bb.webcanvasservice.game.application.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.repository.GameSessionRepository;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurn;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurnState;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipant;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -118,9 +124,9 @@ public class GameService {
          *
          * 250531 게임 시작시 레디상태 false로 모두 변경
          */
-        List<GameRoomEntrance> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdWithLock(gameRoom.getId());
-        userCommandPort.moveUsersToGameSession(entrances.stream().map(GameRoomEntrance::getUserId).collect(Collectors.toList()));
-        gameRoomService.resetGameRoomEntrancesReady(entrances.stream().map(GameRoomEntrance::getId).collect(Collectors.toList()));
+        List<GameRoomParticipant> entrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdWithLock(gameRoom.getId());
+        userCommandPort.moveUsersToGameSession(entrances.stream().map(GameRoomParticipant::getUserId).collect(Collectors.toList()));
+        gameRoomService.resetGameRoomEntrancesReady(entrances.stream().map(GameRoomParticipant::getId).collect(Collectors.toList()));
 
         List<GamePlayHistory> gamePlayHistories = entrances
                 .stream()
@@ -282,9 +288,9 @@ public class GameService {
          * 내부에서만 요청되는 메소드로 클라이언트 validation 처리 없이 complete한다.
          */
 
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomService.findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomEntranceState.PLAYING);
-        gameRoomService.resetGameRoomEntrances(gameRoomEntrances.stream().map(GameRoomEntrance::getId).collect(Collectors.toList()));
-        userCommandPort.moveUsersToRoom(gameRoomEntrances.stream().map(GameRoomEntrance::getUserId).collect(Collectors.toList()));
+        List<GameRoomParticipant> gameRoomParticipants = gameRoomService.findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomParticipantState.PLAYING);
+        gameRoomService.resetGameRoomEntrances(gameRoomParticipants.stream().map(GameRoomParticipant::getId).collect(Collectors.toList()));
+        userCommandPort.moveUsersToRoom(gameRoomParticipants.stream().map(GameRoomParticipant::getUserId).collect(Collectors.toList()));
 
 
         /**
@@ -336,7 +342,7 @@ public class GameService {
             gameSessionRepository.save(gameSession);
 
             gameRoomEntranceRepository
-                    .findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomEntranceState.WAITING)
+                    .findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomParticipantState.WAITING)
                     .forEach(entrance -> {
                         entrance.changeToPlaying();
                         gameRoomEntranceRepository.save(entrance);
@@ -376,7 +382,7 @@ public class GameService {
         /**
          * 현재 게임중인 유저 목록
          */
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomEntranceState.PLAYING);
+        List<GameRoomParticipant> gameRoomParticipants = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameSession.getGameRoomId(), GameRoomParticipantState.PLAYING);
 
         // 유저별 턴 수 집계
         Map<Long, Integer> drawerCountMap = gameTurns.stream()
@@ -389,7 +395,7 @@ public class GameService {
         int minCount = Integer.MAX_VALUE;
         List<Long> candidates = new ArrayList<>();
 
-        for (GameRoomEntrance entrance : gameRoomEntrances) {
+        for (GameRoomParticipant entrance : gameRoomParticipants) {
             Long userId = entrance.getUserId();
             int count = drawerCountMap.getOrDefault(userId, 0);
 

@@ -9,8 +9,8 @@ import com.bb.webcanvasservice.game.presentation.response.*;
  * 게임 및 게임 방 정보 API 응답
  */
 public class GamePresentationDtoMapper {
-    public static GameRoomEntranceResponse toGameRoomEntranceResponse(GameRoomEntranceDto dto) {
-        return new GameRoomEntranceResponse(dto.gameRoomId(), dto.gameRoomEntranceId());
+    public static GameRoomJoinResponse toGameRoomJoinResponse(GameRoomJoinDto dto) {
+        return new GameRoomJoinResponse(dto.gameRoomId(), dto.gameRoomParticipantId());
     }
 
     public static GameRoomListResponse toGameRoomListResponse(GameRoomListDto dto) {
@@ -21,18 +21,18 @@ public class GamePresentationDtoMapper {
         return new GameRoomInfoResponse(dto.gameRoomId(), dto.capacity(), dto.enterCount(), dto.joinCode());
     }
 
-    public static GameRoomEntranceDetailInfoResponse toGameRoomEntranceDetailInfoResponse(GameRoomEntranceDetailInfoDto dto) {
-        return new GameRoomEntranceDetailInfoResponse(
+    public static GameRoomJoinDetailInfoResponse toGameRoomJoinDetailInfoResponse(GameRoomJoinDetailInfoDto dto) {
+        return new GameRoomJoinDetailInfoResponse(
                 dto.gameRoomId(),
-                dto.gameRoomEntranceId(),
-                dto.enteredUsers().stream().map(GamePresentationDtoMapper::toEnteredUserInfoResponse).toList(),
+                dto.gameRoomParticipantId(),
+                dto.joinedUsers().stream().map(GamePresentationDtoMapper::toEnteredUserInfoResponse).toList(),
                 dto.gameRoomState().name(),
                 toEnteredUserInfoResponse(dto.requesterUserSummary())
         );
     }
 
-    public static EnteredUserInfoResponse toEnteredUserInfoResponse(EnteredUserInfoDto dto) {
-        return new EnteredUserInfoResponse(dto.userId(), dto.color(), dto.nickname(), dto.role().name(), dto.ready());
+    public static JoinedUserInfoResponse toEnteredUserInfoResponse(JoinedUserInfoDto dto) {
+        return new JoinedUserInfoResponse(dto.userId(), dto.color(), dto.nickname(), dto.role().name(), dto.ready());
     }
 
     public static GameTurnResponse toGameTurnResponse(GameTurnDto dto) {

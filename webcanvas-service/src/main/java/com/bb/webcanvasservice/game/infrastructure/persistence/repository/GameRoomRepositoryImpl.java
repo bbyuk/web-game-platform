@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
-import com.bb.webcanvasservice.game.domain.model.GameRoom;
-import com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState;
-import com.bb.webcanvasservice.game.domain.model.GameRoomState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.mapper.GameModelMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GameRoomRepositoryImpl implements GameRoomRepository {
     private final GameRoomJpaRepository gameRoomJpaRepository;
+    private final GameSessionJpaRepository gameSessionJpaRepository;
 
     @Override
     public Optional<GameRoom> findById(Long gameRoomId) {
@@ -34,7 +35,7 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     }
 
     @Override
-    public List<GameRoom> findGameRoomsByCapacityAndStateWithEntranceState(int gameRoomCapacity, List<GameRoomState> enterableStates, GameRoomEntranceState activeEntranceState) {
+    public List<GameRoom> findGameRoomsByCapacityAndStateWithEntranceState(int gameRoomCapacity, List<GameRoomState> enterableStates, GameRoomParticipantState activeEntranceState) {
         return gameRoomJpaRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameRoomCapacity, enterableStates, activeEntranceState)
                 .stream()
                 .map(GameModelMapper::toModel)

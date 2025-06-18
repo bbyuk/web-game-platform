@@ -7,14 +7,18 @@ import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
 import com.bb.webcanvasservice.game.application.port.dictionary.DictionaryQueryPort;
 import com.bb.webcanvasservice.game.application.port.user.UserCommandPort;
-import com.bb.webcanvasservice.game.domain.event.GameRoomEntranceEvent;
+import com.bb.webcanvasservice.game.domain.event.GameRoomJoinEvent;
 import com.bb.webcanvasservice.game.domain.event.GameRoomExitEvent;
 import com.bb.webcanvasservice.game.domain.event.GameRoomHostChangedEvent;
 import com.bb.webcanvasservice.game.domain.event.UserReadyChanged;
 import com.bb.webcanvasservice.game.domain.exception.*;
-import com.bb.webcanvasservice.game.domain.model.*;
 import com.bb.webcanvasservice.game.application.repository.GameRoomEntranceRepository;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipant;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantRole;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,8 +29,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.bb.webcanvasservice.game.domain.model.GameRoomEntranceRole.HOST;
-import static com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState.WAITING;
+import static com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantRole.HOST;
+import static com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState.WAITING;
 
 @Slf4j
 @Service
@@ -51,27 +55,15 @@ public class GameRoomService {
     private final ApplicationEventPublisher eventPublisher;
 
 
-
-    /**
-     * 게임 방을 새로 생성해 게임 방 ID를 리턴한다.
-     *
-     * @param userId
-     * @return gameRoomId
-     */
-    @Transactional
-    public GameRoom createGameRoom(Long userId) {
-        return createGameRoom(userId, gameProperties.joinCodeLength(), gameProperties.joinCodeMaxConflictCount());
-    }
-
     /**
      * 게임 방을 새로 생성하고, 생성을 요청한 유저를 입장시킨다.
      *
      * @param userId
-     * @return gameRoomEntranceId
+     * @return gameRoomParticipantId
      */
     @Transactional
-    public GameRoomEntranceDto createGameRoomAndEnter(Long userId) {
-        GameRoom gameRoom = createGameRoom(userId);
+    public GameRoomJoinDto createGameRoomAndEnter(Long userId) {
+        GameRoom gameRoom = createGameRoom(userId, gameProperties.joinCodeLength(), gameProperties.joinCodeMaxConflictCount());
         return enterGameRoom(new EnterGameRoomCommand(gameRoom.getId(), userId, HOST));
     }
 
@@ -83,13 +75,14 @@ public class GameRoomService {
      * - 입장하려는 방에 접속한 유저 세션의 수(entrances)는 최대 8이다.
      *
      * @param command 게임 방 입장 커맨드
-     * @return gameRoomEntranceId 게임 방 입장 ID
+     * @return gameRoomParticipantId 게임 방 입장 ID
      */
     @Transactional
-    public GameRoomEntranceDto enterGameRoom(EnterGameRoomCommand command) {
+    public GameRoomJoinDto enterGameRoom(EnterGameRoomCommand command) {
         /**
          * 대상 게임 방에 입장할 수 있는지 체크한다.
          */
+
         checkGameRoomCanEnter(command.gameRoomId(), command.userId(), command.role(), gameProperties.gameRoomCapacity());
 
         /**
@@ -100,15 +93,15 @@ public class GameRoomService {
          */
         String koreanAdjective = dictionaryQueryPort.drawRandomKoreanAdjective();
 
-        GameRoomEntrance newGameRoomEntrance = gameRoomEntranceRepository.save(
-                new GameRoomEntrance(
+        GameRoomParticipant newGameRoomParticipant = gameRoomEntranceRepository.save(
+                new GameRoomParticipant(
                         null
                         , command.gameRoomId()
                         , command.userId()
-                        , GameRoomEntranceState.WAITING
+                        , GameRoomParticipantState.WAITING
                         , String.format("%s %s", koreanAdjective, "플레이어")
                         , command.role()
-                        , command.role() == GameRoomEntranceRole.HOST
+                        , command.role() == GameRoomParticipantRole.HOST
                 )
         );
 
@@ -118,9 +111,9 @@ public class GameRoomService {
          * 게임 방 입장 이벤트 pub ->
          * 게임 방 broker에 입장 send 위임
          */
-        eventPublisher.publishEvent(new GameRoomEntranceEvent(command.gameRoomId(), command.userId()));
+        eventPublisher.publishEvent(new GameRoomJoinEvent(command.gameRoomId(), command.userId()));
 
-        return new GameRoomEntranceDto(newGameRoomEntrance.getGameRoomId(), newGameRoomEntrance.getId());
+        return new GameRoomJoinDto(newGameRoomParticipant.getGameRoomId(), newGameRoomParticipant.getId());
     }
 
     /**
@@ -160,12 +153,12 @@ public class GameRoomService {
      * @return
      */
     @Transactional
-    public GameRoomEntranceDto enterGameRoomWithJoinCode(String joinCode, Long userId) {
+    public GameRoomJoinDto enterGameRoomWithJoinCode(String joinCode, Long userId) {
         GameRoom targetGameRoom = gameRoomRepository.findRoomWithJoinCodeForEnter(joinCode)
                 .orElseThrow(() -> new GameRoomNotFoundException(String.format("입장 코드가 %s인 방을 찾지 못했습니다.", joinCode)));
 
         return enterGameRoom(
-                new EnterGameRoomCommand(targetGameRoom.getId(), userId, GameRoomEntranceRole.GUEST)
+                new EnterGameRoomCommand(targetGameRoom.getId(), userId, GameRoomParticipantRole.GUEST)
         );
     }
 
@@ -180,20 +173,20 @@ public class GameRoomService {
      * @return
      */
     @Transactional(readOnly = true)
-    public GameRoomEntranceDetailInfoDto findEnteredGameRoomInfo(Long userId) {
-        GameRoomEntrance userEntrance = gameRoomEntranceRepository.findCurrentEnteredGameRoomEntranceByUserId(userId)
-                .orElseThrow(GameRoomEntranceNotFoundException::new);
+    public GameRoomJoinDetailInfoDto findEnteredGameRoomInfo(Long userId) {
+        GameRoomParticipant userEntrance = gameRoomEntranceRepository.findCurrentEnteredGameRoomEntranceByUserId(userId)
+                .orElseThrow(GameRoomParticipantNotFoundException::new);
 
         AtomicInteger index = new AtomicInteger(0);
 
 
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository
-                .findGameRoomEntrancesByGameRoomIdAndStates(userEntrance.getGameRoomId(), GameRoomEntranceState.entered);
+        List<GameRoomParticipant> gameRoomParticipants = gameRoomEntranceRepository
+                .findGameRoomEntrancesByGameRoomIdAndStates(userEntrance.getGameRoomId(), GameRoomParticipantState.entered);
 
-        List<EnteredUserInfoDto> enteredUserSummaries = gameRoomEntrances
+        List<JoinedUserInfoDto> enteredUserSummaries = gameRoomParticipants
                 .stream()
                 .map(gameRoomEntrance ->
-                        new EnteredUserInfoDto(
+                        new JoinedUserInfoDto(
                                 gameRoomEntrance.getUserId(),
                                 gameProperties.gameRoomUserColors().get(index.getAndIncrement()),
                                 gameRoomEntrance.getNickname(),
@@ -205,13 +198,13 @@ public class GameRoomService {
 
         GameRoom gameRoom = gameRoomRepository.findById(userEntrance.getGameRoomId()).orElseThrow(GameRoomNotFoundException::new);
 
-        return new GameRoomEntranceDetailInfoDto(
+        return new GameRoomJoinDetailInfoDto(
                 userEntrance.getGameRoomId(),
                 userEntrance.getId(),
                 enteredUserSummaries,
                 gameRoom.getState(),
                 enteredUserSummaries.stream().filter(enteredUserSummary
-                        -> enteredUserSummary.userId().equals(userId)).findFirst().orElseThrow(GameRoomEntranceNotFoundException::new)
+                        -> enteredUserSummary.userId().equals(userId)).findFirst().orElseThrow(GameRoomParticipantNotFoundException::new)
         );
     }
 
@@ -225,8 +218,8 @@ public class GameRoomService {
      */
     @Transactional
     public void exitFromRoom(Long gameRoomEntranceId, Long userId) {
-        GameRoomEntrance targetEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
-                .orElseThrow(GameRoomEntranceNotFoundException::new);
+        GameRoomParticipant targetEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
+                .orElseThrow(GameRoomParticipantNotFoundException::new);
 
         if (!targetEntrance.getUserId().equals(userId)) {
             log.error("대상 게임 방 입장 기록과 요청 유저가 다릅니다.");
@@ -237,8 +230,8 @@ public class GameRoomService {
 
         GameRoom gameRoom = gameRoomRepository.findById(targetEntrance.getGameRoomId()).orElseThrow(GameRoomNotFoundException::new);
 
-        List<GameRoomEntrance> entrances = gameRoomEntranceRepository
-                .findGameRoomEntrancesByGameRoomIdAndState(gameRoom.getId(), GameRoomEntranceState.WAITING);
+        List<GameRoomParticipant> entrances = gameRoomEntranceRepository
+                .findGameRoomEntrancesByGameRoomIdAndState(gameRoom.getId(), GameRoomParticipantState.WAITING);
 
         if (entrances.isEmpty()) {
             gameRoom.close();
@@ -281,12 +274,12 @@ public class GameRoomService {
      */
     @Transactional
     public boolean updateReady(Long gameRoomEntranceId, Long userId, boolean ready) {
-        GameRoomEntrance targetEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
-                .orElseThrow(GameRoomEntranceNotFoundException::new);
+        GameRoomParticipant targetEntrance = gameRoomEntranceRepository.findById(gameRoomEntranceId)
+                .orElseThrow(GameRoomParticipantNotFoundException::new);
 
         if (!targetEntrance.getUserId().equals(userId)) {
             log.error("다른 유저의 정보 접근 시도");
-            log.error("userId = {} ===>>> gameRoomEntranceId = {}", userId, gameRoomEntranceId);
+            log.error("userId = {} ===>>> gameRoomParticipantId = {}", userId, gameRoomEntranceId);
             throw new AbnormalAccessException();
         }
 
@@ -331,6 +324,7 @@ public class GameRoomService {
     public GameRoom createGameRoom(Long userId, int joinCodeLength, int joinCodeMaxConflictCount) {
         /**
          * 유저가 새로 게임을 생성할 수 있는 상태인지 확인한다.
+         * TODO UserService로 이관 필요
          * - 유저가 현재 아무 방에도 입장하지 않은 상태여야 한다.
          */
         checkUserCanEnterGameRoom(userId);
@@ -352,13 +346,14 @@ public class GameRoomService {
         /**
          * GameRoom 생성
          */
-        return gameRoomRepository.save(new GameRoom(null ,joinCode, GameRoomState.WAITING));
+        return gameRoomRepository.save(GameRoom.create(joinCode));
     }
 
     @Transactional(readOnly = true)
-    public void checkGameRoomCanEnter(Long gameRoomId, Long userId, GameRoomEntranceRole role, int gameRoomCapacity) {
+    public void checkGameRoomCanEnter(Long gameRoomId, Long userId, GameRoomParticipantRole role, int gameRoomCapacity) {
         /**
          * 요청한 유저가 새로운 게임 방에 입장할 수 있는 상태인지 체크한다.
+         * TODO UserService로 이관 필요
          */
         checkUserCanEnterGameRoom(userId);
 
@@ -367,9 +362,9 @@ public class GameRoomService {
             throw new IllegalGameRoomStateException();
         }
 
-        List<GameRoomEntrance> targetGameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, GameRoomEntranceState.WAITING);
+        List<GameRoomParticipant> targetGameRoomParticipants = gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, GameRoomParticipantState.WAITING);
 
-        int enteredUserCounts = targetGameRoomEntrances.size();
+        int enteredUserCounts = targetGameRoomParticipants.size();
 
         if (enteredUserCounts >= gameRoomCapacity) {
             throw new IllegalGameRoomStateException("방의 정원이 모두 찼습니다.");
@@ -391,12 +386,12 @@ public class GameRoomService {
      * 게임 방 ID와 게임 방 입장 상태에 맞는 게임 방 입장 목록을 조회해온다.
      *
      * @param gameRoomId 대상 게임 방 ID
-     * @param gameRoomEntranceState 게임 방 입장 상태
+     * @param gameRoomParticipantState 게임 방 입장 상태
      * @return 게임 방 입장 목록
      */
     @Transactional(readOnly = true)
-    public List<GameRoomEntrance> findGameRoomEntrancesByGameRoomIdAndState(Long gameRoomId, GameRoomEntranceState gameRoomEntranceState) {
-        return gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, gameRoomEntranceState);
+    public List<GameRoomParticipant> findGameRoomEntrancesByGameRoomIdAndState(Long gameRoomId, GameRoomParticipantState gameRoomParticipantState) {
+        return gameRoomEntranceRepository.findGameRoomEntrancesByGameRoomIdAndState(gameRoomId, gameRoomParticipantState);
     }
 
     /**
@@ -436,8 +431,8 @@ public class GameRoomService {
 
     @Transactional(readOnly = true)
     public void validateIsHost(Long gameRoomId, Long userId) {
-        GameRoomEntrance userEntrance = gameRoomEntranceRepository.findCurrentEnteredGameRoomEntranceByUserId(userId)
-                .orElseThrow(GameRoomEntranceNotFoundException::new);
+        GameRoomParticipant userEntrance = gameRoomEntranceRepository.findCurrentEnteredGameRoomEntranceByUserId(userId)
+                .orElseThrow(GameRoomParticipantNotFoundException::new);
 
         if (!userEntrance.isHost()) {
             throw new AbnormalAccessException();
@@ -450,7 +445,7 @@ public class GameRoomService {
      */
     @Transactional
     public void resetGameRoomEntrances(List<Long> gameRoomEntranceIds) {
-        gameRoomEntranceRepository.updateGameRoomEntrancesState(gameRoomEntranceIds, GameRoomEntranceState.WAITING);
+        gameRoomEntranceRepository.updateGameRoomEntrancesState(gameRoomEntranceIds, GameRoomParticipantState.WAITING);
     }
 
     /**
@@ -459,8 +454,8 @@ public class GameRoomService {
      */
     @Transactional
     public void resetGameRoomEntrancesReady(List<Long> gameRoomEntranceIds) {
-        List<GameRoomEntrance> gameRoomEntrances = gameRoomEntranceRepository.findGameRoomEntrancesByIds(gameRoomEntranceIds);
-        gameRoomEntrances.forEach(GameRoomEntrance::resetReady);
-        gameRoomEntranceRepository.saveAll(gameRoomEntrances);
+        List<GameRoomParticipant> gameRoomParticipants = gameRoomEntranceRepository.findGameRoomEntrancesByIds(gameRoomEntranceIds);
+        gameRoomParticipants.forEach(GameRoomParticipant::resetReady);
+        gameRoomEntranceRepository.saveAll(gameRoomParticipants);
     }
 }

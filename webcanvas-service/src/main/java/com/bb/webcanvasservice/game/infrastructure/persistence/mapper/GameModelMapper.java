@@ -1,6 +1,10 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.mapper;
 
 import com.bb.webcanvasservice.game.domain.model.*;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurn;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipant;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.*;
 import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;
 
@@ -24,8 +28,8 @@ public class GameModelMapper {
         return new GameRoom(entity.getId(), entity.getJoinCode(), entity.getState());
     }
 
-    public static GameRoomEntrance toModel(GameRoomEntranceJpaEntity entity) {
-        return new GameRoomEntrance(entity.getId(),
+    public static GameRoomParticipant toModel(GameRoomParticipantJpaEntity entity) {
+        return new GameRoomParticipant(entity.getId(),
                 entity.getGameRoomEntity().getId(),
                 entity.getUserEntity().getId(),
                 entity.getState(),
@@ -61,15 +65,15 @@ public class GameModelMapper {
         return new GameRoomJpaEntity(gameRoom.getId(), gameRoom.getJoinCode(), gameRoom.getState());
     }
 
-    public static GameRoomEntranceJpaEntity toEntity(GameRoomEntrance gameRoomEntrance, GameRoomJpaEntity gameRoomEntity, UserJpaEntity userEntity) {
-        return new GameRoomEntranceJpaEntity(
-                gameRoomEntrance.getId(),
+    public static GameRoomParticipantJpaEntity toEntity(GameRoomParticipant gameRoomParticipant, GameRoomJpaEntity gameRoomEntity, UserJpaEntity userEntity) {
+        return new GameRoomParticipantJpaEntity(
+                gameRoomParticipant.getId(),
                 gameRoomEntity,
                 userEntity,
-                gameRoomEntrance.getNickname(),
-                gameRoomEntrance.getRole(),
-                gameRoomEntrance.getState(),
-                gameRoomEntrance.isReady()
+                gameRoomParticipant.getNickname(),
+                gameRoomParticipant.getRole(),
+                gameRoomParticipant.getState(),
+                gameRoomParticipant.isReady()
         );
     }
 

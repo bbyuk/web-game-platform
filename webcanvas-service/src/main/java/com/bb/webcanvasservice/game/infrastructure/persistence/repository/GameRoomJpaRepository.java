@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
-import com.bb.webcanvasservice.game.domain.model.GameRoomEntranceState;
-import com.bb.webcanvasservice.game.domain.model.GameRoomState;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -25,10 +25,10 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
     @Query("""
             select      gr
             from        GameRoomJpaEntity gr
-            join fetch  GameRoomEntranceJpaEntity gre
-            on          gre.gameRoomEntity.id = gr.id
+            join fetch  GameRoomParticipantJpaEntity grp
+            on          grp.gameRoomEntity.id = gr.id
             where       gr.state != 'CLOSED'
-            and         gre.userEntity.id = :userId
+            and         grp.userEntity.id = :userId
             """)
     Optional<GameRoomJpaEntity> findNotClosedGameRoomByUserId(@Param("userId") Long userId);
 
@@ -52,7 +52,7 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
     /**
      * 입장 가능한 게임 방의 목록을 가져온다.
      *
-     * 조건 1. GameRoom과 연관된 GameRoomEntrance의 수가 게임 방의 수용 인원 수보다 작거나 같아야함
+     * 조건 1. GameRoom과 연관된 GameRoomParticipant의 수가 게임 방의 수용 인원 수보다 작거나 같아야함
      * 조건 2. GameRoom의 state가 enterableStates에 맞는 엔티티만 조회
      * @param gameRoomCapacity 게임 방 최대 정원
      * @param enterableStates 입장 가능한 방 상태
@@ -74,7 +74,7 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
     )
     List<GameRoomJpaEntity> findGameRoomsByCapacityAndStateWithEntranceState(@Param("gameRoomCapacity") int gameRoomCapacity,
                                                                              @Param("enterableStates") List<GameRoomState> enterableStates,
-                                                                             @Param("activeEntranceState")GameRoomEntranceState activeEntranceState);
+                                                                             @Param("activeEntranceState") GameRoomParticipantState activeEntranceState);
 
     /**
      * GameRoom 상태로 게엠 방을 조회한다.

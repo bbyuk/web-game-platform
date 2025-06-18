@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.game.application.service;
 
 import com.bb.webcanvasservice.game.application.registry.GameTurnTimerRegistry;
 import com.bb.webcanvasservice.game.domain.exception.GameTurnTimerNotFoundException;
-import com.bb.webcanvasservice.game.domain.model.GameTurnTimer;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurnTimer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,11 +1,11 @@
-package com.bb.webcanvasservice.game.domain.model;
+package com.bb.webcanvasservice.game.domain.model.participant;
 
 import java.util.List;
 
 /**
  * 게임 방 입장 Entity 의 상태 코드
  */
-public enum GameRoomEntranceState {
+public enum GameRoomParticipantState {
 
     /**
      * 대기 상태
@@ -23,5 +23,5 @@ public enum GameRoomEntranceState {
      */
     EXITED;
 
-    public static final List<GameRoomEntranceState> entered = List.of(WAITING, PLAYING);
+    public static final List<GameRoomParticipantState> entered = List.of(WAITING, PLAYING);
 }

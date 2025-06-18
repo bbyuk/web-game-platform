@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.game.presentation.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "게임 방에 입장한 유저 정보 응답 DTO")
-public record EnteredUserInfoResponse(
+public record JoinedUserInfoResponse(
 
         @Schema(description = "유저 ID", example = "512")
         Long userId,

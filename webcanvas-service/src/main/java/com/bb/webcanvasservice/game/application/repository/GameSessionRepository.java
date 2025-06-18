@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.game.application.repository;
 
-import com.bb.webcanvasservice.game.domain.model.GameSession;
-import com.bb.webcanvasservice.game.domain.model.GameTurn;
-import com.bb.webcanvasservice.game.domain.model.GameTurnState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurn;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurnState;
 
 import java.util.List;
 import java.util.Optional;

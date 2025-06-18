@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.entity;
 
-import com.bb.webcanvasservice.game.domain.model.GameRoomState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
 import com.bb.webcanvasservice.infrastructure.persistence.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -39,24 +39,4 @@ public class GameRoomJpaEntity extends BaseEntity {
      * 게임 방 상태
      */
     private GameRoomState state;
-
-
-    public void changeStateToPlay() {
-        this.state = GameRoomState.PLAYING;
-    }
-
-    /**
-     * 게임 세션이 종료된 후 WAITING 상태로 방 상태를 리셋한다.
-     */
-    public void resetGameRoomState() {
-        this.state = GameRoomState.WAITING;
-    }
-
-    /**
-     * 게임 방 상태를 close한다.
-     */
-    public void close() {
-        this.state = GameRoomState.CLOSED;
-    }
-
 }

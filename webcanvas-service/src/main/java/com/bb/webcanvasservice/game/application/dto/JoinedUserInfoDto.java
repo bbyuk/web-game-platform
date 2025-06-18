@@ -1,12 +1,12 @@
 package com.bb.webcanvasservice.game.application.dto;
 
-import com.bb.webcanvasservice.game.domain.model.GameRoomEntranceRole;
+import com.bb.webcanvasservice.game.domain.model.participant.GameRoomParticipantRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * application layer -> presentation layer 입장된 유저 정보 DTO
  */
-public record EnteredUserInfoDto(
+public record JoinedUserInfoDto(
         @Schema(description = "유저 ID", example = "512")
         Long userId,
 
@@ -17,7 +17,7 @@ public record EnteredUserInfoDto(
         String nickname,
 
         @Schema(description = "게임 방 내에서의 ROLE")
-        GameRoomEntranceRole role,
+        GameRoomParticipantRole role,
 
         @Schema(description = "레디 여부")
         boolean ready
