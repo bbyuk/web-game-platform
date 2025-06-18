@@ -14,7 +14,7 @@ public interface GameRoomRepository {
 
     /**
      * 게임 방 ID로 게임 방을 찾는다.
-     * @param gameRoomId
+     * @param gameRoomId 게임 방 ID
      * @return 게임 방
      */
     Optional<GameRoom> findGameRoomById(Long gameRoomId);
@@ -35,11 +35,12 @@ public interface GameRoomRepository {
     Optional<GameRoom> findGameRoomByGameSessionId(Long gameSessionId);
 
     /**
-     * 현재 입장해있는 방을 조회한다.
-     * @param userId 유저ID
-     * @return gameRoom 현재 입장해있는 방
+     * 유저 ID로 대상 유저가 입장해 있는 게임 방을 찾는다.
+     * @param userId 유저 ID
+     * @return 게임 방
      */
-    Optional<GameRoom> findNotClosedGameRoomByUserId(Long userId);
+    Optional<GameRoom> findCurrentJoinedGameRoomByUserId(Long userId);
+
 
     /**
      * 현재 입장 가능한 방들 중 joinCode의 충돌이 있는지 여부를 비관적 락을 걸어 확인한다.
@@ -62,13 +63,6 @@ public interface GameRoomRepository {
                                                                     GameRoomParticipantState activeEntranceState);
 
     /**
-     * GameRoom 상태로 게엠 방을 조회한다.
-     * @param state
-     * @return
-     */
-    List<GameRoom> findByState(GameRoomState state);
-
-    /**
      * JoinCode로 입장할 방 조회
      * GameRoom.state = 'WAITING' 이어야 한다.
      *
@@ -83,5 +77,6 @@ public interface GameRoomRepository {
      * @return 저장된 게임 방
      */
     GameRoom save(GameRoom gameRoom);
+
 
 }

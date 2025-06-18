@@ -41,14 +41,14 @@ public class GameRoom {
     /**
      * 현재 게임 방의 입장자 목록
      */
-    private Set<GameRoomParticipant> participants;
+    private List<GameRoomParticipant> participants;
 
     /**
      * 게임 방의 정원
      */
     private int gameRoomCapacity;
 
-    public GameRoom(Long id, String joinCode, GameRoomState state) {
+    public GameRoom(Long id, String joinCode, GameRoomState state, GameSession currentGameSession, List<GameRoomParticipant> participants) {
         this.id = id;
         this.joinCode = joinCode;
         this.state = state;
@@ -60,7 +60,7 @@ public class GameRoom {
      * @return 게임 방
      */
     public static GameRoom create(String joinCode) {
-        return new GameRoom(null, joinCode, GameRoomState.WAITING);
+        return new GameRoom(null, joinCode, GameRoomState.WAITING, null, new ArrayList<>());
     }
 
     /**
@@ -132,6 +132,14 @@ public class GameRoom {
     }
 
     /**
+     * 새로운 입장자를 입장시킨다.
+     * @param newParticipant
+     */
+    public void letIn(GameRoomParticipant newParticipant) {
+        participants.add(newParticipant);
+    }
+
+    /**
      * 대상 GameRoomParticipant를 내보내다.
      *
      * @param targetParticipant 대상 participant
@@ -140,7 +148,7 @@ public class GameRoom {
         targetParticipant.exit();
         eventQueue.add(new GameRoomExitEvent(id, targetParticipant.getUserId()));
 
-        Set<GameRoomParticipant> currentParticipants = getCurrentParticipants();
+        List<GameRoomParticipant> currentParticipants = getCurrentParticipants();
 
         if (currentParticipants.isEmpty()) {
             this.close();
@@ -175,11 +183,11 @@ public class GameRoom {
      * 현재 퇴장하지 않은 게임 방 입장자 목록 조회
      * @return
      */
-    public Set<GameRoomParticipant> getCurrentParticipants() {
+    public List<GameRoomParticipant> getCurrentParticipants() {
         return participants
                 .stream()
                 .filter(GameRoomParticipant::isActive)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
@@ -254,7 +262,7 @@ public class GameRoom {
      * 새 게임 세션을 생성해 loading 상태로 할당한다.
      */
     public void loadGameSession(int timePerTurn) {
-        Set<GameRoomParticipant> currentParticipants = getCurrentParticipants();
+        List<GameRoomParticipant> currentParticipants = getCurrentParticipants();
 
         int turnCount = currentParticipants.size();
         this.currentGameSession = GameSession.create(id, turnCount, timePerTurn);
@@ -283,7 +291,7 @@ public class GameRoom {
             throw new GameSessionIsOverException();
         }
 
-        Set<GameRoomParticipant> currentParticipants = getCurrentParticipants();
+        List<GameRoomParticipant> currentParticipants = getCurrentParticipants();
         currentParticipants.forEach(GameRoomParticipant::changeStateToWaiting);
 
         gameSession.end();
@@ -319,7 +327,7 @@ public class GameRoom {
         /**
          * 현재 게임중인 유저 목록
          */
-        Set<GameRoomParticipant> gameRoomParticipants = getCurrentParticipants();
+        List<GameRoomParticipant> gameRoomParticipants = getCurrentParticipants();
 
         // 유저별 턴 수 집계
         Map<Long, Integer> drawerCountMap = gameSession.getDrawerCountMap();
@@ -353,4 +361,17 @@ public class GameRoom {
         return candidates.get(randomIndex);
     }
 
+
+    /**
+     * 유저 ID로 게임 방 입장자를 찾아 리턴한다.
+     * @param targetUserId 대상 유저 ID
+     * @return 게임 방 입장자 객체
+     */
+    public GameRoomParticipant findParticipantByUserId(Long targetUserId) {
+        return getCurrentParticipants()
+                .stream()
+                .filter(participant -> participant.getUserId().equals(targetUserId))
+                .findFirst()
+                .orElseThrow(GameRoomParticipantNotFoundException::new);
+    }
 }

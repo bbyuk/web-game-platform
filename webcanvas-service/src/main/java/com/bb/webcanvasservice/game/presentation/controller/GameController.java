@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.game.presentation.controller;
 
-import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
+import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.presentation.mapper.GameCommandMapper;
 import com.bb.webcanvasservice.game.presentation.mapper.GamePresentationDtoMapper;
 import com.bb.webcanvasservice.game.presentation.request.GameStartRequest;

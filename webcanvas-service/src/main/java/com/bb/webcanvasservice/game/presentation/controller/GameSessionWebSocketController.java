@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.game.presentation.controller;
 
-import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
+import com.bb.webcanvasservice.game.application.service.GameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomParticipantJpaEntity;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -130,13 +131,27 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
      * @return 게임 방 입장 목록
      */
     @Query("""
-            select      gre
-            from        GameRoomParticipantJpaEntity gre
-            join fetch  UserJpaEntity u on gre.userEntity.id = u.id
-            join fetch  GameRoomJpaEntity gr on gre.gameRoomEntity.id = gr.id
-            where       gre.gameRoomEntity.id = :gameRoomId
-            and         gre.state in :gameRoomParticipantStates
-            order by    gre.id asc
+            select      grp
+            from        GameRoomParticipantJpaEntity grp
+            join fetch  UserJpaEntity u on grp.userEntity.id = u.id
+            join fetch  GameRoomJpaEntity gr on grp.gameRoomEntity.id = gr.id
+            where       grp.gameRoomEntity.id = :gameRoomId
+            and         grp.state in :gameRoomParticipantStates
+            order by    grp.id asc
             """)
-    List<GameRoomParticipantJpaEntity> findGameRoomEntrancesByGameRoomIdAndStates(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomParticipantStates") List<GameRoomParticipantState> gameRoomParticipantStates);
+    List<GameRoomParticipantJpaEntity> findGameRoomParticipantsByGameRoomIdAndStates(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomParticipantStates") List<GameRoomParticipantState> gameRoomParticipantStates);
+
+    /**
+     * 게임 방에 해당하는 게임 방 입장자들을 모두 가져온다.
+     * @param gameRoomJpaEntities gameRoomJpa 엔티티 목록
+     * @return 게임 방 입장자 entity 목록
+     */
+    @Query("""
+            select      grp
+            from        GameRoomParticipantJpaEntity grp
+            join fetch  GameRoomJpaEntity gr
+            on          grp.gameRoomEntity = gr
+            where       grp.gameRoomEntity in :gameRoomIds
+           """)
+    List<GameRoomParticipantJpaEntity> findGameRoomParticipantsByGameRooms(@Param("gameRooms") List<GameRoomJpaEntity> gameRoomJpaEntities);
 }

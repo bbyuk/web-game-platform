@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.game.presentation.controller;
 
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
-import com.bb.webcanvasservice.game.application.service.GameRoomService;
+import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.presentation.mapper.GameCommandMapper;
 import com.bb.webcanvasservice.game.presentation.mapper.GamePresentationDtoMapper;
 import com.bb.webcanvasservice.game.presentation.request.GameRoomReadyUpdateRequest;
@@ -23,14 +23,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class GameRoomController {
 
-    private final GameRoomService gameRoomService;
+    private final GameService gameService;
 
     @PostMapping
     @Operation(summary = "게임 방 생성", description = "게임 방을 생성하고 입장한다.")
     public ResponseEntity<GameRoomJoinResponse> createGameRoom(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomJoinResponse(
-                        gameRoomService.createGameRoomAndEnter(authentication.getUserId())
+                        gameService.createGameRoomAndEnter(authentication.getUserId())
                 )
         );
     }
@@ -40,7 +40,7 @@ public class GameRoomController {
     public ResponseEntity<GameRoomListResponse> getJoinableGameRooms(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomListResponse(
-                        gameRoomService.findJoinableGameRooms(authentication.getUserId())
+                        gameService.findJoinableGameRooms(authentication.getUserId())
                 )
         );
     }
@@ -50,7 +50,7 @@ public class GameRoomController {
     public ResponseEntity<GameRoomJoinDetailInfoResponse> getJoinedGameRoom(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomJoinDetailInfoResponse(
-                        gameRoomService.findJoinedGameRoomInfo(authentication.getUserId())
+                        gameService.findJoinedGameRoomInfo(authentication.getUserId())
                 )
         );
     }
@@ -59,7 +59,7 @@ public class GameRoomController {
     @Operation(summary = "현재 입장한 게임 방에서 퇴장", description = "요청을 보낸 유저가 입장한 게임 방에서 퇴장한다.")
     @DeleteMapping("participant/{gameRoomParticipantId}")
     public ResponseEntity<GameRoomExitResponse> exitGameRoom(@Authenticated WebCanvasAuthentication authentication, @PathVariable("gameRoomParticipantId") Long gameRoomParticipantId) {
-        gameRoomService.exitFromRoom(
+        gameService.exitFromRoom(
                 GameCommandMapper.toExitGameRoomCommand(gameRoomParticipantId, authentication.getUserId())
         );
         return ResponseEntity.ok(new GameRoomExitResponse(true));
@@ -71,7 +71,7 @@ public class GameRoomController {
     public ResponseEntity<GameRoomJoinResponse> enterGameRoom(@PathVariable("gameRoomId") Long gameRoomId, @Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomJoinResponse(
-                        gameRoomService.enterGameRoom(GameCommandMapper.toEnterGameRoomCommand(gameRoomId, authentication.getUserId()))
+                        gameService.enterGameRoom(GameCommandMapper.toEnterGameRoomCommand(gameRoomId, authentication.getUserId()))
                 )
         );
     }
@@ -82,7 +82,7 @@ public class GameRoomController {
                                                                           @Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomJoinResponse(
-                        gameRoomService.enterGameRoomWithJoinCode(joinCode, authentication.getUserId())
+                        gameService.enterGameRoomWithJoinCode(joinCode, authentication.getUserId())
                 )
         );
     }
@@ -94,7 +94,7 @@ public class GameRoomController {
             @RequestBody GameRoomReadyUpdateRequest request,
             @Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
-                gameRoomService.updateReady(
+                gameService.updateReady(
                         GameCommandMapper.toUpdateReadyCommand(
                                 gameRoomParticipantId, authentication.getUserId(), request.ready()
                         )

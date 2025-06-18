@@ -57,7 +57,7 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
                 """;
 
         return em.createQuery(jpql, Boolean.class)
-                .setParameter("enteredStates", GameRoomParticipantState.entered)
+                .setParameter("enteredStates", GameRoomParticipantState.joined)
                 .setParameter("gameRoomId", gameRoomId)
                 .setParameter("userId", userId)
                 .getSingleResult();
@@ -74,7 +74,7 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
                 """;
         return em.createQuery(jpql, Long.class)
                 .setParameter("gameRoomId", gameRoomId)
-                .setParameter("enteredStates", GameRoomParticipantState.entered)
+                .setParameter("enteredStates", GameRoomParticipantState.joined)
                 .getSingleResult().intValue();
     }
 
@@ -108,7 +108,7 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
 
         GameRoomParticipantJpaEntity gameRoomParticipantJpaEntity = em.createQuery(jpql, GameRoomParticipantJpaEntity.class)
                 .setParameter("userId", userId)
-                .setParameter("enteredStates", GameRoomParticipantState.entered)
+                .setParameter("enteredStates", GameRoomParticipantState.joined)
                 .getSingleResult();
 
         return Optional.of(GameModelMapper.toModel(gameRoomParticipantJpaEntity));
@@ -129,7 +129,7 @@ public class GameRoomEntranceRepositoryImpl implements GameRoomEntranceRepositor
 
     @Override
     public List<GameRoomParticipant> findGameRoomEntrancesByGameRoomIdAndStates(Long gameRoomId, List<GameRoomParticipantState> gameRoomParticipantStates) {
-        return gameRoomParticipantJpaRepository.findGameRoomEntrancesByGameRoomIdAndStates(gameRoomId, gameRoomParticipantStates)
+        return gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRoomIdAndStates(gameRoomId, gameRoomParticipantStates)
                 .stream()
                 .map(GameModelMapper::toModel)
                 .collect(Collectors.toList());

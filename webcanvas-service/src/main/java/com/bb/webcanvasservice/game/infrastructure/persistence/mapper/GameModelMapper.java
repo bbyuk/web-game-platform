@@ -8,6 +8,9 @@ import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipant;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.*;
 import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * entity <-> domain model
  *
@@ -24,9 +27,19 @@ public class GameModelMapper {
         return new GamePlayHistory(entity.getUserEntity().getId(), entity.getGameSessionEntity().getId());
     }
 
-    public static GameRoom toModel(GameRoomJpaEntity entity) {
-        return new GameRoom(entity.getId(), entity.getJoinCode(), entity.getState());
+    public static GameRoom toModel(GameRoomJpaEntity gameRoomEntity, GameSessionJpaEntity gameSessionEntity, List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities) {
+        return new GameRoom(
+                gameRoomEntity.getId(),
+                gameRoomEntity.getJoinCode(),
+                gameRoomEntity.getState(),
+                toModel(gameSessionEntity),
+                gameRoomParticipantEntities.stream().map(GameModelMapper::toModel).toList());
     }
+
+    public static GameRoom toModel(GameRoomJpaEntity gameRoomEntity) {
+        return new GameRoom(gameRoomEntity.getId(), gameRoomEntity.getJoinCode(), gameRoomEntity.getState(), null, null);
+    }
+
 
     public static GameRoomParticipant toModel(GameRoomParticipantJpaEntity entity) {
         return new GameRoomParticipant(entity.getId(),

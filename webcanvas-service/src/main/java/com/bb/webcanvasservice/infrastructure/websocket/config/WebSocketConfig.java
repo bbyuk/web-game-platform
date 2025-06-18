@@ -1,7 +1,6 @@
 package com.bb.webcanvasservice.infrastructure.websocket.config;
 
 import com.bb.webcanvasservice.common.util.JwtManager;
-import com.bb.webcanvasservice.game.application.service.GameRoomService;
 import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.infrastructure.security.websocket.WebSocketAuthenticationArgumentResolver;
 import com.bb.webcanvasservice.infrastructure.websocket.interceptor.JwtAuthenticationChannelInterceptor;
@@ -34,7 +33,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     /**
      * 게임 방과 연관되어 있는 웹소켓 이벤트 브로커 구독 요청의 validation 처리를 위한 서비스 주입
      */
-    private final GameRoomService gameRoomService;
     private final GameService gameService;
 
     /**

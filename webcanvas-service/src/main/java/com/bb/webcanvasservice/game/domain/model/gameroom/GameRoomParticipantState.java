@@ -23,5 +23,5 @@ public enum GameRoomParticipantState {
      */
     EXITED;
 
-    public static final List<GameRoomParticipantState> entered = List.of(WAITING, PLAYING);
+    public static final List<GameRoomParticipantState> joined = List.of(WAITING, PLAYING);
 }

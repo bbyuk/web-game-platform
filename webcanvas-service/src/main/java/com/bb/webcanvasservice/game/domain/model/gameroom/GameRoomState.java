@@ -21,7 +21,5 @@ public enum GameRoomState {
      */
     PLAYING;
 
-    public static List<GameRoomState> enterable() {
-        return List.of(WAITING);
-    };
+    public final static List<GameRoomState> joinable = List.of(WAITING);
 }

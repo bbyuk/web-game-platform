@@ -28,10 +28,10 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
             from        GameRoomJpaEntity gr
             join fetch  GameRoomParticipantJpaEntity grp
             on          grp.gameRoomEntity.id = gr.id
-            where       gr.state != 'CLOSED'
+            where       gr.state in (:joinedStates)
             and         grp.userEntity.id = :userId
             """)
-    Optional<GameRoomJpaEntity> findNotClosedGameRoomByUserId(@Param("userId") Long userId);
+    Optional<GameRoomJpaEntity> findCurrentJoinedGameRoomByUserId(@Param("userId") Long userId, @Param("joinedStates") List<GameRoomParticipantState> joinedStates);
 
     /**
      * 현재 입장 가능한 방들 중 joinCode의 충돌이 있는지 여부를 비관적 락을 걸어 확인한다.
