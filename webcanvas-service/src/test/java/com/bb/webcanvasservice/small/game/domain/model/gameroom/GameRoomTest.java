@@ -215,4 +215,27 @@ class GameRoomTest {
         gameRoom.processEventQueue(event -> publishedEventCount.incrementAndGet());
         Assertions.assertThat(publishedEventCount.get()).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName("게임 방 퇴장 테스트 - 호스트가 퇴장할 때 방에 인원이 남아있다면 GUEST 중 가장 먼저 입장한 유저가 HOST가 된다.")
+    void testExitGameRoom_success_2() throws Exception {
+        // given
+        User user1 = User.create(FingerprintGenerator.generate());
+        User user2 = User.create(FingerprintGenerator.generate());
+
+        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+
+        GameRoomParticipant gameRoomParticipant1 = GameRoomParticipant.create(gameRoom.getId(), user1.getId(), "테스트중인");
+        GameRoomParticipant gameRoomParticipant2 = GameRoomParticipant.create(gameRoom.getId(), user2.getId(), "테스트중인");
+
+        gameRoom.letIn(gameRoomParticipant1);
+        gameRoom.letIn(gameRoomParticipant2);
+
+        // when
+        gameRoom.sendOut(gameRoomParticipant1);
+
+        // then
+
+        Assertions.assertThat(gameRoomParticipant2.isHost()).isTrue();
+    }
 }

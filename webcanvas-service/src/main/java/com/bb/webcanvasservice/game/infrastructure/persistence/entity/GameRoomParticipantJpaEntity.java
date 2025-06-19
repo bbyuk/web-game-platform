@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * 게임 방 입장자를 나타내는 엔티티 클래스
  */
@@ -67,4 +69,16 @@ public class GameRoomParticipantJpaEntity extends BaseEntity {
      */
     @Column(name = "ready")
     private boolean ready;
+
+    /**
+     * 입장 시각
+     */
+    @Column(name = "joined_at")
+    private LocalDateTime joinedAt;
+
+    /**
+     * 퇴장 시각
+     */
+    @Column(name = "exit_at")
+    private LocalDateTime exitAt;
 }

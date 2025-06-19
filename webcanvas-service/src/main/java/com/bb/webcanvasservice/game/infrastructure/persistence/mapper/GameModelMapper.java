@@ -49,7 +49,10 @@ public class GameModelMapper {
                 entity.getState(),
                 entity.getNickname(),
                 entity.getRole(),
-                entity.isReady());
+                entity.isReady(),
+                entity.getJoinedAt(),
+                entity.getExitAt()
+        );
     }
 
 
@@ -89,7 +92,9 @@ public class GameModelMapper {
                 gameRoomParticipant.getNickname(),
                 gameRoomParticipant.getRole(),
                 gameRoomParticipant.getState(),
-                gameRoomParticipant.isReady()
+                gameRoomParticipant.isReady(),
+                gameRoomParticipant.getJoinedAt(),
+                gameRoomParticipant.getExitAt()
         );
     }
 

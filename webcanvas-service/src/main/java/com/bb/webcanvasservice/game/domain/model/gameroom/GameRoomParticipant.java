@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.game.domain.model.gameroom;
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomHostCanNotChangeReadyException;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -46,6 +47,24 @@ public class GameRoomParticipant {
     private boolean ready;
 
     /**
+     * 입장 시각
+     */
+    private LocalDateTime joinedAt;
+
+    /**
+     * 퇴장 시각
+     */
+    private LocalDateTime exitAt;
+
+    public LocalDateTime getJoinedAt() {
+        return joinedAt;
+    }
+
+    public LocalDateTime getExitAt() {
+        return exitAt;
+    }
+
+    /**
      * 새로운 입장자 도메인 객체를 생성해 리턴한다.
      * @param gameRoomId 입장하는 게임 방 ID
      * @param userId 입장하는 유저 ID
@@ -61,7 +80,9 @@ public class GameRoomParticipant {
                 GameRoomParticipantState.WAITING,
                 String.format("%s %s", nicknameAdjective, "플레이어"),
                 GameRoomParticipantRole.GUEST,
-                false
+                false,
+                null,
+                null
         );
     }
 
@@ -73,7 +94,16 @@ public class GameRoomParticipant {
         return ready;
     }
 
-    public GameRoomParticipant(Long id, Long gameRoomId, Long userId, GameRoomParticipantState state, String nickname, GameRoomParticipantRole role, boolean ready) {
+    public GameRoomParticipant(
+            Long id,
+            Long gameRoomId,
+            Long userId,
+            GameRoomParticipantState state,
+            String nickname,
+            GameRoomParticipantRole role,
+            boolean ready,
+            LocalDateTime joinedAt,
+            LocalDateTime exitAt) {
         this.id = id;
         this.gameRoomId = gameRoomId;
         this.userId = userId;
@@ -81,13 +111,24 @@ public class GameRoomParticipant {
         this.nickname = nickname;
         this.role = role;
         this.ready = ready;
+        this.joinedAt = joinedAt;
+        this.exitAt = exitAt;
     }
 
     /**
-     * 게임 입장 Entity를 exit 처리한다.
+     * 게임 입장자를 exit 처리한다.
      */
     public void exit() {
         this.state = GameRoomParticipantState.EXITED;
+        this.exitAt = LocalDateTime.now();
+    }
+
+    /**
+     * 게임 입장자를 입장 시킨다.
+     */
+    public void join() {
+        this.state = GameRoomParticipantState.IN_ROOM;
+        this.joinedAt = LocalDateTime.now();
     }
 
     /**
@@ -192,8 +233,7 @@ public class GameRoomParticipant {
     }
 
     public boolean isActive() {
-        return this.state == GameRoomParticipantState.PLAYING
-                || this.state == GameRoomParticipantState.WAITING;
+        return GameRoomParticipantState.joined.contains(state);
     }
 
     /**

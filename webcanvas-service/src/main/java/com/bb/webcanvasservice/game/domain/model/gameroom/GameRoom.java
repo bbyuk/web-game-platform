@@ -135,6 +135,7 @@ public class GameRoom {
             newParticipant.changeRoleToHost();
         }
 
+        newParticipant.join();
         participants.add(newParticipant);
     }
 
@@ -157,8 +158,7 @@ public class GameRoom {
              * 퇴장 요청을 보낸 유저가 HOST일 경우 남은 유저 중 제일 처음 입장한 유저가 HOST가 된다.
              */
             currentParticipants.stream()
-                    .filter(participant -> !participant.equals(targetParticipant))
-                    .sorted(Comparator.comparingLong(GameRoomParticipant::getId))
+                    .sorted(Comparator.comparing(GameRoomParticipant::getJoinedAt))
                     .findFirst()
                     .ifPresentOrElse(
                             participant -> {
