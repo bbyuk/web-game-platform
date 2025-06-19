@@ -115,7 +115,6 @@ public class GameService {
          * 2. 게임 방이 입장 가능한 상태인지 체크
          */
         GameRoom gameRoom = gameRoomRepository.findGameRoomById(command.gameRoomId()).orElseThrow(GameRoomNotFoundException::new);
-        gameRoom.checkCanJoin();
 
         /**
          * dictionary 도메인 서비스로부터 랜덤 형용사 조회
@@ -337,11 +336,6 @@ public class GameService {
          * 요청 보낸 유저가 대상 게임 방의 HOST가 맞는지 확인
          */
         gameRoom.validateIsHost(command.userId());
-
-        /**
-         * 게임 시작을 위한 게임 방 상태 검증
-         */
-        gameRoom.validateStateToPlay();
 
 
         /**

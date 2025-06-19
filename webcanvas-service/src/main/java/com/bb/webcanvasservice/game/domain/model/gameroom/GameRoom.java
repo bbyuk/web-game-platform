@@ -144,6 +144,8 @@ public class GameRoom {
      * @param newParticipant
      */
     public void letIn(GameRoomParticipant newParticipant) {
+        checkCanJoin();
+
         if (participants.isEmpty()) {
             newParticipant.changeRoleToHost();
         }
@@ -257,7 +259,7 @@ public class GameRoom {
     /**
      * 게임 방 상태가 시작할 수 있는 상태인지 검증한다.
      */
-    public void validateStateToPlay() {
+    public void validateStateToLoad() {
         if (!isWaiting()) {
             throw new IllegalGameRoomStateException("게임 방의 상태가 게임을 시작할 수 없는 상태입니다.");
         }
@@ -268,12 +270,32 @@ public class GameRoom {
         if (currentGameSession != null) {
             throw new IllegalGameRoomStateException("이미 게임 세션이 진행중입니다.");
         }
+
+        List<GameRoomParticipant> currentParticipants = getCurrentParticipants();
+        /**
+         * 모든 유저가 레디 상태여야 한다.
+         */
+        if (currentParticipants
+                .stream()
+                .filter(GameRoomParticipant::isReady)
+                .count() < currentParticipants.size()) {
+            throw new IllegalGameRoomStateException("레디를 하지 않은 유저가 있습니다.");
+        }
+
+        /**
+         * 게임을 시작하기 위해서는 방에 인원은 최소 2명 이상이어야 한다.
+         */
+        if (currentParticipants.size() < 2) {
+            throw new IllegalGameRoomStateException("게임을 시작하기 위해서는 최소 2명 이상이 필요합니다.");
+        }
     }
 
     /**
      * 새 게임 세션을 생성해 loading 상태로 할당한다.
      */
     public void loadGameSession(int timePerTurn) {
+        validateStateToLoad();
+
         List<GameRoomParticipant> currentParticipants = getCurrentParticipants();
 
         int turnCount = currentParticipants.size();
