@@ -10,9 +10,6 @@ public record EnterGameRoomCommand(
         Long gameRoomId,
 
         @Schema(description = "입장 요청 유저 ID")
-        Long userId,
-
-        @Schema(description = "게임 방 입장 역할 코드")
-        GameRoomParticipantRole role
+        Long userId
 ) {
 }

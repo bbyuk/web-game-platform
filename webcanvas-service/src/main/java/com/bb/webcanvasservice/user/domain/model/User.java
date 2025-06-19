@@ -34,7 +34,7 @@ public class User {
     }
 
 
-    public static User createNewUser(String fingerprint) {
+    public static User create(String fingerprint) {
         return new User(null, fingerprint, UserState.IN_LOBBY, null);
     }
 

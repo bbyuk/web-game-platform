@@ -53,15 +53,16 @@ public class GameRoomParticipant {
      * @param role 입장자 role
      * @return 입장자
      */
-    public static GameRoomParticipant create(Long gameRoomId, Long userId, String nicknameAdjective, GameRoomParticipantRole role) {
+    public static GameRoomParticipant create(Long gameRoomId, Long userId, String nicknameAdjective) {
         return new GameRoomParticipant(
                 null,
                 gameRoomId,
                 userId,
                 GameRoomParticipantState.WAITING,
                 String.format("%s %s", nicknameAdjective, "플레이어"),
-                role,
-                role ==GameRoomParticipantRole.HOST);
+                GameRoomParticipantRole.GUEST,
+                false
+        );
     }
 
     public boolean isReady() {
@@ -197,8 +198,10 @@ public class GameRoomParticipant {
 
     /**
      * 게임 방 입장자 역할을 HOST로 변경한다.
+     * HOST는 항상 ready true이다.
      */
     public void changeRoleToHost() {
         this.role = GameRoomParticipantRole.HOST;
+        this.ready = true;
     }
 }

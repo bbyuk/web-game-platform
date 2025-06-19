@@ -64,7 +64,7 @@ public class UserApplicationService {
                         }
                 );
 
-        return UserApplicationDtoMapper.toUserDto(userRepository.save(User.createNewUser(fingerprint)));
+        return UserApplicationDtoMapper.toUserDto(userRepository.save(User.create(fingerprint)));
     }
 
     /**

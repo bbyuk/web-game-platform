@@ -12,7 +12,7 @@ import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantRol
 public class GameCommandMapper {
 
     public static EnterGameRoomCommand toEnterGameRoomCommand(Long gameRoomId, Long userId) {
-        return new EnterGameRoomCommand(gameRoomId, userId, GameRoomParticipantRole.GUEST);
+        return new EnterGameRoomCommand(gameRoomId, userId);
     }
 
     public static StartGameCommand toStartGameCommand(Long gameRoomId, int turnCount, int timePerTurn, Long userId) {

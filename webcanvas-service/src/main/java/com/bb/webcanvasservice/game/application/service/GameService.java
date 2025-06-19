@@ -26,11 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantRole.HOST;
 import static com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.WAITING;
 
 @Slf4j
@@ -69,7 +67,7 @@ public class GameService {
          * TODO userId 로 게임 방 생성 가능한지 validation 추가
          */
         GameRoom gameRoom = createGameRoom(gameProperties.joinCodeLength(), gameProperties.joinCodeMaxConflictCount());
-        return enterGameRoom(new EnterGameRoomCommand(gameRoom.getId(), userId, HOST));
+        return enterGameRoom(new EnterGameRoomCommand(gameRoom.getId(), userId));
     }
 
     /**
@@ -131,7 +129,6 @@ public class GameService {
                 gameRoom.getId()
                 , command.userId()
                 , koreanAdjective
-                , command.role()
         );
         gameRoom.letIn(newGameRoomParticipant);
 
@@ -167,7 +164,7 @@ public class GameService {
                 .orElseThrow(() -> new GameRoomNotFoundException(String.format("입장 코드가 %s인 방을 찾지 못했습니다.", joinCode)));
 
         return enterGameRoom(
-                new EnterGameRoomCommand(targetGameRoom.getId(), userId, GameRoomParticipantRole.GUEST)
+                new EnterGameRoomCommand(targetGameRoom.getId(), userId)
         );
     }
 

@@ -101,9 +101,10 @@ public class GameRoom {
     }
 
     /**
-     * 게임 방 상태를 close한다.
+     * 남은 게임 방 입장 유저들을 모두 내보내고 상태를 close한다.
      */
     public void close() {
+        getCurrentParticipants().stream().forEach(GameRoomParticipant::exit);
         this.state = GameRoomState.CLOSED;
     }
 
@@ -127,7 +128,7 @@ public class GameRoom {
      * 게임 방에 입장할 수 있는 상태인지 확인한다.
      */
     public void checkCanJoin() {
-        if (isWaiting()) {
+        if (!isWaiting()) {
             throw new IllegalGameRoomStateException();
         }
 
@@ -143,6 +144,10 @@ public class GameRoom {
      * @param newParticipant
      */
     public void letIn(GameRoomParticipant newParticipant) {
+        if (participants.isEmpty()) {
+            newParticipant.changeRoleToHost();
+        }
+
         participants.add(newParticipant);
     }
 
