@@ -34,6 +34,11 @@ public class GameRoom {
     private GameRoomState state;
 
     /**
+     * 게임 방의 정원
+     */
+    private int capacity;
+
+    /**
      * 현재 게임 방에서 진행중인 게임 세션
      */
     private GameSession currentGameSession;
@@ -43,15 +48,13 @@ public class GameRoom {
      */
     private List<GameRoomParticipant> participants;
 
-    /**
-     * 게임 방의 정원
-     */
-    private int gameRoomCapacity;
-
-    public GameRoom(Long id, String joinCode, GameRoomState state, GameSession currentGameSession, List<GameRoomParticipant> participants) {
+    public GameRoom(Long id, String joinCode, GameRoomState state, int capacity, GameSession currentGameSession, List<GameRoomParticipant> participants) {
         this.id = id;
         this.joinCode = joinCode;
         this.state = state;
+        this.capacity = capacity;
+        this.currentGameSession = currentGameSession;
+        this.participants = participants;
     }
 
     /**
@@ -59,8 +62,8 @@ public class GameRoom {
      *
      * @return 게임 방
      */
-    public static GameRoom create(String joinCode) {
-        return new GameRoom(null, joinCode, GameRoomState.WAITING, null, new ArrayList<>());
+    public static GameRoom create(String joinCode, int capacity) {
+        return new GameRoom(null, joinCode, GameRoomState.WAITING,  capacity, null, new ArrayList<>());
     }
 
     /**
@@ -126,7 +129,7 @@ public class GameRoom {
 
         int enteredUserCounts = getCurrentParticipants().size();
 
-        if (enteredUserCounts >= gameRoomCapacity) {
+        if (enteredUserCounts >= capacity) {
             throw new IllegalGameRoomStateException("방의 정원이 모두 찼습니다.");
         }
     }
@@ -321,6 +324,10 @@ public class GameRoom {
     }
 
 
+    /**
+     * 게임 방 내에서 다음 그림 그릴 사람을 찾는다.
+     * @return 게임 방내에서 다음 그릴 사람 user id 리턴
+     */
     public Long findNextDrawerId() {
         GameSession gameSession = getCurrentGameSession();
 
@@ -374,4 +381,6 @@ public class GameRoom {
                 .findFirst()
                 .orElseThrow(GameRoomParticipantNotFoundException::new);
     }
+
+
 }

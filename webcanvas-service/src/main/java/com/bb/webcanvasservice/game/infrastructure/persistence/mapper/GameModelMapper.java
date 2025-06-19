@@ -77,7 +77,7 @@ public class GameModelMapper {
     }
 
     public static GameRoomJpaEntity toEntity(GameRoom gameRoom) {
-        return new GameRoomJpaEntity(gameRoom.getId(), gameRoom.getJoinCode(), gameRoom.getState());
+        return new GameRoomJpaEntity(gameRoom.getId(), gameRoom.getJoinCode(), gameRoom.getState(), gameRoom.getCapacity());
     }
 
     public static GameRoomParticipantJpaEntity toEntity(GameRoomParticipant gameRoomParticipant, GameRoomJpaEntity gameRoomEntity, UserJpaEntity userEntity) {

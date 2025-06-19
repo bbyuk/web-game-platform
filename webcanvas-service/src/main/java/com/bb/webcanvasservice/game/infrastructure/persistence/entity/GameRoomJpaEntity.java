@@ -39,4 +39,10 @@ public class GameRoomJpaEntity extends BaseEntity {
      * 게임 방 상태
      */
     private GameRoomState state;
+
+    @Column(name = "capacity")
+    /**
+     * 게임 방 정원
+     */
+    private int capacity;
 }

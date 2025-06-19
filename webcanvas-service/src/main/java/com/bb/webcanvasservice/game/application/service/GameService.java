@@ -318,7 +318,9 @@ public class GameService {
         /**
          * GameRoom 생성
          */
-        return gameRoomRepository.save(GameRoom.create(joinCode));
+        return gameRoomRepository.save(
+                GameRoom.create(joinCode, gameProperties.gameRoomCapacity())
+        );
     }
 
 // ==========
