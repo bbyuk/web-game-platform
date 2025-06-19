@@ -125,21 +125,6 @@ public class GameRoom {
     }
 
     /**
-     * 게임 방에 입장할 수 있는 상태인지 확인한다.
-     */
-    public void checkCanJoin() {
-        if (!isWaiting()) {
-            throw new IllegalGameRoomStateException();
-        }
-
-        int enteredUserCounts = getCurrentParticipants().size();
-
-        if (enteredUserCounts >= capacity) {
-            throw new IllegalGameRoomStateException("방의 정원이 모두 찼습니다.");
-        }
-    }
-
-    /**
      * 새로운 입장자를 입장시킨다.
      * @param newParticipant
      */
@@ -413,5 +398,23 @@ public class GameRoom {
                 .orElseThrow(GameRoomParticipantNotFoundException::new);
     }
 
+    /**
+     * ===================== 내부 상태 쿼리 메소드 =================
+     */
+
+    /**
+     * 게임 방에 입장할 수 있는 상태인지 확인한다.
+     */
+    private void checkCanJoin() {
+        if (!isWaiting()) {
+            throw new IllegalGameRoomStateException();
+        }
+
+        int enteredUserCounts = getCurrentParticipants().size();
+
+        if (enteredUserCounts >= capacity) {
+            throw new IllegalGameRoomStateException("방의 정원이 모두 찼습니다.");
+        }
+    }
 
 }

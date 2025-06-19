@@ -5,12 +5,16 @@ import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.game.domain.exception.IllegalGameRoomStateException;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipant;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
 import com.bb.webcanvasservice.user.domain.model.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Tag("small")
 @DisplayName("[small] [game] 게임 방 도메인 모델 테스트")
@@ -178,5 +182,37 @@ class GameRoomTest {
         Assertions.assertThatThrownBy(() -> gameRoom.letIn(user9Participant))
                 .isInstanceOf(IllegalGameRoomStateException.class);
         // then
+    }
+
+    @Test
+    @DisplayName("게임 방 퇴장 테스트 - 게임 방에서 퇴장한다.")
+    void testExitGameRoom_success_1() throws Exception {
+        // given
+        User user1 = User.create(FingerprintGenerator.generate());
+        User user2 = User.create(FingerprintGenerator.generate());
+
+        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+
+        GameRoomParticipant gameRoomParticipant1 = GameRoomParticipant.create(gameRoom.getId(), user1.getId(), "테스트중인");
+        GameRoomParticipant gameRoomParticipant2 = GameRoomParticipant.create(gameRoom.getId(), user2.getId(), "테스트중인");
+
+        gameRoom.letIn(gameRoomParticipant1);
+        gameRoom.letIn(gameRoomParticipant2);
+
+        // when
+        gameRoom.sendOut(gameRoomParticipant2);
+
+        // then
+        List<GameRoomParticipant> currentParticipants = gameRoom.getCurrentParticipants();
+
+        // 방에 남은 participant 수
+        Assertions.assertThat(currentParticipants.size()).isEqualTo(1);
+        // 방에서 나간 participant 상태
+        Assertions.assertThat(gameRoomParticipant2.getState()).isEqualTo(GameRoomParticipantState.EXITED);
+
+        // 본인을 제외하고 퇴장 이벤트 발행
+        AtomicInteger publishedEventCount = new AtomicInteger(0);
+        gameRoom.processEventQueue(event -> publishedEventCount.incrementAndGet());
+        Assertions.assertThat(publishedEventCount.get()).isEqualTo(1);
     }
 }
