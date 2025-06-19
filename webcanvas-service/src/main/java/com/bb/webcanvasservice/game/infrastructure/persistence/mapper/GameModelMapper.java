@@ -32,12 +32,13 @@ public class GameModelMapper {
                 gameRoomEntity.getId(),
                 gameRoomEntity.getJoinCode(),
                 gameRoomEntity.getState(),
+                gameRoomEntity.getCapacity(),
                 toModel(gameSessionEntity, gameTurns),
                 gameRoomParticipantEntities.stream().map(GameModelMapper::toModel).toList());
     }
 
     public static GameRoom toModel(GameRoomJpaEntity gameRoomEntity) {
-        return new GameRoom(gameRoomEntity.getId(), gameRoomEntity.getJoinCode(), gameRoomEntity.getState(), null, null);
+        return new GameRoom(gameRoomEntity.getId(), gameRoomEntity.getJoinCode(), gameRoomEntity.getState(), gameRoomEntity.getCapacity(), null, null);
     }
 
 

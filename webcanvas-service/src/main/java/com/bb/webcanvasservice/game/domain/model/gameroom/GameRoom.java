@@ -57,6 +57,22 @@ public class GameRoom {
         this.participants = participants;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getJoinCode() {
+        return joinCode;
+    }
+
+    public GameRoomState getState() {
+        return state;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
     /**
      * 새 게임 방을 생성해 리턴한다.
      *
@@ -100,23 +116,11 @@ public class GameRoom {
             throw new GameSessionNotFoundException();
         }
 
-        if (!currentGameSession.isPlaying()) {
+        if (currentGameSession.isEnd()) {
             throw new GameSessionIsOverException();
         }
 
         return currentGameSession;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getJoinCode() {
-        return joinCode;
-    }
-
-    public GameRoomState getState() {
-        return state;
     }
 
     /**
