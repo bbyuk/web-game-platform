@@ -215,13 +215,11 @@ public class GameRoom {
 
     /**
      * 대상 게임방 입장자의 레디 상태를 변경한다.
-     * @param targetParticipantId 게임방 입장자 ID
+     * @param targetParticipant 게임방 입장자
      * @param ready 변경할 레디 상태
      */
-    public void changeParticipantReady(Long targetParticipantId, boolean ready) {
-        GameRoomParticipant targetParticipant = findParticipant(targetParticipantId);
+    public void changeParticipantReady(GameRoomParticipant targetParticipant, boolean ready) {
         targetParticipant.changeReady(ready);
-
         eventQueue.add(new UserReadyChanged(id, targetParticipant.getUserId(), ready));
     }
 

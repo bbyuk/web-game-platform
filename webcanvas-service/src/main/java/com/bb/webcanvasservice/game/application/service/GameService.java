@@ -256,7 +256,10 @@ public class GameService {
     public boolean updateReady(UpdateReadyCommand command) {
         GameRoom gameRoom = gameRoomRepository.findGameRoomByGameRoomParticipantId(command.gameRoomParticipantId()).orElseThrow(GameRoomParticipantNotFoundException::new);
 
-        gameRoom.changeParticipantReady(command.gameRoomParticipantId(), command.ready());
+        gameRoom.changeParticipantReady(
+                gameRoom.findParticipant(command.gameRoomParticipantId()),
+                command.ready()
+        );
 
         gameRoomRepository.save(gameRoom);
         log.debug("게임 방 레디 변경 저장 = {}", command.gameRoomParticipantId());

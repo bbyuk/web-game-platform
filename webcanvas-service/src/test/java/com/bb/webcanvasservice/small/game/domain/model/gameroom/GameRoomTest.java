@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.small.game.domain.model.gameroom;
 
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
+import com.bb.webcanvasservice.game.domain.event.AllUserInGameSessionLoadedEvent;
 import com.bb.webcanvasservice.game.domain.event.UserReadyChanged;
 import com.bb.webcanvasservice.game.domain.exception.IllegalGameRoomStateException;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
@@ -256,7 +257,7 @@ class GameRoomTest {
         var gameRoomField = GameRoom.class.getDeclaredField("id");
         gameRoomField.setAccessible(true);
         GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
-        ReflectionUtils.setField(gameRoomField, gameRoom,1L);
+        ReflectionUtils.setField(gameRoomField, gameRoom, 1L);
 
         var participantIdField = GameRoomParticipant.class.getDeclaredField("id");
         participantIdField.setAccessible(true);
@@ -270,7 +271,7 @@ class GameRoomTest {
         gameRoom.letIn(gameRoomParticipant2);
 
         // when
-        gameRoom.changeParticipantReady(gameRoomParticipant2.getId(), true);
+        gameRoom.changeParticipantReady(gameRoomParticipant2, true);
         List<Long> readyUserList = List.of(gameRoomParticipant2.getUserId());
 
         // then
@@ -280,5 +281,51 @@ class GameRoomTest {
             UserReadyChanged userReadyChanged = (UserReadyChanged) event;
             Assertions.assertThat(readyUserList.contains(userReadyChanged.getUserId()));
         });
+    }
+
+    @Test
+    @DisplayName("게임 세션 시작 - 게임 세션이 시작되면 게임 세션의 상태와 게임 방 입장자 상태가 바뀌고 이벤트 발행")
+    void testGameStart() throws Exception {
+        // given
+        var userIdField = User.class.getDeclaredField("id");
+        userIdField.setAccessible(true);
+        long hostId = 1L;
+
+        User user1 = User.create(FingerprintGenerator.generate());
+        User user2 = User.create(FingerprintGenerator.generate());
+
+        ReflectionUtils.setField(userIdField, user1, hostId);
+        ReflectionUtils.setField(userIdField, user2, 2L);
+
+        var gameRoomIdField = GameRoom.class.getDeclaredField("id");
+        gameRoomIdField.setAccessible(true);
+        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+        ReflectionUtils.setField(gameRoomIdField, gameRoom, 1L);
+
+        GameRoomParticipant gameRoomParticipant1 = GameRoomParticipant.create(gameRoom.getId(), user1.getId(), "테스트중인");
+        GameRoomParticipant gameRoomParticipant2 = GameRoomParticipant.create(gameRoom.getId(), user2.getId(), "테스트중인");
+
+        gameRoom.letIn(gameRoomParticipant1);
+        gameRoom.letIn(gameRoomParticipant2);
+
+        gameRoom.changeParticipantReady(gameRoomParticipant2, true);
+
+        gameRoom.loadGameSession(150);
+
+        // when
+        gameRoom.startGameSession();
+
+        // 테스트 데이터 처리 중 발생한 이벤트 clear
+        gameRoom.processEventQueue(event -> {});
+
+        // then
+        Assertions.assertThat(gameRoom.getCurrentGameSession().isPlaying())
+                .isTrue();
+        gameRoom.getCurrentParticipants().forEach(
+                participant ->
+                        Assertions.assertThat(participant.isPlaying())
+                                .isTrue()
+        );
+        gameRoom.processEventQueue(event -> Assertions.assertThat(event).isInstanceOf(AllUserInGameSessionLoadedEvent.class));
     }
 }

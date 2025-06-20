@@ -86,12 +86,25 @@ public class GameRoomParticipant {
         );
     }
 
+    /**
+     * 게임 방 입장자가 레디를 했는지 여부를 리턴한다.
+     * 호스트라면 무조건 true를 리턴한다.
+     * @return 레디 여부
+     */
     public boolean isReady() {
         if (this.role == GameRoomParticipantRole.HOST) {
             return true;
         }
 
         return ready;
+    }
+
+    /**
+     * 게임 방 입장자의 상태가 PLAYING인지 여부를 리턴한다.
+     * @return 플레잉 여부
+     */
+    public boolean isPlaying() {
+        return this.state == GameRoomParticipantState.PLAYING;
     }
 
     public GameRoomParticipant(
