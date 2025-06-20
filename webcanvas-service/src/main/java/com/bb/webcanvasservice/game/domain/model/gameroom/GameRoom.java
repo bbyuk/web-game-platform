@@ -73,6 +73,10 @@ public class GameRoom {
         return capacity;
     }
 
+    public List<GameRoomParticipant> getParticipants() {
+        return participants;
+    }
+
     /**
      * 새 게임 방을 생성해 리턴한다.
      *
