@@ -222,7 +222,7 @@ public class GameRoom {
         GameRoomParticipant targetParticipant = findParticipant(targetParticipantId);
         targetParticipant.changeReady(ready);
 
-        eventQueue.add(new UserReadyChanged(targetParticipant.getGameRoomId(), targetParticipant.getUserId(), ready));
+        eventQueue.add(new UserReadyChanged(id, targetParticipant.getUserId(), ready));
     }
 
     /**
