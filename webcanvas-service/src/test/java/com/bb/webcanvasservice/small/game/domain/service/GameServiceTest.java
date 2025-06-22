@@ -10,10 +10,7 @@ import com.bb.webcanvasservice.game.application.dto.GameRoomListDto;
 import com.bb.webcanvasservice.game.application.dto.JoinedUserInfoDto;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.service.GameService;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipant;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantRole;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.*;
 import com.bb.webcanvasservice.small.game.dummy.ApplicationEventPublisherDummy;
 import com.bb.webcanvasservice.small.game.stub.service.*;
 import org.assertj.core.api.Assertions;
@@ -189,5 +186,28 @@ public class GameServiceTest {
         GameRoomParticipant participant = gameRoom.findParticipant(gameRoomJoinDto.gameRoomParticipantId());
 
         Assertions.assertThat(participant.isReady()).isTrue();
+    }
+
+    @Test
+    @DisplayName("게임 세션 시작 요청 - 게임 세션을 로드한다.")
+    void testStartGame() throws Exception {
+        // given
+        Long hostUserId = 1L;
+        Long guestUserId = 2L;
+        GameRoomJoinDto gameRoomAndEnter = gameService.createGameRoomAndEnter(hostUserId);
+        GameRoomJoinDto gameRoomJoinDto = gameService.joinGameRoom(new JoinGameRoomCommand(gameRoomAndEnter.gameRoomId(), guestUserId));
+
+        gameService.updateReady(new UpdateReadyCommand(gameRoomJoinDto.gameRoomParticipantId(), guestUserId, true));
+
+        // when
+        Long gameSessionId = gameService.startGame(new StartGameCommand(gameRoomJoinDto.gameRoomId(), 2, 20, hostUserId));
+        GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomJoinDto.gameRoomId()).orElseThrow(RuntimeException::new);
+
+        // then
+        Assertions.assertThat(gameRoom.getCurrentGameSession()).isNotNull();
+        Assertions.assertThat(gameRoom.getCurrentGameSession().getState()).isEqualTo(GameSessionState.LOADING);
+        gameRoom.getParticipants().forEach(participant -> {
+            Assertions.assertThat(participant.isPlaying()).isTrue();
+        });
     }
 }
