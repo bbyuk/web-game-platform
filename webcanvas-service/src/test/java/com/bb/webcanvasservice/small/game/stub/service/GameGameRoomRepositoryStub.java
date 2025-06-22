@@ -21,6 +21,8 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
     private long gameSessionSEq = 0L;
     private long gameTurnSeq = 0L;
 
+    private Map<Long, GameRoom> userGameRoomMap = new HashMap<>();
+
     private Map<Long, GameRoom> gameRooms = new HashMap<>();
 
     private Map<Long, GameRoomParticipant> gameRoomParticipants = new HashMap<>();
@@ -42,7 +44,7 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
 
     @Override
     public Optional<GameRoom> findCurrentJoinedGameRoomByUserId(Long userId) {
-        return Optional.empty();
+        return Optional.of(userGameRoomMap.get(userId));
     }
 
     @Override
@@ -69,7 +71,7 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
             /**
              * 게임 방 입장자 저장
              */
-            saveAll(gameRoom.getParticipants());
+            saveAllGameRoomParticipants(gameRoom.getParticipants());
             /**
              * TODO 턴 목록 저장
              * TODO 세션 저장
@@ -78,12 +80,19 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
             /**
              * 게임 방 저장
              */
-            if (gameRooms.containsKey(gameRoom.getId())) {
-                gameRooms.replace(gameRoom.getId(), gameRoom);
-            } else {
-                ReflectionUtils.setField(idField, gameRoom, ++gameRoomSeq);
+            if (!gameRooms.containsKey(gameRoom.getId())) {
+                if (gameRoom.getId() == null) {
+                    ReflectionUtils.setField(idField, gameRoom, ++gameRoomSeq);
+                }
+
                 gameRooms.put(gameRoom.getId(), gameRoom);
             }
+
+            gameRoom.getParticipants().forEach(participant -> {
+                if (!userGameRoomMap.containsKey(participant.getUserId())) {
+                    userGameRoomMap.put(participant.getUserId(), gameRoom);
+                }
+            });
 
             return gameRoom;
         } catch (NoSuchFieldException e) {
@@ -91,7 +100,7 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
         }
     }
 
-    private void saveAll(Iterable<GameRoomParticipant> participants) {
+    private void saveAllGameRoomParticipants(Iterable<GameRoomParticipant> participants) {
         try {
             Field gameRoomParticipantIdField = GameRoomParticipant.class.getDeclaredField("id");
             gameRoomParticipantIdField.setAccessible(true);
@@ -101,9 +110,7 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
                     ReflectionUtils.setField(gameRoomParticipantIdField, participant, ++gameRoomParticipantSeq);
                 }
 
-                if (gameRoomParticipants.containsKey(participant.getId())) {
-                    gameRoomParticipants.replace(participant.getId(), participant);
-                } else {
+                if (!gameRoomParticipants.containsKey(participant.getId())) {
                     gameRoomParticipants.put(participant.getId(), participant);
                 }
             }
