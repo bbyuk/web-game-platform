@@ -8,7 +8,10 @@ import com.bb.webcanvasservice.game.application.dto.GameRoomJoinDetailInfoDto;
 import com.bb.webcanvasservice.game.application.dto.GameRoomJoinDto;
 import com.bb.webcanvasservice.game.application.dto.GameRoomListDto;
 import com.bb.webcanvasservice.game.application.dto.JoinedUserInfoDto;
+import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.service.GameService;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipant;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantRole;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
 import com.bb.webcanvasservice.small.game.dummy.ApplicationEventPublisherDummy;
@@ -22,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Tag("small")
-@DisplayName("[small] [service] GameService small test")
+@DisplayName("[small] [game] [service] 게임 애플리케이션 서비스 로직 test")
 public class GameServiceTest {
 
     /**
@@ -30,10 +33,12 @@ public class GameServiceTest {
      */
     private final int gameRoomCapacity = 6;
 
+    GameRoomRepository gameRoomRepository = new GameGameRoomRepositoryStub();
+
     GameService gameService = new GameService(
             new GameDictionaryQueryPortStub(),
             new GameUserCommandPortStub(),
-            new GameGameRoomRepositoryStub(),
+            gameRoomRepository,
             new GameGamePlayHistoryRepositoryStub(),
             new GameGameSessionLoadRegistryStub(),
             new GameProperties(gameRoomCapacity,
@@ -66,36 +71,6 @@ public class GameServiceTest {
         // then
         Assertions.assertThat(resultDto.gameRoomId()).isEqualTo(1L);
         Assertions.assertThat(resultDto.gameRoomParticipantId()).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("현재 입장한 게임 방 및 입장 정보 조회 - 성공 테스트")
-    void testFindJoinedGameRoomInfo() throws Exception {
-        // given
-        Long userId = 1L;
-
-        GameRoomJoinDto gameRoomAndEnter = gameService.createGameRoomAndEnter(userId);
-
-        // when
-        GameRoomJoinDetailInfoDto joinedGameRoomInfo = gameService.findJoinedGameRoomInfo(userId);
-
-        JoinedUserInfoDto playerJoinInfo = new JoinedUserInfoDto(
-                userId,
-                "#ff3c00",
-                "깔끔한 플레이어",
-                GameRoomParticipantRole.HOST,
-                true
-        );
-        GameRoomJoinDetailInfoDto resultDto = new GameRoomJoinDetailInfoDto(
-                gameRoomAndEnter.gameRoomId(),
-                gameRoomAndEnter.gameRoomParticipantId(),
-                List.of(playerJoinInfo),
-                GameRoomState.WAITING,
-                playerJoinInfo
-        );
-
-        // then
-        Assertions.assertThat(joinedGameRoomInfo).usingRecursiveComparison().isEqualTo(resultDto);
     }
 
     @Test
@@ -164,6 +139,55 @@ public class GameServiceTest {
         // then
 
         Assertions.assertThat(joinableGameRooms.roomList().size()).isEqualTo(3);
+    }
 
+    @Test
+    @DisplayName("현재 입장한 게임 방 및 입장 정보 조회 - 성공 테스트")
+    void testFindJoinedGameRoomInfo() throws Exception {
+        // given
+        Long userId = 1L;
+
+        GameRoomJoinDto gameRoomAndEnter = gameService.createGameRoomAndEnter(userId);
+
+        // when
+        GameRoomJoinDetailInfoDto joinedGameRoomInfo = gameService.findJoinedGameRoomInfo(userId);
+
+        JoinedUserInfoDto playerJoinInfo = new JoinedUserInfoDto(
+                userId,
+                "#ff3c00",
+                "깔끔한 플레이어",
+                GameRoomParticipantRole.HOST,
+                true
+        );
+        GameRoomJoinDetailInfoDto resultDto = new GameRoomJoinDetailInfoDto(
+                gameRoomAndEnter.gameRoomId(),
+                gameRoomAndEnter.gameRoomParticipantId(),
+                List.of(playerJoinInfo),
+                GameRoomState.WAITING,
+                playerJoinInfo
+        );
+
+        // then
+        Assertions.assertThat(joinedGameRoomInfo).usingRecursiveComparison().isEqualTo(resultDto);
+    }
+
+    @Test
+    @DisplayName("레디 상태 변경 - 성공 테스트")
+    void testUpdateReady() throws Exception {
+        // given
+        Long hostUserId = 1L;
+        Long guestUserId = 2L;
+        GameRoomJoinDto gameRoomAndEnter = gameService.createGameRoomAndEnter(hostUserId);
+
+        GameRoomJoinDto gameRoomJoinDto = gameService.joinGameRoom(new JoinGameRoomCommand(gameRoomAndEnter.gameRoomId(), guestUserId));
+
+        // when
+        gameService.updateReady(new UpdateReadyCommand(gameRoomJoinDto.gameRoomParticipantId(), guestUserId, true));
+
+        // then
+        GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomJoinDto.gameRoomId()).orElseThrow(RuntimeException::new);
+        GameRoomParticipant participant = gameRoom.findParticipant(gameRoomJoinDto.gameRoomParticipantId());
+
+        Assertions.assertThat(participant.isReady()).isTrue();
     }
 }
