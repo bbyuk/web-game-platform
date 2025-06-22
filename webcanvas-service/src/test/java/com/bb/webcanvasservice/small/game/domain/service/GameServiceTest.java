@@ -1,6 +1,8 @@
 package com.bb.webcanvasservice.small.game.domain.service;
 
 import com.bb.webcanvasservice.game.application.command.JoinGameRoomCommand;
+import com.bb.webcanvasservice.game.application.command.StartGameCommand;
+import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.GameRoomJoinDetailInfoDto;
 import com.bb.webcanvasservice.game.application.dto.GameRoomJoinDto;
@@ -141,5 +143,29 @@ public class GameServiceTest {
 
         // then
         Assertions.assertThat(joinableGameRooms.roomList().size()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("입장 가능한 게임 방 조회 - 게임방 상태가 WAITING인 게임 방만 조회된다.")
+    void testFindJoinableGameRooms_2() throws Exception {
+        // given
+        Long userIdSeq = 0L;
+        Long gameRoom1HostId = ++userIdSeq;
+        GameRoomJoinDto gameRoomJoinDto1 = gameService.createGameRoomAndEnter(gameRoom1HostId);
+        GameRoomJoinDto gameRoomJoinDto2 = gameService.createGameRoomAndEnter(++userIdSeq);
+        GameRoomJoinDto gameRoomJoinDto3 = gameService.createGameRoomAndEnter(++userIdSeq);
+        GameRoomJoinDto gameRoomJoinDto4 = gameService.createGameRoomAndEnter(++userIdSeq);
+
+        // when
+        Long gameRoom1GuestId = ++userIdSeq;
+        GameRoomJoinDto gameRoomJoinDto = gameService.joinGameRoom(new JoinGameRoomCommand(gameRoomJoinDto1.gameRoomId(), gameRoom1GuestId));
+        gameService.updateReady(new UpdateReadyCommand(gameRoomJoinDto.gameRoomParticipantId(), gameRoom1GuestId, true));
+        gameService.startGame(new StartGameCommand(gameRoomJoinDto1.gameRoomId(), 2, 20, gameRoom1HostId));
+
+        GameRoomListDto joinableGameRooms = gameService.findJoinableGameRooms(++userIdSeq);
+        // then
+
+        Assertions.assertThat(joinableGameRooms.roomList().size()).isEqualTo(3);
+
     }
 }

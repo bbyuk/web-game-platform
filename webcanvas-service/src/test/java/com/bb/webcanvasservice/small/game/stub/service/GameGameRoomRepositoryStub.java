@@ -35,7 +35,8 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
 
     @Override
     public Optional<GameRoom> findGameRoomByGameRoomParticipantId(Long gameRoomParticipantId) {
-        return Optional.empty();
+        GameRoomParticipant gameRoomParticipant = gameRoomParticipants.get(gameRoomParticipantId);
+        return Optional.of(gameRooms.get(gameRoomParticipant.getGameRoomId()));
     }
 
     @Override
