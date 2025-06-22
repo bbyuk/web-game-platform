@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.user.domain.adapter.game;
 
+import com.bb.webcanvasservice.user.domain.exception.AlreadyJoinedRoomException;
 import com.bb.webcanvasservice.game.domain.port.user.GameUserCommandPort;
 import com.bb.webcanvasservice.user.domain.exception.UserNotFoundException;
 import com.bb.webcanvasservice.user.domain.model.User;
@@ -41,5 +42,15 @@ public class GameUserCommandAdapter implements GameUserCommandPort {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         user.moveToLobby();
         userRepository.save(user);
+    }
+
+    @Override
+    public void validateUserCanJoin(Long userId) {
+        User user = userRepository
+                .findById(userId).orElseThrow(UserNotFoundException::new);
+
+        if (user.getState() != UserState.IN_LOBBY) {
+            throw new AlreadyJoinedRoomException();
+        }
     }
 }

@@ -30,4 +30,10 @@ public interface GameUserCommandPort {
      * @param userId 대상 유저 ID
      */
     void moveUserToLobby(Long userId);
+
+    /**
+     * 대상 유저가 입장 가능한 상태인지 체크한다.
+     * @param userId 대상 유저 ID
+     */
+    void validateUserCanJoin(Long userId);
 }

@@ -33,7 +33,6 @@ public class GameServiceTest {
     GameService gameService = new GameService(
             new GameDictionaryQueryPortStub(),
             new GameUserCommandPortStub(),
-            new GameUserQueryPortStub(),
             new GameGameRoomRepositoryStub(),
             new GameGamePlayHistoryRepositoryStub(),
             new GameGameSessionLoadRegistryStub(),

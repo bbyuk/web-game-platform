@@ -24,4 +24,9 @@ public class GameUserCommandPortStub implements GameUserCommandPort {
     public void moveUserToLobby(Long userId) {
 
     }
+
+    @Override
+    public void validateUserCanJoin(Long userId) {
+
+    }
 }
