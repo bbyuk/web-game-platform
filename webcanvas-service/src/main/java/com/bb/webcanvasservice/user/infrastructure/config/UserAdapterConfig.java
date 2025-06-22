@@ -29,7 +29,7 @@ public class UserAdapterConfig {
 
     @Bean
     public GameUserQueryPort gameUserQueryPort() {
-        return new GameUserQueryAdapter();
+        return new GameUserQueryAdapter(userRepository);
     }
 
     @Bean

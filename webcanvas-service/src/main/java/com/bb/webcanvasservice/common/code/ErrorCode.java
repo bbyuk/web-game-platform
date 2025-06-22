@@ -45,6 +45,7 @@ public enum ErrorCode {
     GAME_ROOM_JOIN_CODE_NOT_GENERATED("R001", "입장 코드 생성 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR),
     GAME_ROOM_HAS_ILLEGAL_STATUS("R002", "방이 입장할 수 있는 상태가 아닙니다.", HttpStatus.CONFLICT),
     GAME_ROOM_PARTICIPANT_NOT_FOUND("R003", "방에 입장한 기록을 찾지 못했습니다.", HttpStatus.NOT_FOUND),
+    CAN_NOT_JOIN_GAME_ROOM("R004", "입장할 수 없습니다.", HttpStatus.CONFLICT),
     DICTIONARY_FILE_PARSE_FAILED("D000", "사전 파일을 파싱하는 도중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     DICTIONARY_FILE_DOWNLOAD_FAILED("D001", "사전 파일을 다운로드 받는 도중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     WORD_NOT_FOUND("D002", "단어를 찾지 못했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),

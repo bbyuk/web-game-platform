@@ -10,11 +10,9 @@ import com.bb.webcanvasservice.game.application.dto.GameRoomListDto;
 import com.bb.webcanvasservice.game.application.dto.JoinedUserInfoDto;
 import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantRole;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
 import com.bb.webcanvasservice.small.game.dummy.ApplicationEventPublisherDummy;
 import com.bb.webcanvasservice.small.game.stub.service.*;
-import com.bb.webcanvasservice.user.domain.model.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -35,6 +33,7 @@ public class GameServiceTest {
     GameService gameService = new GameService(
             new GameDictionaryQueryPortStub(),
             new GameUserCommandPortStub(),
+            new GameUserQueryPortStub(),
             new GameGameRoomRepositoryStub(),
             new GameGamePlayHistoryRepositoryStub(),
             new GameGameSessionLoadRegistryStub(),

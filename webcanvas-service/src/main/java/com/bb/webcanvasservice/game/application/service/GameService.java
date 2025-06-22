@@ -7,6 +7,7 @@ import com.bb.webcanvasservice.game.application.command.StartGameCommand;
 import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
+import com.bb.webcanvasservice.game.domain.exception.CannotJoinGameRoomException;
 import com.bb.webcanvasservice.game.domain.port.dictionary.GameDictionaryQueryPort;
 import com.bb.webcanvasservice.game.domain.port.user.GameUserCommandPort;
 import com.bb.webcanvasservice.game.application.registry.GameSessionLoadRegistry;
@@ -19,6 +20,7 @@ import com.bb.webcanvasservice.game.domain.exception.GameRoomParticipantNotFound
 import com.bb.webcanvasservice.game.domain.exception.JoinCodeNotGeneratedException;
 import com.bb.webcanvasservice.game.domain.model.GamePlayHistory;
 import com.bb.webcanvasservice.game.domain.model.gameroom.*;
+import com.bb.webcanvasservice.game.domain.port.user.GameUserQueryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -38,6 +40,7 @@ public class GameService {
      */
     private final GameDictionaryQueryPort dictionaryQueryPort;
     private final GameUserCommandPort userCommandPort;
+    private final GameUserQueryPort gameUserQueryPort;
 
     /**
      * 도메인 레포지토리
@@ -112,9 +115,12 @@ public class GameService {
     public GameRoomJoinDto joinGameRoom(JoinGameRoomCommand command) {
         /**
          * 대상 게임 방에 입장할 수 있는지 체크한다.
-         * TODO 1. GameRoomUserQueryPort를 통한 유저 상태 체크
-         * 2. 게임 방이 입장 가능한 상태인지 체크
+         * GameRoomUserQueryPort를 통한 유저 상태 체크
          */
+        if (!gameUserQueryPort.userCanJoin(command.userId())) {
+            throw new CannotJoinGameRoomException();
+        }
+
         GameRoom gameRoom = gameRoomRepository.findGameRoomById(command.gameRoomId()).orElseThrow(GameRoomNotFoundException::new);
 
         /**

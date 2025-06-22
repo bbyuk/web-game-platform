@@ -78,6 +78,14 @@ public class User {
     }
 
     /**
+     * 유저 상태가 현재 로비일 경우에만 게임 방 입장이 가능하다.
+     * @return 게임 방 입장 가능 여부.
+     */
+    public boolean canJoin() {
+        return this.state == UserState.IN_LOBBY;
+    }
+
+    /**
      * 매핑을 위한 getter 모음
      */
     public Long getId() {
