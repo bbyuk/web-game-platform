@@ -96,8 +96,8 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     }
 
     @Override
-    public List<GameRoom> findGameRoomsByCapacityAndStateWithEntranceState(int gameRoomCapacity, List<GameRoomState> joinableStates, GameRoomParticipantState activeEntranceState) {
-        List<GameRoomJpaEntity> gameRoomJpaEntities = gameRoomJpaRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameRoomCapacity, joinableStates, activeEntranceState);
+    public List<GameRoom> findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(int gameRoomCapacity, GameRoomState gameRoomState, GameRoomParticipantState gameRoomParticipantState) {
+        List<GameRoomJpaEntity> gameRoomJpaEntities = gameRoomJpaRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameRoomCapacity, gameRoomState, gameRoomParticipantState);
         Map<Long, GameSessionJpaEntity> gameSessionEntityPerGameRoomPerGameRoomId = gameSessionJpaRepository.findGameSessionsByGameRoomsAndStates(gameRoomJpaEntities, GameSessionState.active)
                 .stream()
                 .collect(Collectors.toMap(

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GameGameRoomRepositoryStub implements GameRoomRepository {
 
@@ -53,8 +54,12 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
     }
 
     @Override
-    public List<GameRoom> findGameRoomsByCapacityAndStateWithEntranceState(int gameRoomCapacity, List<GameRoomState> enterableStates, GameRoomParticipantState activeEntranceState) {
-        return null;
+    public List<GameRoom> findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(int gameRoomCapacity, GameRoomState gameRoomState, GameRoomParticipantState gameRoomParticiapantState) {
+        return gameRooms.values().stream()
+                .filter(
+                        gameRoom -> gameRoom.getCurrentParticipants().size() < gameRoomCapacity
+                                && gameRoomState == gameRoom.getState())
+                .collect(Collectors.toList());
     }
 
     @Override

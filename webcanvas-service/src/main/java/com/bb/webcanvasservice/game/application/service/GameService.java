@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.game.application.service;
 
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
-import com.bb.webcanvasservice.game.application.command.EnterGameRoomCommand;
+import com.bb.webcanvasservice.game.application.command.JoinGameRoomCommand;
 import com.bb.webcanvasservice.game.application.command.ExitGameRoomCommand;
 import com.bb.webcanvasservice.game.application.command.StartGameCommand;
 import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
@@ -28,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import static com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.WAITING;
 
 @Slf4j
 @Service
@@ -67,7 +65,7 @@ public class GameService {
          * TODO userId 로 게임 방 생성 가능한지 validation 추가
          */
         GameRoom gameRoom = createGameRoom(gameProperties.joinCodeLength(), gameProperties.joinCodeMaxConflictCount());
-        return enterGameRoom(new EnterGameRoomCommand(gameRoom.getId(), userId));
+        return joinGameRoom(new JoinGameRoomCommand(gameRoom.getId(), userId));
     }
 
     /**
@@ -83,7 +81,10 @@ public class GameService {
     @Transactional
     public GameRoomListDto findJoinableGameRooms(Long userId) {
         return new GameRoomListDto(
-                gameRoomRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameProperties.gameRoomCapacity(), GameRoomState.joinable, WAITING)
+                gameRoomRepository.findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(
+                                gameProperties.gameRoomCapacity(),
+                                GameRoomState.WAITING,
+                                GameRoomParticipantState.WAITING)
                         .stream()
                         .map(gameRoom ->
                                 new GameRoomInfoDto(
@@ -108,7 +109,7 @@ public class GameService {
      * @return gameRoomParticipantId 게임 방 입장 ID
      */
     @Transactional
-    public GameRoomJoinDto enterGameRoom(EnterGameRoomCommand command) {
+    public GameRoomJoinDto joinGameRoom(JoinGameRoomCommand command) {
         /**
          * 대상 게임 방에 입장할 수 있는지 체크한다.
          * TODO 1. GameRoomUserQueryPort를 통한 유저 상태 체크
@@ -156,16 +157,16 @@ public class GameService {
      * Join Code로 게임 방에 입장한다.
      *
      * @param joinCode 입장 코드
-     * @param userId 유저 ID
+     * @param userId   유저 ID
      * @return 입장 리턴 DTO
      */
     @Transactional
-    public GameRoomJoinDto enterGameRoomWithJoinCode(String joinCode, Long userId) {
+    public GameRoomJoinDto joinGameRoomWithJoinCode(String joinCode, Long userId) {
         GameRoom targetGameRoom = gameRoomRepository.findRoomWithJoinCodeForEnter(joinCode)
                 .orElseThrow(() -> new GameRoomNotFoundException(String.format("입장 코드가 %s인 방을 찾지 못했습니다.", joinCode)));
 
-        return enterGameRoom(
-                new EnterGameRoomCommand(targetGameRoom.getId(), userId)
+        return joinGameRoom(
+                new JoinGameRoomCommand(targetGameRoom.getId(), userId)
         );
     }
 
@@ -296,7 +297,8 @@ public class GameService {
 
     /**
      * 게임 방을 생성한다.
-     * @param joinCodeLength 입장 코드 최대 길이
+     *
+     * @param joinCodeLength           입장 코드 최대 길이
      * @param joinCodeMaxConflictCount
      * @return
      */
