@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.user.application.repository;
+package com.bb.webcanvasservice.user.domain.repository;
 
 import com.bb.webcanvasservice.user.domain.model.User;
 import com.bb.webcanvasservice.user.domain.model.UserState;

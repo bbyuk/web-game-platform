@@ -62,6 +62,13 @@ public class User {
     }
 
     /**
+     * 유저 상태를 로비로 이동한다.
+     */
+    public void moveToLobby() {
+        this.state = UserState.IN_LOBBY;
+    }
+
+    /**
      * 현재 플레이중인 게임을 완료하고 게임 방으로 돌아간다.
      */
     public void endGameAndResetToRoom() {

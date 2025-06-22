@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.small.game.stub.service;
 
-import com.bb.webcanvasservice.game.application.port.dictionary.DictionaryQueryPort;
+import com.bb.webcanvasservice.game.domain.port.dictionary.GameDictionaryQueryPort;
 
-public class GameDictionaryQueryPortStub implements DictionaryQueryPort {
+public class GameDictionaryQueryPortStub implements GameDictionaryQueryPort {
     @Override
     public String drawRandomKoreanNoun() {
         return "명사";

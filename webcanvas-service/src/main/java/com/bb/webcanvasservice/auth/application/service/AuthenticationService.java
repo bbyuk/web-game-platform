@@ -3,8 +3,8 @@ package com.bb.webcanvasservice.auth.application.service;
 import com.bb.webcanvasservice.auth.application.command.LoginCommand;
 import com.bb.webcanvasservice.auth.application.dto.LoginSuccessDto;
 import com.bb.webcanvasservice.auth.application.dto.TokenRefreshSuccessDto;
-import com.bb.webcanvasservice.auth.application.port.UserCommandPort;
-import com.bb.webcanvasservice.auth.application.port.UserQueryPort;
+import com.bb.webcanvasservice.auth.domain.port.AuthUserCommandPort;
+import com.bb.webcanvasservice.auth.domain.port.AuthUserQueryPort;
 import com.bb.webcanvasservice.common.code.ErrorCode;
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JwtManager;
@@ -26,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthenticationService {
 
     private final JwtManager jwtManager;
-    private final UserQueryPort userQueryPort;
-    private final UserCommandPort userCommandPort;
+    private final AuthUserQueryPort userQueryPort;
+    private final AuthUserCommandPort userCommandPort;
     private final SecurityProperties securityProperties;
 
     /**

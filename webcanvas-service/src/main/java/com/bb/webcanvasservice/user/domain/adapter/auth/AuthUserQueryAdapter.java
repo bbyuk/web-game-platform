@@ -1,21 +1,21 @@
-package com.bb.webcanvasservice.user.application.adapter.auth;
+package com.bb.webcanvasservice.user.domain.adapter.auth;
 
-import com.bb.webcanvasservice.auth.application.port.UserQueryPort;
+import com.bb.webcanvasservice.auth.domain.port.AuthUserQueryPort;
 import com.bb.webcanvasservice.user.domain.exception.UserNotFoundException;
 import com.bb.webcanvasservice.user.domain.mapper.UserModelViewMapper;
-import com.bb.webcanvasservice.user.application.repository.UserRepository;
+import com.bb.webcanvasservice.user.domain.repository.UserRepository;
 import com.bb.webcanvasservice.user.domain.view.UserInfo;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 /**
  * auth 유저 조회 포트 어댑터
  */
-@Service
-@RequiredArgsConstructor
-public class AuthUserQueryAdapter implements UserQueryPort {
+public class AuthUserQueryAdapter implements AuthUserQueryPort {
 
     private final UserRepository userRepository;
+
+    public AuthUserQueryAdapter(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public UserInfo findUserInfoWith(String fingerprint) {

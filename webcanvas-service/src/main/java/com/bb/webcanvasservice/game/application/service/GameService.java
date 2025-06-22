@@ -7,8 +7,8 @@ import com.bb.webcanvasservice.game.application.command.StartGameCommand;
 import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
-import com.bb.webcanvasservice.game.application.port.dictionary.DictionaryQueryPort;
-import com.bb.webcanvasservice.game.application.port.user.UserCommandPort;
+import com.bb.webcanvasservice.game.domain.port.dictionary.GameDictionaryQueryPort;
+import com.bb.webcanvasservice.game.domain.port.user.GameUserCommandPort;
 import com.bb.webcanvasservice.game.application.registry.GameSessionLoadRegistry;
 import com.bb.webcanvasservice.game.application.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
@@ -36,8 +36,8 @@ public class GameService {
     /**
      * 크로스 도메인 포트
      */
-    private final DictionaryQueryPort dictionaryQueryPort;
-    private final UserCommandPort userCommandPort;
+    private final GameDictionaryQueryPort dictionaryQueryPort;
+    private final GameUserCommandPort userCommandPort;
 
     /**
      * 도메인 레포지토리

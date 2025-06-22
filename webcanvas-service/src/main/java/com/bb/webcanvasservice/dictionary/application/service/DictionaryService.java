@@ -6,7 +6,7 @@ import com.bb.webcanvasservice.dictionary.domain.exception.DictionaryFileParseFa
 import com.bb.webcanvasservice.dictionary.domain.exception.WordNotFoundException;
 import com.bb.webcanvasservice.dictionary.domain.model.Language;
 import com.bb.webcanvasservice.dictionary.domain.model.PartOfSpeech;
-import com.bb.webcanvasservice.dictionary.application.repository.WordRepository;
+import com.bb.webcanvasservice.dictionary.domain.repository.WordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;

@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.user.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.user.domain.model.User;
 import com.bb.webcanvasservice.user.domain.model.UserState;
-import com.bb.webcanvasservice.user.application.repository.UserRepository;
+import com.bb.webcanvasservice.user.domain.repository.UserRepository;
 import com.bb.webcanvasservice.user.infrastructure.persistence.mapper.UserModelEntityMapper;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

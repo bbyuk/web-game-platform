@@ -1,10 +1,10 @@
 package com.bb.webcanvasservice.small.game.stub.service;
 
-import com.bb.webcanvasservice.game.application.port.user.UserCommandPort;
+import com.bb.webcanvasservice.game.domain.port.user.GameUserCommandPort;
 
 import java.util.List;
 
-public class GameUserCommandPortStub implements UserCommandPort {
+public class GameUserCommandPortStub implements GameUserCommandPort {
     @Override
     public void moveUsersToGameSession(List<Long> userIds) {
 

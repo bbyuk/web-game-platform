@@ -1,13 +1,11 @@
-package com.bb.webcanvasservice.auth.application.port;
+package com.bb.webcanvasservice.auth.domain.port;
 
 import com.bb.webcanvasservice.user.domain.view.UserInfo;
-
-import java.util.Optional;
 
 /**
  * 유저 도메인 조회 포트
  */
-public interface UserQueryPort {
+public interface AuthUserQueryPort {
     /**
      * fingerprint로 유저 정보를 찾는다.
      * fingerprint로 찾지 못했을 경우 콜백 로직을 클라이언트쪽에서 구현해야 하므로 Optional로 감싸 리턴한다.

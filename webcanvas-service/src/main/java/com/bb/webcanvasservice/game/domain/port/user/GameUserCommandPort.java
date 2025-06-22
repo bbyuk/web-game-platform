@@ -1,11 +1,11 @@
-package com.bb.webcanvasservice.game.application.port.user;
+package com.bb.webcanvasservice.game.domain.port.user;
 
 import java.util.List;
 
 /**
  * game -> user command 포트
  */
-public interface UserCommandPort {
+public interface GameUserCommandPort {
 
     /**
      * 유저 ID 리스트로 대상 유저들의 상태를 GameSession 내부로 변경한다.

@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.dictionary.infrastructure.persistence.repository
 import com.bb.webcanvasservice.dictionary.domain.model.Language;
 import com.bb.webcanvasservice.dictionary.domain.model.PartOfSpeech;
 import com.bb.webcanvasservice.dictionary.domain.model.Word;
-import com.bb.webcanvasservice.dictionary.application.repository.WordRepository;
+import com.bb.webcanvasservice.dictionary.domain.repository.WordRepository;
 import com.bb.webcanvasservice.dictionary.infrastructure.persistence.mapper.DictionaryModelMapper;
 import com.bb.webcanvasservice.dictionary.infrastructure.persistence.entity.WordJpaEntity;
 import jakarta.persistence.EntityManager;

@@ -1,9 +1,9 @@
-package com.bb.webcanvasservice.game.application.port.dictionary;
+package com.bb.webcanvasservice.game.domain.port.dictionary;
 
 /**
  * game -> dictionary 조회 포트
  */
-public interface DictionaryQueryPort {
+public interface GameDictionaryQueryPort {
 
     /**
      * 무작위 한국어 명사 뽑기
