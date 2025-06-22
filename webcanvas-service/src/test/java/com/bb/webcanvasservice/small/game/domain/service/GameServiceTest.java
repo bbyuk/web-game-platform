@@ -6,6 +6,7 @@ import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.small.game.dummy.ApplicationEventPublisherDummy;
 import com.bb.webcanvasservice.small.game.stub.service.*;
 import com.bb.webcanvasservice.user.domain.model.User;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -49,11 +50,12 @@ public class GameServiceTest {
     void testCreateGameRoomAndEnter() throws Exception {
         // given
         Long userId = 23L;
-        GameRoomJoinDto resultDto = gameService.createGameRoomAndEnter(userId);
-
 
         // when
+        GameRoomJoinDto resultDto = gameService.createGameRoomAndEnter(userId);
 
         // then
+        Assertions.assertThat(resultDto.gameRoomId()).isEqualTo(1L);
+        Assertions.assertThat(resultDto.gameRoomParticipantId()).isEqualTo(1L);
     }
 }

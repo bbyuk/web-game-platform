@@ -144,6 +144,8 @@ public class GameService {
                 )
         );
 
+        gameRoomRepository.save(gameRoom);
+
         return new GameRoomJoinDto(
                 newGameRoomParticipant.getGameRoomId(),
                 newGameRoomParticipant.getId()
