@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.game.application.service;
 
+import com.bb.webcanvasservice.game.application.command.ProcessToNextTurnCommand;
 import com.bb.webcanvasservice.game.application.registry.GameTurnTimerRegistry;
 import com.bb.webcanvasservice.game.domain.exception.GameTurnTimerNotFoundException;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurnTimer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,16 +20,15 @@ public class GameTurnTimerService {
     /**
      * 게임 턴 타이머를 스케줄러에 등록한다.
      *
-     * @param gameRoomId     게임 방 ID
-     * @param period         타이머 간격
+     * @param command 턴 진행 command
      * @param turnEndHandler 턴 종료시 작업할 핸들러
      */
-    public void registerTurnTimer(Long gameRoomId, Long gameSessionId, int period, Consumer<Long> turnEndHandler) {
-        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> {
-            turnEndHandler.accept(gameSessionId);
-        }, 0, period, TimeUnit.SECONDS);
+    public void registerTurnTimer(ProcessToNextTurnCommand command, Consumer<ProcessToNextTurnCommand> turnEndHandler) {
+        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
+                () -> turnEndHandler.accept(command), 0,
+                command.period(), TimeUnit.SECONDS);
 
-        gameTurnTimerRegistry.register(gameRoomId, new GameTurnTimer(future, period, turnEndHandler));
+        gameTurnTimerRegistry.register(command.gameRoomId(), new GameTurnTimer(future, command.period(), turnEndHandler));
     }
 
     /**
@@ -49,26 +48,20 @@ public class GameTurnTimerService {
     /**
      * 게임 방 턴 타이머 초기화
      *
-     * @param gameRoomId
+     * @param command 커맨드
      */
-    public void resetTurnTimer(Long gameRoomId) {
-        if (!gameTurnTimerRegistry.contains(gameRoomId)) {
+    public void resetTurnTimer(ProcessToNextTurnCommand command) {
+        if (!gameTurnTimerRegistry.contains(command.gameSessionId())) {
             GameTurnTimerNotFoundException exception = new GameTurnTimerNotFoundException();
             throw exception;
         }
 
-        GameTurnTimer oldTimer = gameTurnTimerRegistry.get(gameRoomId);
-        stopTurnTimer(gameRoomId);
+        GameTurnTimer oldTimer = gameTurnTimerRegistry.get(command.gameRoomId());
+        stopTurnTimer(command.gameRoomId());
 
 
         // 새 타이머 등록
-        ScheduledFuture<?> newTimerEngine = scheduler.scheduleAtFixedRate(
-                () -> oldTimer.executeCallback(gameRoomId),
-                0,
-                oldTimer.getPeriod(),
-                TimeUnit.SECONDS);
-
-        gameTurnTimerRegistry.register(gameRoomId, oldTimer.recreateNewTimer(newTimerEngine));
+        registerTurnTimer(command, (c) -> oldTimer.executeCallback(c));
     }
 
 }

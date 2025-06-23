@@ -1,10 +1,7 @@
 package com.bb.webcanvasservice.game.application.service;
 
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
-import com.bb.webcanvasservice.game.application.command.ExitGameRoomCommand;
-import com.bb.webcanvasservice.game.application.command.JoinGameRoomCommand;
-import com.bb.webcanvasservice.game.application.command.StartGameCommand;
-import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
+import com.bb.webcanvasservice.game.application.command.*;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
 import com.bb.webcanvasservice.game.application.registry.GameSessionLoadRegistry;
@@ -416,12 +413,14 @@ public class GameService {
      * 별도의 컨텍스트에서 싫랭되어야 하므로 트랜잭션읇 분리한다.
      */
     @Transactional
-    public void processToNextTurn(Long gameSessionId) {
-        log.debug("{} 세션 다음 턴으로 진행", gameSessionId);
-        GameRoom gameRoom = gameRoomRepository.findGameRoomByGameSessionId(gameSessionId).orElseThrow(GameRoomNotFoundException::new);
+    public void processToNextTurn(ProcessToNextTurnCommand command) {
+        log.debug("{} 세션 다음 턴으로 진행", command.gameSessionId());
+        GameRoom gameRoom = gameRoomRepository.findGameRoomByGameSessionId(command.gameSessionId()).orElseThrow(GameRoomNotFoundException::new);
         GameSession gameSession = gameRoom.getCurrentGameSession();
 
-        gameSession.passCurrentTurn();
+        if (!command.answered()) {
+            gameSession.passCurrentTurn();
+        }
 
         if (gameSession.shouldEnd()) {
             log.debug("모든 턴이 진행되었습니다.");
@@ -445,7 +444,7 @@ public class GameService {
         eventPublisher.publishEvent(
                 new GameTurnProgressedEvent(
                         gameSession.getGameRoomId(),
-                        gameSessionId,
+                        command.gameSessionId(),
                         gameTurn.getId()
                 )
         );

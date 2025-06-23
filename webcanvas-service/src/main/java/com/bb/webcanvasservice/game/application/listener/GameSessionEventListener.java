@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.game.application.listener;
 
 import com.bb.webcanvasservice.common.message.MessageSender;
+import com.bb.webcanvasservice.game.application.command.ProcessToNextTurnCommand;
 import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;
 import com.bb.webcanvasservice.game.domain.event.AllUserInGameSessionLoadedEvent;
@@ -40,9 +41,7 @@ public class GameSessionEventListener {
         messageSender.send("/session/" + event.getGameSessionId(), event);
 
         gameTurnTimerService.registerTurnTimer(
-                event.getGameRoomId(),
-                event.getGameSessionId(),
-                event.getTimePerTurn(),
+                new ProcessToNextTurnCommand(event.getGameRoomId(), event.getGameSessionId(), event.getTimePerTurn(), false),
                 gameService::processToNextTurn
         );
     }
@@ -60,6 +59,7 @@ public class GameSessionEventListener {
 
     /**
      * 게임 세션 종료 이벤트 핸들러
+     *
      * @param event
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)

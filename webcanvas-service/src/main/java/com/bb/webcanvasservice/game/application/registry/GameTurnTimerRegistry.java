@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.application.registry;
 
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurnTimer;
+import com.bb.webcanvasservice.game.application.service.GameTurnTimer;
 
 /**
  * 게임 턴 타이머의 참조를 저장
