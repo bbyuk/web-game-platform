@@ -4,10 +4,7 @@ import com.bb.webcanvasservice.game.application.command.JoinGameRoomCommand;
 import com.bb.webcanvasservice.game.application.command.StartGameCommand;
 import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
-import com.bb.webcanvasservice.game.application.dto.GameRoomJoinDetailInfoDto;
-import com.bb.webcanvasservice.game.application.dto.GameRoomJoinDto;
-import com.bb.webcanvasservice.game.application.dto.GameRoomListDto;
-import com.bb.webcanvasservice.game.application.dto.JoinedUserInfoDto;
+import com.bb.webcanvasservice.game.application.dto.*;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.domain.model.gameroom.*;
@@ -217,6 +214,37 @@ public class GameServiceTest {
             Assertions.assertThat(participant.isLoading()).isTrue();
             Assertions.assertThat(participant.isReady()).isEqualTo(participant.isHost());
         });
+    }
+
+    @Test
+    @DisplayName("게임 방 ID로 현재 게임 세션 조회 - 성공테스트")
+    void 게임_방_ID로_현재_게임_세션을_조회한다() throws Exception {
+        // given
+        // given
+        Long hostUserId = 1L;
+        Long guestUserId = 2L;
+        GameRoomJoinDto gameRoomAndEnter = gameService.createGameRoomAndEnter(hostUserId);
+        GameRoomJoinDto gameRoomJoinDto = gameService.joinGameRoom(new JoinGameRoomCommand(gameRoomAndEnter.gameRoomId(), guestUserId));
+
+        gameService.updateReady(new UpdateReadyCommand(gameRoomJoinDto.gameRoomParticipantId(), guestUserId, true));
+
+        Long gameSessionId = gameService.loadGameSession(new StartGameCommand(gameRoomJoinDto.gameRoomId(), 2, 20, hostUserId));
+        GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomJoinDto.gameRoomId()).orElseThrow(RuntimeException::new);
+
+        // when
+        GameSessionDto findCurrentGameSession = gameService.findCurrentGameSession(gameRoom.getId());
+
+        var gameSession = gameRoom.getCurrentGameSession();
+
+        var expectedResult = new GameSessionDto(
+                gameSession.getId(),
+                gameSession.getState(),
+                gameSession.getTimePerTurn(),
+                gameSession.getCompletedGameTurnCount(),
+                gameSession.getTurnCount()
+        );
+        // then
+        Assertions.assertThat(expectedResult).usingRecursiveComparison().isEqualTo(findCurrentGameSession);
     }
 
     @Test

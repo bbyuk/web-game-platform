@@ -57,6 +57,7 @@ public class GameSession {
         this.turnCount = turnCount;
         this.timePerTurn = timePerTurn;
         this.state = state;
+        this.gameTurns = gameTurns;
     }
 
     /**
