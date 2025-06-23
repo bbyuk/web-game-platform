@@ -427,16 +427,19 @@ public class GameService {
             log.debug("게임 세션 종료");
 
             gameRoom.endCurrentGameSession();
+            gameRoomRepository.save(gameRoom);
 
             userCommandPort.moveUsersToRoom(gameRoom.getCurrentParticipants().stream().map(GameRoomParticipant::getUserId).collect(Collectors.toList()));
             return;
         }
 
 
-        GameTurn gameTurn = gameSession.createNewGameTurn(
+        GameTurn newGameTurn = gameSession.processToNextTurn(
                 gameRoom.findNextDrawerId(),
                 dictionaryQueryPort.drawRandomKoreanNoun()
         );
+
+        gameRoomRepository.save(gameRoom);
 
         /**
          * 새 턴이 진행되었음을 알리는 event pub
@@ -445,7 +448,7 @@ public class GameService {
                 new GameTurnProgressedEvent(
                         gameSession.getGameRoomId(),
                         command.gameSessionId(),
-                        gameTurn.getId()
+                        newGameTurn.getId()
                 )
         );
     }

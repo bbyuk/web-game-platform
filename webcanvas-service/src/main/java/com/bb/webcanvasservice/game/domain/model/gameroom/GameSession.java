@@ -60,6 +60,13 @@ public class GameSession {
         this.gameTurns = gameTurns;
     }
 
+    public GameTurn processToNextTurn(Long drawerId, String answer) {
+        GameTurn newGameTurn = GameTurn.create(id, drawerId, answer, timePerTurn);
+        gameTurns.add(newGameTurn);
+
+        return newGameTurn;
+    }
+
     /**
      * 해당 세션을 종료해야하는지 여부를 체크한다.
      * @return 종료 여부
@@ -179,7 +186,7 @@ public class GameSession {
      * @param answer 정답
      * @return
      */
-    public GameTurn createNewGameTurn(Long drawerId, String answer) {
+    public GameTurn create(Long drawerId, String answer) {
         GameTurn newGameTurn = GameTurn.create(id, drawerId, answer, timePerTurn);
         gameTurns.add(newGameTurn);
         return newGameTurn;

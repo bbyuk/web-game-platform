@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.small.game.domain.service;
 
 import com.bb.webcanvasservice.game.application.command.JoinGameRoomCommand;
+import com.bb.webcanvasservice.game.application.command.ProcessToNextTurnCommand;
 import com.bb.webcanvasservice.game.application.command.StartGameCommand;
 import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
@@ -298,5 +299,56 @@ public class GameServiceTest {
                 .stream()
                 .forEach(participant -> Assertions.assertThat(participant.isPlaying()).isTrue());
 
+    }
+
+    @Test
+    @DisplayName("게임 턴 진행 테스트 - 게임 턴 period second 마다 게임 턴이 진행된다.")
+    void 게임_턴_진행_테스트() throws Exception {
+        // given
+        Long hostUserId = 1L;
+        Long guestUserId = 2L;
+        GameRoomJoinDto gameRoomAndEnter = gameService.createGameRoomAndEnter(hostUserId);
+        GameRoomJoinDto gameRoomJoinDto = gameService.joinGameRoom(new JoinGameRoomCommand(gameRoomAndEnter.gameRoomId(), guestUserId));
+
+        gameService.updateReady(new UpdateReadyCommand(gameRoomJoinDto.gameRoomParticipantId(), guestUserId, true));
+
+        Long gameSessionId = gameService.loadGameSession(new StartGameCommand(gameRoomJoinDto.gameRoomId(), 2, 1, hostUserId));
+        GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomJoinDto.gameRoomId()).orElseThrow(RuntimeException::new);
+
+        // when
+        CountDownLatch hostThreadLatch = new CountDownLatch(1);
+        CountDownLatch guestThreadLatch = new CountDownLatch(1);
+
+        // 비동기 실행
+        Thread hostSubscriptionThread = new Thread(() -> {
+            try {
+                gameService.successSubscription(gameSessionId, hostUserId);
+            } finally {
+                hostThreadLatch.countDown(); // 완료 알림
+            }
+        });
+        Thread guestSubscriptionThread = new Thread(() -> {
+            try {
+                gameService.successSubscription(gameSessionId, guestUserId);
+            } finally {
+                guestThreadLatch.countDown(); // 완료 알림
+            }
+        });
+
+        hostSubscriptionThread.start();
+        guestSubscriptionThread.start();
+
+        // 최대 2초 기다림
+        boolean hostCompleted = hostThreadLatch.await(2, java.util.concurrent.TimeUnit.SECONDS);
+        boolean guestCompleted = guestThreadLatch.await(2, java.util.concurrent.TimeUnit.SECONDS);
+
+        // when
+        Thread.sleep(3000);
+        // 3초 이후엔 모든 턴이 종료
+        GameSession gameSession = gameRoom.getCurrentGameSession();
+
+        // then
+        Assertions.assertThat(gameSession.getGameTurns().size()).isEqualTo(2);
+        Assertions.assertThat(gameSession.isEnd()).isTrue();
     }
 }

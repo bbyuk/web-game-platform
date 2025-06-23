@@ -22,8 +22,9 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
 
     private Map<Long, GameRoom> userGameRoomMap = new HashMap<>();
     private Map<Long, GameRoom> gameRooms = new HashMap<>();
-
     private Map<Long, GameSession> gameSessions = new HashMap<>();
+
+    private Map<Long, GameTurn> gameTurns = new HashMap<>();
 
     private Map<Long, GameRoomParticipant> gameRoomParticipants = new HashMap<>();
 
@@ -78,10 +79,6 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
              * 게임 방 입장자 저장
              */
             saveAllGameRoomParticipants(gameRoom.getParticipants());
-            /**
-             * TODO 턴 목록 저장
-             * TODO 세션 저장
-             */
 
             /**
              * 게임 방 저장
@@ -95,18 +92,14 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
             }
 
             /**
-             * 게임 방 입장자 저장
-             */
-            gameRoom.getParticipants().forEach(participant -> {
-                if (!userGameRoomMap.containsKey(participant.getUserId())) {
-                    userGameRoomMap.put(participant.getUserId(), gameRoom);
-                }
-            });
-
-            /**
              * 게임 세션 저장
              */
             saveGameSession(gameRoom.getGameSession());
+
+            /**
+             * 게임 턴 목록 저장
+             */
+            saveAllGameTurns(gameRoom.getGameSession().getGameTurns());
 
             return gameRoom;
         } catch (NoSuchFieldException e) {
@@ -145,6 +138,25 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
 
                 if (!gameRoomParticipants.containsKey(participant.getId())) {
                     gameRoomParticipants.put(participant.getId(), participant);
+                }
+            }
+        } catch (NoSuchFieldException e) {
+            throw new IllegalStateException();
+        }
+    }
+
+    private void saveAllGameTurns(Iterable<GameTurn> turns) {
+        try {
+            Field gameTurnIdField = GameTurn.class.getDeclaredField("id");
+            gameTurnIdField.setAccessible(true);
+
+            for (GameTurn gameTurn : turns) {
+                if (gameTurn.getId() == null) {
+                    ReflectionUtils.setField(gameTurnIdField, gameTurn, ++gameTurnSeq);
+                }
+
+                if (!gameTurns.containsKey(gameTurn.getId())) {
+                    gameTurns.put(gameTurn.getId(), gameTurn);
                 }
             }
         } catch (NoSuchFieldException e) {
