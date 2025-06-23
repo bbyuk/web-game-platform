@@ -27,7 +27,7 @@ public class GameController {
     public ResponseEntity<GameStartResponse> startGame(@RequestBody GameStartRequest request, @Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 new GameStartResponse(
-                        gameService.startGame(
+                        gameService.loadGameSession(
                                 GameCommandMapper.toStartGameCommand(request.gameRoomId(), request.turnCount(), request.timePerTurn(), authentication.getUserId())
                         )
                 )

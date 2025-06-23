@@ -57,4 +57,11 @@ public class InMemoryGameSessionLoadRegistry implements GameSessionLoadRegistry 
             return users.size() == enteredUserCount;
         }
     }
+
+    @Override
+    public boolean isClear(Long gameSessionId) {
+        Object lock = this.lockMap.get(gameSessionId);
+
+        return lock == null;
+    }
 }

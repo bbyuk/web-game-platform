@@ -11,6 +11,7 @@ import com.bb.webcanvasservice.game.application.dto.JoinedUserInfoDto;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.domain.model.gameroom.*;
+import com.bb.webcanvasservice.game.infrastructure.persistence.registry.InMemoryGameSessionLoadRegistry;
 import com.bb.webcanvasservice.small.game.dummy.ApplicationEventPublisherDummy;
 import com.bb.webcanvasservice.small.game.stub.service.*;
 import org.assertj.core.api.Assertions;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 @Tag("small")
 @DisplayName("[small] [game] [service] 게임 애플리케이션 서비스 로직 test")
@@ -31,30 +33,35 @@ public class GameServiceTest {
     private final int gameRoomCapacity = 6;
 
     GameRoomRepository gameRoomRepository = new GameGameRoomRepositoryStub();
+    InMemoryGameSessionLoadRegistry gameSessionLoadRegistry = new InMemoryGameSessionLoadRegistry();
 
-    GameService gameService = new GameService(
-            new GameDictionaryQueryPortStub(),
-            new GameUserCommandPortStub(),
-            gameRoomRepository,
-            new GameGamePlayHistoryRepositoryStub(),
-            new GameGameSessionLoadRegistryStub(),
-            new GameProperties(gameRoomCapacity,
-                    5,
-                    8,
-                    List.of(
-                            "#ff3c00",
-                            "#0042ff",
-                            "#1e9000",
-                            "#f2cb00",
-                            "#8400a8",
-                            "#00c8c8",
-                            "#ff68ff",
-                            "#969696"
-                    ),
-                    new ArrayList<>()
-            ),
-            new ApplicationEventPublisherDummy()
-    );
+    GameService gameService;
+
+    {
+        gameService = new GameService(
+                new GameDictionaryQueryPortStub(),
+                new GameUserCommandPortStub(),
+                gameRoomRepository,
+                new GameGamePlayHistoryRepositoryStub(),
+                gameSessionLoadRegistry,
+                new GameProperties(gameRoomCapacity,
+                        5,
+                        8,
+                        List.of(
+                                "#ff3c00",
+                                "#0042ff",
+                                "#1e9000",
+                                "#f2cb00",
+                                "#8400a8",
+                                "#00c8c8",
+                                "#ff68ff",
+                                "#969696"
+                        ),
+                        new ArrayList<>()
+                ),
+                new ApplicationEventPublisherDummy()
+        );
+    }
 
     @Test
     @DisplayName("게임 방 생성 및 입장 - 성공 테스트")
@@ -130,7 +137,7 @@ public class GameServiceTest {
         Long gameRoom1GuestId = ++userIdSeq;
         GameRoomJoinDto gameRoomJoinDto = gameService.joinGameRoom(new JoinGameRoomCommand(gameRoomJoinDto1.gameRoomId(), gameRoom1GuestId));
         gameService.updateReady(new UpdateReadyCommand(gameRoomJoinDto.gameRoomParticipantId(), gameRoom1GuestId, true));
-        gameService.startGame(new StartGameCommand(gameRoomJoinDto1.gameRoomId(), 2, 20, gameRoom1HostId));
+        gameService.loadGameSession(new StartGameCommand(gameRoomJoinDto1.gameRoomId(), 2, 20, gameRoom1HostId));
 
         GameRoomListDto joinableGameRooms = gameService.findJoinableGameRooms(++userIdSeq);
         // then
@@ -189,7 +196,7 @@ public class GameServiceTest {
     }
 
     @Test
-    @DisplayName("게임 세션 시작 요청 - 게임 세션을 로드한다.")
+    @DisplayName("호스트의 게임 시작 요청 - 게임 세션을 로드한다.")
     void testStartGame() throws Exception {
         // given
         Long hostUserId = 1L;
@@ -200,7 +207,7 @@ public class GameServiceTest {
         gameService.updateReady(new UpdateReadyCommand(gameRoomJoinDto.gameRoomParticipantId(), guestUserId, true));
 
         // when
-        Long gameSessionId = gameService.startGame(new StartGameCommand(gameRoomJoinDto.gameRoomId(), 2, 20, hostUserId));
+        Long gameSessionId = gameService.loadGameSession(new StartGameCommand(gameRoomJoinDto.gameRoomId(), 2, 20, hostUserId));
         GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomJoinDto.gameRoomId()).orElseThrow(RuntimeException::new);
 
         // then
@@ -210,5 +217,58 @@ public class GameServiceTest {
             Assertions.assertThat(participant.isLoading()).isTrue();
             Assertions.assertThat(participant.isReady()).isEqualTo(participant.isHost());
         });
+    }
+
+    @Test
+    @DisplayName("게임 세션 시작 - 모든 클라이언트가 구독 성공 시 로드되어 있는 게임세션을 시작한다.")
+    void 모든_클라이언트가_구독_성공시_로드되어_있는_게임세션을_시작한다() throws Exception {
+        // given
+        Long hostUserId = 1L;
+        Long guestUserId = 2L;
+        GameRoomJoinDto gameRoomAndEnter = gameService.createGameRoomAndEnter(hostUserId);
+        GameRoomJoinDto gameRoomJoinDto = gameService.joinGameRoom(new JoinGameRoomCommand(gameRoomAndEnter.gameRoomId(), guestUserId));
+
+        gameService.updateReady(new UpdateReadyCommand(gameRoomJoinDto.gameRoomParticipantId(), guestUserId, true));
+
+        Long gameSessionId = gameService.loadGameSession(new StartGameCommand(gameRoomJoinDto.gameRoomId(), 2, 20, hostUserId));
+        GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomJoinDto.gameRoomId()).orElseThrow(RuntimeException::new);
+
+        // when
+        CountDownLatch hostThreadLatch = new CountDownLatch(1);
+        CountDownLatch guestThreadLatch = new CountDownLatch(1);
+
+        // 비동기 실행
+        Thread hostSubscriptionThread = new Thread(() -> {
+            try {
+                gameService.successSubscription(gameSessionId, hostUserId);
+            } finally {
+                hostThreadLatch.countDown(); // 완료 알림
+            }
+        });
+        Thread guestSubscriptionThread = new Thread(() -> {
+            try {
+                gameService.successSubscription(gameSessionId, guestUserId);
+            } finally {
+                guestThreadLatch.countDown(); // 완료 알림
+            }
+        });
+
+        hostSubscriptionThread.start();
+        guestSubscriptionThread.start();
+
+        // 최대 2초 기다림
+        boolean hostCompleted = hostThreadLatch.await(2, java.util.concurrent.TimeUnit.SECONDS);
+        boolean guestCompleted = guestThreadLatch.await(2, java.util.concurrent.TimeUnit.SECONDS);
+
+
+        // then
+        Assertions.assertThat(hostCompleted && guestCompleted).isTrue();
+        Assertions.assertThat(gameSessionLoadRegistry.isClear(gameSessionId)).isTrue();
+
+        Assertions.assertThat(gameRoom.getCurrentGameSession().isPlaying()).isTrue();
+        gameRoom.getCurrentParticipants()
+                .stream()
+                .forEach(participant -> Assertions.assertThat(participant.isPlaying()).isTrue());
+
     }
 }

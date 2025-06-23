@@ -1,10 +1,7 @@
 package com.bb.webcanvasservice.small.game.stub.service;
 
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipant;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.*;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -19,12 +16,14 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
     private long gameRoomSeq = 0L;
 
     private long gameRoomParticipantSeq = 0L;
-    private long gameSessionSEq = 0L;
+    private long gameSessionSeq = 0L;
     private long gameTurnSeq = 0L;
 
-    private Map<Long, GameRoom> userGameRoomMap = new HashMap<>();
 
+    private Map<Long, GameRoom> userGameRoomMap = new HashMap<>();
     private Map<Long, GameRoom> gameRooms = new HashMap<>();
+
+    private Map<Long, GameSession> gameSessions = new HashMap<>();
 
     private Map<Long, GameRoomParticipant> gameRoomParticipants = new HashMap<>();
 
@@ -41,7 +40,8 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
 
     @Override
     public Optional<GameRoom> findGameRoomByGameSessionId(Long gameSessionId) {
-        return Optional.empty();
+        GameSession gameSession = gameSessions.get(gameSessionId);
+        return findGameRoomById(gameSession.getGameRoomId());
     }
 
     @Override
@@ -94,14 +94,41 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
                 gameRooms.put(gameRoom.getId(), gameRoom);
             }
 
+            /**
+             * 게임 방 입장자 저장
+             */
             gameRoom.getParticipants().forEach(participant -> {
                 if (!userGameRoomMap.containsKey(participant.getUserId())) {
                     userGameRoomMap.put(participant.getUserId(), gameRoom);
                 }
             });
 
+            /**
+             * 게임 세션 저장
+             */
+            saveGameSession(gameRoom.getGameSession());
+
             return gameRoom;
         } catch (NoSuchFieldException e) {
+            throw new IllegalStateException();
+        }
+    }
+
+    private void saveGameSession(GameSession gameSession) {
+        try {
+            if (gameSession != null) {
+                if (gameSession.getId() == null) {
+                    Field idField = GameSession.class.getDeclaredField("id");
+                    idField.setAccessible(true);
+                    ReflectionUtils.setField(idField, gameSession, ++gameSessionSeq);
+                }
+
+                if (!gameSessions.containsKey(gameSession.getId())) {
+                    gameSessions.put(gameSession.getId(), gameSession);
+                }
+            }
+        }
+        catch(Exception e) {
             throw new IllegalStateException();
         }
     }

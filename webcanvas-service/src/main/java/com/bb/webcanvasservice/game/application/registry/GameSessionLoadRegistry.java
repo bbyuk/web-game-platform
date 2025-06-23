@@ -26,4 +26,11 @@ public interface GameSessionLoadRegistry {
      * @return
      */
     boolean isAllLoaded(Long gameSessionId, int enteredUserCount);
+
+    /**
+     * 대상 게임 세션 레지스트리가 클리어 된 상태인지 체크한다.
+     * @param gameSessionId 대상 게임 세션 ID
+     * @return 클리어 여부
+     */
+    boolean isClear(Long gameSessionId);
 }

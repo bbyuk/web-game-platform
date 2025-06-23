@@ -5,7 +5,10 @@ import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.game.domain.event.*;
 import com.bb.webcanvasservice.game.domain.exception.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
@@ -41,7 +44,7 @@ public class GameRoom {
     /**
      * 현재 게임 방에서 진행중인 게임 세션
      */
-    private GameSession currentGameSession;
+    private GameSession gameSession;
 
     /**
      * 현재 게임 방의 입장자 목록
@@ -53,7 +56,7 @@ public class GameRoom {
         this.joinCode = joinCode;
         this.state = state;
         this.capacity = capacity;
-        this.currentGameSession = currentGameSession;
+        this.gameSession = currentGameSession;
         this.participants = participants;
     }
 
@@ -73,6 +76,10 @@ public class GameRoom {
         return capacity;
     }
 
+    public GameSession getGameSession() {
+        return gameSession;
+    }
+
     public List<GameRoomParticipant> getParticipants() {
         return participants;
     }
@@ -83,7 +90,7 @@ public class GameRoom {
      * @return 게임 방
      */
     public static GameRoom create(String joinCode, int capacity) {
-        return new GameRoom(null, joinCode, GameRoomState.WAITING,  capacity, null, new ArrayList<>());
+        return new GameRoom(null, joinCode, GameRoomState.WAITING, capacity, null, new ArrayList<>());
     }
 
     /**
@@ -114,22 +121,24 @@ public class GameRoom {
 
     /**
      * 현재 게임 세션을 가져온다.
+     *
      * @return
      */
     public GameSession getCurrentGameSession() {
-        if (currentGameSession == null) {
+        if (gameSession == null) {
             throw new GameSessionNotFoundException();
         }
 
-        if (currentGameSession.isEnd()) {
+        if (gameSession.isEnd()) {
             throw new GameSessionIsOverException();
         }
 
-        return currentGameSession;
+        return gameSession;
     }
 
     /**
      * 새로운 입장자를 입장시킨다.
+     *
      * @param newParticipant
      */
     public void letIn(GameRoomParticipant newParticipant) {
@@ -176,6 +185,7 @@ public class GameRoom {
 
     /**
      * 게임 방이 닫힌지 확인한다.
+     *
      * @return 게임 방 close 여부
      */
     public boolean isClosed() {
@@ -184,6 +194,7 @@ public class GameRoom {
 
     /**
      * 현재 퇴장하지 않은 게임 방 입장자 목록 조회
+     *
      * @return
      */
     public List<GameRoomParticipant> getCurrentParticipants() {
@@ -195,6 +206,7 @@ public class GameRoom {
 
     /**
      * 게임 방 입장자 ID로 현재 게임방에 접속한 입장자 객체 조회
+     *
      * @param targetRoomParticipantId 대상 게임 방 입장자 ID
      * @return 게임 방 입장자
      */
@@ -210,6 +222,7 @@ public class GameRoom {
 
     /**
      * 게임 방 이벤트 큐에 들어있는 이벤트를 순차적으로 모두 처리하고 클리어한다.
+     *
      * @param eventsPublisher
      */
     public void processEventQueue(Consumer<ApplicationEvent> eventsPublisher) {
@@ -219,8 +232,9 @@ public class GameRoom {
 
     /**
      * 대상 게임방 입장자의 레디 상태를 변경한다.
+     *
      * @param targetParticipant 게임방 입장자
-     * @param ready 변경할 레디 상태
+     * @param ready             변경할 레디 상태
      */
     public void changeParticipantReady(GameRoomParticipant targetParticipant, boolean ready) {
         targetParticipant.changeReady(ready);
@@ -229,6 +243,7 @@ public class GameRoom {
 
     /**
      * 대상 유저가 호스트인지 확인한다.
+     *
      * @param userId
      */
     public void validateIsHost(Long userId) {
@@ -254,7 +269,7 @@ public class GameRoom {
         /**
          * 현재 진행중인 게임 세션이 있는지 확인
          */
-        if (currentGameSession != null) {
+        if (gameSession != null) {
             throw new IllegalGameRoomStateException("이미 게임 세션이 진행중입니다.");
         }
 
@@ -286,7 +301,7 @@ public class GameRoom {
         List<GameRoomParticipant> currentParticipants = getCurrentParticipants();
 
         int turnCount = currentParticipants.size();
-        this.currentGameSession = GameSession.create(id, turnCount, timePerTurn);
+        this.gameSession = GameSession.create(id, turnCount, timePerTurn);
 
         changeStateToPlay();
 
@@ -305,7 +320,7 @@ public class GameRoom {
                 }
         );
 
-        eventQueue.add(new GameSessionStartEvent(id, currentGameSession.getId()));
+        eventQueue.add(new GameSessionStartEvent(id, gameSession.getId()));
     }
 
     /**
@@ -349,6 +364,7 @@ public class GameRoom {
 
     /**
      * 게임 방 내에서 다음 그림 그릴 사람을 찾는다.
+     *
      * @return 게임 방내에서 다음 그릴 사람 user id 리턴
      */
     public Long findNextDrawerId() {
@@ -394,6 +410,7 @@ public class GameRoom {
 
     /**
      * 유저 ID로 게임 방 입장자를 찾아 리턴한다.
+     *
      * @param targetUserId 대상 유저 ID
      * @return 게임 방 입장자 객체
      */
