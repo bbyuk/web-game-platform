@@ -77,7 +77,7 @@ public class GameRoomParticipant {
                 null,
                 gameRoomId,
                 userId,
-                GameRoomParticipantState.WAITING,
+                GameRoomParticipantState.INIT,
                 String.format("%s %s", nicknameAdjective, "플레이어"),
                 GameRoomParticipantRole.GUEST,
                 false,
@@ -85,28 +85,7 @@ public class GameRoomParticipant {
                 null
         );
     }
-
-    /**
-     * 게임 방 입장자가 레디를 했는지 여부를 리턴한다.
-     * 호스트라면 무조건 true를 리턴한다.
-     * @return 레디 여부
-     */
-    public boolean isReady() {
-        if (this.role == GameRoomParticipantRole.HOST) {
-            return true;
-        }
-
-        return ready;
-    }
-
-    /**
-     * 게임 방 입장자의 상태가 PLAYING인지 여부를 리턴한다.
-     * @return 플레잉 여부
-     */
-    public boolean isPlaying() {
-        return this.state == GameRoomParticipantState.PLAYING;
-    }
-
+    
     public GameRoomParticipant(
             Long id,
             Long gameRoomId,
@@ -140,7 +119,7 @@ public class GameRoomParticipant {
      * 게임 입장자를 입장 시킨다.
      */
     public void join() {
-        this.state = GameRoomParticipantState.IN_ROOM;
+        this.state = GameRoomParticipantState.WAITING;
         this.joinedAt = LocalDateTime.now();
     }
 
@@ -174,7 +153,7 @@ public class GameRoomParticipant {
     }
 
     /**
-     * 게임 방 상태를 대기중으로 변경한다.
+     * 게임 방 입장자 상태를 대기중으로 변경한다.
      */
     public void changeStateToWaiting() {
         this.state = GameRoomParticipantState.WAITING;
@@ -185,14 +164,6 @@ public class GameRoomParticipant {
      */
     public void resetReady() {
         this.ready = GameRoomParticipantRole.HOST == this.role;
-    }
-
-    /**
-     * 유저가 호스트인지 체크한다.
-     * @return
-     */
-    public boolean isHost() {
-        return this.role == GameRoomParticipantRole.HOST;
     }
 
     public Long getId() {
@@ -245,9 +216,50 @@ public class GameRoomParticipant {
         }
     }
 
+    /**
+     * 게임 방 입장자 객체가 활성상태인지 체크한다.
+     * @return 활성 상태 여부
+     */
     public boolean isActive() {
         return GameRoomParticipantState.joined.contains(state);
     }
+
+    /**
+     * 로딩중인지 여부를 리턴한다.
+     * @return 로딩 여부
+     */
+    public boolean isLoading() {
+        return this.state == GameRoomParticipantState.LOADING;
+    }
+
+    /**
+     * 유저가 호스트인지 체크한다.
+     * @return
+     */
+    public boolean isHost() {
+        return this.role == GameRoomParticipantRole.HOST;
+    }
+    /**
+     * 게임 방 입장자가 레디를 했는지 여부를 리턴한다.
+     * 호스트라면 무조건 true를 리턴한다.
+     * @return 레디 여부
+     */
+    public boolean isReady() {
+        if (this.role == GameRoomParticipantRole.HOST) {
+            return true;
+        }
+
+        return ready;
+    }
+
+    /**
+     * 게임 방 입장자의 상태가 PLAYING인지 여부를 리턴한다.
+     * @return 플레잉 여부
+     */
+    public boolean isPlaying() {
+        return this.state == GameRoomParticipantState.PLAYING;
+    }
+
 
     /**
      * 게임 방 입장자 역할을 HOST로 변경한다.
@@ -256,5 +268,12 @@ public class GameRoomParticipant {
     public void changeRoleToHost() {
         this.role = GameRoomParticipantRole.HOST;
         this.ready = true;
+    }
+
+    /**
+     * 게임 세션이 로드되어 로딩 상태로 변경한다.
+     */
+    public void loadSession() {
+        this.state = GameRoomParticipantState.LOADING;
     }
 }

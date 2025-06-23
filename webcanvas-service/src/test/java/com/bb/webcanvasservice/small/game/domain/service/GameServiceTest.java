@@ -207,7 +207,8 @@ public class GameServiceTest {
         Assertions.assertThat(gameRoom.getCurrentGameSession()).isNotNull();
         Assertions.assertThat(gameRoom.getCurrentGameSession().getState()).isEqualTo(GameSessionState.LOADING);
         gameRoom.getParticipants().forEach(participant -> {
-            Assertions.assertThat(participant.isPlaying()).isTrue();
+            Assertions.assertThat(participant.isLoading()).isTrue();
+            Assertions.assertThat(participant.isReady()).isEqualTo(participant.isHost());
         });
     }
 }

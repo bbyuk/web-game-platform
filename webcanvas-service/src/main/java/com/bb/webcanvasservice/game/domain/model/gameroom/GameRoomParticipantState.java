@@ -8,6 +8,11 @@ import java.util.List;
 public enum GameRoomParticipantState {
 
     /**
+     * 초기 상태
+     */
+    INIT,
+
+    /**
      * 대기 상태
      */
     WAITING,
@@ -15,7 +20,7 @@ public enum GameRoomParticipantState {
     /**
      * 게임 방 내
      */
-    IN_ROOM,
+    LOADING,
 
     /**
      * 게임 플레이중
@@ -27,5 +32,5 @@ public enum GameRoomParticipantState {
      */
     EXITED;
 
-    public static final List<GameRoomParticipantState> joined = List.of(IN_ROOM, PLAYING);
+    public static final List<GameRoomParticipantState> joined = List.of(WAITING, LOADING, PLAYING);
 }

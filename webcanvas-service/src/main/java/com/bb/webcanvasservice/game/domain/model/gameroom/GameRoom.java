@@ -298,7 +298,12 @@ public class GameRoom {
          *
          * 250531 게임 시작시 레디상태 false로 모두 변경
          */
-        currentParticipants.forEach(GameRoomParticipant::resetReady);
+        currentParticipants.forEach(
+                gameRoomParticipant -> {
+                    gameRoomParticipant.resetReady();
+                    gameRoomParticipant.loadSession();
+                }
+        );
 
         eventQueue.add(new GameSessionStartEvent(id, currentGameSession.getId()));
     }
