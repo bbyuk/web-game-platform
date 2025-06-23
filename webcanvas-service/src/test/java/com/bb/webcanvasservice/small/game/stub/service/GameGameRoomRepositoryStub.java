@@ -99,7 +99,9 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
             /**
              * 게임 턴 목록 저장
              */
-            saveAllGameTurns(gameRoom.getGameSession().getGameTurns());
+            if (gameRoom.getGameSession() != null) {
+                saveAllGameTurns(gameRoom.getGameSession().getGameTurns());
+            }
 
             return gameRoom;
         } catch (NoSuchFieldException e) {
