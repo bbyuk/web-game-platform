@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.user.presentation.controller;
 
 import com.bb.webcanvasservice.common.security.Authenticated;
 import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
-import com.bb.webcanvasservice.user.application.service.UserApplicationService;
+import com.bb.webcanvasservice.user.application.service.UserService;
 import com.bb.webcanvasservice.user.presentation.mapper.UserPresentationDtoMapper;
 import com.bb.webcanvasservice.user.presentation.request.UserCreateRequest;
 import com.bb.webcanvasservice.user.presentation.response.UserInfoResponse;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("user")
 public class UserController {
 
-    private final UserApplicationService userApplicationService;
+    private final UserService userService;
 
     /**
      * 유저 생성
@@ -36,7 +36,7 @@ public class UserController {
     public ResponseEntity<UserInfoResponse> createNewUser(@RequestBody UserCreateRequest userCreateRequest) {
         return ResponseEntity.ok(
                 UserPresentationDtoMapper.toUserInfoResponse(
-                        userApplicationService.createUser(userCreateRequest.clientFingerprint())
+                        userService.createUser(userCreateRequest.clientFingerprint())
                 )
         );
     }
@@ -46,7 +46,7 @@ public class UserController {
     public ResponseEntity<UserStateInfoResponse> findUserState(@Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 UserPresentationDtoMapper.toUserStateInfoResponse(
-                        userApplicationService.findUserState(authentication.getUserId())
+                        userService.findUserState(authentication.getUserId())
                 )
         );
     }

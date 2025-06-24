@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Import;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
-@Import({ JpaConfig.class, UserRepositoryImpl.class})
+@Import({JpaConfig.class, UserRepositoryImpl.class})
 @DisplayName("[medium] [user] [persistence] User Repository 단위테스트")
 class UserRepositoryTest {
 
@@ -34,10 +34,29 @@ class UserRepositoryTest {
         // then
         userRepository.findById(savedUser.getId())
                 .ifPresent(findUser ->
-                                Assertions
-                                        .assertThat(findUser)
-                                        .usingRecursiveComparison()
-                        .isEqualTo(savedUser)
+                        Assertions
+                                .assertThat(findUser)
+                                .usingRecursiveComparison()
+                                .isEqualTo(savedUser)
                 );
+    }
+
+    @Test
+    @DisplayName("클라이언트의 Fingerprint로 등록된 유저 조회")
+    void fingerprint로_조회() throws Exception {
+        // given
+        String fingerprint = FingerprintGenerator.generate();
+        User savedUser = userRepository.save(User.create(fingerprint));
+
+        // when
+        userRepository.findByFingerprint(fingerprint)
+                .ifPresent(findUser ->
+                        Assertions.assertThat(findUser)
+                                .usingRecursiveComparison()
+                                .isEqualTo(savedUser)
+                );
+
+        // then
+
     }
 }

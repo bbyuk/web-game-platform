@@ -7,19 +7,16 @@ import com.bb.webcanvasservice.user.domain.repository.UserRepository;
 import com.bb.webcanvasservice.user.domain.exception.AlreadyRegisteredUserException;
 import com.bb.webcanvasservice.user.domain.exception.UserNotFoundException;
 import com.bb.webcanvasservice.user.domain.model.User;
-import com.bb.webcanvasservice.user.domain.model.UserState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * 게임 유저에 대한 비즈니스 로직을 처리하는 서비스 클래스
  */
 @Service
 @RequiredArgsConstructor
-public class UserApplicationService {
+public class UserService {
 
     private final UserRepository userRepository;
 
