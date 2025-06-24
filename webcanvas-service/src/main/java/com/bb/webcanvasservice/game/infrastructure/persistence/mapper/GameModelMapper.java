@@ -24,10 +24,16 @@ import java.util.stream.Collectors;
 public class GameModelMapper {
 
     public static GamePlayHistory toModel(GamePlayHistoryJpaEntity entity) {
+        if (entity == null) {
+            return null;
+        }
         return new GamePlayHistory(entity.getUserEntity().getId(), entity.getGameSessionEntity().getId());
     }
 
     public static GameRoom toModel(GameRoomJpaEntity gameRoomEntity, GameSessionJpaEntity gameSessionEntity, List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities, List<GameTurnJpaEntity> gameTurns) {
+        if (gameRoomEntity == null) {
+            return null;
+        }
         return new GameRoom(
                 gameRoomEntity.getId(),
                 gameRoomEntity.getJoinCode(),
@@ -37,12 +43,18 @@ public class GameModelMapper {
                 gameRoomParticipantEntities.stream().map(GameModelMapper::toModel).toList());
     }
 
-    public static GameRoom toModel(GameRoomJpaEntity gameRoomEntity) {
-        return new GameRoom(gameRoomEntity.getId(), gameRoomEntity.getJoinCode(), gameRoomEntity.getState(), gameRoomEntity.getCapacity(), null, null);
+    public static GameRoom toModel(GameRoomJpaEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        return new GameRoom(entity.getId(), entity.getJoinCode(), entity.getState(), entity.getCapacity(), null, null);
     }
 
 
     public static GameRoomParticipant toModel(GameRoomParticipantJpaEntity entity) {
+        if (entity == null) {
+            return null;
+        }
         return new GameRoomParticipant(entity.getId(),
                 entity.getGameRoomEntity().getId(),
                 entity.getUserEntity().getId(),
@@ -57,6 +69,9 @@ public class GameModelMapper {
 
 
     public static GameSession toModel(GameSessionJpaEntity entity, List<GameTurnJpaEntity> gameTurns) {
+        if (entity == null) {
+            return null;
+        }
         return new GameSession(
                 entity.getId(),
                 entity.getGameRoomEntity().getId(),
@@ -68,6 +83,9 @@ public class GameModelMapper {
     }
 
     public static GameTurn toModel(GameTurnJpaEntity entity) {
+        if (entity == null) {
+            return null;
+        }
         return new GameTurn(
                 entity.getId(),
                 entity.getGameSessionEntity().getId(),

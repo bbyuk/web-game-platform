@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Import;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 @Import({JpaConfig.class, UserRepositoryImpl.class})
-@DisplayName("[medium] [user] [persistence] User Repository 단위테스트")
+@DisplayName("[medium] [user] [persistence] User Repository 영속성 테스트")
 class UserRepositoryTest {
 
     @Autowired

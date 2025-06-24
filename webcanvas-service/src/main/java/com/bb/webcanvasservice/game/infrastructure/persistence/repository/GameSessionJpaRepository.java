@@ -61,7 +61,7 @@ public interface GameSessionJpaRepository extends JpaRepository<GameSessionJpaEn
             join fetch  GameRoomJpaEntity gr
             on          gs.gameRoomEntity = gr
             where       gs.gameRoomEntity.id = :gameRoomId
-            and         gs.state = :activeStates
+            and         gs.state in :activeStates
             """
     )
     Optional<GameSessionJpaEntity> findByGameRoomIdAndStates(@Param("gameRoomId") Long gameRoomId,
