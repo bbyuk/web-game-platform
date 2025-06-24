@@ -40,7 +40,7 @@ public class GameModelMapper {
                 gameRoomEntity.getState(),
                 gameRoomEntity.getCapacity(),
                 toModel(gameSessionEntity, gameTurns),
-                gameRoomParticipantEntities.stream().map(GameModelMapper::toModel).toList());
+                gameRoomParticipantEntities.stream().map(GameModelMapper::toModel).collect(Collectors.toList()));
     }
 
     public static GameRoom toModel(GameRoomJpaEntity entity) {
