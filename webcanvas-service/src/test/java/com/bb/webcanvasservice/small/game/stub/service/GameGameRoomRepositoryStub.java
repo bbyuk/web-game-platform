@@ -78,7 +78,13 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
             /**
              * 게임 방 입장자 저장
              */
-            saveAllGameRoomParticipants(gameRoom.getParticipants());
+            List<GameRoomParticipant> participants = gameRoom.getParticipants();
+            saveAllGameRoomParticipants(participants);
+            participants.stream().forEach(participant -> {
+                if (!userGameRoomMap.containsKey(participant.getUserId())) {
+                    userGameRoomMap.put(participant.getUserId(), gameRoom);
+                }
+            });
 
             /**
              * 게임 방 저장

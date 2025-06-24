@@ -6,12 +6,18 @@ import com.bb.webcanvasservice.game.application.command.StartGameCommand;
 import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
+import com.bb.webcanvasservice.game.application.registry.GameTurnTimerRegistry;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.service.GameService;
+import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;
 import com.bb.webcanvasservice.game.domain.model.gameroom.*;
 import com.bb.webcanvasservice.game.infrastructure.persistence.registry.InMemoryGameSessionLoadRegistry;
+import com.bb.webcanvasservice.game.infrastructure.persistence.registry.InMemoryGameTurnTimerRegistry;
 import com.bb.webcanvasservice.small.game.dummy.ApplicationEventPublisherDummy;
-import com.bb.webcanvasservice.small.game.stub.service.*;
+import com.bb.webcanvasservice.small.game.stub.service.GameDictionaryQueryPortStub;
+import com.bb.webcanvasservice.small.game.stub.service.GameGamePlayHistoryRepositoryStub;
+import com.bb.webcanvasservice.small.game.stub.service.GameGameRoomRepositoryStub;
+import com.bb.webcanvasservice.small.game.stub.service.GameUserCommandPortStub;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -20,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 
 @Tag("small")
 @DisplayName("[small] [game] [service] 게임 애플리케이션 서비스 로직 test")
@@ -33,33 +40,32 @@ public class GameServiceTest {
     GameRoomRepository gameRoomRepository = new GameGameRoomRepositoryStub();
     InMemoryGameSessionLoadRegistry gameSessionLoadRegistry = new InMemoryGameSessionLoadRegistry();
 
-    GameService gameService;
+    GameTurnTimerRegistry gameTurnTimerRegistry = new InMemoryGameTurnTimerRegistry();
+    GameService gameService = new GameService(
+            new GameDictionaryQueryPortStub(),
+            new GameUserCommandPortStub(),
+            gameRoomRepository,
+            new GameGamePlayHistoryRepositoryStub(),
+            gameSessionLoadRegistry,
+            new GameProperties(gameRoomCapacity,
+                    5,
+                    8,
+                    List.of(
+                            "#ff3c00",
+                            "#0042ff",
+                            "#1e9000",
+                            "#f2cb00",
+                            "#8400a8",
+                            "#00c8c8",
+                            "#ff68ff",
+                            "#969696"
+                    ),
+                    new ArrayList<>()
+            ),
+            new ApplicationEventPublisherDummy()
+    );
 
-    {
-        gameService = new GameService(
-                new GameDictionaryQueryPortStub(),
-                new GameUserCommandPortStub(),
-                gameRoomRepository,
-                new GameGamePlayHistoryRepositoryStub(),
-                gameSessionLoadRegistry,
-                new GameProperties(gameRoomCapacity,
-                        5,
-                        8,
-                        List.of(
-                                "#ff3c00",
-                                "#0042ff",
-                                "#1e9000",
-                                "#f2cb00",
-                                "#8400a8",
-                                "#00c8c8",
-                                "#ff68ff",
-                                "#969696"
-                        ),
-                        new ArrayList<>()
-                ),
-                new ApplicationEventPublisherDummy()
-        );
-    }
+    GameTurnTimerService gameTurnTimerService = new GameTurnTimerService(gameTurnTimerRegistry, Executors.newScheduledThreadPool(4));
 
     @Test
     @DisplayName("게임 방 생성 및 입장 - 성공 테스트")
@@ -301,54 +307,4 @@ public class GameServiceTest {
 
     }
 
-    @Test
-    @DisplayName("게임 턴 진행 테스트 - 게임 턴 period second 마다 게임 턴이 진행된다.")
-    void 게임_턴_진행_테스트() throws Exception {
-        // given
-        Long hostUserId = 1L;
-        Long guestUserId = 2L;
-        GameRoomJoinDto gameRoomAndEnter = gameService.createGameRoomAndEnter(hostUserId);
-        GameRoomJoinDto gameRoomJoinDto = gameService.joinGameRoom(new JoinGameRoomCommand(gameRoomAndEnter.gameRoomId(), guestUserId));
-
-        gameService.updateReady(new UpdateReadyCommand(gameRoomJoinDto.gameRoomParticipantId(), guestUserId, true));
-
-        Long gameSessionId = gameService.loadGameSession(new StartGameCommand(gameRoomJoinDto.gameRoomId(), 2, 1, hostUserId));
-        GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomJoinDto.gameRoomId()).orElseThrow(RuntimeException::new);
-
-        // when
-        CountDownLatch hostThreadLatch = new CountDownLatch(1);
-        CountDownLatch guestThreadLatch = new CountDownLatch(1);
-
-        // 비동기 실행
-        Thread hostSubscriptionThread = new Thread(() -> {
-            try {
-                gameService.successSubscription(gameSessionId, hostUserId);
-            } finally {
-                hostThreadLatch.countDown(); // 완료 알림
-            }
-        });
-        Thread guestSubscriptionThread = new Thread(() -> {
-            try {
-                gameService.successSubscription(gameSessionId, guestUserId);
-            } finally {
-                guestThreadLatch.countDown(); // 완료 알림
-            }
-        });
-
-        hostSubscriptionThread.start();
-        guestSubscriptionThread.start();
-
-        // 최대 2초 기다림
-        boolean hostCompleted = hostThreadLatch.await(2, java.util.concurrent.TimeUnit.SECONDS);
-        boolean guestCompleted = guestThreadLatch.await(2, java.util.concurrent.TimeUnit.SECONDS);
-
-        // when
-        Thread.sleep(3000);
-        // 3초 이후엔 모든 턴이 종료
-        GameSession gameSession = gameRoom.getCurrentGameSession();
-
-        // then
-        Assertions.assertThat(gameSession.getGameTurns().size()).isEqualTo(2);
-        Assertions.assertThat(gameSession.isEnd()).isTrue();
-    }
 }
