@@ -5,14 +5,12 @@ import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEnt
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 /**
  * 게임 유저의 persitence layer를 담당하는 JPA 레포지토리 클래스
  */
-@Repository
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long> {
 
     /**

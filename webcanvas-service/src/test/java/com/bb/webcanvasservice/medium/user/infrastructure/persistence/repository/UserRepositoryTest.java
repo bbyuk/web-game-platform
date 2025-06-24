@@ -1,18 +1,25 @@
-package com.bb.webcanvasservice.medium.user.domain.repository;
+package com.bb.webcanvasservice.medium.user.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
+import com.bb.webcanvasservice.config.JpaConfig;
 import com.bb.webcanvasservice.user.domain.model.User;
 import com.bb.webcanvasservice.user.domain.repository.UserRepository;
+import com.bb.webcanvasservice.user.infrastructure.persistence.repository.UserRepositoryImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
+@Import({ JpaConfig.class, UserRepositoryImpl.class})
+@DisplayName("[medium] [user] [persistence] User Repository 단위테스트")
 class UserRepositoryTest {
 
+    @Autowired
     UserRepository userRepository;
 
     @Test
