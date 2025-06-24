@@ -6,6 +6,7 @@ import com.bb.webcanvasservice.config.JpaConfig;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipant;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomRepositoryImpl;
 import com.bb.webcanvasservice.user.domain.model.User;
 import com.bb.webcanvasservice.user.domain.repository.UserRepository;
@@ -55,7 +56,7 @@ public class GameRepositoryTest {
     }
 
     @Test
-    @DisplayName("게임 방 ID로 게임 방 찾기 - 입장자만 있는 경우")
+    @DisplayName("게임 방 ID로 게임 방 찾기 - 입장자 캐스케이드")
     void 게임방_ID로_게임_방_찾기_2() throws Exception {
         // given
         User hostUser = userRepository.save(User.create(FingerprintGenerator.generate()));
@@ -77,7 +78,7 @@ public class GameRepositoryTest {
     }
 
     @Test
-    @DisplayName("게임 방 ID로 게임 방 찾기 - 턴이 없는 세션만 있는 경우")
+    @DisplayName("게임 방 ID로 게임 방 찾기 - 세션 캐스케이드")
     void 게임방_ID로_게임_방_찾기_3() throws Exception {
         // given
         User hostUser = userRepository.save(User.create(FingerprintGenerator.generate()));
@@ -103,6 +104,41 @@ public class GameRepositoryTest {
                 .ifPresent(findGameRoom -> {
                     Assertions.assertThat(findGameRoom).usingRecursiveComparison().isEqualTo(savedGameRoom);
                 });
+
+        // then
+    }
+    
+    @Test
+    @DisplayName("게임 방 ID로 게임 방 찾기 - 턴, 세션 캐스케이드")
+    void 게임_방_ID로_게임_방_찾기() throws Exception {
+        // given
+        User hostUser = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User guestUser = userRepository.save(User.create(FingerprintGenerator.generate()));
+
+        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+
+        GameRoomParticipant host = GameRoomParticipant.create(hostUser.getId(), "호스트");
+        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.getId(), "게스트");
+
+        gameRoom.letIn(host);
+        gameRoom.letIn(guest);
+
+        gameRoom.changeParticipantReady(guest, true);
+
+        gameRoom.loadGameSession(2);
+
+        GameSession gameSession = gameRoom.getGameSession();
+        gameSession.processToNextTurn(guestUser.getId(), "테스트");
+
+        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
+
+        // when
+        Assertions.assertThat(gameSession.getGameTurns().size()).isEqualTo(1);
+        gameRoomRepository.findGameRoomById(savedGameRoom.getId())
+                .ifPresent(findGameRoom -> {
+                    Assertions.assertThat(findGameRoom).usingRecursiveComparison().isEqualTo(savedGameRoom);
+                });
+
 
         // then
     }

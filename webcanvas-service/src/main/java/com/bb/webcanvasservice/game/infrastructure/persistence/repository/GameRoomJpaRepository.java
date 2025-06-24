@@ -126,5 +126,5 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
             where   gs.id = :gameSessionId
             """
     )
-    Optional<GameRoom> findByGameSessionId(@Param("gameSessionId") Long gameSessionId);
+    Optional<GameRoomJpaEntity> findByGameSessionId(@Param("gameSessionId") Long gameSessionId);
 }

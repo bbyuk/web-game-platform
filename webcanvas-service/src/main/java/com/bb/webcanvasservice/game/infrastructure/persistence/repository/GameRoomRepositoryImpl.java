@@ -39,7 +39,7 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
         GameRoomJpaEntity gameRoomJpaEntity = gameSessionJpaEntity == null
                 ? gameRoomJpaRepository.findById(gameRoomId).orElseThrow(GameRoomNotFoundException::new)
                 : gameSessionJpaEntity.getGameRoomEntity();
-        
+
         List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRoomIdAndStates(gameRoomId, GameRoomParticipantState.joined);
         List<GameTurnJpaEntity> gameTurnEntities = gameSessionJpaEntity == null
                 ? null
@@ -58,40 +58,22 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     @Override
     public Optional<GameRoom> findGameRoomByGameRoomParticipantId(Long gameRoomParticipantId) {
         GameRoomParticipantJpaEntity gameRoomParticipantEntity = gameRoomParticipantJpaRepository.findById(gameRoomParticipantId).orElseThrow(GameRoomParticipantNotFoundException::new);
-
         GameRoomJpaEntity gameRoomEntity = gameRoomParticipantEntity.getGameRoomEntity();
-        GameSessionJpaEntity gameSessionJpaEntity = gameSessionJpaRepository.findByGameRoomIdAndStates(gameRoomEntity.getId(), GameSessionState.active).orElse(null);
-        List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRoomIdAndStates(gameRoomEntity.getId(), GameRoomParticipantState.joined);
-        List<GameTurnJpaEntity> gameTurnEntities = gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionJpaEntity.getId());
-
-        return Optional.of(
-                GameModelMapper.toModel(
-                        gameRoomEntity,
-                        gameSessionJpaEntity,
-                        gameRoomParticipantEntities,
-                        gameTurnEntities
-                )
-        );
+        return findGameRoomById(gameRoomEntity.getId());
     }
 
     @Override
     public Optional<GameRoom> findGameRoomByGameSessionId(Long gameSessionId) {
-        return gameRoomJpaRepository.findByGameSessionId(gameSessionId);
+        GameRoomJpaEntity gameRoomEntity = gameRoomJpaRepository.findByGameSessionId(gameSessionId)
+                .orElseThrow(GameRoomNotFoundException::new);
+        return findGameRoomById(gameRoomEntity.getId());
     }
 
     @Override
     public Optional<GameRoom> findCurrentJoinedGameRoomByUserId(Long userId) {
         GameRoomParticipantJpaEntity gameRoomParticipantJpaEntity = gameRoomParticipantJpaRepository.findGameRoomEntranceByUserIdAndGameRoomStates(userId, GameRoomParticipantState.joined)
                 .orElseThrow(GameRoomParticipantNotFoundException::new);
-        GameRoomJpaEntity gameRoomEntity = gameRoomParticipantJpaEntity.getGameRoomEntity();
-        GameSessionJpaEntity gameSessionEntity = gameSessionJpaRepository.findByGameRoomIdAndStates(gameRoomEntity.getId(), GameSessionState.active).orElse(null);
-        List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRoomIdAndStates(gameRoomEntity.getId(), GameRoomParticipantState.joined);
-        List<GameTurnJpaEntity> gameTurnEntities = gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionEntity.getId());
-
-
-        return Optional.of(
-                GameModelMapper.toModel(gameRoomEntity, gameSessionEntity, gameRoomParticipantEntities, gameTurnEntities)
-        );
+        return findGameRoomById(gameRoomParticipantJpaEntity.getGameRoomEntity().getId());
     }
 
     @Override
