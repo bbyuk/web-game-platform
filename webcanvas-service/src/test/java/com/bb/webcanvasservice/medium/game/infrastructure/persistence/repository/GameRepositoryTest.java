@@ -98,6 +98,7 @@ public class GameRepositoryTest {
         GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
 
         // when
+        Assertions.assertThat(savedGameRoom.getGameSession()).isNotNull();
         gameRoomRepository.findGameRoomById(savedGameRoom.getId())
                 .ifPresent(findGameRoom -> {
                     Assertions.assertThat(findGameRoom).usingRecursiveComparison().isEqualTo(savedGameRoom);
