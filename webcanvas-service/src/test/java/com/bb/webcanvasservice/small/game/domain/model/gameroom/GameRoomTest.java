@@ -41,7 +41,7 @@ class GameRoomTest {
         gameRoom.letIn(gameRoomParticipant1);
         gameRoom.letIn(gameRoomParticipant2);
 
-        gameRoomParticipant2.changeReady(true);
+        gameRoom.changeParticipantReady(gameRoomParticipant2, true);
 
         gameRoom.loadGameSession(150);
 
@@ -68,7 +68,7 @@ class GameRoomTest {
         gameRoom.letIn(gameRoomParticipant1);
         gameRoom.letIn(gameRoomParticipant2);
 
-        gameRoomParticipant2.changeReady(true);
+        gameRoom.changeParticipantReady(gameRoomParticipant2, true);
 
         gameRoom.loadGameSession(150);
 

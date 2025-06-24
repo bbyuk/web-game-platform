@@ -18,6 +18,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import java.util.Optional;
+
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 @Import({JpaConfig.class, GameRoomRepositoryImpl.class, UserRepositoryImpl.class})
@@ -70,6 +72,36 @@ public class GameRepositoryTest {
         gameRoomRepository.save(savedGameRoom);
 
         // when
+
+        // then
+    }
+
+    @Test
+    @DisplayName("게임 방 ID로 게임 방 찾기 - 턴이 없는 세션만 있는 경우")
+    void 게임방_ID로_게임_방_찾기_3() throws Exception {
+        // given
+        User hostUser = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User guestUser = userRepository.save(User.create(FingerprintGenerator.generate()));
+
+        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+
+        GameRoomParticipant host = GameRoomParticipant.create(hostUser.getId(), "호스트");
+        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.getId(), "게스트");
+
+        gameRoom.letIn(host);
+        gameRoom.letIn(guest);
+
+        gameRoom.changeParticipantReady(guest, true);
+
+        gameRoom.loadGameSession(2);
+
+        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
+
+        // when
+        gameRoomRepository.findGameRoomById(savedGameRoom.getId())
+                .ifPresent(findGameRoom -> {
+                    Assertions.assertThat(findGameRoom).usingRecursiveComparison().isEqualTo(savedGameRoom);
+                });
 
         // then
     }
