@@ -124,8 +124,7 @@ public class GameService {
         String koreanAdjective = dictionaryQueryPort.drawRandomKoreanAdjective();
 
         GameRoomParticipant newGameRoomParticipant = GameRoomParticipant.create(
-                gameRoom.getId()
-                , command.userId()
+                command.userId()
                 , koreanAdjective
         );
         gameRoom.letIn(newGameRoomParticipant);

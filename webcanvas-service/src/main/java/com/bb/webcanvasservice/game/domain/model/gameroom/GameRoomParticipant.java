@@ -19,7 +19,7 @@ public class GameRoomParticipant {
     /**
      * 입장한 게임 방
      */
-    private final Long gameRoomId;
+    private Long gameRoomId;
 
     /**
      * 입장한 유저 ID
@@ -66,16 +66,14 @@ public class GameRoomParticipant {
 
     /**
      * 새로운 입장자 도메인 객체를 생성해 리턴한다.
-     * @param gameRoomId 입장하는 게임 방 ID
      * @param userId 입장하는 유저 ID
      * @param nicknameAdjective 닉네임의 앞에 붙을 형용사
-     * @param role 입장자 role
      * @return 입장자
      */
-    public static GameRoomParticipant create(Long gameRoomId, Long userId, String nicknameAdjective) {
+    public static GameRoomParticipant create(Long userId, String nicknameAdjective) {
         return new GameRoomParticipant(
                 null,
-                gameRoomId,
+                null,
                 userId,
                 GameRoomParticipantState.INIT,
                 String.format("%s %s", nicknameAdjective, "플레이어"),
@@ -118,7 +116,8 @@ public class GameRoomParticipant {
     /**
      * 게임 입장자를 입장 시킨다.
      */
-    public void join() {
+    public void join(Long gameRoomId) {
+        this.gameRoomId = gameRoomId;
         this.state = GameRoomParticipantState.WAITING;
         this.joinedAt = LocalDateTime.now();
     }

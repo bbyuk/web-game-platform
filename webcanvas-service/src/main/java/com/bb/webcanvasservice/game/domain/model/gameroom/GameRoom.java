@@ -148,7 +148,7 @@ public class GameRoom {
             newParticipant.changeRoleToHost();
         }
 
-        newParticipant.join();
+        newParticipant.join(id);
         participants.add(newParticipant);
     }
 
