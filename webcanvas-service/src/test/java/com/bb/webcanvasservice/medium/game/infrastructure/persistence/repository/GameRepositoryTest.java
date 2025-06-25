@@ -182,4 +182,34 @@ public class GameRepositoryTest {
         Assertions.assertThat(findGameRoomByHost).usingRecursiveComparison().isEqualTo(findGameRoomByGuest);
     }
 
+    @Test
+    @DisplayName("게임 세션 ID로 조회 - 성공 테스트")
+    void 게임_세션_ID로_조회() throws Exception {
+        // given
+        // given
+        User hostUser = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User guestUser = userRepository.save(User.create(FingerprintGenerator.generate()));
+
+        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+
+        GameRoomParticipant host = GameRoomParticipant.create(hostUser.getId(), "호스트");
+        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.getId(), "게스트");
+
+        gameRoom.letIn(host);
+        gameRoom.letIn(guest);
+
+        gameRoom.changeParticipantReady(guest, true);
+
+        gameRoom.loadGameSession(22);
+
+        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
+
+        // when
+        GameRoom findGameRoom = gameRoomRepository.findGameRoomByGameSessionId(savedGameRoom.getGameSession().getId())
+                .orElseThrow(RuntimeException::new);
+
+        // then
+        Assertions.assertThat(findGameRoom).usingRecursiveComparison().isEqualTo(savedGameRoom);
+    }
+
 }
