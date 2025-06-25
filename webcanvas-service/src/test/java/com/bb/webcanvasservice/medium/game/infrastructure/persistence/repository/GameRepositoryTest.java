@@ -143,4 +143,43 @@ public class GameRepositoryTest {
         // then
     }
 
+    @Test
+    @DisplayName("게임 방 입장자 ID로 조회 - 성공 테스트")
+    void 게임_방_입장자_ID로_조회() throws Exception {
+        // given
+        User hostUser = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User guestUser = userRepository.save(User.create(FingerprintGenerator.generate()));
+
+        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+
+        GameRoomParticipant host = GameRoomParticipant.create(hostUser.getId(), "호스트");
+        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.getId(), "게스트");
+
+        gameRoom.letIn(host);
+        gameRoom.letIn(guest);
+
+        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
+        GameRoomParticipant findHostParticipant = savedGameRoom.getParticipants()
+                .stream()
+                .filter(participant -> participant.getUserId().equals(hostUser.getId()))
+                .findFirst()
+                .orElseThrow(IllegalAccessError::new);
+
+        GameRoomParticipant findGuestParticipant = savedGameRoom.getParticipants()
+                .stream()
+                .filter(participant -> participant.getUserId().equals(guestUser.getId()))
+                .findFirst()
+                .orElseThrow(IllegalAccessError::new);
+
+        // when
+        GameRoom findGameRoomByHost = gameRoomRepository.findGameRoomByGameRoomParticipantId(findHostParticipant.getId())
+                .orElseThrow(RuntimeException::new);
+        GameRoom findGameRoomByGuest = gameRoomRepository.findGameRoomByGameRoomParticipantId(findGuestParticipant.getId())
+                .orElseThrow(RuntimeException::new);
+
+        // then
+        Assertions.assertThat(findGameRoomByHost).usingRecursiveComparison().isEqualTo(savedGameRoom);
+        Assertions.assertThat(findGameRoomByHost).usingRecursiveComparison().isEqualTo(findGameRoomByGuest);
+    }
+
 }
