@@ -32,18 +32,26 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     @Override
     public Optional<GameRoom> findGameRoomById(Long gameRoomId) {
         return gameRoomJpaRepository.findById(gameRoomId)
-                .flatMap(gameRoomJpaEntity ->
-                        gameSessionJpaRepository.findByGameRoomIdAndStates(gameRoomId, GameSessionState.active)
-                                .map(gameSessionJpaEntity ->
-                                        GameModelMapper.toModel(
-                                                gameRoomJpaEntity,
-                                                gameSessionJpaEntity,
-                                                gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRoomIdAndStates(
-                                                        gameRoomId, GameRoomParticipantState.joined
-                                                ),
-                                                gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionJpaEntity.getId())
-                                        )
-                                )
+                .map(gameRoomJpaEntity -> {
+                            List<GameRoomParticipantJpaEntity> gameRoomParticipantJpaEntities = gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRoomIdAndStates(
+                                    gameRoomId, GameRoomParticipantState.joined
+                            );
+                            return gameSessionJpaRepository.findByGameRoomIdAndStates(gameRoomId, GameSessionState.active)
+                                    .map(gameSessionJpaEntity ->
+                                            GameModelMapper.toModel(
+                                                    gameRoomJpaEntity,
+                                                    gameSessionJpaEntity,
+                                                    gameRoomParticipantJpaEntities,
+                                                    gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionJpaEntity.getId())
+                                            )
+                                    )
+                                    .orElse(GameModelMapper.toModel(
+                                            gameRoomJpaEntity,
+                                            null,
+                                            gameRoomParticipantJpaEntities,
+                                            null
+                                    ));
+                        }
                 );
     }
 
@@ -68,7 +76,7 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     @Override
     public Optional<GameRoom> findCurrentJoinedGameRoomByUserId(Long userId) {
         return gameRoomParticipantJpaRepository.findGameRoomEntranceByUserIdAndGameRoomStates(userId, GameRoomParticipantState.joined)
-                .flatMap(participantJpaEntity -> findGameRoomById(participantJpaEntity.getId()));
+                .flatMap(participantJpaEntity -> findGameRoomById(participantJpaEntity.getGameRoomEntity().getId()));
     }
 
     @Override
