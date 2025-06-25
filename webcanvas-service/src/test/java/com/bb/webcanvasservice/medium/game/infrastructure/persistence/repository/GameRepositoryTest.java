@@ -186,7 +186,6 @@ public class GameRepositoryTest {
     @DisplayName("게임 세션 ID로 조회 - 성공 테스트")
     void 게임_세션_ID로_조회() throws Exception {
         // given
-        // given
         User hostUser = userRepository.save(User.create(FingerprintGenerator.generate()));
         User guestUser = userRepository.save(User.create(FingerprintGenerator.generate()));
 
@@ -210,6 +209,39 @@ public class GameRepositoryTest {
 
         // then
         Assertions.assertThat(findGameRoom).usingRecursiveComparison().isEqualTo(savedGameRoom);
+    }
+
+    @Test
+    @DisplayName("유저 ID로 대상 유저가 입장해 있는 방 조회 - 성공 테스트")
+    void 유저ID로_대상_유저가_입장해_있는_방_조회() throws Exception {
+        // given
+        User hostUser = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User guestUser = userRepository.save(User.create(FingerprintGenerator.generate()));
+
+        Long wrongUserId = 2321L;
+
+        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+
+        GameRoomParticipant host = GameRoomParticipant.create(hostUser.getId(), "호스트");
+        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.getId(), "게스트");
+
+        gameRoom.letIn(host);
+        gameRoom.letIn(guest);
+
+        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
+
+        // when
+        GameRoom findByHostUserId = gameRoomRepository.findCurrentJoinedGameRoomByUserId(host.getUserId())
+                .orElseThrow(RuntimeException::new);
+
+        GameRoom findByGuestUserId = gameRoomRepository.findCurrentJoinedGameRoomByUserId(guest.getUserId())
+                .orElseThrow(RuntimeException::new);
+
+        // then
+        Assertions.assertThat(findByHostUserId).usingRecursiveComparison().isEqualTo(savedGameRoom);
+        Assertions.assertThat(findByGuestUserId).usingRecursiveComparison().isEqualTo(savedGameRoom);
+        Assertions.assertThat(gameRoomRepository.findCurrentJoinedGameRoomByUserId(wrongUserId)).isEmpty();
+
     }
 
 }
