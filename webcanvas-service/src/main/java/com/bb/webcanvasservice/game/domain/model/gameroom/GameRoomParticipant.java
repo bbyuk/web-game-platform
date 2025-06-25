@@ -136,7 +136,7 @@ public class GameRoomParticipant {
     /**
      * 레디 상태를 바꾼다.
      */
-    public void changeReady(boolean ready) {
+    void changeReady(boolean ready) {
         if (isHost()) {
             throw new GameRoomHostCanNotChangeReadyException();
         }
