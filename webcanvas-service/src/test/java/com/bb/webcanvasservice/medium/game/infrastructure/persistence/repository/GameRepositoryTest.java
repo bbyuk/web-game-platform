@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Transactional
 @DataJpaTest
 @Import({
         JpaConfig.class,
@@ -266,6 +267,24 @@ public class GameRepositoryTest {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void JoinCode를_사용할_수_있는지_여부를_체크_1() throws Exception {
         // given
+
+        String joinCode = JoinCodeGenerator.generate(joinCodeLength);
+        GameRoom gameRoom = GameRoom.create(joinCode, roomCapacity);
+        gameRoom.close();
+
+        gameRoomRepository.save(gameRoom);
+        // when
+        Assertions.assertThat(gameRoomRepository.existsJoinCodeConflictOnActiveGameRoom(joinCode))
+                .isEqualTo(false);
+
+        // then
+    }
+
+
+    @Test
+    @DisplayName("JoinCode를 사용할 수 있는지 여부를 체크 - 동시에 여러 스레드가 같은 JoinCode를 생성해 경합하는 RaceCondition 테스트")
+    void JoinCode를_사용할_수_있는지_여부를_체크_2() throws Exception {
+        // given
         String raceConditionJoinCode = JoinCodeGenerator.generate(joinCodeLength);
 
         int threadCount = 2;
@@ -306,16 +325,6 @@ public class GameRepositoryTest {
 
         // then
         Assertions.assertThat(joinCodeUsingCount.get()).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("JoinCode를 사용할 수 있는지 여부를 체크 - 동시에 여러 스레드가 같은 JoinCode를 생성해 경합하는 RaceCondition 테스트")
-    void JoinCode를_사용할_수_있는지_여부를_체크_2() throws Exception {
-        // given
-
-        // when
-
-        // then
     }
 
     @Test
