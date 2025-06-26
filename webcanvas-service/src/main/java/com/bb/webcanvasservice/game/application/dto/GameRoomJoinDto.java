@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.game.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "application layer to presentation layer GameRoomEntrance DTO")
+@Schema(description = "application layer to presentation layer GameRoomParticipant DTO")
 public record GameRoomJoinDto(
 
 

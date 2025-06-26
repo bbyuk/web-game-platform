@@ -1,6 +1,5 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
@@ -69,9 +68,9 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
                     ) < :gameRoomCapacity
             """
     )
-    List<GameRoomJpaEntity> findGameRoomsByCapacityAndStateWithEntranceState(@Param("gameRoomCapacity") int gameRoomCapacity,
-                                                                             @Param("gameRoomState") GameRoomState gameRoomState,
-                                                                             @Param("gameRoomParticipantState") GameRoomParticipantState gameRoomParticipantState);
+    List<GameRoomJpaEntity> findGameRoomsByCapacityAndStateAndGameRoomParticipantState(@Param("gameRoomCapacity") int gameRoomCapacity,
+                                                                                       @Param("gameRoomState") GameRoomState gameRoomState,
+                                                                                       @Param("gameRoomParticipantState") GameRoomParticipantState gameRoomParticipantState);
 
     /**
      * GameRoom 상태로 게엠 방을 조회한다.

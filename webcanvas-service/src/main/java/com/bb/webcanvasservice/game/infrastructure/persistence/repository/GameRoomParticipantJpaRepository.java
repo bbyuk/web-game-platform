@@ -32,7 +32,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
                 and         gre.state = com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.WAITING
             )
             """)
-    boolean existsGameRoomEntranceByUserId(@Param("userId") Long userId);
+    boolean existsGameRoomParticipantByUserId(@Param("userId") Long userId);
 
     /**
      * 입장한 방 찾기
@@ -68,7 +68,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
             """
     )
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<GameRoomParticipantJpaEntity> findGameRoomEntrancesByGameRoomIdWithLock(@Param("gameRoomId") Long gameRoomId);
+    List<GameRoomParticipantJpaEntity> findGameRoomParticipantsByGameRoomIdWithLock(@Param("gameRoomId") Long gameRoomId);
 
     /**
      * 유저 ID로 현재 입장한 게임 방의 입장 정보 조회
@@ -85,7 +85,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
             and         gre.state in :gameRoomParticipantStates
             """
     )
-    Optional<GameRoomParticipantJpaEntity> findGameRoomEntranceByUserIdAndGameRoomStates(@Param("userId") Long userId, @Param("gameRoomParticipantStates") List<GameRoomParticipantState> gameRoomParticipantStates);
+    Optional<GameRoomParticipantJpaEntity> findGameRoomParticipantByUserIdAndGameRoomStates(@Param("userId") Long userId, @Param("gameRoomParticipantStates") List<GameRoomParticipantState> gameRoomParticipantStates);
 
     /**
      * 게임 방 ID와 상태로 GameRoomParticipant 목록을 조회한다.
@@ -102,7 +102,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
             and         gre.state = :gameRoomParticipantState
             order by    gre.id asc
             """)
-    List<GameRoomParticipantJpaEntity> findGameRoomEntrancesByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomParticipantState") GameRoomParticipantState gameRoomParticipantState);
+    List<GameRoomParticipantJpaEntity> findGameRoomParticipantsByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomParticipantState") GameRoomParticipantState gameRoomParticipantState);
 
     /**
      * 방에 입장한 수
@@ -122,7 +122,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
             order by    gre.id asc
             """
     )
-    long findGameRoomEntranceCountByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomParticipantState") GameRoomParticipantState gameRoomParticipantState);
+    long findGameRoomParticipantCountByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomParticipantState") GameRoomParticipantState gameRoomParticipantState);
 
     /**
      * 게임 방 ID와 상태들로 GameRoomParticipant 목록을 조회한다.

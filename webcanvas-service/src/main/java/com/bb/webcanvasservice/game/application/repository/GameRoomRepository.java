@@ -52,7 +52,7 @@ public interface GameRoomRepository {
     /**
      * 입장 가능한 게임 방의 목록을 가져온다.
      *
-     * 조건 1. GameRoom과 연관된 GameRoomEntrance의 수가 게임 방의 수용 인원 수보다 작거나 같아야함
+     * 조건 1. GameRoom과 연관된 GameRoomParticipant의 수가 게임 방의 수용 인원 수보다 작거나 같아야함
      * 조건 2. GameRoom의 state가 enterableStates에 맞는 엔티티만 조회
      * @param gameRoomCapacity 게임 방 정원
      * @param gameRoomState 게임 방 상태

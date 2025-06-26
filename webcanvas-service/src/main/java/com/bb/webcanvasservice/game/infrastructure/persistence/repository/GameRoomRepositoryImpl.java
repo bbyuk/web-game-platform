@@ -74,7 +74,7 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
 
     @Override
     public Optional<GameRoom> findCurrentJoinedGameRoomByUserId(Long userId) {
-        return gameRoomParticipantJpaRepository.findGameRoomEntranceByUserIdAndGameRoomStates(userId, GameRoomParticipantState.joined)
+        return gameRoomParticipantJpaRepository.findGameRoomParticipantByUserIdAndGameRoomStates(userId, GameRoomParticipantState.joined)
                 .flatMap(participantJpaEntity -> findGameRoomById(participantJpaEntity.getGameRoomEntity().getId()));
     }
 
@@ -89,7 +89,7 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
 
     @Override
     public List<GameRoom> findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(int gameRoomCapacity, GameRoomState gameRoomState, GameRoomParticipantState gameRoomParticipantState) {
-        List<GameRoomJpaEntity> gameRoomJpaEntities = gameRoomJpaRepository.findGameRoomsByCapacityAndStateWithEntranceState(gameRoomCapacity, gameRoomState, gameRoomParticipantState);
+        List<GameRoomJpaEntity> gameRoomJpaEntities = gameRoomJpaRepository.findGameRoomsByCapacityAndStateAndGameRoomParticipantState(gameRoomCapacity, gameRoomState, gameRoomParticipantState);
         Map<Long, GameSessionJpaEntity> gameSessionEntityPerGameRoomPerGameRoomId = gameSessionJpaRepository.findGameSessionsByGameRoomsAndStates(gameRoomJpaEntities, GameSessionState.active)
                 .stream()
                 .collect(Collectors.toMap(

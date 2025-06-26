@@ -70,7 +70,7 @@ public class GameService {
      * <p>
      * 이미 입장한 방이 있는 경우, AlreadyEnteredRoomException 을 throw한다.
      * <p>
-     * TODO 메모리에서 WAITING GameRoomEntrance filtering 처리 -> batch size 및 페이징 처리 필요
+     * TODO 메모리에서 WAITING GameRoomParticipant filtering 처리 -> batch size 및 페이징 처리 필요
      *
      * @param userId 유저 ID
      * @return GameRoomListResponse 게임 방 조회 응답 DTO
@@ -100,7 +100,7 @@ public class GameService {
      * <p>
      * - 입장시키려는 유저가 현재 아무 방에도 접속하지 않은 상태여야 한다.
      * - 입장하려는 방의 상태가 WAITING이어야 한다.
-     * - 입장하려는 방에 접속한 유저 세션의 수(entrances)는 최대 8이다.
+     * - 입장하려는 방에 접속한 유저 세션의 수(participants)는 최대 8이다.
      *
      * @param command 게임 방 입장 커맨드
      * @return gameRoomParticipantId 게임 방 입장 ID
@@ -119,7 +119,7 @@ public class GameService {
          * dictionary 도메인 서비스로부터 랜덤 형용사 조회
          * 명사와 결합하여 랜덤 닉네임 할당
          *
-         * HOST로 입장한다면 entrance의 ready상태를 true로 초기 설정
+         * HOST로 입장한다면 participant의 ready상태를 true로 초기 설정
          */
         String koreanAdjective = dictionaryQueryPort.drawRandomKoreanAdjective();
 
@@ -353,7 +353,7 @@ public class GameService {
 
         List<GamePlayHistory> gamePlayHistories = participants
                 .stream()
-                .map(entrance -> new GamePlayHistory(entrance.getUserId(), gameRoom.getCurrentGameSession().getId()))
+                .map(participant -> new GamePlayHistory(participant.getUserId(), gameRoom.getCurrentGameSession().getId()))
                 .toList();
         gamePlayHistoryRepository.saveAll(gamePlayHistories);
 

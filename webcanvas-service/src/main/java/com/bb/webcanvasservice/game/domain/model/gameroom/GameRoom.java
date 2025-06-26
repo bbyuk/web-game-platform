@@ -381,8 +381,8 @@ public class GameRoom {
         int minCount = Integer.MAX_VALUE;
         List<Long> candidates = new ArrayList<>();
 
-        for (GameRoomParticipant entrance : gameRoomParticipants) {
-            Long userId = entrance.getUserId();
+        for (GameRoomParticipant participant : gameRoomParticipants) {
+            Long userId = participant.getUserId();
             int count = drawerCountMap.getOrDefault(userId, 0);
 
             if (count < minCount) {

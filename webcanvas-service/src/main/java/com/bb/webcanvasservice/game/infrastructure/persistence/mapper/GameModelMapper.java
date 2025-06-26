@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  *
  * @Game
  * @GameRoom
- * @GameRoomEntrance
+ * @GameRoomParticipant
  * @GameSession
  * @GameTurn
  * @GamePlayHistory
