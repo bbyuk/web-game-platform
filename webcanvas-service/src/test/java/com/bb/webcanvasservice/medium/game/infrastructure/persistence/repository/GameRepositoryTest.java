@@ -372,42 +372,20 @@ public class GameRepositoryTest {
     }
 
     @Test
-    @DisplayName("게임 방 저장 - GameRoomParticipant, GameSession, GameTurn 없는 case")
+    @DisplayName("게임 방 저장")
     void 게임_방_저장_1() throws Exception {
         // given
+        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+
 
         // when
+        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
 
         // then
-    }
+        Assertions.assertThat(gameRoom)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(savedGameRoom);
 
-    @Test
-    @DisplayName("게임 방 저장 - GameSession, GameTurn 없는 case")
-    void 게임_방_저장_2() throws Exception {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    @DisplayName("게임 방 저장 - GameTurn 없는 case")
-    void 게임_방_저장_3() throws Exception {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    @DisplayName("게임 방 저장 - 애그리거트 내 전체 도메인 모델 저장")
-    void 게임_방_저장_4() throws Exception {
-        // given
-
-        // when
-
-        // then
     }
 }
