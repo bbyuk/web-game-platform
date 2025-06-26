@@ -2,6 +2,8 @@ package com.bb.webcanvasservice.auth.domain.port;
 
 import com.bb.webcanvasservice.user.domain.view.UserInfo;
 
+import java.util.Optional;
+
 /**
  * 유저 도메인 조회 포트
  */
@@ -12,12 +14,12 @@ public interface AuthUserQueryPort {
      * @param fingerprint 대상 유저 fingerprint
      * @return 유저 정보 view
      */
-    UserInfo findUserInfoWith(String fingerprint);
+    Optional<UserInfo> findUserInfoWith(String fingerprint);
 
     /**
      * 유저 ID로 유저 정보를 찾는다.
      * @param userId 대상 유저 ID
      * @return 유저 정보 view
      */
-    UserInfo findUserInfoWith(Long userId);
+    Optional<UserInfo> findUserInfoWith(Long userId);
 }

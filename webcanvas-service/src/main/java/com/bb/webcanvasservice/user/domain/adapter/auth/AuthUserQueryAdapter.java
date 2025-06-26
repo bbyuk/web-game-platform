@@ -6,6 +6,8 @@ import com.bb.webcanvasservice.user.domain.mapper.UserModelViewMapper;
 import com.bb.webcanvasservice.user.domain.repository.UserRepository;
 import com.bb.webcanvasservice.user.domain.view.UserInfo;
 
+import java.util.Optional;
+
 /**
  * auth 유저 조회 포트 어댑터
  */
@@ -18,12 +20,12 @@ public class AuthUserQueryAdapter implements AuthUserQueryPort {
     }
 
     @Override
-    public UserInfo findUserInfoWith(String fingerprint) {
-        return userRepository.findByFingerprint(fingerprint).map(UserModelViewMapper::toView).orElseGet(null);
+    public Optional<UserInfo> findUserInfoWith(String fingerprint) {
+        return userRepository.findByFingerprint(fingerprint).map(UserModelViewMapper::toView);
     }
 
     @Override
-    public UserInfo findUserInfoWith(Long userId) {
-        return UserModelViewMapper.toView(userRepository.findById(userId).orElseThrow(UserNotFoundException::new));
+    public Optional<UserInfo> findUserInfoWith(Long userId) {
+        return userRepository.findById(userId).map(UserModelViewMapper::toView);
     }
 }

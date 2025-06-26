@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.auth.application.service;
 import com.bb.webcanvasservice.auth.application.command.LoginCommand;
 import com.bb.webcanvasservice.auth.application.dto.LoginSuccessDto;
 import com.bb.webcanvasservice.auth.application.dto.TokenRefreshSuccessDto;
+import com.bb.webcanvasservice.auth.domain.exception.AuthenticationFailedException;
 import com.bb.webcanvasservice.auth.domain.port.AuthUserCommandPort;
 import com.bb.webcanvasservice.auth.domain.port.AuthUserQueryPort;
 import com.bb.webcanvasservice.common.code.ErrorCode;
@@ -46,10 +47,8 @@ public class AuthenticationService {
                 ? FingerprintGenerator.generate()
                 : command.fingerprint();
 
-        UserInfo userInfo = userQueryPort.findUserInfoWith(fingerprint);
-        if (userInfo == null) {
-            userInfo = userCommandPort.createUser(fingerprint);
-        }
+        UserInfo userInfo = userQueryPort.findUserInfoWith(fingerprint)
+                .orElse(userCommandPort.createUser(fingerprint));
 
         String accessToken = jwtManager.generateToken(userInfo.id(), userInfo.fingerprint(), securityProperties.accessTokenExpiration());
         String refreshToken = jwtManager.generateToken(userInfo.id(), userInfo.fingerprint(), securityProperties.refreshTokenExpiration());
@@ -73,7 +72,8 @@ public class AuthenticationService {
          * 이 토큰이 유저에게 할당된 refreshToken인지 validation
          */
         Long userId = jwtManager.getUserIdFromToken(token);
-        UserInfo userInfo = userQueryPort.findUserInfoWith(userId);
+        UserInfo userInfo = userQueryPort.findUserInfoWith(userId)
+                .orElseThrow(() -> new AuthenticationFailedException("인증 대상 유저를 찾지 못했습니다."));
 
         if (!userInfo.refreshToken().equals(token)) {
             log.error("유저에게 할당되지 않은 refresh token 입니다.");

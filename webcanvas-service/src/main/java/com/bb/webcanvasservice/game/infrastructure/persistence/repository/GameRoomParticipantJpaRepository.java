@@ -151,7 +151,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
             from        GameRoomParticipantJpaEntity grp
             join fetch  GameRoomJpaEntity gr
             on          grp.gameRoomEntity = gr
-            where       grp.gameRoomEntity in :gameRoomIds
+            where       grp.gameRoomEntity in :gameRooms
            """)
     List<GameRoomParticipantJpaEntity> findGameRoomParticipantsByGameRooms(@Param("gameRooms") List<GameRoomJpaEntity> gameRoomJpaEntities);
 }
