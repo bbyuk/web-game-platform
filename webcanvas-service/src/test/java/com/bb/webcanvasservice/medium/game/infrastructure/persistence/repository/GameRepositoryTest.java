@@ -244,4 +244,83 @@ public class GameRepositoryTest {
 
     }
 
+    @Test
+    @DisplayName("JoinCode를 사용할 수 있는지 여부를 체크 - 성공 테스트")
+    void JoinCode를_사용할_수_있는지_여부를_체크_1() throws Exception {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    @DisplayName("JoinCode를 사용할 수 있는지 여부를 체크 - 동시에 여러 스레드가 같은 JoinCode를 생성해 경합하는 RaceCondition 테스트")
+    void JoinCode를_사용할_수_있는지_여부를_체크_2() throws Exception {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    @DisplayName("게임 방 정원, 상태, 입장자 상태로 게임 방 찾기")
+    void 게임_방_정원_상태_입장자_상태로_게임_방_찾기() throws Exception {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    @DisplayName("JoinCode로 게임 방 찾기")
+    void JoinCode로_게임_방_찾기() throws Exception {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    @DisplayName("게임 방 저장 - GameRoomParticipant, GameSession, GameTurn 없는 case")
+    void 게임_방_저장_1() throws Exception {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    @DisplayName("게임 방 저장 - GameSession, GameTurn 없는 case")
+    void 게임_방_저장_2() throws Exception {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    @DisplayName("게임 방 저장 - GameTurn 없는 case")
+    void 게임_방_저장_3() throws Exception {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    @DisplayName("게임 방 저장 - 애그리거트 내 전체 도메인 모델 저장")
+    void 게임_방_저장_4() throws Exception {
+        // given
+
+        // when
+
+        // then
+    }
 }

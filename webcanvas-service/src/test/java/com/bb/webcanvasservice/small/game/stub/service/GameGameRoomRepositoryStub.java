@@ -65,7 +65,7 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
     }
 
     @Override
-    public Optional<GameRoom> findRoomWithJoinCodeForEnter(String joinCode) {
+    public Optional<GameRoom> findGameRoomByJoinCode(String joinCode) {
         return Optional.empty();
     }
 

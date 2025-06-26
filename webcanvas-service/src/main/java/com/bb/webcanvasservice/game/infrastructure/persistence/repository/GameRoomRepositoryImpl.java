@@ -1,7 +1,6 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
-import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.game.domain.model.gameroom.*;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomParticipantJpaEntity;
@@ -114,7 +113,7 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     }
 
     @Override
-    public Optional<GameRoom> findRoomWithJoinCodeForEnter(String joinCode) {
+    public Optional<GameRoom> findGameRoomByJoinCode(String joinCode) {
         return gameRoomJpaRepository.findRoomWithJoinCodeForEnter(joinCode)
                 .map(GameModelMapper::toModel);
     }
