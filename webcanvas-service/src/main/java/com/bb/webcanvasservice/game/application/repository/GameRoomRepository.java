@@ -70,7 +70,7 @@ public interface GameRoomRepository {
      * @param joinCode
      * @return
      */
-    Optional<GameRoom> findGameRoomByJoinCode(String joinCode);
+    Optional<GameRoom> findGameRoomByJoinCodeAndState(String joinCode, GameRoomState state);
 
     /**
      * 게임 방 애그리거트 루트를 저장한다.

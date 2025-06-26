@@ -80,7 +80,11 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
 
     @Override
     public boolean existsJoinCodeConflictOnActiveGameRoom(String joinCode) {
-        return gameRoomJpaRepository.existsJoinCodeConflictOnActiveGameRoom(joinCode);
+        return !gameRoomJpaRepository
+                .findGameRoomByJoinCodeAndActiveStatesWithLock(
+                        joinCode,
+                        GameRoomState.active)
+                .isEmpty();
     }
 
     @Override
@@ -113,8 +117,8 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     }
 
     @Override
-    public Optional<GameRoom> findGameRoomByJoinCode(String joinCode) {
-        return gameRoomJpaRepository.findRoomWithJoinCodeForEnter(joinCode)
+    public Optional<GameRoom> findGameRoomByJoinCodeAndState(String joinCode, GameRoomState state) {
+        return gameRoomJpaRepository.findGameRoomByJoinCodeAndState(joinCode, state)
                 .map(GameModelMapper::toModel);
     }
 

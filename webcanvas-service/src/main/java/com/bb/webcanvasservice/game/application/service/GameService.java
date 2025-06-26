@@ -159,7 +159,7 @@ public class GameService {
      */
     @Transactional
     public GameRoomJoinDto joinGameRoomWithJoinCode(String joinCode, Long userId) {
-        GameRoom targetGameRoom = gameRoomRepository.findGameRoomByJoinCode(joinCode)
+        GameRoom targetGameRoom = gameRoomRepository.findGameRoomByJoinCodeAndState(joinCode, GameRoomState.WAITING)
                 .orElseThrow(() -> new GameRoomNotFoundException(String.format("입장 코드가 %s인 방을 찾지 못했습니다.", joinCode)));
 
         return joinGameRoom(

@@ -41,14 +41,12 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
-            select exists (
-                select  1
-                from    GameRoomJpaEntity gr
-                where   gr.state != 'CLOSED'
-                and     gr.joinCode = :joinCode
-            )
+            select  gr
+            from    GameRoomJpaEntity gr
+            where   gr.joinCode =   :joinCode
+            and     gr.state    in  :activeStates
             """)
-    boolean existsJoinCodeConflictOnActiveGameRoom(@Param("joinCode") String joinCode);
+    List<GameRoomJpaEntity> findGameRoomByJoinCodeAndActiveStatesWithLock(@Param("joinCode") String joinCode, @Param("activeStates")List<GameRoomState> activeStates);
 
     /**
      * 게임 방과 게임 방 입장자 상태, 게임 방의 정원에 맞는 게임 방의 목록을 가져온다.
@@ -97,10 +95,10 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
     @Query("""
            select   gr
            from     GameRoomJpaEntity gr
-           where    gr.joinCode =: joinCode
-           and      gr.state = 'WAITING'
+           where    gr.joinCode = :joinCode
+           and      gr.state = :state
            """)
-    Optional<GameRoomJpaEntity> findRoomWithJoinCodeForEnter(String joinCode);
+    Optional<GameRoomJpaEntity> findGameRoomByJoinCodeAndState(@Param("joinCode") String joinCode, @Param("state") GameRoomState state);
 
     /**
      * 게임 방 입장자 ID로 게임 방을 조회한다.

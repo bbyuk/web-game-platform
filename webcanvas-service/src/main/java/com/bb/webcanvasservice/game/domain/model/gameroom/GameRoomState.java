@@ -22,4 +22,5 @@ public enum GameRoomState {
     PLAYING;
 
     public final static List<GameRoomState> joinable = List.of(WAITING);
+    public final static List<GameRoomState> active = List.of(WAITING, PLAYING);
 }

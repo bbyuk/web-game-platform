@@ -6,6 +6,7 @@ import com.bb.webcanvasservice.config.JpaConfig;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipant;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomRepositoryImpl;
 import com.bb.webcanvasservice.user.domain.model.User;
@@ -18,18 +19,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
-@Import({JpaConfig.class, GameRoomRepositoryImpl.class, UserRepositoryImpl.class})
+@Import({
+        JpaConfig.class,
+        GameRoomRepositoryImpl.class,
+        UserRepositoryImpl.class,
+        RaceConditionTester.class
+})
 @DisplayName("[medium] [game] [persistence] Game Repository 영속성 테스트")
 public class GameRepositoryTest {
 
 
     @Autowired
     private GameRoomRepository gameRoomRepository;
+
+    @Autowired
+    private RaceConditionTester raceConditionTester;
 
     @Autowired
     private UserRepository userRepository;
@@ -107,7 +124,7 @@ public class GameRepositoryTest {
 
         // then
     }
-    
+
     @Test
     @DisplayName("게임 방 ID로 게임 방 찾기 - 턴, 세션 캐스케이드")
     void 게임_방_ID로_게임_방_찾기() throws Exception {
@@ -245,13 +262,50 @@ public class GameRepositoryTest {
     }
 
     @Test
-    @DisplayName("JoinCode를 사용할 수 있는지 여부를 체크 - 성공 테스트")
+    @DisplayName("JoinCode를 사용할 수 있는지 여부를 체크 - Active 상태인 방들 중 파라미터로 넘어온 JoinCode를 사용하는 방이 없어야 한다.")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     void JoinCode를_사용할_수_있는지_여부를_체크_1() throws Exception {
         // given
+        String raceConditionJoinCode = JoinCodeGenerator.generate(joinCodeLength);
+
+        int threadCount = 2;
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch readyLatch = new CountDownLatch(threadCount);
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(threadCount);
+
+        List<Future<?>> futures = new ArrayList<>();
+        AtomicInteger joinCodeUsingCount = new AtomicInteger(0);
+
+        for (int i = 0; i < threadCount; i++) {
+            futures.add(executor.submit(() -> {
+                try {
+                    readyLatch.countDown(); // 준비 완료 알림
+                    startLatch.await();     // 모든 스레드가 준비될 때까지 대기
+
+                    // 👇 여기서 race condition 유도하고 싶은 로직 실행
+                    raceConditionTester.joinCodeRaceCondition(raceConditionJoinCode, roomCapacity, joinCodeUsingCount);
+
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } finally {
+                    doneLatch.countDown();
+                }
+            }));
+        }
 
         // when
+        // 모든 스레드가 준비될 때까지 기다림
+        readyLatch.await();
+        // 동시에 시작
+        startLatch.countDown();
+
+        // 완료 대기
+        doneLatch.await();
+        executor.shutdown();
 
         // then
+        Assertions.assertThat(joinCodeUsingCount.get()).isEqualTo(1);
     }
 
     @Test
@@ -278,8 +332,32 @@ public class GameRepositoryTest {
     @DisplayName("JoinCode로 게임 방 찾기")
     void JoinCode로_게임_방_찾기() throws Exception {
         // given
+        String cannotUseJoinCode = JoinCodeGenerator.generate(joinCodeLength);
+        String canUseJoinCode = JoinCodeGenerator.generate(joinCodeLength);
+
+        GameRoom gameRoom = GameRoom.create(cannotUseJoinCode, roomCapacity);
+        GameRoom closedRoom = GameRoom.create(canUseJoinCode, roomCapacity);
+        closedRoom.close();
+
+        gameRoomRepository.save(gameRoom);
+        gameRoomRepository.save(closedRoom);
 
         // when
+        Assertions.assertThat(
+                        gameRoomRepository
+                                .findGameRoomByJoinCodeAndState(
+                                        cannotUseJoinCode,
+                                        GameRoomState.WAITING
+                                )
+                )
+                .isNotEmpty();
+        Assertions.assertThat(
+                gameRoomRepository
+                        .findGameRoomByJoinCodeAndState(
+                                canUseJoinCode,
+                                GameRoomState.WAITING
+                        )
+        ).isEmpty();
 
         // then
     }
