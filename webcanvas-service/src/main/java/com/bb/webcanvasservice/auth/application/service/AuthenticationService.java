@@ -48,7 +48,7 @@ public class AuthenticationService {
                 : command.fingerprint();
 
         UserInfo userInfo = userQueryPort.findUserInfoWith(fingerprint)
-                .orElse(userCommandPort.createUser(fingerprint));
+                .orElseGet(() -> userCommandPort.createUser(fingerprint));
 
         String accessToken = jwtManager.generateToken(userInfo.id(), userInfo.fingerprint(), securityProperties.accessTokenExpiration());
         String refreshToken = jwtManager.generateToken(userInfo.id(), userInfo.fingerprint(), securityProperties.refreshTokenExpiration());
