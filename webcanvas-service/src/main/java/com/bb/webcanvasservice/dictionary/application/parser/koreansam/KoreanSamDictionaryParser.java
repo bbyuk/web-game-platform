@@ -122,7 +122,7 @@ public class KoreanSamDictionaryParser extends DictionaryParser {
                                  * item.senseinfo.strPos (명사)
                                  */
 
-                                Word word = Word.createNewWord(
+                                Word word = Word.create(
                                         Language.KOREAN,
                                         value,
                                         index,

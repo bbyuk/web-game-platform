@@ -35,7 +35,7 @@ public class Word {
      * @param pos 품사
      * @return 단어 객체
      */
-    public static Word createNewWord(Language language, String value, Long index, PartOfSpeech pos) {
+    public static Word create(Language language, String value, Long index, PartOfSpeech pos) {
         return new Word(null ,language, value, index, pos);
     }
 

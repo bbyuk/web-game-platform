@@ -115,7 +115,7 @@ public class ElementaryDictionaryParser extends DictionaryParser {
                                             continue;
                                         }
 
-                                        Word word = Word.createNewWord(
+                                        Word word = Word.create(
                                                 Language.KOREAN,
                                                 value,
                                                 index,
