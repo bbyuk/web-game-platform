@@ -179,7 +179,7 @@ export default function GameRoomPage() {
       }
 
       switch (frame.event) {
-        case "ROOM/ENTRANCE":
+        case "ROOM/JOIN":
         case "ROOM/EXIT":
           if (authenticatedUserId !== frame.userId) {
             /**

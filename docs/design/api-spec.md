@@ -70,7 +70,7 @@
 - **설명**: API를 요청한 사용자가 입장해있는 webcanvas-service 방의 정보를 조회한다.
 - **요청 예시**:
   ```http
-  GET /game/canvas/room/entrance
+  GET /game/canvas/room/detail
   Authorization: Bearer {token}
   ```
 - **응답 예시**:
@@ -211,7 +211,7 @@
   ```
 ### ✅ 6. 방 나가기
 
-- **URL**: `/game/canvas/room/entrance`
+- **URL**: `/game/canvas/room/participant`
 - **Method**: `DELETE`
 - **설명**: 방에서 나간다. - 클라이언트를 강제로 종료하게 되더라도 게임 세션이 끝나기 전까지 나가지지 않음.
 - **요청 예시**:
