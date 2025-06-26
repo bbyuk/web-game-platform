@@ -36,7 +36,7 @@ export default function GameRoomPage() {
   const [connected, setConnected] = useState(false);
   const [enteredUsers, setEnteredUsers] = useState([]);
   const [myInfo, setMyInfo] = useState({
-    gameRoomEntranceId: null,
+    gameRoomParticipantId: null,
     nickname: null,
     color: null,
     role: null,
@@ -73,7 +73,7 @@ export default function GameRoomPage() {
           nickname: response.requesterUserSummary.nickname,
           color: response.requesterUserSummary.color,
           role: response.requesterUserSummary.role,
-          gameRoomEntranceId: response.gameRoomEntranceId,
+          gameRoomParticipantId: response.gameRoomEntranceId,
           ready: response.requesterUserSummary.ready,
         });
 
@@ -133,14 +133,14 @@ export default function GameRoomPage() {
    * 현재 게임 방에서 퇴장한다.
    * @returns {Promise<void>}
    */
-  const exitGameRoom = async (gameRoomEntranceId) => {
+  const exitGameRoom = async (gameRoomParticipantId) => {
     if (!confirm("방에서 나가시겠습니까?")) {
       return;
     }
 
     const response = await apiLock(
-      game.exitFromGameRoom(gameRoomEntranceId),
-      async () => await apiClient.delete(game.exitFromGameRoom(gameRoomEntranceId))
+      game.exitFromGameRoom(gameRoomParticipantId),
+      async () => await apiClient.delete(game.exitFromGameRoom(gameRoomParticipantId))
     );
 
     if (response.success) {
@@ -259,7 +259,7 @@ export default function GameRoomPage() {
             icon: <ArrowLeft size={20} className="text-gray-400" />,
             button: true,
             onClick: () => {
-              exitGameRoom(myInfo.gameRoomEntranceId);
+              exitGameRoom(myInfo.gameRoomParticipantId);
             },
           }
         : {

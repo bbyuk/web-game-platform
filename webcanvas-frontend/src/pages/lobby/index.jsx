@@ -24,7 +24,7 @@ export default function LobbyPage() {
    * ============== 유저 정의 함수 ===============
    */
   const enterRoom = async (targetRoomId) => {
-    const { gameRoomId, gameRoomEntranceId } = await apiLock(
+    const { gameRoomId, gameRoomParticipantId } = await apiLock(
       game.joinGameRoom(targetRoomId),
       async () => await apiClient.post(game.joinGameRoom(targetRoomId))
     );

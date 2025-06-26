@@ -157,7 +157,7 @@
     "message": "게임 방 입장 성공",
     "data": {
       "gameRoomId": 11,
-      "gameRoomEntranceId": 222,
+      "gameRoomParticipantId": 222,
       "enteredUsers": [
         {
           "userId": 1
@@ -196,7 +196,7 @@
     "data": [
       {
         "gameRoomId": 22,
-        "gameRoomEntranceId": 1223
+        "gameRoomParticipantId": 1223
       }
     ]
   }

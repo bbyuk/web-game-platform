@@ -51,10 +51,10 @@ export default function GameRoomWaitingPage() {
    */
   const toggleReady = () => {
     apiLock(
-      game.updateReady(myInfo.gameRoomEntranceId),
+      game.updateReady(myInfo.gameRoomParticipantId),
       async () =>
         await apiClient
-          .patch(game.updateReady(myInfo.gameRoomEntranceId), {
+          .patch(game.updateReady(myInfo.gameRoomParticipantId), {
             ready: !myInfo.ready,
           })
           .then((response) => {
