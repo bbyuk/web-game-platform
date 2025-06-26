@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         RaceConditionTester.class
 })
 @DisplayName("[medium] [game] [persistence] Game Repository 영속성 테스트")
-public class GameRepositoryTest {
+public class GameRoomRepositoryTest {
 
 
     @Autowired
