@@ -37,7 +37,7 @@ public class Message {
         this.destination = destination;
     }
 
-    public static Message createNewMessage(String value, Long senderId, String destination) {
+    public static Message create(String value, Long senderId, String destination) {
         return new Message(value, senderId, destination);
     }
 

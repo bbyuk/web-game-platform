@@ -34,7 +34,7 @@ public class ChatService {
     public void sendChatMessage(SendMessageCommand command) {
         String destination = getDestination(command.gameRoomId());
 
-        Message newMessage = Message.createNewMessage(command.message(), command.senderId(), destination);
+        Message newMessage = Message.create(command.message(), command.senderId(), destination);
 
         /**
          * TODO 채팅방에 메세지 임시저장
