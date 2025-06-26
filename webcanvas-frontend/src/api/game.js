@@ -4,19 +4,19 @@ const BASE = "/game/canvas";
 
 export const game = {
   // 입장 가능한 방 목록 조회
-  getEnterableRooms: `${BASE}/room`,
+  getJoinableRooms: `${BASE}/room`,
   // 게임 방 생성
   createGameRoom: `${BASE}/room`,
   // 게임 방 입장
-  enterGameRoom: (gameRoomId) => `${BASE}/room/${gameRoomId}/entrance`,
+  joinGameRoom: (gameRoomId) => `${BASE}/room/${gameRoomId}/participant`,
   // 입장 코드로 게임 방 입장
-  enterGameRoomWithJoinCode: (joinCode) => `${BASE}/room/${joinCode}/entrance`,
+  joinGameRoomWithJoinCode: (joinCode) => `${BASE}/room/${joinCode}/participant`,
   // 현재 입장한 게임 방 조회
-  getCurrentEnteredGameRoom: `${BASE}/room/entrance`,
+  getCurrentJoinedGameRoom: `${BASE}/room/detail`,
   // 현재 입장한 게임 방 퇴장
-  exitFromGameRoom: (gameRoomEntranceId) => `${BASE}/room/entrance/${gameRoomEntranceId}`,
+  exitFromGameRoom: (gameRoomParticipantId) => `${BASE}/room/participant/${gameRoomParticipantId}`,
   // 레디 상태 변경
-  updateReady: (gameRoomEntranceId) => `${BASE}/room/entrance/${gameRoomEntranceId}/ready`,
+  updateReady: (gameRoomParticipantId) => `${BASE}/room/participant/${gameRoomParticipantId}/ready`,
   // 게임 시작
   startGame: `${BASE}/session`,
   // 현재 세션 조회

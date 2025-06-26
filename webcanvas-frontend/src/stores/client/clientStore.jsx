@@ -6,6 +6,6 @@ export const useClientStore = create((set) => ({
     set({ isLoading: true });
   },
   endLoading: () => {
-    set({ isLoading: false});
+    set({ isLoading: false });
   },
 }));

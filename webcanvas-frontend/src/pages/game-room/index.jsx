@@ -1,34 +1,34 @@
-import {Outlet, useLocation, useNavigate, useParams} from "react-router-dom";
-import React, {useEffect, useRef, useState} from "react";
-import {game} from "@/api/index.js";
-import {getApiClient} from "@/client/http/index.jsx";
-import {pages} from "@/router/index.jsx";
-import {EMPTY_MESSAGES, REDIRECT_MESSAGES} from "@/constants/message.js";
-import {ArrowLeft, Gamepad2, MessageCircle} from "lucide-react";
-import {getWebSocketClient} from "@/client/stomp/index.jsx";
-import {useAuthentication} from "@/contexts/authentication/index.jsx";
-import {useApiLock} from "@/api/lock/index.jsx";
-import {useLeftSideStore} from "@/stores/layout/leftSideStore.jsx";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { game } from "@/api/index.js";
+import { getApiClient } from "@/client/http/index.jsx";
+import { pages } from "@/router/index.jsx";
+import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
+import { ArrowLeft, Gamepad2, MessageCircle } from "lucide-react";
+import { getWebSocketClient } from "@/client/stomp/index.jsx";
+import { useAuthentication } from "@/contexts/authentication/index.jsx";
+import { useApiLock } from "@/api/lock/index.jsx";
+import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
 import ItemList from "@/components/layouts/side-panel/contents/item-list/index.jsx";
-import {useRightSideStore} from "@/stores/layout/rightSideStore.jsx";
+import { useRightSideStore } from "@/stores/layout/rightSideStore.jsx";
 import ChatList from "@/components/layouts/side-panel/contents/chat-list/index.jsx";
 import SidePanelFooterInput from "@/components/layouts/side-panel/footer/input/index.jsx";
-import {useClientStore} from '@/stores/client/clientStore.jsx';
+import { useClientStore } from "@/stores/client/clientStore.jsx";
 
 export default function GameRoomPage() {
   // ===============================================================
   // 상태 정의
   // ===============================================================
-  const {roomId} = useParams();
-  const {authenticatedUserId} = useAuthentication();
-  const {apiLock} = useApiLock();
+  const { roomId } = useParams();
+  const { authenticatedUserId } = useAuthentication();
+  const { apiLock } = useApiLock();
   const apiClient = getApiClient();
   const navigate = useNavigate();
   const webSocketClientRef = useRef(null);
   const leftSideStore = useLeftSideStore();
   const rightSideStore = useRightSideStore();
-  const {startLoading} = useClientStore();
-  const {state} = useLocation();
+  const { startLoading } = useClientStore();
+  const { state } = useLocation();
 
   /**
    * 페이지 상태
@@ -54,7 +54,7 @@ export default function GameRoomPage() {
    * @param ready
    */
   const changeReadyState = (ready) => {
-    setMyInfo({...myInfo, ready});
+    setMyInfo({ ...myInfo, ready });
   };
 
   /**
@@ -64,7 +64,7 @@ export default function GameRoomPage() {
   const findCurrentGameRoomInfo = async () => {
     // 방 정보 조회
     return await apiClient
-      .get(game.getCurrentEnteredGameRoom)
+      .get(game.getCurrentJoinedGameRoom)
       .then((response) => {
         // 상태 셋팅
         setEnteredUsers(response.enteredUsers);
@@ -83,10 +83,10 @@ export default function GameRoomPage() {
 
         setGameRoomState(response.gameRoomState);
         if (response.gameRoomState === "WAITING") {
-          navigate(pages.gameRoom.waiting.url(response.gameRoomId), {replace: true});
+          navigate(pages.gameRoom.waiting.url(response.gameRoomId), { replace: true });
           return null;
         } else if (response.gameRoomState === "PLAYING") {
-          navigate(pages.gameRoom.playing.url(response.gameRoomId), {replace: true});
+          navigate(pages.gameRoom.playing.url(response.gameRoomId), { replace: true });
           return null;
         }
 
@@ -97,7 +97,7 @@ export default function GameRoomPage() {
         if (error.code === "R003") {
           // 로비로 이동
           alert(REDIRECT_MESSAGES.TO_LOBBY);
-          navigate(pages.lobby.url, {replace: true});
+          navigate(pages.lobby.url, { replace: true });
           return null;
         }
       });
@@ -112,7 +112,7 @@ export default function GameRoomPage() {
       leftSideStore.setContents({
         slot: ItemList,
         props: {
-          value: response.enteredUsers.map(({nickname, ...rest}) => ({
+          value: response.enteredUsers.map(({ nickname, ...rest }) => ({
             label: nickname,
             ...rest,
           })),
@@ -144,7 +144,7 @@ export default function GameRoomPage() {
     );
 
     if (response.success) {
-      navigate(pages.lobby.url, {replace: true});
+      navigate(pages.lobby.url, { replace: true });
     }
   };
 
@@ -158,10 +158,8 @@ export default function GameRoomPage() {
       webSocketClientRef.current.deactivate();
     }
     const options = {
-      onConnect: (frame) => {
-      },
-      onError: (frame) => {
-      },
+      onConnect: (frame) => {},
+      onError: (frame) => {},
     };
     webSocketClientRef.current = getWebSocketClient(options);
   };
@@ -210,7 +208,7 @@ export default function GameRoomPage() {
           break;
         case "ROOM/SESSION_STARTED":
           startLoading();
-          navigate(pages.gameRoom.playing.url(roomId), {replace: true});
+          navigate(pages.gameRoom.playing.url(roomId), { replace: true });
           // findCurrentGameRoomInfo().then((response) => {
           //   if (!response) {
           //     return;
@@ -254,21 +252,21 @@ export default function GameRoomPage() {
   // ===============================================================
 
   useEffect(() => {
-    const title = gameRoomState === "WAITING"
-      ? {
-        label: "exit",
-        icon: <ArrowLeft size={20} className="text-gray-400"/>,
-        button: true,
-        onClick: () => {
-          exitGameRoom(myInfo.gameRoomEntranceId);
-        },
-      }
-      :
-      {
-        label: "playing",
-        icon: <Gamepad2 className="w-6 h-6 text-green-500"/>,
-        button: false,
-      };
+    const title =
+      gameRoomState === "WAITING"
+        ? {
+            label: "exit",
+            icon: <ArrowLeft size={20} className="text-gray-400" />,
+            button: true,
+            onClick: () => {
+              exitGameRoom(myInfo.gameRoomEntranceId);
+            },
+          }
+        : {
+            label: "playing",
+            icon: <Gamepad2 className="w-6 h-6 text-green-500" />,
+            button: false,
+          };
 
     console.log(title);
 
@@ -283,10 +281,9 @@ export default function GameRoomPage() {
   useEffect(() => {
     rightSideStore.setTitle({
       label: "chat",
-      icon: <MessageCircle size={20} className="text-gray-400"/>,
+      icon: <MessageCircle size={20} className="text-gray-400" />,
       button: false,
-      onClick: () => {
-      },
+      onClick: () => {},
     });
 
     rightSideStore.setContents({
@@ -339,7 +336,6 @@ export default function GameRoomPage() {
     }
   }, [state]);
 
-
   /**
    * leftbar 리스트 등록
    */
@@ -354,7 +350,7 @@ export default function GameRoomPage() {
       leftSideStore.setContents({
         slot: ItemList,
         props: {
-          value: enteredUsers.map(({nickname, ready, role, ...rest}) => ({
+          value: enteredUsers.map(({ nickname, ready, role, ...rest }) => ({
             label: nickname,
             highlight: ready,
             theme: getLeftSideItemTheme(role, ready),

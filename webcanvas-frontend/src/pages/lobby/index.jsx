@@ -25,8 +25,8 @@ export default function LobbyPage() {
    */
   const enterRoom = async (targetRoomId) => {
     const { gameRoomId, gameRoomEntranceId } = await apiLock(
-      game.enterGameRoom(targetRoomId),
-      async () => await apiClient.post(game.enterGameRoom(targetRoomId))
+      game.joinGameRoom(targetRoomId),
+      async () => await apiClient.post(game.joinGameRoom(targetRoomId))
     );
 
     moveToGameRoom(gameRoomId);
@@ -34,9 +34,9 @@ export default function LobbyPage() {
 
   const findEnterableGameRooms = async () => {
     const response = await apiLock(
-      game.getEnterableRooms,
+      game.getJoinableRooms,
       async () =>
-        await apiClient.get(game.getEnterableRooms).catch(async (error) => {
+        await apiClient.get(game.getJoinableRooms).catch(async (error) => {
           if (error.code === "U002") {
             /**
              * 이미 방에 입장한 상태

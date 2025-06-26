@@ -12,7 +12,7 @@ import { pages } from "@/router/index.jsx";
 import GameTurnTimer from "@/components/game-turn-timer/index.jsx";
 import AnswerBoard from "@/components/answer-board/index.jsx";
 import { useTimer } from "@/pages/game-room/playing/timer.jsx";
-import { useClientStore } from '@/stores/client/clientStore.jsx';
+import { useClientStore } from "@/stores/client/clientStore.jsx";
 
 export default function GameRoomPlayingPage() {
   // ===============================================================
@@ -33,7 +33,6 @@ export default function GameRoomPlayingPage() {
   const { webSocketClientRef, enteredUsers } = useOutletContext();
   const { setContents } = useLeftSideStore();
   const { endLoading } = useClientStore();
-
 
   const [gameSessionId, setGameSessionId] = useState(null);
   const [currentDrawerId, setCurrentDrawerId] = useState(null);
@@ -91,7 +90,10 @@ export default function GameRoomPlayingPage() {
         case "SESSION/END":
           // TODO 게임 종료 이벤트 클라이언트 핸들링
           alert("게임이 종료되었습니다. 대기실로 이동합니다.");
-          navigate(pages.gameRoom.waiting.url(roomId), { replace: true, state: { gameSessionEnd: true } });
+          navigate(pages.gameRoom.waiting.url(roomId), {
+            replace: true,
+            state: { gameSessionEnd: true },
+          });
           break;
       }
     };
