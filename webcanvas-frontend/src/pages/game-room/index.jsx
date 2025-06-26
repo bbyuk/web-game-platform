@@ -73,7 +73,7 @@ export default function GameRoomPage() {
           nickname: response.requesterUserSummary.nickname,
           color: response.requesterUserSummary.color,
           role: response.requesterUserSummary.role,
-          gameRoomParticipantId: response.gameRoomEntranceId,
+          gameRoomParticipantId: response.gameRoomParticipantId,
           ready: response.requesterUserSummary.ready,
         });
 
