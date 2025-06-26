@@ -90,12 +90,7 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     @Override
     public List<GameRoom> findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(int gameRoomCapacity, GameRoomState gameRoomState, GameRoomParticipantState gameRoomParticipantState) {
         List<GameRoomJpaEntity> gameRoomJpaEntities = gameRoomJpaRepository.findGameRoomsByCapacityAndStateAndGameRoomParticipantState(gameRoomCapacity, gameRoomState, gameRoomParticipantState);
-        Map<Long, GameSessionJpaEntity> gameSessionEntityPerGameRoomPerGameRoomId = gameSessionJpaRepository.findGameSessionsByGameRoomsAndStates(gameRoomJpaEntities, GameSessionState.active)
-                .stream()
-                .collect(Collectors.toMap(
-                        entity -> entity.getGameRoomEntity().getId(),
-                        entity -> entity
-                ));
+
         Map<Long, List<GameRoomParticipantJpaEntity>> gameRoomParticipantEntitiesPerGameRoomId = gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRooms(gameRoomJpaEntities)
                 .stream()
                 .collect(Collectors.groupingBy(gameRoomParticipantJpaEntity -> gameRoomParticipantJpaEntity.getGameRoomEntity().getId()));
@@ -103,14 +98,13 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
         return gameRoomJpaEntities
                 .stream()
                 .map(gameRoomJpaEntity -> {
-                    GameSessionJpaEntity gameSessionEntity = gameSessionEntityPerGameRoomPerGameRoomId.get(gameRoomJpaEntity.getId());
                     List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomParticipantEntitiesPerGameRoomId.get(gameRoomJpaEntity.getId());
                     return (
                             GameModelMapper.toModel(
                                     gameRoomJpaEntity,
-                                    gameSessionEntity,
+                                    null,
                                     gameRoomParticipantEntities,
-                                    gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionEntity.getId())
+                                    null
                             )
                     );
                 }).collect(Collectors.toList());

@@ -4,6 +4,7 @@ import com.bb.webcanvasservice.game.domain.model.gameroom.GameSessionState;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameSessionJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameTurnJpaEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -77,11 +78,10 @@ public interface GameSessionJpaRepository extends JpaRepository<GameSessionJpaEn
     @Query("""
            select       gs
            from         GameSessionJpaEntity gs
-           join fetch   GameRoomJpaEntity gr
-           on           gs.gameRoomEntity = gr
            where        gs.gameRoomEntity in :gameRooms
            and          gs.state in :activeStates
            """
     )
+    @EntityGraph(attributePaths = {"gameRoomEntity"})
     List<GameSessionJpaEntity> findGameSessionsByGameRoomsAndStates(@Param("gameRooms") List<GameRoomJpaEntity> gameRooms, @Param("activeStates") List<GameSessionState> activeStates);
 }

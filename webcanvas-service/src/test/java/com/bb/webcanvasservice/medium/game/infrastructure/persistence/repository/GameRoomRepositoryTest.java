@@ -4,10 +4,7 @@ import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.config.JpaConfig;
 import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipant;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
+import com.bb.webcanvasservice.game.domain.model.gameroom.*;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomRepositoryImpl;
 import com.bb.webcanvasservice.user.domain.model.User;
 import com.bb.webcanvasservice.user.domain.repository.UserRepository;
@@ -54,7 +51,7 @@ public class GameRoomRepositoryTest {
 
     int joinCodeLength = 6;
 
-    int roomCapacity = 5;
+    int roomCapacity = 8;
 
 
     @Test
@@ -387,5 +384,68 @@ public class GameRoomRepositoryTest {
                 .ignoringFields("id")
                 .isEqualTo(savedGameRoom);
 
+    }
+
+    @Test
+    @DisplayName("입장 가능한 게임 방의 목록 조회 - 성공테스트")
+    void 입장_가능한_게임_방의_목록_조회() throws Exception {
+        // given
+        User user1 = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User user2 = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User user3 = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User user4 = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User user5 = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User user6 = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User user7 = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User user8 = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User user9 = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User user10 = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User user11 = userRepository.save(User.create(FingerprintGenerator.generate()));
+
+
+        GameRoom fullRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+        GameRoom joinableRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+        GameRoom playingRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
+
+        GameRoomParticipant participant1 = GameRoomParticipant.create(user1.getId(), "테스트");
+        GameRoomParticipant participant2 = GameRoomParticipant.create(user2.getId(), "테스트");
+        GameRoomParticipant participant3 = GameRoomParticipant.create(user3.getId(), "테스트");
+        GameRoomParticipant participant4 = GameRoomParticipant.create(user4.getId(), "테스트");
+        GameRoomParticipant participant5 = GameRoomParticipant.create(user5.getId(), "테스트");
+        GameRoomParticipant participant6 = GameRoomParticipant.create(user6.getId(), "테스트");
+        GameRoomParticipant participant7 = GameRoomParticipant.create(user7.getId(), "테스트");
+        GameRoomParticipant participant8 = GameRoomParticipant.create(user8.getId(), "테스트");
+        GameRoomParticipant participant9 = GameRoomParticipant.create(user9.getId(), "테스트");
+        GameRoomParticipant participant10 = GameRoomParticipant.create(user10.getId(), "테스트");
+        GameRoomParticipant participant11 = GameRoomParticipant.create(user11.getId(), "테스트");
+
+        fullRoom.letIn(participant1);
+        fullRoom.letIn(participant2);
+        fullRoom.letIn(participant3);
+        fullRoom.letIn(participant4);
+        fullRoom.letIn(participant5);
+        fullRoom.letIn(participant6);
+        fullRoom.letIn(participant7);
+        fullRoom.letIn(participant8);
+
+        joinableRoom.letIn(participant9);
+
+        playingRoom.letIn(participant10);
+        playingRoom.letIn(participant11);
+
+        playingRoom.changeParticipantReady(participant11, true);
+        playingRoom.loadGameSession(20);
+        playingRoom.startGameSession();
+
+        GameRoom savedGameRoom1 = gameRoomRepository.save(fullRoom);
+        GameRoom savedGameRoom2 = gameRoomRepository.save(joinableRoom);
+        GameRoom savedGameRoom3 = gameRoomRepository.save(playingRoom);
+
+
+        // when
+        List<GameRoom> gameRooms = gameRoomRepository.findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(roomCapacity, GameRoomState.WAITING, GameRoomParticipantState.WAITING);
+
+        // then
+        Assertions.assertThat(gameRooms.size()).isEqualTo(1);
     }
 }
