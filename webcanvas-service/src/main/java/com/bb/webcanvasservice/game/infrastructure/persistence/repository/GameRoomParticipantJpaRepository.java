@@ -1,9 +1,11 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomParticipantJpaEntity;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -154,4 +156,28 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
             where       grp.gameRoomEntity in :gameRooms
            """)
     List<GameRoomParticipantJpaEntity> findGameRoomParticipantsByGameRooms(@Param("gameRooms") List<GameRoomJpaEntity> gameRoomJpaEntities);
+
+
+    /**
+     * 게임 방 상태와 게임 방 입장자 상태로 게임 방 입장자 목록을 게임 방 entity와 함께 조회한다.
+     *
+     * @param gameRooms 게임방 Entity 리스트
+     * @param gameRoomParticipantState 게임 방 입장자 상태
+     * @param gameRoomState 게임 방 상태
+     * @return
+     */
+    @Query(
+            """
+            select      grp
+            from        GameRoomParticipantJpaEntity grp
+            where       grp.gameRoomEntity in :gameRooms
+            and         grp.state = :gameRoomParticipantState
+            and         grp.gameRoomEntity.state = :gameRoomState
+            """
+    )
+    @EntityGraph(attributePaths = { "gameRoomEntity" })
+    List<GameRoomParticipantJpaEntity> findGameRoomParticipantsByGameRoomParticipantStateAndGameRoomState(
+            @Param("gameRooms") List<GameRoomJpaEntity> gameRooms,
+            @Param("gameRoomParticipantState") GameRoomParticipantState gameRoomParticipantState,
+            @Param("gameRoomState") GameRoomState gameRoomState);
 }

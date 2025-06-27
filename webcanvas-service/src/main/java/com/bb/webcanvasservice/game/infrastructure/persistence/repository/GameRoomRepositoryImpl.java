@@ -90,15 +90,15 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     @Override
     public List<GameRoom> findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(int gameRoomCapacity, GameRoomState gameRoomState, GameRoomParticipantState gameRoomParticipantState) {
         List<GameRoomJpaEntity> gameRoomJpaEntities = gameRoomJpaRepository.findGameRoomsByCapacityAndStateAndGameRoomParticipantState(gameRoomCapacity, gameRoomState, gameRoomParticipantState);
+        List<GameRoomParticipantJpaEntity> gameRoomParticipantJpaEntities = gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRoomParticipantStateAndGameRoomState(gameRoomJpaEntities, gameRoomParticipantState, gameRoomState);
 
-        Map<Long, List<GameRoomParticipantJpaEntity>> gameRoomParticipantEntitiesPerGameRoomId = gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRooms(gameRoomJpaEntities)
-                .stream()
-                .collect(Collectors.groupingBy(gameRoomParticipantJpaEntity -> gameRoomParticipantJpaEntity.getGameRoomEntity().getId()));
+        Map<Long, List<GameRoomParticipantJpaEntity>> gameRoomPaticipantMap = gameRoomParticipantJpaEntities.stream()
+                .collect(Collectors.groupingBy(participantJpaEntity -> participantJpaEntity.getGameRoomEntity().getId()));
 
         return gameRoomJpaEntities
                 .stream()
                 .map(gameRoomJpaEntity -> {
-                    List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomParticipantEntitiesPerGameRoomId.get(gameRoomJpaEntity.getId());
+                    List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomPaticipantMap.get(gameRoomJpaEntity.getId());
                     return (
                             GameModelMapper.toModel(
                                     gameRoomJpaEntity,
