@@ -441,4 +441,15 @@ public class GameRoom {
         }
     }
 
+    /**
+     * 현재 게임 방 입장자 중 유저 ID에 해당하는 대상 입장자 객체를 리턴한다.
+     * @param userId 유저 ID
+     * @return 게임 방 입장자 객체
+     */
+    public GameRoomParticipant getCurrentParticipantByUserId(Long userId) {
+        return getCurrentParticipants().stream()
+                .filter(gameRoomParticipant -> gameRoomParticipant.getUserId().equals(userId))
+                .findFirst()
+                .orElseThrow(GameRoomParticipantNotFoundException::new);
+    }
 }

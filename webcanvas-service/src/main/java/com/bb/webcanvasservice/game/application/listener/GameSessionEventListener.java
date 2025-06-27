@@ -38,6 +38,7 @@ public class GameSessionEventListener {
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAllUserInGameSessionLoaded(AllUserInGameSessionLoadedEvent event) {
+        log.debug("모든 유저가 로딩되어 게임을 시작 gameSessionId = {}", event.getGameSessionId());
         messageSender.send("/session/" + event.getGameSessionId(), event);
 
         gameTurnTimerService.registerTurnTimer(

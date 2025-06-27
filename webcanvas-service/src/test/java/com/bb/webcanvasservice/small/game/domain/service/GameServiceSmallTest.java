@@ -1,7 +1,6 @@
 package com.bb.webcanvasservice.small.game.domain.service;
 
 import com.bb.webcanvasservice.game.application.command.JoinGameRoomCommand;
-import com.bb.webcanvasservice.game.application.command.ProcessToNextTurnCommand;
 import com.bb.webcanvasservice.game.application.command.StartGameCommand;
 import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
@@ -30,7 +29,7 @@ import java.util.concurrent.Executors;
 
 @Tag("small")
 @DisplayName("[small] [game] [service] 게임 애플리케이션 서비스 로직 test")
-public class GameServiceTest {
+public class GameServiceSmallTest {
 
     /**
      * Stub으로 셋팅한 GameService
@@ -300,11 +299,13 @@ public class GameServiceTest {
         Assertions.assertThat(hostCompleted && guestCompleted).isTrue();
         Assertions.assertThat(gameSessionLoadRegistry.isClear(gameSessionId)).isTrue();
 
-        Assertions.assertThat(gameRoom.getCurrentGameSession().isPlaying()).isTrue();
-        gameRoom.getCurrentParticipants()
-                .stream()
-                .forEach(participant -> Assertions.assertThat(participant.isPlaying()).isTrue());
-
+        gameRoomRepository.findGameRoomById(gameRoom.getId())
+                .ifPresent(savedGameRoom -> {
+                    Assertions.assertThat(savedGameRoom.getCurrentGameSession().isPlaying()).isTrue();
+                    savedGameRoom.getCurrentParticipants()
+                            .stream()
+                            .forEach(participant -> Assertions.assertThat(participant.isPlaying()).isTrue());
+                });
     }
 
 }

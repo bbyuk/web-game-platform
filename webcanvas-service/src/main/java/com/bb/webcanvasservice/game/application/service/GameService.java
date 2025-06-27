@@ -142,11 +142,12 @@ public class GameService {
                 )
         );
 
-        gameRoomRepository.save(gameRoom);
+        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
+
 
         return new GameRoomJoinDto(
-                newGameRoomParticipant.getGameRoomId(),
-                newGameRoomParticipant.getId()
+                savedGameRoom.getId(),
+                savedGameRoom.getCurrentParticipantByUserId(command.userId()).getId()
         );
     }
 
@@ -465,10 +466,12 @@ public class GameService {
 
         gameSessionLoadRegistry.register(gameSessionId, userId);
         if (gameSessionLoadRegistry.isAllLoaded(gameSessionId, enteredUserCount)) {
-            gameRoom.startGameSession();
-            gameRoom.processEventQueue(eventPublisher::publishEvent);
-
             gameSessionLoadRegistry.clear(gameSessionId);
+
+            gameRoom.startGameSession();
+            gameRoomRepository.save(gameRoom);
+
+            gameRoom.processEventQueue(eventPublisher::publishEvent);
         }
     }
 }

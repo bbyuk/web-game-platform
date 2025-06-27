@@ -11,6 +11,7 @@ import com.bb.webcanvasservice.user.domain.repository.UserRepository;
 import com.bb.webcanvasservice.user.infrastructure.persistence.repository.UserRepositoryImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -36,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         UserRepositoryImpl.class,
         RaceConditionTester.class
 })
+@Tag("medium")
 @DisplayName("[medium] [game] [persistence] Game Repository 영속성 테스트")
 public class GameRoomRepositoryTest {
 
