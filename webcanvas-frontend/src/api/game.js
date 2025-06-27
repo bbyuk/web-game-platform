@@ -8,9 +8,9 @@ export const game = {
   // 게임 방 생성
   createGameRoom: `${BASE}/room`,
   // 게임 방 입장
-  joinGameRoom: (gameRoomId) => `${BASE}/room/${gameRoomId}/participant`,
+  joinGameRoom: (gameRoomId) => `${BASE}/room/id/${gameRoomId}/participant`,
   // 입장 코드로 게임 방 입장
-  joinGameRoomWithJoinCode: (joinCode) => `${BASE}/room/${joinCode}/participant`,
+  joinGameRoomWithJoinCode: (joinCode) => `${BASE}/room/code/${joinCode}/participant`,
   // 현재 입장한 게임 방 조회
   getCurrentJoinedGameRoom: `${BASE}/room/detail`,
   // 현재 입장한 게임 방 퇴장
