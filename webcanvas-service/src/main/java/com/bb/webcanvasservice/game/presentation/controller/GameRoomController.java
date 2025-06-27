@@ -66,9 +66,10 @@ public class GameRoomController {
     }
 
 
-    @PostMapping("{gameRoomId}/participant")
+    @PostMapping("id/{gameRoomId}/participant")
     @Operation(summary = "게임 방 입장", description = "입장 요청을 보낸 유저를 대상 게임 방에 입장시킨다.")
-    public ResponseEntity<GameRoomJoinResponse> joinGameRoom(@PathVariable("gameRoomId") Long gameRoomId, @Authenticated WebCanvasAuthentication authentication) {
+    public ResponseEntity<GameRoomJoinResponse> joinGameRoom(@PathVariable("gameRoomId") Long gameRoomId,
+                                                             @Authenticated WebCanvasAuthentication authentication) {
         return ResponseEntity.ok(
                 GamePresentationDtoMapper.toGameRoomJoinResponse(
                         gameService.joinGameRoom(GameCommandMapper.toEnterGameRoomCommand(gameRoomId, authentication.getUserId()))
@@ -76,7 +77,7 @@ public class GameRoomController {
         );
     }
 
-    @PostMapping("{joinCode}/participant")
+    @PostMapping("code/{joinCode}/participant")
     @Operation(summary = "Join Code로 게임 방 입장", description = "Join Code로 입장 요청읇 보낸 유저를 대상 게임 방에 입장시킨다.")
     public ResponseEntity<GameRoomJoinResponse> joinGameRoomWithJoinCode(@PathVariable("joinCode") String joinCode,
                                                                          @Authenticated WebCanvasAuthentication authentication) {
