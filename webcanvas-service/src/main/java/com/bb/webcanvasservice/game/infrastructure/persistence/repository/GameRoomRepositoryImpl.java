@@ -9,6 +9,7 @@ import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameTurnJp
 import com.bb.webcanvasservice.game.infrastructure.persistence.mapper.GameModelMapper;
 import com.bb.webcanvasservice.user.domain.exception.UserNotFoundException;
 import com.bb.webcanvasservice.user.infrastructure.persistence.repository.UserJpaRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -27,6 +28,7 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     private final GameRoomParticipantJpaRepository gameRoomParticipantJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final GameTurnJpaRepository gameTurnJpaRepository;
+    private final EntityManager em;
 
     @Override
     public Optional<GameRoom> findGameRoomById(Long gameRoomId) {
@@ -130,7 +132,6 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
                             ? null
                             : gameSessionJpaRepository.save(GameModelMapper.toEntity(gameSession, gameRoomEntity));
 
-
             List<GameRoomParticipant> gameRoomParticipants = gameRoom.getParticipants();
             /**
              * TODO N+1 문제 체크
@@ -151,6 +152,11 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
             List<GameTurnJpaEntity> gameTurnEntities = gameSessionEntity == null
                     ? null
                     : gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionEntity.getId());
+
+            /**
+             * insert 쿼리 미실행으로 명시적 flush
+             */
+            em.flush();
 
             return GameModelMapper.toModel(
                     gameRoomEntity,
