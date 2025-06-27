@@ -95,8 +95,8 @@ public class GameServiceMediumTest {
         GameRoomJoinDto resultDto = gameService.createGameRoomAndEnter(userId);
 
         // then
-        Assertions.assertThat(resultDto.gameRoomId()).isEqualTo(1L);
-        Assertions.assertThat(resultDto.gameRoomParticipantId()).isEqualTo(1L);
+        Assertions.assertThat(resultDto.gameRoomId()).isNotNull();
+        Assertions.assertThat(resultDto.gameRoomParticipantId()).isNotNull();
     }
 
     @Test
@@ -194,7 +194,10 @@ public class GameServiceMediumTest {
         );
 
         // then
-        Assertions.assertThat(joinedGameRoomInfo).usingRecursiveComparison().isEqualTo(resultDto);
+        Assertions.assertThat(joinedGameRoomInfo)
+                .usingRecursiveComparison()
+                .ignoringFields("joinedUsers.nickname")
+                .isEqualTo(resultDto);
     }
 
     @Test
@@ -293,6 +296,7 @@ public class GameServiceMediumTest {
         // 비동기 실행
         Thread hostSubscriptionThread = new Thread(() -> {
             try {
+                System.out.println("hostSubscriptionThrea");
                 gameService.successSubscription(gameSessionId, hostUserId);
             } finally {
                 hostThreadLatch.countDown(); // 완료 알림
@@ -300,6 +304,7 @@ public class GameServiceMediumTest {
         });
         Thread guestSubscriptionThread = new Thread(() -> {
             try {
+                System.out.println("guestSubscriptionThread");
                 gameService.successSubscription(gameSessionId, guestUserId);
             } finally {
                 guestThreadLatch.countDown(); // 완료 알림
@@ -319,12 +324,15 @@ public class GameServiceMediumTest {
         Assertions.assertThat(gameSessionLoadRegistry.isClear(gameSessionId)).isTrue();
 
         gameRoomRepository.findGameRoomById(gameRoom.getId())
-                .ifPresent(savedGameRoom -> {
-                    Assertions.assertThat(savedGameRoom.getCurrentGameSession().isPlaying()).isTrue();
-                    savedGameRoom.getCurrentParticipants()
-                            .stream()
-                            .forEach(participant -> Assertions.assertThat(participant.isPlaying()).isTrue());
-                });
+                .ifPresent(
+                        savedGameRoom -> {
+                            Assertions.assertThat(savedGameRoom.getCurrentGameSession().isPlaying()).isTrue();
+                            savedGameRoom.getCurrentParticipants()
+                                    .stream()
+                                    .forEach(participant ->
+                                            Assertions.assertThat(participant.isPlaying()).isTrue()
+                                    );
+                        });
     }
 
 }

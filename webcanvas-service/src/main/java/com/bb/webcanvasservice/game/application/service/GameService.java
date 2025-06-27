@@ -347,7 +347,7 @@ public class GameService {
          * 새로운 게임 세션을 생성해 로드한다.
          */
         gameRoom.loadGameSession(command.timePerTurn());
-        gameRoomRepository.save(gameRoom);
+        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
 
         List<GameRoomParticipant> participants = gameRoom.getCurrentParticipants();
         userCommandPort.moveUsersToGameSession(participants.stream().map(GameRoomParticipant::getUserId).collect(Collectors.toList()));
@@ -364,7 +364,7 @@ public class GameService {
          */
         gameRoom.processEventQueue(eventPublisher::publishEvent);
 
-        return gameRoom.getCurrentGameSession().getId();
+        return savedGameRoom.getCurrentGameSession().getId();
     }
 
 
@@ -376,7 +376,7 @@ public class GameService {
      */
     @Transactional(readOnly = true)
     public GameSessionDto findCurrentGameSession(Long gameRoomId) {
-        GameRoom gameRoom = gameRoomRepository.findGameRoomByGameRoomParticipantId(gameRoomId).orElseThrow(GameRoomNotFoundException::new);
+        GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomId).orElseThrow(GameRoomNotFoundException::new);
         GameSession gameSession = gameRoom.getCurrentGameSession();
 
         return new GameSessionDto(
