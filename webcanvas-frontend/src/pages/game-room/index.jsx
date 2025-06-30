@@ -94,7 +94,7 @@ export default function GameRoomPage() {
         return response;
       })
       .catch((error) => {
-        if (error.code === "R003") {
+        if (error.code === "R003" || error.code === "R000") {
           // 로비로 이동
           alert(REDIRECT_MESSAGES.TO_LOBBY);
           navigate(pages.lobby.url, { replace: true });
