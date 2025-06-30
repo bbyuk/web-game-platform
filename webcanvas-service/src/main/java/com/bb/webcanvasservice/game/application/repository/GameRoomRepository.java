@@ -14,6 +14,7 @@ public interface GameRoomRepository {
 
     /**
      * 게임 방 ID로 게임 방을 찾는다.
+     *
      * @param gameRoomId 게임 방 ID
      * @return 게임 방
      */
@@ -21,6 +22,7 @@ public interface GameRoomRepository {
 
     /**
      * 게임 입장자 ID로 대상 게임 방을 조회한다.
+     *
      * @param gameRoomParticipantId 게임 입장자 ID
      * @return 대상 게임 방 객체
      */
@@ -29,6 +31,7 @@ public interface GameRoomRepository {
 
     /**
      * 게임 세션 ID로 해당 게임 세션 ID가 진행되는 게임 방 객체를 조회한다.
+     *
      * @param gameSessionId 게임 세션 ID
      * @return 게임 방
      */
@@ -36,6 +39,7 @@ public interface GameRoomRepository {
 
     /**
      * 유저 ID로 대상 유저가 입장해 있는 게임 방을 찾는다.
+     *
      * @param userId 유저 ID
      * @return 게임 방
      */
@@ -44,6 +48,7 @@ public interface GameRoomRepository {
 
     /**
      * 현재 입장 가능한 방들 중 joinCode의 충돌이 있는지 여부를 비관적 락을 걸어 확인한다.
+     *
      * @param joinCode
      * @return
      */
@@ -51,16 +56,15 @@ public interface GameRoomRepository {
 
     /**
      * 입장 정원, 게임 방 상태, 게임 방 입장자 목록 상태로 게임 방 목록 조회
-     *
+     * <p>
      * 조건 1. GameRoom과 연관된 GameRoomParticipant의 수가 게임 방의 수용 인원 수보다 작거나 같아야함
      * 조건 2. GameRoom의 state가 enterableStates에 맞는 엔티티만 조회
-     * @param gameRoomCapacity 게임 방 정원
-     * @param gameRoomState 게임 방 상태
+     *
+     * @param gameRoomState            게임 방 상태
      * @param gameRoomParticipantState 게임 방 입장자 상태
      * @return
      */
-    List<GameRoom> findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(int gameRoomCapacity,
-                                                                                      GameRoomState gameRoomState,
+    List<GameRoom> findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(GameRoomState gameRoomState,
                                                                                       GameRoomParticipantState gameRoomParticipantState);
 
     /**
@@ -74,6 +78,7 @@ public interface GameRoomRepository {
 
     /**
      * 게임 방 애그리거트 루트를 저장한다.
+     *
      * @param gameRoom 게임 방 객체
      * @return 저장된 게임 방
      */

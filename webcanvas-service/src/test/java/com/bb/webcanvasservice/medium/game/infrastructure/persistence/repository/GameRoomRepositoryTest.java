@@ -29,7 +29,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Transactional
 @DataJpaTest
 @Import({
         JpaConfig.class,
@@ -37,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         UserRepositoryImpl.class,
         RaceConditionTester.class
 })
+@Transactional
 @Tag("medium")
 @DisplayName("[medium] [game] [persistence] Game Repository 영속성 테스트")
 public class GameRoomRepositoryTest {
@@ -445,7 +445,7 @@ public class GameRoomRepositoryTest {
 
 
         // when
-        List<GameRoom> gameRooms = gameRoomRepository.findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(roomCapacity, GameRoomState.WAITING, GameRoomParticipantState.WAITING);
+        List<GameRoom> gameRooms = gameRoomRepository.findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(GameRoomState.WAITING, GameRoomParticipantState.WAITING);
 
         // then
         Assertions.assertThat(gameRooms.size()).isEqualTo(1);

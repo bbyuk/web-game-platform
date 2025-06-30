@@ -1,7 +1,6 @@
 package com.bb.webcanvasservice.user.domain.adapter.game;
 
 import com.bb.webcanvasservice.game.domain.port.user.GameUserQueryPort;
-import com.bb.webcanvasservice.user.domain.exception.UserNotFoundException;
 import com.bb.webcanvasservice.user.domain.repository.UserRepository;
 
 /**
@@ -17,8 +16,6 @@ public class GameUserQueryAdapter implements GameUserQueryPort {
 
     @Override
     public boolean userCanJoin(Long userId) {
-        return userRepository
-                .findById(userId).orElseThrow(UserNotFoundException::new)
-                .canJoin();
+        return true;
     }
 }

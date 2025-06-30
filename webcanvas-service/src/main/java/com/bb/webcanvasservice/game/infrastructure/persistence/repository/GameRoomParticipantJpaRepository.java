@@ -161,7 +161,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
     /**
      * 게임 방 상태와 게임 방 입장자 상태로 게임 방 입장자 목록을 게임 방 entity와 함께 조회한다.
      *
-     * @param gameRooms 게임방 Entity 리스트
+     * @param gameRoomIds 게임방 id 리스트
      * @param gameRoomParticipantState 게임 방 입장자 상태
      * @param gameRoomState 게임 방 상태
      * @return
@@ -170,14 +170,14 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
             """
             select      grp
             from        GameRoomParticipantJpaEntity grp
-            where       grp.gameRoomEntity in :gameRooms
+            where       grp.gameRoomEntity.id in :gameRoomIds
             and         grp.state = :gameRoomParticipantState
             and         grp.gameRoomEntity.state = :gameRoomState
             """
     )
     @EntityGraph(attributePaths = { "gameRoomEntity" })
     List<GameRoomParticipantJpaEntity> findGameRoomParticipantsByGameRoomParticipantStateAndGameRoomState(
-            @Param("gameRooms") List<GameRoomJpaEntity> gameRooms,
+            @Param("gameRoomIds") List<Long> gameRoomIds,
             @Param("gameRoomParticipantState") GameRoomParticipantState gameRoomParticipantState,
             @Param("gameRoomState") GameRoomState gameRoomState);
 }

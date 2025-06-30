@@ -54,7 +54,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .setParameter("state", state)
                 .setParameter("ids", userIds)
                 .executeUpdate();
-
+        em.flush();
         em.clear();
     }
 }

@@ -77,9 +77,19 @@ public class GameService {
      */
     @Transactional
     public GameRoomListDto findJoinableGameRooms(Long userId) {
+        /**
+         * 유저 상태 validation
+         */
+        userCommandPort.validateUserCanJoin(userId);
+
+        /**
+         * 내 입장에서 입장 가능한 방 목록 조회
+         *
+         * 1. 게임 방이 정원이 차있으면 안됨.
+         * 2. 게임 방이 WAITING 상태여야함.
+         */
         return new GameRoomListDto(
                 gameRoomRepository.findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(
-                                gameProperties.gameRoomCapacity(),
                                 GameRoomState.WAITING,
                                 GameRoomParticipantState.WAITING)
                         .stream()
@@ -460,18 +470,23 @@ public class GameService {
      * @param userId
      */
     @Transactional
-    public void successSubscription(Long gameSessionId, Long userId) {
+    public boolean successSubscription(Long gameSessionId, Long userId) {
+        log.debug("user {} subscribe game session {}", userId, gameSessionId);
         GameRoom gameRoom = gameRoomRepository.findGameRoomByGameSessionId(gameSessionId).orElseThrow(GameRoomNotFoundException::new);
         int enteredUserCount = gameRoom.getCurrentParticipants().size();
 
         gameSessionLoadRegistry.register(gameSessionId, userId);
         if (gameSessionLoadRegistry.isAllLoaded(gameSessionId, enteredUserCount)) {
+            log.debug("game session {} all loaded", gameSessionId);
             gameSessionLoadRegistry.clear(gameSessionId);
 
             gameRoom.startGameSession();
             gameRoomRepository.save(gameRoom);
 
             gameRoom.processEventQueue(eventPublisher::publishEvent);
+            return true;
         }
+
+        return false;
     }
 }

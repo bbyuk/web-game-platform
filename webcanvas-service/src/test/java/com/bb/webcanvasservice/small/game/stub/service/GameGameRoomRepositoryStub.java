@@ -56,10 +56,10 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
     }
 
     @Override
-    public List<GameRoom> findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(int gameRoomCapacity, GameRoomState gameRoomState, GameRoomParticipantState gameRoomParticiapantState) {
+    public List<GameRoom> findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(GameRoomState gameRoomState, GameRoomParticipantState gameRoomParticiapantState) {
         return gameRooms.values().stream()
                 .filter(
-                        gameRoom -> gameRoom.getCurrentParticipants().size() < gameRoomCapacity
+                        gameRoom -> gameRoom.getCurrentParticipants().size() < gameRoom.getCapacity()
                                 && gameRoomState == gameRoom.getState())
                 .collect(Collectors.toList());
     }

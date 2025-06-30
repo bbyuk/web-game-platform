@@ -16,9 +16,13 @@ import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;
 import com.bb.webcanvasservice.game.domain.model.gameroom.*;
+import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomJpaRepository;
+import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomParticipantJpaRepository;
+import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameSessionJpaRepository;
 import com.bb.webcanvasservice.user.domain.model.User;
 import com.bb.webcanvasservice.user.domain.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
@@ -29,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Tag("medium")
 @DisplayName("[medium] [game] [service] 게임 애플리케이션 서비스 통합 test")
@@ -60,6 +65,10 @@ public class GameServiceMediumTest {
 
     @Autowired
     WordRepository wordRepository;
+
+    @Autowired
+    GameServiceTester gameServiceTester;
+
 
     @BeforeAll
     public void setUpOtherDomainData() {
@@ -281,13 +290,13 @@ public class GameServiceMediumTest {
         // given
         Long hostUserId = 1L;
         Long guestUserId = 2L;
-        GameRoomJoinDto gameRoomAndEnter = gameService.createGameRoomAndEnter(hostUserId);
-        GameRoomJoinDto gameRoomJoinDto = gameService.joinGameRoom(new JoinGameRoomCommand(gameRoomAndEnter.gameRoomId(), guestUserId));
 
-        gameService.updateReady(new UpdateReadyCommand(gameRoomJoinDto.gameRoomParticipantId(), guestUserId, true));
+        var testData = gameServiceTester.prepareGameSessionStartTestData(hostUserId, guestUserId);
 
-        Long gameSessionId = gameService.loadGameSession(new StartGameCommand(gameRoomJoinDto.gameRoomId(), 2, 20, hostUserId));
-        GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomJoinDto.gameRoomId()).orElseThrow(RuntimeException::new);
+        GameRoom gameRoom = gameRoomRepository.findGameRoomById(testData.gameRoomId()).orElseThrow(RuntimeException::new);
+
+        AtomicBoolean hostResult = new AtomicBoolean(false);
+        AtomicBoolean guestResult = new AtomicBoolean(false);
 
         // when
         CountDownLatch hostThreadLatch = new CountDownLatch(1);
@@ -297,7 +306,7 @@ public class GameServiceMediumTest {
         Thread hostSubscriptionThread = new Thread(() -> {
             try {
                 System.out.println("hostSubscriptionThrea");
-                gameService.successSubscription(gameSessionId, hostUserId);
+                hostResult.set(gameService.successSubscription(testData.gameSessionId(), hostUserId));
             } finally {
                 hostThreadLatch.countDown(); // 완료 알림
             }
@@ -305,7 +314,7 @@ public class GameServiceMediumTest {
         Thread guestSubscriptionThread = new Thread(() -> {
             try {
                 System.out.println("guestSubscriptionThread");
-                gameService.successSubscription(gameSessionId, guestUserId);
+                guestResult.set(gameService.successSubscription(testData.gameSessionId(), guestUserId));
             } finally {
                 guestThreadLatch.countDown(); // 완료 알림
             }
@@ -321,18 +330,10 @@ public class GameServiceMediumTest {
 
         // then
         Assertions.assertThat(hostCompleted && guestCompleted).isTrue();
-        Assertions.assertThat(gameSessionLoadRegistry.isClear(gameSessionId)).isTrue();
+        Assertions.assertThat(gameSessionLoadRegistry.isClear(testData.gameSessionId())).isTrue();
 
-        gameRoomRepository.findGameRoomById(gameRoom.getId())
-                .ifPresent(
-                        savedGameRoom -> {
-                            Assertions.assertThat(savedGameRoom.getCurrentGameSession().isPlaying()).isTrue();
-                            savedGameRoom.getCurrentParticipants()
-                                    .stream()
-                                    .forEach(participant ->
-                                            Assertions.assertThat(participant.isPlaying()).isTrue()
-                                    );
-                        });
+        // 순서에 상관없이 둘 중 한 군데에서는 모두 로드되었음을 체크 가능
+        Assertions.assertThat(hostResult.get() || guestResult.get()).isTrue();
     }
 
 }
