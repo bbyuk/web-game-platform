@@ -20,6 +20,7 @@ import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRo
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomParticipantJpaRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameSessionJpaRepository;
 import com.bb.webcanvasservice.user.domain.model.User;
+import com.bb.webcanvasservice.user.domain.model.UserState;
 import com.bb.webcanvasservice.user.domain.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -74,7 +75,7 @@ public class GameServiceMediumTest {
     public void setUpOtherDomainData() {
 
         // user
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 100; i++) {
             userRepository.save(User.create(FingerprintGenerator.generate()));
         }
 
@@ -288,8 +289,8 @@ public class GameServiceMediumTest {
     @DisplayName("게임 세션 시작 - 모든 클라이언트가 구독 성공 시 로드되어 있는 게임세션을 시작한다.")
     void 모든_클라이언트가_구독_성공시_로드되어_있는_게임세션을_시작한다() throws Exception {
         // given
-        Long hostUserId = 1L;
-        Long guestUserId = 2L;
+        Long hostUserId = 99L;
+        Long guestUserId = 100L;
 
         var testData = gameServiceTester.prepareGameSessionStartTestData(hostUserId, guestUserId);
 
@@ -334,6 +335,7 @@ public class GameServiceMediumTest {
 
         // 순서에 상관없이 둘 중 한 군데에서는 모두 로드되었음을 체크 가능
         Assertions.assertThat(hostResult.get() || guestResult.get()).isTrue();
+
     }
 
 }
