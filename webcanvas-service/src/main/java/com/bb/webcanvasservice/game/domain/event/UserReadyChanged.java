@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.domain.event;
 
-import com.bb.webcanvasservice.common.event.ApplicationEvent;
+import com.bb.webcanvasservice.domain.shared.event.ApplicationEvent;
 
 /**
  * 유저의 레디 상태가 변경되었을 때 발행되는 이벤트

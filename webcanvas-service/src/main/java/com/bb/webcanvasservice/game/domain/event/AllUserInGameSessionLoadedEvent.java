@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.domain.event;
 
-import com.bb.webcanvasservice.common.event.ApplicationEvent;
+import com.bb.webcanvasservice.domain.shared.event.ApplicationEvent;
 
 /**
  * 게임 세션에 참여한 모든 유저들이 로드되었을 때 발행할 이벤트
