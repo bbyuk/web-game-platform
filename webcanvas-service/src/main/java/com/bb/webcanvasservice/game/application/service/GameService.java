@@ -440,6 +440,8 @@ public class GameService {
             gameRoomRepository.save(gameRoom);
 
             userCommandPort.moveUsersToRoom(gameRoom.getCurrentParticipants().stream().map(GameRoomParticipant::getUserId).collect(Collectors.toList()));
+
+            gameRoom.processEventQueue(eventPublisher::publishEvent);
             return;
         }
 
