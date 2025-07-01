@@ -26,8 +26,8 @@ public interface GameRoomJpaRepository extends JpaRepository<GameRoomJpaEntity, 
     @Query("""
             select      gr
             from        GameRoomJpaEntity gr
-            join fetch  GameRoomParticipantJpaEntity grp
-            on          grp.gameRoomEntity.id = gr.id
+            join        GameRoomParticipantJpaEntity grp
+            on          grp.gameRoomEntity = gr
             where       gr.state in (:joinedStates)
             and         grp.userEntity.id = :userId
             """)

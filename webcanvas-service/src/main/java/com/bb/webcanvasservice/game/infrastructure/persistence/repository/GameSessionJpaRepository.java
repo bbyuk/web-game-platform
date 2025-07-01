@@ -37,8 +37,7 @@ public interface GameSessionJpaRepository extends JpaRepository<GameSessionJpaEn
     @Query("""
             select  gt
             from    GameTurnJpaEntity gt
-            join fetch GameSessionJpaEntity gs
-            on      gt.gameSessionEntity = gs
+            join fetch gt.gameSessionEntity gs
             where   gt.gameSessionEntity.id = :gameSessionId
             """)
     List<GameTurnJpaEntity> findTurnsByGameSessionId(@Param("gameSessionId") Long gameSessionId);
@@ -59,8 +58,7 @@ public interface GameSessionJpaRepository extends JpaRepository<GameSessionJpaEn
             """
             select      gs
             from        GameSessionJpaEntity gs
-            join fetch  GameRoomJpaEntity gr
-            on          gs.gameRoomEntity = gr
+            join fetch  gs.gameRoomEntity gr
             where       gs.gameRoomEntity.id = :gameRoomId
             and         gs.state in :activeStates
             """

@@ -42,12 +42,11 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
      * @return 대상 유저가 입장한 게임 방 입장 정보
      */
     @Query("""
-           select       gre
-           from         GameRoomParticipantJpaEntity gre
-           join fetch   UserJpaEntity u
-           on           gre.userEntity.id = u.id
-           where        gre.userEntity.id = :userId
-           and          gre.state = 'WAITING'
+           select       grp
+           from         GameRoomParticipantJpaEntity grp
+           join fetch   grp.userEntity u
+           where        grp.userEntity.id = :userId
+           and          grp.state = 'WAITING'
            """)
     Optional<GameRoomParticipantJpaEntity> findByUserId(@Param("userId") Long userId);
 
@@ -60,13 +59,13 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
      */
     @Query(
             """
-            select      gre
-            from        GameRoomParticipantJpaEntity gre
-            join fetch  UserJpaEntity u on gre.userEntity.id = u.id
-            join fetch  GameRoomJpaEntity gr on gre.gameRoomEntity.id = gr.id
-            where       gre.gameRoomEntity.id = :gameRoomId
-            and         gre.state = com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.WAITING
-            order by    gre.id asc
+            select      grp
+            from        GameRoomParticipantJpaEntity grp
+            join fetch  grp.userEntity u
+            join fetch  grp.gameRoomEntity gr
+            where       grp.gameRoomEntity.id = :gameRoomId
+            and         grp.state = com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.WAITING
+            order by    grp.id asc
             """
     )
     @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -79,12 +78,12 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
      */
     @Query(
             """
-            select      gre
-            from        GameRoomParticipantJpaEntity gre
-            join fetch  UserJpaEntity u on gre.userEntity.id = u.id
-            join fetch  GameRoomJpaEntity gr on gre.gameRoomEntity.id = gr.id
-            where       gre.userEntity.id = :userId
-            and         gre.state in :gameRoomParticipantStates
+            select      grp
+            from        GameRoomParticipantJpaEntity grp
+            join fetch  grp.userEntity u
+            join fetch  grp.gameRoomEntity gr
+            where       grp.userEntity.id = :userId
+            and         grp.state in :gameRoomParticipantStates
             """
     )
     Optional<GameRoomParticipantJpaEntity> findGameRoomParticipantByUserIdAndGameRoomStates(@Param("userId") Long userId, @Param("gameRoomParticipantStates") List<GameRoomParticipantState> gameRoomParticipantStates);
@@ -96,13 +95,13 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
      * @return 게임 방 입장 정보 목록
      */
     @Query("""
-            select      gre
-            from        GameRoomParticipantJpaEntity gre
-            join fetch  UserJpaEntity u on gre.userEntity.id = u.id
-            join fetch  GameRoomJpaEntity gr on gre.gameRoomEntity.id = gr.id
-            where       gre.gameRoomEntity.id = :gameRoomId
-            and         gre.state = :gameRoomParticipantState
-            order by    gre.id asc
+            select      grp
+            from        GameRoomParticipantJpaEntity grp
+            join fetch  grp.userEntity u
+            join fetch  grp.gameRoomEntity gr
+            where       grp.gameRoomEntity.id = :gameRoomId
+            and         grp.state = :gameRoomParticipantState
+            order by    grp.id asc
             """)
     List<GameRoomParticipantJpaEntity> findGameRoomParticipantsByGameRoomIdAndState(@Param("gameRoomId") Long gameRoomId, @Param("gameRoomParticipantState") GameRoomParticipantState gameRoomParticipantState);
 
@@ -135,8 +134,8 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
     @Query("""
             select      grp
             from        GameRoomParticipantJpaEntity grp
-            join fetch  UserJpaEntity u on grp.userEntity.id = u.id
-            join fetch  GameRoomJpaEntity gr on grp.gameRoomEntity.id = gr.id
+            join fetch  grp.userEntity u
+            join fetch  grp.gameRoomEntity gr
             where       grp.gameRoomEntity.id = :gameRoomId
             and         grp.state in :gameRoomParticipantStates
             order by    grp.id asc
@@ -151,8 +150,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
     @Query("""
             select      grp
             from        GameRoomParticipantJpaEntity grp
-            join fetch  GameRoomJpaEntity gr
-            on          grp.gameRoomEntity = gr
+            join fetch  grp.gameRoomEntity gr
             where       grp.gameRoomEntity in :gameRooms
            """)
     List<GameRoomParticipantJpaEntity> findGameRoomParticipantsByGameRooms(@Param("gameRooms") List<GameRoomJpaEntity> gameRoomJpaEntities);

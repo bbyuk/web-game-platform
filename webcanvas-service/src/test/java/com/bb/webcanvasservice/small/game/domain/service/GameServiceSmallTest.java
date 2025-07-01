@@ -64,8 +64,6 @@ public class GameServiceSmallTest {
             new ApplicationEventPublisherDummy()
     );
 
-    GameTurnTimerService gameTurnTimerService = new GameTurnTimerService(gameTurnTimerRegistry, Executors.newScheduledThreadPool(4));
-
     @Test
     @DisplayName("게임 방 생성 및 입장 - 성공 테스트")
     void testCreateGameRoomAndEnter() throws Exception {
