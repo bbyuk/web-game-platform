@@ -21,7 +21,7 @@ export default function ChatList({ messages, removeOldChat }) {
   }, [messages]);
 
   return (
-    <div className="flex flex-col h-full space-y-2 pr-1 overflow-y-auto custom-scrollbar">
+    <div className="flex flex-col h-full space-y-2 pr-1 overflow-y-auto scrollbar-hide">
       {messages.map((message, index) => (
         <ChatBubble
           key={`chat-message-${index}`}
