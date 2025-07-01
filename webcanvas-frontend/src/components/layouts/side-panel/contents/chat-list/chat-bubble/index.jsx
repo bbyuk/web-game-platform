@@ -1,23 +1,34 @@
 import { useAuthentication } from "@/contexts/authentication/index.jsx";
 
 /**
- * 말풍선 컴포넌트
- * @param sender
+ * 채팅 말풍선
+ * @param senderId
  * @param message
+ * @param nickname
+ * @param color
  * @returns {JSX.Element}
- * @constructor
  */
-export default function ChatBubble({ senderId, message }) {
+export default function ChatBubble({ senderId, message, nickname, color }) {
   const { authenticatedUserId } = useAuthentication();
   const isMe = authenticatedUserId === senderId;
 
   return (
     <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-      <div
-        className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm whitespace-pre-line
-          ${isMe ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-100"}`}
-      >
-        {message}
+      <div className="flex flex-col max-w-[80%]">
+        {!isMe && (
+          <span
+            className="mb-1 ml-1 text-xs font-semibold"
+            style={{ color }}
+          >
+            {nickname}
+          </span>
+        )}
+        <div
+          className={`px-3 py-2 rounded-2xl text-sm whitespace-pre-line break-words
+            ${isMe ? "bg-blue-600 text-white self-end" : "bg-gray-700 text-gray-100 self-start"}`}
+        >
+          {message}
+        </div>
       </div>
     </div>
   );

@@ -226,7 +226,21 @@ export default function GameRoomPage() {
      */
     const gameRoomChatHandler = (frame) => {
       console.log(frame);
-      setChatMessages((prevItems) => [...prevItems, frame]);
+
+      const newMessage = {
+        value: frame.value,
+        senderId: frame.senderId,
+        nickname: enteredUsers
+          .filter(enteredUser => enteredUser.userId === frame.senderId)
+          .map(enteredUser => enteredUser.nickname),
+        color: enteredUsers
+          .filter(enteredUser => enteredUser.userId === frame.senderId)
+          .map(enteredUser => enteredUser.color)
+      }
+
+      console.log(enteredUsers);
+
+      setChatMessages((prevItems) => [...prevItems, newMessage]);
     };
 
     const topics = [
