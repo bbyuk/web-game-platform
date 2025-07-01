@@ -3,17 +3,22 @@ import { useEffect } from "react";
 
 const MAX_CHAT_COUNT = 100;
 
-export default function ChatList({ chats, removeOldChat }) {
+export default function ChatList({ messages, removeOldChat }) {
   useEffect(() => {
-    if (chats.length > MAX_CHAT_COUNT) {
+    if (messages.length > MAX_CHAT_COUNT) {
       removeOldChat(MAX_CHAT_COUNT);
     }
-  }, [chats]);
+  }, [messages]);
 
+  console.log(messages);
   return (
     <div className="flex flex-col h-full space-y-2 pr-1 overflow-y-auto custom-scrollbar">
-      {chats.map((chat, index) => (
-        <ChatBubble key={`chat-${index}`} senderId={chat.senderId} message={chat.message} />
+      {messages.map((message, index) => (
+        <ChatBubble
+          key={`chat-message-${index}`}
+          senderId={message.senderId}
+          message={message.value}
+        />
       ))}
     </div>
   );

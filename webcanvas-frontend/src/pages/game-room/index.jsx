@@ -42,7 +42,7 @@ export default function GameRoomPage() {
     role: null,
     ready: false,
   });
-  const [chats, setChats] = useState([]);
+  const [chatMessages, setChatMessages] = useState([]);
   const [gameRoomState, setGameRoomState] = useState(null);
 
   // ===============================================================
@@ -226,7 +226,7 @@ export default function GameRoomPage() {
      */
     const gameRoomChatHandler = (frame) => {
       console.log(frame);
-      setChats((prevItems) => [...prevItems, frame]);
+      setChatMessages((prevItems) => [...prevItems, frame]);
     };
 
     const topics = [
@@ -289,9 +289,9 @@ export default function GameRoomPage() {
     rightSideStore.setContents({
       slot: ChatList,
       props: {
-        chats: chats,
+        messages: chatMessages,
         removeOldChat: (maxChatCount) => {
-          setChats((prev) => prev.slice(-maxChatCount));
+          setChatMessages((prev) => prev.slice(-maxChatCount));
         },
       },
     });
@@ -312,13 +312,13 @@ export default function GameRoomPage() {
     rightSideStore.setContents({
       slot: ChatList,
       props: {
-        chats: chats,
+        messages: chatMessages,
         removeOldChat: (maxChatCount) => {
-          setChats((prev) => prev.slice(-maxChatCount));
+          setChatMessages((prev) => prev.slice(-maxChatCount));
         },
       },
     });
-  }, [chats]);
+  }, [chatMessages]);
 
   /**
    * roomId 서버 조회 및 validation
