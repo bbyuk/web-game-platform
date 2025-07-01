@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -126,44 +127,47 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     @Override
     public GameRoom save(GameRoom gameRoom) {
         try {
-            GameRoomJpaEntity gameRoomEntity = gameRoomJpaRepository.save(
+            GameRoomJpaEntity gameRoomJpaEntity = gameRoomJpaRepository.save(
                     GameModelMapper.toEntity(gameRoom)
             );
 
-
-            GameSession gameSession = gameRoom.getGameSession();
-            GameSessionJpaEntity gameSessionEntity =
-                    gameSession == null
-                            ? null
-                            : gameSessionJpaRepository.save(GameModelMapper.toEntity(gameSession, gameRoomEntity));
-
-            List<GameRoomParticipant> gameRoomParticipants = gameRoom.getParticipants();
-            /**
-             * TODO N+1 문제 체크
-             */
-            List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomParticipants
-                    .stream()
+            List<GameRoomParticipantJpaEntity> gameRoomParticipantJpaEntities = gameRoom.getParticipants().stream()
                     .map(gameRoomParticipant
                             -> GameModelMapper.toEntity(
                             gameRoomParticipant,
-                            gameRoomEntity,
+                            gameRoomJpaEntity,
                             userJpaRepository.findById(gameRoomParticipant.getUserId()).orElseThrow(UserNotFoundException::new))
                     )
                     .toList();
-            gameRoomParticipantJpaRepository.saveAll(
-                    gameRoomParticipantEntities
-            );
+            gameRoomParticipantJpaRepository.saveAll(gameRoomParticipantJpaEntities);
 
-            List<GameTurnJpaEntity> gameTurnEntities = gameSessionEntity == null
-                    ? null
-                    : gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionEntity.getId());
+            Optional<GameSession> optionalGameSession = Optional.ofNullable(gameRoom.getGameSession());
+
+            Optional<GameSessionJpaEntity> savedGameSessionJpaEntity =
+                    optionalGameSession
+                            .map(gameSession -> GameModelMapper.toEntity(gameSession, gameRoomJpaEntity))
+                            .map(gameSessionJpaRepository::save);
+
+            List<GameTurnJpaEntity> gameTurnJpaEntities = optionalGameSession
+                    .map(GameSession::getGameTurns)
+                    .orElseGet(Collections::emptyList)
+                    .stream()
+                    .map(gameTurn -> GameModelMapper.toEntity(
+                            gameTurn,
+                            savedGameSessionJpaEntity.orElse(null)
+                    ))
+                    .collect(Collectors.toList());
+
+            if (!gameTurnJpaEntities.isEmpty()) {
+                gameTurnJpaRepository.saveAll(gameTurnJpaEntities);
+            }
 
 
             return GameModelMapper.toModel(
-                    gameRoomEntity,
-                    gameSessionEntity,
-                    gameRoomParticipantEntities,
-                    gameTurnEntities
+                    gameRoomJpaEntity,
+                    savedGameSessionJpaEntity.orElse(null),
+                    gameRoomParticipantJpaEntities,
+                    gameTurnJpaEntities
             );
         } catch (Exception e) {
             log.error(e.getMessage(), e);

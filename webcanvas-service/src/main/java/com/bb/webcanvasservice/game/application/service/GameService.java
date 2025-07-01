@@ -444,12 +444,13 @@ public class GameService {
         }
 
 
-        GameTurn newGameTurn = gameSession.processToNextTurn(
+        gameSession.allocateNewGameTurn(
                 gameRoom.findNextDrawerId(),
                 dictionaryQueryPort.drawRandomKoreanNoun()
         );
 
-        gameRoomRepository.save(gameRoom);
+        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
+        GameTurn newGameTurn = savedGameRoom.getGameSession().getCurrentTurn();
 
         /**
          * 새 턴이 진행되었음을 알리는 event pub

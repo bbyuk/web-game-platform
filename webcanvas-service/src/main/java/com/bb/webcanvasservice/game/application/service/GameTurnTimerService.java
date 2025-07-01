@@ -1,5 +1,7 @@
 package com.bb.webcanvasservice.game.application.service;
 
+import com.bb.webcanvasservice.common.exception.BusinessException;
+import com.bb.webcanvasservice.common.handler.AsyncExceptionHandler;
 import com.bb.webcanvasservice.game.application.command.ProcessToNextTurnCommand;
 import com.bb.webcanvasservice.game.application.registry.GameTurnTimerRegistry;
 import com.bb.webcanvasservice.game.domain.exception.GameTurnTimerNotFoundException;
@@ -16,6 +18,7 @@ import java.util.function.Consumer;
 public class GameTurnTimerService {
     private final GameTurnTimerRegistry gameTurnTimerRegistry;
     private final ScheduledExecutorService scheduler;
+    private final AsyncExceptionHandler exceptionHandler;
 
     /**
      * 게임 턴 타이머를 스케줄러에 등록한다.
@@ -25,9 +28,15 @@ public class GameTurnTimerService {
      */
     public void registerTurnTimer(ProcessToNextTurnCommand command, Consumer<ProcessToNextTurnCommand> turnEndHandler) {
         ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
-                () -> turnEndHandler.accept(command), 0,
+                () -> {
+                    try {
+                        turnEndHandler.accept(command);
+                    }
+                    catch(Exception e) {
+                        exceptionHandler.handle(e);
+                    }
+                }, 0,
                 command.period(), TimeUnit.SECONDS);
-
         gameTurnTimerRegistry.register(command.gameRoomId(), new GameTurnTimer(future, command.period(), turnEndHandler));
     }
 

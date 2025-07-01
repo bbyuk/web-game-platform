@@ -145,7 +145,7 @@ public class GameRoomRepositoryTest {
         gameRoom.loadGameSession(2);
 
         GameSession gameSession = gameRoom.getGameSession();
-        gameSession.processToNextTurn(guestUser.getId(), "테스트");
+        gameSession.allocateNewGameTurn(guestUser.getId(), "테스트");
 
         GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
 

@@ -60,11 +60,14 @@ public class GameSession {
         this.gameTurns = gameTurns;
     }
 
-    public GameTurn processToNextTurn(Long drawerId, String answer) {
+    /**
+     * 새 게임턴을 할당한다.
+     * @param drawerId 새로 할당할 턴의 drawer id
+     * @param answer 새로 할당할 턴의 정답.
+     */
+    public void allocateNewGameTurn(Long drawerId, String answer) {
         GameTurn newGameTurn = GameTurn.create(id, drawerId, answer, timePerTurn);
         gameTurns.add(newGameTurn);
-
-        return newGameTurn;
     }
 
     /**
@@ -177,7 +180,14 @@ public class GameSession {
      * 현재 턴을 pass 한다
      */
     public void passCurrentTurn() {
-        getCurrentTurn().pass();
+        if (gameTurns.isEmpty()) {
+            return;
+        }
+        GameTurn currentTurn = gameTurns.get(gameTurns.size() - 1);
+        if (currentTurn.isCompleted()) {
+            return;
+        }
+        currentTurn.pass();
     }
 
     /**

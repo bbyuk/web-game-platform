@@ -78,7 +78,7 @@ public class GameModelMapper {
                 entity.getTurnCount(),
                 entity.getTimePerTurn(),
                 entity.getState(),
-                gameTurns.stream().map(GameModelMapper::toModel).toList()
+                gameTurns.stream().map(GameModelMapper::toModel).collect(Collectors.toList())
         );
     }
 
@@ -127,4 +127,5 @@ public class GameModelMapper {
     public static GameTurnJpaEntity toEntity(GameTurn gameTurn, GameSessionJpaEntity gameSessionEntity) {
         return new GameTurnJpaEntity(gameTurn.getId(), gameSessionEntity, gameTurn.getDrawerId(), gameTurn.getAnswer(), gameTurn.getCorrectAnswererId(), gameTurn.getState());
     }
+
 }
