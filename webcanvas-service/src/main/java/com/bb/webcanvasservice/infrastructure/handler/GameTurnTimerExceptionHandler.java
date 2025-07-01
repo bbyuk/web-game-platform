@@ -1,5 +1,6 @@
-package com.bb.webcanvasservice.common.handler;
+package com.bb.webcanvasservice.infrastructure.handler;
 
+import com.bb.webcanvasservice.common.handler.AsyncExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
