@@ -1,7 +1,6 @@
 package com.bb.webcanvasservice.game.application.service;
 
-import com.bb.webcanvasservice.common.exception.BusinessException;
-import com.bb.webcanvasservice.common.handler.AsyncExceptionHandler;
+import com.bb.webcanvasservice.common.exception.handler.AsyncExceptionHandler;
 import com.bb.webcanvasservice.game.application.command.ProcessToNextTurnCommand;
 import com.bb.webcanvasservice.game.application.registry.GameTurnTimerRegistry;
 import com.bb.webcanvasservice.game.domain.exception.GameTurnTimerNotFoundException;

@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.application.listener;
 
-import com.bb.webcanvasservice.common.message.MessageSender;
+import com.bb.webcanvasservice.common.messaging.websocket.MessageSender;
 import com.bb.webcanvasservice.game.domain.event.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

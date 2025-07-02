@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.infrastructure.lock;
 import com.bb.webcanvasservice.common.lock.DistributedLock;
 import com.bb.webcanvasservice.common.lock.callback.AsyncLockCallback;
 import com.bb.webcanvasservice.common.lock.callback.LockCallback;
-import com.bb.webcanvasservice.common.lock.exception.LockAlreadyOccupiedException;
+import com.bb.webcanvasservice.infrastructure.lock.exception.LockAlreadyOccupiedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

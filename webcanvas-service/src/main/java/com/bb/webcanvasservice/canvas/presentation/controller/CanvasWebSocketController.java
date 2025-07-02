@@ -2,8 +2,8 @@ package com.bb.webcanvasservice.canvas.presentation.controller;
 
 import com.bb.webcanvasservice.canvas.application.service.CanvasService;
 import com.bb.webcanvasservice.canvas.presentation.request.StrokeRequest;
-import com.bb.webcanvasservice.common.security.Authenticated;
-import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
+import com.bb.webcanvasservice.infrastructure.security.http.Authenticated;
+import com.bb.webcanvasservice.infrastructure.security.http.WebCanvasAuthentication;
 import com.bb.webcanvasservice.canvas.presentation.mapper.CanvasCommandMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

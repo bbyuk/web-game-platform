@@ -2,8 +2,8 @@ package com.bb.webcanvasservice.infrastructure.persistence.sequence;
 
 
 import com.bb.webcanvasservice.common.sequence.SequenceRepository;
-import com.bb.webcanvasservice.common.sequence.exception.SequenceCreateFailedException;
-import com.bb.webcanvasservice.common.sequence.exception.SequenceNotFoundException;
+import com.bb.webcanvasservice.infrastructure.persistence.sequence.exception.SequenceCreateFailedException;
+import com.bb.webcanvasservice.infrastructure.persistence.sequence.exception.SequenceNotFoundException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;

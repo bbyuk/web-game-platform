@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.infrastructure.security.websocket;
 
-import com.bb.webcanvasservice.common.security.Authenticated;
-import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
-import com.bb.webcanvasservice.infrastructure.security.web.exception.ApplicationAuthenticationException;
+import com.bb.webcanvasservice.infrastructure.security.http.Authenticated;
+import com.bb.webcanvasservice.infrastructure.security.http.WebCanvasAuthentication;
+import com.bb.webcanvasservice.infrastructure.security.http.exception.ApplicationAuthenticationException;
 import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;

@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.chat.application.listener;
 
 import com.bb.webcanvasservice.chat.application.mapper.ChatApplicationDtoMapper;
-import com.bb.webcanvasservice.common.message.MessageSender;
+import com.bb.webcanvasservice.common.messaging.websocket.MessageSender;
 import com.bb.webcanvasservice.chat.domain.event.MessageSentEvent;
 import com.bb.webcanvasservice.chat.domain.model.Message;
 import lombok.RequiredArgsConstructor;

@@ -2,8 +2,8 @@ package com.bb.webcanvasservice.auth.presentation.controller;
 
 import com.bb.webcanvasservice.auth.application.service.AuthenticationService;
 import com.bb.webcanvasservice.auth.presentation.response.AuthenticationInnerResponse;
-import com.bb.webcanvasservice.common.security.Authenticated;
-import com.bb.webcanvasservice.common.security.WebCanvasAuthentication;
+import com.bb.webcanvasservice.infrastructure.security.http.Authenticated;
+import com.bb.webcanvasservice.infrastructure.security.http.WebCanvasAuthentication;
 import com.bb.webcanvasservice.auth.presentation.mapper.AuthenticationCommandMapper;
 import com.bb.webcanvasservice.auth.presentation.mapper.AuthenticationPresentationDtoMapper;
 import com.bb.webcanvasservice.auth.presentation.request.LoginRequest;

@@ -2,7 +2,7 @@ package com.bb.webcanvasservice.chat.application.service;
 
 import com.bb.webcanvasservice.chat.application.command.SendMessageCommand;
 import com.bb.webcanvasservice.chat.domain.model.Message;
-import com.bb.webcanvasservice.common.message.MessageSender;
+import com.bb.webcanvasservice.common.messaging.websocket.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
