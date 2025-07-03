@@ -1,11 +1,10 @@
 package com.bb.webcanvasservice.game.domain.adapter;
 
 import com.bb.webcanvasservice.chat.domain.port.game.ChatGameCommandPort;
-import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
+import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurn;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * chat -> game command port adapter 구현체
@@ -14,8 +13,11 @@ public class ChatGameCommandAdapter implements ChatGameCommandPort {
 
     private final GameRoomRepository gameRoomRepository;
 
-    public ChatGameCommandAdapter(GameRoomRepository gameRoomRepository) {
+    private final ApplicationEventPublisher eventPublisher;
+
+    public ChatGameCommandAdapter(GameRoomRepository gameRoomRepository, ApplicationEventPublisher eventPublisher) {
         this.gameRoomRepository = gameRoomRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -23,11 +25,9 @@ public class ChatGameCommandAdapter implements ChatGameCommandPort {
         GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomId)
                 .orElseThrow(GameRoomNotFoundException::new);
 
-        GameSession gameSession = gameRoom.getCurrentGameSession();
-        GameTurn currentTurn = gameSession.getCurrentTurn();
+        gameRoom.checkAnswer(senderId, value);
 
-        currentTurn.checkAnswer(senderId, value);
-
+        gameRoom.processEventQueue(eventPublisher::publishEvent);
         gameRoomRepository.save(gameRoom);
     }
 }

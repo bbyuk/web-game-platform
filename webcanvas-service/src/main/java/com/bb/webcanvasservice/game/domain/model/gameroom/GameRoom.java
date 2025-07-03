@@ -452,4 +452,27 @@ public class GameRoom {
                 .findFirst()
                 .orElseThrow(GameRoomParticipantNotFoundException::new);
     }
+
+    public void checkAnswer(Long senderId, String value) {
+        GameSession gameSession = getCurrentGameSession();
+        GameTurn currentTurn = gameSession.getCurrentTurn();
+
+        if (currentTurn.isDrawer(senderId)) {
+            if (currentTurn.containsAnswer(value)) {
+                /**
+                 * 해당 턴의 drawer가 정답을 포함한 채팅을 입력할 시 해당턴은 PASS로 처리
+                 *
+                 * TODO 해당 유저에게 패널티 부여
+                 */
+                currentTurn.pass();
+                eventQueue.add(new GameTurnProgressRequestedEvent(id, gameSession.getId(), currentTurn.getId()));
+            }
+        }
+        else {
+            if (currentTurn.isAnswer(value))  {
+                currentTurn.markingAsCorrect(senderId);
+                eventQueue.add(new GameTurnProgressRequestedEvent(id, gameSession.getId(), currentTurn.getId(), senderId));
+            }
+        }
+    }
 }

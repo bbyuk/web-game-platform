@@ -70,15 +70,6 @@ public class GameTurn {
         return this.state == GameTurnState.ACTIVE;
     }
 
-    /**
-     * 대상 턴의 정답이 맞는지 체크한다.
-     * @param answer
-     * @return
-     */
-    public boolean isAnswer(String answer) {
-        return this.answer.equals(answer);
-    }
-
     public Long getId() {
         return id;
     }
@@ -124,38 +115,39 @@ public class GameTurn {
     }
 
     /**
-     * 해당 턴의 정답인지 확인한다.
-     * @param senderId
-     * @param value
+     * 대상 턴의 정답이 맞는지 체크한다.
+     * @param value 입력 값
+     * @return 정답 여부
      */
-    public void checkAnswer(Long senderId, String value) {
-        if (drawerId == senderId) {
-            if (value.contains(answer)) {
-                /**
-                 * 해당 턴의 drawer가 정답을 포함한 채팅을 입력할 시 해당턴은 PASS로 처리
-                 *
-                 * TODO 해당 유저에게 패널티 부여
-                 */
-                pass();
-            }
-        }
+    public boolean isAnswer(String value) {
+        return this.answer.equals(answer);
+    }
 
-        if (answer.equals(value)) {
-            markingAsCorrect(senderId);
-        }
+    /**
+     * 대상 턴의 정답을 포함한 메세지인지 확인한다.
+     * @param value 입력 값
+     * @return 정답 포함 여부
+     */
+    public boolean containsAnswer(String value) {
+        return value.contains(answer);
+    }
+
+    /**
+     * 해당턴의 drawer인지 여부를 확인한다.
+     * @param userId 유저 ID
+     * @return drawer 여부
+     */
+    public boolean isDrawer(Long userId) {
+        return drawerId.equals(userId);
     }
 
     /**
      * 정답 처리를 수행한다.
-     * @param senderId
+     * @param userId
      */
-    private void markingAsCorrect(Long senderId) {
-        this.correctAnswererId = senderId;
+    public void markingAsCorrect(Long userId) {
+        this.correctAnswererId = userId;
         this.state = GameTurnState.ANSWERED;
-
-        /**
-         * TODO 이벤트 발행
-         */
     }
 
     /**

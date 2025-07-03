@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.game.application.repository;
+package com.bb.webcanvasservice.game.domain.repository;
 
 import com.bb.webcanvasservice.game.domain.model.GamePlayHistory;
 

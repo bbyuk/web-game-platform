@@ -6,9 +6,8 @@ import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
 import com.bb.webcanvasservice.game.application.registry.GameTurnTimerRegistry;
-import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
+import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.service.GameService;
-import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;
 import com.bb.webcanvasservice.game.domain.model.gameroom.*;
 import com.bb.webcanvasservice.game.infrastructure.persistence.registry.InMemoryGameSessionLoadRegistry;
 import com.bb.webcanvasservice.game.infrastructure.persistence.registry.InMemoryGameTurnTimerRegistry;
@@ -25,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
 
 @Tag("small")
 @DisplayName("[small] [game] [service] 게임 애플리케이션 서비스 로직 test")

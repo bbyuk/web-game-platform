@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.small.game.stub.service;
 
-import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
+import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.model.gameroom.*;
 import org.springframework.util.ReflectionUtils;
 

@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.small.game.stub.service;
 
-import com.bb.webcanvasservice.game.application.repository.GamePlayHistoryRepository;
+import com.bb.webcanvasservice.game.domain.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.game.domain.model.GamePlayHistory;
 
 import java.util.List;

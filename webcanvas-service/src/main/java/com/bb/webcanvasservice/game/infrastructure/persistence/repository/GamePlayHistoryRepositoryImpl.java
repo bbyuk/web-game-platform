@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.game.domain.model.GamePlayHistory;
-import com.bb.webcanvasservice.game.application.repository.GamePlayHistoryRepository;
+import com.bb.webcanvasservice.game.domain.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameSessionJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.mapper.GameModelMapper;
 import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;

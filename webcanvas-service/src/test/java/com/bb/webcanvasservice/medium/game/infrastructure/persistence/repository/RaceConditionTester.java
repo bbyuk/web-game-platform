@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.medium.game.infrastructure.persistence.repository;
 
-import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
+import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;

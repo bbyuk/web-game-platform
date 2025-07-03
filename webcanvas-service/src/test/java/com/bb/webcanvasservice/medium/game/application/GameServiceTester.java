@@ -4,7 +4,7 @@ import com.bb.webcanvasservice.game.application.command.JoinGameRoomCommand;
 import com.bb.webcanvasservice.game.application.command.StartGameCommand;
 import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
 import com.bb.webcanvasservice.game.application.dto.GameRoomJoinDto;
-import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
+import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

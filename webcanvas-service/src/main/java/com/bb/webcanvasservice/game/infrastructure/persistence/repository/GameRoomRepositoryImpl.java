@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
-import com.bb.webcanvasservice.game.application.repository.GameRoomRepository;
+import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.model.gameroom.*;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomParticipantJpaEntity;
