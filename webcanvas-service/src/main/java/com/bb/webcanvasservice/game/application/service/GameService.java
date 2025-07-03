@@ -13,7 +13,7 @@ import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomParticipantNotFoundException;
 import com.bb.webcanvasservice.game.domain.exception.JoinCodeNotGeneratedException;
 import com.bb.webcanvasservice.game.domain.model.GamePlayHistory;
-import com.bb.webcanvasservice.game.domain.model.gameroom.*;
+import com.bb.webcanvasservice.game.domain.model.room.*;
 import com.bb.webcanvasservice.game.domain.port.dictionary.GameDictionaryQueryPort;
 import com.bb.webcanvasservice.game.domain.port.user.GameUserCommandPort;
 import lombok.RequiredArgsConstructor;

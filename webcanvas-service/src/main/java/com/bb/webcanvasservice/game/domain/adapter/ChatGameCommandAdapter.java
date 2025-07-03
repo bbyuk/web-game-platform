@@ -3,7 +3,7 @@ package com.bb.webcanvasservice.game.domain.adapter;
 import com.bb.webcanvasservice.chat.domain.port.game.ChatGameCommandPort;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoom;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**

@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.game.domain.model.gameroom;
+package com.bb.webcanvasservice.game.domain.model.room;
 
 import com.bb.webcanvasservice.common.event.ApplicationEvent;
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
@@ -453,6 +453,11 @@ public class GameRoom {
                 .orElseThrow(GameRoomParticipantNotFoundException::new);
     }
 
+    /**
+     * 현재 게임 방에서 진행중인 세션의 턴 정답을 체크한다.
+     * @param senderId
+     * @param value
+     */
     public void checkAnswer(Long senderId, String value) {
         GameSession gameSession = getCurrentGameSession();
         GameTurn currentTurn = gameSession.getCurrentTurn();

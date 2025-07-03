@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurnState;
+import com.bb.webcanvasservice.game.domain.model.room.GameTurnState;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameTurnJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

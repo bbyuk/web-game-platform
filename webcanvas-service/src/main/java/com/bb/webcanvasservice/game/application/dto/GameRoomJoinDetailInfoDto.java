@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.application.dto;
 
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoomState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoomState;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

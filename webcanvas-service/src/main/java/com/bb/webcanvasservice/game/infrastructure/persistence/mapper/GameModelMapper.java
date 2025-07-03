@@ -1,10 +1,10 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.mapper;
 
 import com.bb.webcanvasservice.game.domain.model.*;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoom;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameSession;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurn;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipant;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoom;
+import com.bb.webcanvasservice.game.domain.model.room.GameSession;
+import com.bb.webcanvasservice.game.domain.model.room.GameTurn;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipant;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.*;
 import com.bb.webcanvasservice.user.infrastructure.persistence.entity.UserJpaEntity;
 

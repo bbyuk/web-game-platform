@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.small.game.stub.service;
 
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
-import com.bb.webcanvasservice.game.domain.model.gameroom.*;
+import com.bb.webcanvasservice.game.domain.model.room.*;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;

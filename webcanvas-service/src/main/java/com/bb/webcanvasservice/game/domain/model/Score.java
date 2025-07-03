@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.domain.model;
 
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameTurn;
+import com.bb.webcanvasservice.game.domain.model.room.GameTurn;
 
 /**
  * 턴별로 획득한 점수 도메인 모델
