@@ -63,15 +63,6 @@ public class GameTurn {
     }
 
     /**
-     * 정답을 맟히지 못하고 제한 시간이 넘은 경우 턴 상태를 PASS로 변경한다.
-     */
-    public void pass() {
-        if (isActive()) {
-            this.state = GameTurnState.PASSED;
-        }
-    }
-
-    /**
      * 현재 활성화 되어 있는 턴인지 여부를 체크한다.
      * @return 활성화 여부
      */
@@ -130,5 +121,53 @@ public class GameTurn {
      */
     public LocalDateTime calculateExpiration() {
         return startedAt.plusSeconds(duration);
+    }
+
+    /**
+     * 해당 턴의 정답인지 확인한다.
+     * @param senderId
+     * @param value
+     */
+    public void checkAnswer(Long senderId, String value) {
+        if (drawerId == senderId) {
+            if (value.contains(answer)) {
+                /**
+                 * 해당 턴의 drawer가 정답을 포함한 채팅을 입력할 시 해당턴은 PASS로 처리
+                 *
+                 * TODO 해당 유저에게 패널티 부여
+                 */
+                pass();
+            }
+        }
+
+        if (answer.equals(value)) {
+            markingAsCorrect(senderId);
+        }
+    }
+
+    /**
+     * 정답 처리를 수행한다.
+     * @param senderId
+     */
+    private void markingAsCorrect(Long senderId) {
+        this.correctAnswererId = senderId;
+        this.state = GameTurnState.ANSWERED;
+
+        /**
+         * TODO 이벤트 발행
+         */
+    }
+
+    /**
+     * 정답을 맟히지 못하고 제한 시간이 넘은 경우 턴 상태를 PASS로 변경한다.
+     */
+    public void pass() {
+        if (isActive()) {
+            this.state = GameTurnState.PASSED;
+        }
+
+        /**
+         * TODO 이벤트 발행
+         */
     }
 }

@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.chat.application.service;
 
 import com.bb.webcanvasservice.chat.application.command.SendMessageCommand;
 import com.bb.webcanvasservice.chat.domain.model.Message;
+import com.bb.webcanvasservice.chat.domain.port.game.ChatGameCommandPort;
 import com.bb.webcanvasservice.common.messaging.websocket.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatService {
 
     private final MessageSender messageSender;
+
+    private final ChatGameCommandPort chatGameCommandPort;
 
     /**
      * destination을 만들어 가져온다.
@@ -33,14 +36,15 @@ public class ChatService {
     @Transactional
     public void sendChatMessage(SendMessageCommand command) {
         String destination = getDestination(command.gameRoomId());
-
         Message newMessage = Message.create(command.message(), command.senderId(), destination);
+
+        chatGameCommandPort.checkAnswer(command.gameRoomId(), command.senderId(), command.message());
 
         /**
          * TODO 채팅방에 메세지 임시저장
          */
 
-        // 도메인 이벤트 발행
+
         messageSender.send(destination, newMessage);
     }
 }
