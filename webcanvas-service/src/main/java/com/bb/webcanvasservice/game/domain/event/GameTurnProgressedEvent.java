@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.domain.event;
 
-import com.bb.webcanvasservice.domain.shared.event.ApplicationEvent;
+import com.bb.webcanvasservice.common.event.ApplicationEvent;
 
 /**
  * 게임 턴이 넘어갔을 때 발행되는 이벤트

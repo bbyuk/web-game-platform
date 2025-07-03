@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.domain.event;
 
-import com.bb.webcanvasservice.domain.shared.event.ApplicationEvent;
+import com.bb.webcanvasservice.common.event.ApplicationEvent;
 
 /**
  * 게임 방 호스트 변경시 pub 이벤트

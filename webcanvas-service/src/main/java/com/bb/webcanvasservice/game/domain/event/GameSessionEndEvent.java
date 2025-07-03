@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.domain.event;
 
-import com.bb.webcanvasservice.domain.shared.event.ApplicationEvent;
+import com.bb.webcanvasservice.common.event.ApplicationEvent;
 
 /**
  * 게임 세션 종료시 발생하는 이벤트

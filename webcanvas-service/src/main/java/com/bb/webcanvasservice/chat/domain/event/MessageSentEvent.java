@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.chat.domain.event;
 
-import com.bb.webcanvasservice.domain.shared.event.ApplicationEvent;
+import com.bb.webcanvasservice.common.event.ApplicationEvent;
 import com.bb.webcanvasservice.chat.domain.model.Message;
 
 /**
