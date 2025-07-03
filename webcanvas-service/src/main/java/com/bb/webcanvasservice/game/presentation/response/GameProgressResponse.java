@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.game.presentation.response;
 
-import com.bb.webcanvasservice.game.domain.model.room.GameSessionState;
-import com.bb.webcanvasservice.game.domain.model.room.GameTurnState;
+import com.bb.webcanvasservice.game.domain.model.session.GameSessionState;
+import com.bb.webcanvasservice.game.domain.model.session.GameTurnState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;

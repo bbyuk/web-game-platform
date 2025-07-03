@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.medium.game.infrastructure.persistence.repositor
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.config.JpaConfig;
+import com.bb.webcanvasservice.game.domain.model.session.GameSession;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.model.room.*;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomRepositoryImpl;
@@ -145,7 +146,7 @@ public class GameRoomRepositoryTest {
         gameRoom.loadGameSession(2);
 
         GameSession gameSession = gameRoom.getGameSession();
-        gameSession.allocateNewGameTurn(guestUser.getId(), "테스트");
+        gameSession.allocateNewGameTurn("테스트");
 
         GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
 

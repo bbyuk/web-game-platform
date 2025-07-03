@@ -17,10 +17,6 @@ public enum GameRoomParticipantState {
      */
     WAITING,
 
-    /**
-     * 게임 방 내
-     */
-    LOADING,
 
     /**
      * 게임 플레이중
@@ -32,5 +28,5 @@ public enum GameRoomParticipantState {
      */
     EXITED;
 
-    public static final List<GameRoomParticipantState> joined = List.of(WAITING, LOADING, PLAYING);
+    public static final List<GameRoomParticipantState> joined = List.of(WAITING, PLAYING);
 }

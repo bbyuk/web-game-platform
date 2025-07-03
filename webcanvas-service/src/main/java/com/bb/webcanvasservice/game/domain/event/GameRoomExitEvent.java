@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.domain.event;
 
-import com.bb.webcanvasservice.common.event.ApplicationEvent;
+import com.bb.webcanvasservice.domain.shared.event.ApplicationEvent;
 
 /**
  * 게임 방 퇴장 이벤트 발생시 pub 이벤트

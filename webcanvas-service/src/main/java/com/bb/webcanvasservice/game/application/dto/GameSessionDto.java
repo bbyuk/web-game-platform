@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.application.dto;
 
-import com.bb.webcanvasservice.game.domain.model.room.GameSessionState;
+import com.bb.webcanvasservice.game.domain.model.session.GameSessionState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "application layer -> presentation layer GameSession 정보 DTO")

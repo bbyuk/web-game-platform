@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
-import com.bb.webcanvasservice.game.domain.model.room.GameSessionState;
+import com.bb.webcanvasservice.game.domain.model.session.GameSessionState;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameSessionJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameTurnJpaEntity;

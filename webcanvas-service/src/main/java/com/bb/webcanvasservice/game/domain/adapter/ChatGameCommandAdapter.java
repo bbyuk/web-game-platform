@@ -1,9 +1,12 @@
 package com.bb.webcanvasservice.game.domain.adapter;
 
 import com.bb.webcanvasservice.chat.domain.port.game.ChatGameCommandPort;
+import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
+import com.bb.webcanvasservice.game.domain.model.session.GameSession;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.game.domain.model.room.GameRoom;
+import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -11,23 +14,21 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class ChatGameCommandAdapter implements ChatGameCommandPort {
 
-    private final GameRoomRepository gameRoomRepository;
+    private final GameSessionRepository gameSessionRepository;
 
     private final ApplicationEventPublisher eventPublisher;
 
-    public ChatGameCommandAdapter(GameRoomRepository gameRoomRepository, ApplicationEventPublisher eventPublisher) {
-        this.gameRoomRepository = gameRoomRepository;
+    public ChatGameCommandAdapter(GameSessionRepository gameSessionRepository, ApplicationEventPublisher eventPublisher) {
+        this.gameSessionRepository = gameSessionRepository;
         this.eventPublisher = eventPublisher;
     }
 
     @Override
     public void checkAnswer(Long gameRoomId, Long senderId, String value) {
-        GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomId)
-                .orElseThrow(GameRoomNotFoundException::new);
+        GameSession gameSession = gameSessionRepository.findCurrentGameSessionByGameRoomId(gameRoomId)
+                .orElseThrow(GameSessionNotFoundException::new);
 
-        gameRoom.checkAnswer(senderId, value);
-
-        gameRoom.processEventQueue(eventPublisher::publishEvent);
-        gameRoomRepository.save(gameRoom);
+        gameSession.checkAnswer(senderId, value);
+        gameSession.processEventQueue(eventPublisher::publishEvent);
     }
 }

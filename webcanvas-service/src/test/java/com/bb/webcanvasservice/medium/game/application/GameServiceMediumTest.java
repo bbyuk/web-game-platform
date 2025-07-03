@@ -12,6 +12,7 @@ import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
 import com.bb.webcanvasservice.game.application.registry.GameSessionLoadRegistry;
 import com.bb.webcanvasservice.game.application.registry.GameTurnTimerRegistry;
+import com.bb.webcanvasservice.game.domain.model.session.GameSessionState;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;

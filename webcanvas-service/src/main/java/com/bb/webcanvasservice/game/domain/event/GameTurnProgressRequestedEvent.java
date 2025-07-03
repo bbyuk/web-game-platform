@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.domain.event;
 
-import com.bb.webcanvasservice.common.event.ApplicationEvent;
+import com.bb.webcanvasservice.domain.shared.event.ApplicationEvent;
 
 /**
  * 게임 턴 진행처리 요청 이벤트

@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.entity;
 
-import com.bb.webcanvasservice.game.domain.model.room.GameTurnState;
+import com.bb.webcanvasservice.game.domain.model.session.GameTurnState;
 import com.bb.webcanvasservice.infrastructure.persistence.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;

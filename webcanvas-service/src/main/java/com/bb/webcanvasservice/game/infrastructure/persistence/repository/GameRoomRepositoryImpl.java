@@ -1,5 +1,7 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
+import com.bb.webcanvasservice.game.domain.model.session.GameSession;
+import com.bb.webcanvasservice.game.domain.model.session.GameSessionState;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.model.room.*;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
@@ -36,21 +38,7 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
                             List<GameRoomParticipantJpaEntity> gameRoomParticipantJpaEntities = gameRoomParticipantJpaRepository.findGameRoomParticipantsByGameRoomIdAndStates(
                                     gameRoomId, GameRoomParticipantState.joined
                             );
-                            return gameSessionJpaRepository.findByGameRoomIdAndStates(gameRoomId, GameSessionState.active)
-                                    .map(gameSessionJpaEntity ->
-                                            GameModelMapper.toModel(
-                                                    gameRoomJpaEntity,
-                                                    gameSessionJpaEntity,
-                                                    gameRoomParticipantJpaEntities,
-                                                    gameTurnJpaRepository.findTurnsByGameSessionId(gameSessionJpaEntity.getId())
-                                            )
-                                    )
-                                    .orElse(GameModelMapper.toModel(
-                                            gameRoomJpaEntity,
-                                            null,
-                                            gameRoomParticipantJpaEntities,
-                                            null
-                                    ));
+                            return GameModelMapper.toModel(gameRoomJpaEntity, gameRoomParticipantJpaEntities);
                         }
                 );
     }
@@ -105,17 +93,12 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
 
         return gameRoomJpaEntities
                 .stream()
-                .map(gameRoomJpaEntity -> {
-                    List<GameRoomParticipantJpaEntity> gameRoomParticipantEntities = gameRoomPaticipantMap.get(gameRoomJpaEntity.getId());
-                    return (
-                            GameModelMapper.toModel(
-                                    gameRoomJpaEntity,
-                                    null,
-                                    gameRoomParticipantEntities,
-                                    null
-                            )
-                    );
-                }).collect(Collectors.toList());
+                .map(gameRoomJpaEntity -> (
+                        GameModelMapper.toModel(
+                                gameRoomJpaEntity,
+                                gameRoomPaticipantMap.get(gameRoomJpaEntity.getId())
+                        )
+                )).collect(Collectors.toList());
     }
 
     @Override
@@ -141,33 +124,31 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
                     .toList();
             gameRoomParticipantJpaRepository.saveAll(gameRoomParticipantJpaEntities);
 
-            Optional<GameSession> optionalGameSession = Optional.ofNullable(gameRoom.getGameSession());
-
-            Optional<GameSessionJpaEntity> savedGameSessionJpaEntity =
-                    optionalGameSession
-                            .map(gameSession -> GameModelMapper.toEntity(gameSession, gameRoomJpaEntity))
-                            .map(gameSessionJpaRepository::save);
-
-            List<GameTurnJpaEntity> gameTurnJpaEntities = optionalGameSession
-                    .map(GameSession::getGameTurns)
-                    .orElseGet(Collections::emptyList)
-                    .stream()
-                    .map(gameTurn -> GameModelMapper.toEntity(
-                            gameTurn,
-                            savedGameSessionJpaEntity.orElse(null)
-                    ))
-                    .collect(Collectors.toList());
-
-            if (!gameTurnJpaEntities.isEmpty()) {
-                gameTurnJpaRepository.saveAll(gameTurnJpaEntities);
-            }
+//            Optional<GameSession> optionalGameSession = Optional.ofNullable(gameRoom.getGameSession());
+//
+//            Optional<GameSessionJpaEntity> savedGameSessionJpaEntity =
+//                    optionalGameSession
+//                            .map(gameSession -> GameModelMapper.toEntity(gameSession, gameRoomJpaEntity))
+//                            .map(gameSessionJpaRepository::save);
+//
+//            List<GameTurnJpaEntity> gameTurnJpaEntities = optionalGameSession
+//                    .map(GameSession::getGameTurns)
+//                    .orElseGet(Collections::emptyList)
+//                    .stream()
+//                    .map(gameTurn -> GameModelMapper.toEntity(
+//                            gameTurn,
+//                            savedGameSessionJpaEntity.orElse(null)
+//                    ))
+//                    .collect(Collectors.toList());
+//
+//            if (!gameTurnJpaEntities.isEmpty()) {
+//                gameTurnJpaRepository.saveAll(gameTurnJpaEntities);
+//            }
 
 
             return GameModelMapper.toModel(
                     gameRoomJpaEntity,
-                    savedGameSessionJpaEntity.orElse(null),
-                    gameRoomParticipantJpaEntities,
-                    gameTurnJpaEntities
+                    gameRoomParticipantJpaEntities
             );
         } catch (Exception e) {
             log.error(e.getMessage(), e);

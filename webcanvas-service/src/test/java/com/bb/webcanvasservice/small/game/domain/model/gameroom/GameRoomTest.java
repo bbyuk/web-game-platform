@@ -8,7 +8,7 @@ import com.bb.webcanvasservice.game.domain.exception.IllegalGameRoomStateExcepti
 import com.bb.webcanvasservice.game.domain.model.room.GameRoom;
 import com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipant;
 import com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipantState;
-import com.bb.webcanvasservice.game.domain.model.room.GameSession;
+import com.bb.webcanvasservice.game.domain.model.session.GameSession;
 import com.bb.webcanvasservice.user.domain.model.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
