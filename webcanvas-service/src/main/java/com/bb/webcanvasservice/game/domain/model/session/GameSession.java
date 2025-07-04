@@ -315,6 +315,8 @@ public class GameSession extends AggregateRoot {
             throw new GameSessionNotFoundException();
         }
         state = GameSessionState.PLAYING;
+        gamePlayers.stream()
+                .forEach(GamePlayer::changeStateToPlaying);
     }
 
     /**

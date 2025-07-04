@@ -15,6 +15,7 @@ import com.bb.webcanvasservice.game.domain.model.room.*;
 import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.registry.InMemoryGameSessionLoadRegistry;
 import com.bb.webcanvasservice.game.infrastructure.persistence.registry.InMemoryGameTurnTimerRegistry;
+import com.bb.webcanvasservice.infrastructure.lock.InMemoryConcurrencyLock;
 import com.bb.webcanvasservice.small.game.dummy.ApplicationEventPublisherDummy;
 import com.bb.webcanvasservice.small.game.stub.service.GameDictionaryQueryPortStub;
 import com.bb.webcanvasservice.small.game.stub.service.GameGamePlayHistoryRepositoryStub;
@@ -24,9 +25,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.ReflectionUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 @Tag("small")
 @DisplayName("[small] [game] [service] 게임 애플리케이션 서비스 로직 test")
@@ -41,26 +45,58 @@ public class GameServiceSmallTest {
     InMemoryGameSessionLoadRegistry gameSessionLoadRegistry = new InMemoryGameSessionLoadRegistry();
 
     GameSessionRepository gameSessionRepository = new GameSessionRepository() {
-        Map<Long, GameSession> gameSessions = new HashMap<>();
-        Map<Long, GamePlayer> gamePlayers = new HashMap<>();
-        Map<Long, GameTurn> gameTurns = new HashMap<>();
+        Map<Long, GameSession> gameSessions = new ConcurrentHashMap<>();
+        Map<Long, GamePlayer> gamePlayers = new ConcurrentHashMap<>();
+        Map<Long, GameTurn> gameTurns = new ConcurrentHashMap<>();
+        long gameSessionIdSeq = 0L;
+        long gamePlayerIdSeq = 0L;
+        long gameTurnIdSeq = 0L;
 
         @Override
         public GameSession save(GameSession gameSession) {
+            for (GamePlayer gamePlayer : gameSession.gamePlayers()) {
+                GamePlayer saveGamePlayer = new GamePlayer(
+                        gamePlayer.id() == null ? ++gamePlayerIdSeq : gamePlayer.id(),
+                        gamePlayer.gameSessionId(),
+                        gamePlayer.userId(),
+                        gamePlayer.nickname(),
+                        gamePlayer.state()
+                );
+                gamePlayers.putIfAbsent(saveGamePlayer.id(), saveGamePlayer);
+                gamePlayers.replace(saveGamePlayer.id(), saveGamePlayer);
+            }
 
-            gameSession.gamePlayers().stream().forEach(gamePlayer -> {
-                gamePlayers.putIfAbsent(gamePlayer.id(), gamePlayer);
-                gamePlayers.replace(gamePlayer.id(), gamePlayer);
-            });
+            for (GameTurn gameTurn : gameSession.gameTurns()) {
+                GameTurn saveGameTurn = new GameTurn(
+                        gameTurn.id() == null ? ++gameTurnIdSeq : gameTurn.id(),
+                        gameTurn.gameSessionId(),
+                        gameTurn.drawerId(),
+                        gameTurn.answer(),
+                        gameTurn.startedAt(),
+                        gameTurn.correctAnswererId(),
+                        gameTurn.state(),
+                        gameTurn.duration()
+                );
+                gameTurns.putIfAbsent(saveGameTurn.id(), saveGameTurn);
+                gameTurns.replace(saveGameTurn.id(), saveGameTurn);
+            }
 
-            gameSession.gameTurns().stream().forEach(gameTurn -> {
-                gameTurns.putIfAbsent(gameTurn.id(), gameTurn);
-                gameTurns.replace(gameTurn.id(), gameTurn);
-            });
+            long gameSessionId = gameSession.id() == null ? ++gameSessionIdSeq : gameSession.id();
+            GameSession saveGameSession = new GameSession(
+                    gameSessionId,
+                    gameSession.gameRoomId(),
+                    gameSession.turnCount(),
+                    gameSession.timePerTurn(),
+                    gameSession.state(),
+                    gamePlayers.values().stream().filter(gamePlayer -> gamePlayer.gameSessionId().equals(gameSessionId)).collect(Collectors.toList()),
+                    gameTurns.values().stream().filter(gameTurn -> gameTurn.gameSessionId().equals(gameSessionId)).collect(Collectors.toList())
+            );
 
-            gameSessions.putIfAbsent(gameSession.id(), gameSession);
-            gameSessions.replace(gameSession.id(), gameSession);
-            return null;
+
+            gameSessions.putIfAbsent(saveGameSession.id(), saveGameSession);
+            gameSessions.replace(saveGameSession.id(), saveGameSession);
+
+            return saveGameSession;
         }
 
         @Override
@@ -109,7 +145,8 @@ public class GameServiceSmallTest {
                     ),
                     new ArrayList<>()
             ),
-            new ApplicationEventPublisherDummy()
+            new ApplicationEventPublisherDummy(),
+            new InMemoryConcurrencyLock()
     );
 
     @Test

@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.game.application.service;
 
+import com.bb.webcanvasservice.common.lock.ConcurrencyLock;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.game.application.command.*;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
@@ -55,7 +56,7 @@ public class GameService {
      */
     private final GameProperties gameProperties;
     private final ApplicationEventPublisher eventPublisher;
-
+    private final ConcurrencyLock concurrencyLock;
 
     /**
      * 게임 방을 새로 생성하고, 생성을 요청한 유저를 입장시킨다.
@@ -500,20 +501,25 @@ public class GameService {
     public boolean successSubscription(Long gameSessionId, Long userId) {
         log.debug("user {} subscribe game session {}", userId, gameSessionId);
 
-        GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId).orElseThrow(GameSessionNotFoundException::new);
-        gameSession.loadPlayer(userId);
+        return concurrencyLock.executeWithLock(
+                "game-session-subscribe-" + gameSessionId,
+                () -> {
+                    GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId).orElseThrow(GameSessionNotFoundException::new);
+                    gameSession.loadPlayer(userId);
 
-        GameSession savedGameSession = gameSessionRepository.save(gameSession);
+                    GameSession savedGameSession = gameSessionRepository.save(gameSession);
 
-        if (savedGameSession.isAllPlayersLoaded()) {
-            log.debug("game session {} all loaded", gameSessionId);
+                    if (savedGameSession.isAllPlayersLoaded()) {
+                        log.debug("game session {} all loaded", gameSessionId);
 
-            gameSession.start();
+                        gameSession.start();
 
-            eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn()));
-            return true;
-        }
+                        gameSessionRepository.save(gameSession);
+                        eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn()));
+                        return true;
+                    }
 
-        return false;
+                    return false;
+                });
     }
 }
