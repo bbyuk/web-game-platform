@@ -379,7 +379,7 @@ public class GameService {
                 gameRoom.getCurrentParticipants().stream()
                         .map(gameRoomParticipant ->
                                 GamePlayer.create(
-                                        savedGameSession.getId(),
+                                        savedGameSession.id(),
                                         gameRoomParticipant.getUserId(),
                                         gameRoomParticipant.getNickname()
                                 )
@@ -393,7 +393,7 @@ public class GameService {
 
         List<GamePlayHistory> gamePlayHistories = participants
                 .stream()
-                .map(participant -> new GamePlayHistory(participant.getUserId(), savedGameSession.getId()))
+                .map(participant -> new GamePlayHistory(participant.getUserId(), savedGameSession.id()))
                 .toList();
         gamePlayHistoryRepository.saveAll(gamePlayHistories);
 
@@ -401,8 +401,8 @@ public class GameService {
         /**
          * 이벤트 발행하여 커밋 이후 next turn 및 메세징 처리
          */
-        eventPublisher.publishEvent(new GameSessionStartEvent(gameRoom.getId(), savedGameSession.getGameRoomId()));
-        return savedGameSession.getId();
+        eventPublisher.publishEvent(new GameSessionStartEvent(gameRoom.getId(), savedGameSession.gameRoomId()));
+        return savedGameSession.id();
     }
 
 
@@ -417,11 +417,11 @@ public class GameService {
         GameSession gameSession = gameSessionRepository.findCurrentGameSessionByGameRoomId(gameRoomId).orElseThrow(GameSessionNotFoundException::new);
 
         return new GameSessionDto(
-                gameSession.getId(),
-                gameSession.getState(),
-                gameSession.getTimePerTurn(),
+                gameSession.id(),
+                gameSession.state(),
+                gameSession.timePerTurn(),
                 gameSession.getCompletedGameTurnCount(),
-                gameSession.getTurnCount()
+                gameSession.turnCount()
         );
     }
 
@@ -469,7 +469,7 @@ public class GameService {
             gameRoomRepository.save(gameRoom);
 
             userCommandPort.moveUsersToRoom(gameRoom.getCurrentParticipants().stream().map(GameRoomParticipant::getUserId).collect(Collectors.toList()));
-            eventPublisher.publishEvent(new GameSessionEndEvent(gameSession.getId(), gameRoom.getId()));
+            eventPublisher.publishEvent(new GameSessionEndEvent(gameSession.id(), gameRoom.getId()));
             return;
         }
 
@@ -512,7 +512,7 @@ public class GameService {
 
             gameSession.start();
 
-            eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.getId(), gameSession.getGameRoomId(), gameSession.getTimePerTurn()));
+            eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn()));
             return true;
         }
 

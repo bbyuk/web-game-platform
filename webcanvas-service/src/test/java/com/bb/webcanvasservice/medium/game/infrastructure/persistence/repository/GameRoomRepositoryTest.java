@@ -151,7 +151,7 @@ public class GameRoomRepositoryTest {
         GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
 
         // when
-        Assertions.assertThat(gameSession.getGameTurns().size()).isEqualTo(1);
+        Assertions.assertThat(gameSession.gameTurns().size()).isEqualTo(1);
         gameRoomRepository.findGameRoomById(savedGameRoom.getId())
                 .ifPresent(findGameRoom -> {
                     Assertions.assertThat(findGameRoom).usingRecursiveComparison().isEqualTo(savedGameRoom);

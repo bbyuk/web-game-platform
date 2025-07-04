@@ -136,11 +136,25 @@ public class GameModelMapper {
     }
 
     public static GameSessionJpaEntity toEntity(GameSession gameSession, GameRoomJpaEntity gameRoomEntity) {
-        return new GameSessionJpaEntity(gameSession.getId(), gameRoomEntity, gameSession.getState(), gameSession.getTurnCount(), gameSession.getTimePerTurn());
+        return new GameSessionJpaEntity(gameSession.id(), gameRoomEntity, gameSession.state(), gameSession.turnCount(), gameSession.timePerTurn());
     }
 
     public static GameTurnJpaEntity toEntity(GameTurn gameTurn, GameSessionJpaEntity gameSessionEntity) {
         return new GameTurnJpaEntity(gameTurn.getId(), gameSessionEntity, gameTurn.getDrawerId(), gameTurn.getAnswer(), gameTurn.getCorrectAnswererId(), gameTurn.getState());
+    }
+
+    public static GamePlayerJpaEntity toEntity(GamePlayer gamePlayer, GameSessionJpaEntity gameSessionJpaEntity, UserJpaEntity userJpaEntity) {
+        if (gamePlayer == null) {
+            return null;
+        }
+
+        return new GamePlayerJpaEntity(
+                gamePlayer.id(),
+                gameSessionJpaEntity,
+                userJpaEntity,
+                gamePlayer.state(),
+                gamePlayer.nickname()
+        );
     }
 
 }

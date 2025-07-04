@@ -1,7 +1,5 @@
 package com.bb.webcanvasservice.game.domain.model.session;
 
-import com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipantState;
-
 /**
  * 게임 세션 참여자
  */
@@ -40,6 +38,22 @@ public class GamePlayer {
         return new GamePlayer(null, gameSessionId, userId, nickname, GamePlayerState.INIT);
     }
 
+    // ===================================================
+    // ====================== getter =====================
+    // ===================================================
+
+    public Long id() { return id; }
+    public Long userId() {
+        return userId;
+    }
+    public Long gameSessionId() { return gameSessionId; }
+    public String nickname() { return nickname; }
+    public GamePlayerState state() { return state; }
+
+    // ===================================================
+    // ====================== getter =====================
+    // ===================================================
+
     /**
      * 로딩중인지 여부를 리턴한다.
      * @return 로딩 여부
@@ -60,10 +74,6 @@ public class GamePlayer {
      */
     public void changeStateToPlaying() {
         this.state = GamePlayerState.PLAYING;
-    }
-
-    public Long getUserId() {
-        return userId;
     }
 
     /**

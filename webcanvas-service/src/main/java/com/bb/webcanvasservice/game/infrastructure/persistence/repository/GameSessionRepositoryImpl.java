@@ -1,14 +1,21 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
 import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
+import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
 import com.bb.webcanvasservice.game.domain.model.session.GameSession;
 import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
+import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GamePlayerJpaEntity;
+import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameSessionJpaEntity;
+import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameTurnJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.mapper.GameModelMapper;
+import com.bb.webcanvasservice.user.domain.exception.UserNotFoundException;
 import com.bb.webcanvasservice.user.infrastructure.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * TODO GameSessionRepository 구현
@@ -17,19 +24,80 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GameSessionRepositoryImpl implements GameSessionRepository {
 
-    private final GameRoomJpaRepository gameRoomRepository;
+    /**
+     * aggregate internal jpa repository
+     */
     private final GameSessionJpaRepository gameSessionJpaRepository;
+    private final GamePlayerJpaRepository gamePlayerJpaRepository;
+    private final GameTurnJpaRepository gameTurnJpaRepository;
+
+    /**
+     * aggregate external jpa repository
+     */
     private final UserJpaRepository userJpaRepository;
     private final GameRoomJpaRepository gameRoomJpaRepository;
 
+    /**
+     * GameSession (root)
+     * - List<GameTurn>
+     * - List<GamePlayer>
+     * 일괄 저장
+     *
+     * @param gameSession
+     * @return 저장 후 재매핑한 GameSession
+     */
     @Override
     public GameSession save(GameSession gameSession) {
-        return null;
+        GameSessionJpaEntity gameSessionJpaEntity = GameModelMapper.toEntity(
+                gameSession,
+                gameRoomJpaRepository.findById(gameSession.gameRoomId())
+                        .orElseThrow(GameRoomNotFoundException::new)
+        );
+
+        GameSessionJpaEntity savedGameSessionJpaEntity = gameSessionJpaRepository.save(gameSessionJpaEntity);
+
+        List<GameTurnJpaEntity> gameTurnJpaEntities = gameSession
+                .gameTurns()
+                .stream()
+                .map(gameTurn -> GameModelMapper.toEntity(gameTurn, gameSessionJpaEntity))
+                .collect(Collectors.toList());
+        gameTurnJpaRepository.saveAll(gameTurnJpaEntities);
+
+        /**
+         * TODO 튜닝 포인트 userJpaRepository에 userId 쿼리 한방쿼리로 변경
+         */
+        List<GamePlayerJpaEntity> gamePlayerJpaEntities = gameSession
+                .gamePlayers()
+                .stream()
+                .map(gamePlayer -> GameModelMapper.toEntity(
+                                gamePlayer,
+                                savedGameSessionJpaEntity,
+                                userJpaRepository.findById(gamePlayer.id())
+                                        .orElseThrow(UserNotFoundException::new)
+                        )
+                ).collect(Collectors.toList());
+        gamePlayerJpaRepository.saveAll(gamePlayerJpaEntities);
+
+        return GameModelMapper.toModel(
+                savedGameSessionJpaEntity,
+                gamePlayerJpaEntities,
+                gameTurnJpaEntities
+        );
     }
 
     @Override
     public Optional<GameSession> findGameSessionById(Long gameSessionId) {
-        return Optional.empty();
+        GameSessionJpaEntity gameSessionJpaEntity = gameSessionJpaRepository.findById(gameSessionId).orElseThrow(GameSessionNotFoundException::new);
+        List<GameTurnJpaEntity> gameTurnJpaEntities = gameTurnJpaRepository.findByGameSessionId(gameSessionId);
+        List<GamePlayerJpaEntity> gamePlayerJpaEntities = gamePlayerJpaRepository.findByGameSessionId(gameSessionId);
+
+        return Optional.of(GameModelMapper
+                .toModel(
+                        gameSessionJpaEntity,
+                        gamePlayerJpaEntities,
+                        gameTurnJpaEntities
+                )
+        );
     }
 
     @Override

@@ -23,7 +23,7 @@ public interface GameTurnJpaRepository extends JpaRepository<GameTurnJpaEntity, 
             from    GameTurnJpaEntity gt
             where   gt.gameSessionEntity.id = :gameSessionId
             """)
-    List<GameTurnJpaEntity> findTurnsByGameSessionId(@Param("gameSessionId") Long gameSessionId);
+    List<GameTurnJpaEntity> findByGameSessionId(@Param("gameSessionId") Long gameSessionId);
 
     /**
      * 게임 세션 ID로 해당 세션에 포함된 게임 턴 수를 조회한다.

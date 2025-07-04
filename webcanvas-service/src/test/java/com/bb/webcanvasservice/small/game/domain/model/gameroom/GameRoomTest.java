@@ -49,7 +49,7 @@ class GameRoomTest {
         GameSession gameSession = gameRoom.getCurrentGameSession();
 
         // then
-        Assertions.assertThat(gameSession.getTimePerTurn()).isEqualTo(150);
+        Assertions.assertThat(gameSession.timePerTurn()).isEqualTo(150);
         Assertions.assertThat(gameSession.isLoading()).isTrue();
     }
 

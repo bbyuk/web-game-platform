@@ -1,15 +1,11 @@
 package com.bb.webcanvasservice.game.domain.model.session;
 
 import com.bb.webcanvasservice.domain.shared.AggregateRoot;
-import com.bb.webcanvasservice.game.domain.event.AllUserInGameSessionLoadedEvent;
-import com.bb.webcanvasservice.game.domain.event.GameSessionEndEvent;
-import com.bb.webcanvasservice.game.domain.event.GameSessionStartEvent;
 import com.bb.webcanvasservice.game.domain.event.GameTurnProgressRequestedEvent;
 import com.bb.webcanvasservice.game.domain.exception.GameSessionIsOverException;
 import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
 import com.bb.webcanvasservice.game.domain.exception.GameTurnNotFoundException;
 import com.bb.webcanvasservice.game.domain.exception.NextDrawerNotFoundException;
-import com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,15 +52,6 @@ public class GameSession extends AggregateRoot {
      * 현재 세션에 포함된 게임 턴들
      */
     private List<GameTurn> gameTurns;
-
-    /**
-     * 게임 턴을 가져온다.
-     * @return
-     */
-    public List<GameTurn> getGameTurns() {
-        return gameTurns;
-    }
-
 
 
     public GameSession(Long id, Long gameRoomId, int turnCount, int timePerTurn, GameSessionState state, List<GamePlayer> gamePlayers, List<GameTurn> gameTurns) {
@@ -129,33 +116,41 @@ public class GameSession extends AggregateRoot {
     }
 
 
-    public Long getGameRoomId() {
+    // ===================================================
+    // ====================== getter =====================
+    // ===================================================
+    public Long gameRoomId() {
         return gameRoomId;
     }
-
-    /**
-     * 해당 세션에 할당된 턴 갯수
-     * @return
-     */
-    public int getTurnCount() {
+    public int turnCount() {
         return turnCount;
     }
 
-    /**
-     * 해당 세션에서 설정된 게임 턴당 시간
-     * @return
-     */
-    public int getTimePerTurn() {
+    public int timePerTurn() {
         return timePerTurn;
     }
 
-    public Long getId() {
+    public Long id() {
         return id;
     }
 
-    public GameSessionState getState() {
+
+    public GameSessionState state() {
         return state;
     }
+
+    public List<GamePlayer> gamePlayers() {
+        return gamePlayers;
+    }
+
+    public List<GameTurn> gameTurns() {
+        return gameTurns;
+    }
+
+    // ===================================================
+    // ====================== getter =====================
+    // ===================================================
+
 
     /**
      * 현재 게임 방에서 진행중인 세션의 턴 정답을 체크한다.
@@ -200,7 +195,7 @@ public class GameSession extends AggregateRoot {
         List<Long> candidates = new ArrayList<>();
 
         for (GamePlayer gamePlayer : gamePlayers) {
-            Long userId = gamePlayer.getUserId();
+            Long userId = gamePlayer.userId();
             int count = drawerCountMap.getOrDefault(userId, 0);
 
             if (count < minCount) {
@@ -338,7 +333,7 @@ public class GameSession extends AggregateRoot {
      */
     public void loadPlayer(Long userId) {
         gamePlayers.stream()
-                .filter(gamePlayer -> gamePlayer.getUserId().equals(userId))
+                .filter(gamePlayer -> gamePlayer.userId().equals(userId))
                 .findFirst()
                 .ifPresent(GamePlayer::load);
     }

@@ -44,7 +44,7 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
     @Override
     public Optional<GameRoom> findGameRoomByGameSessionId(Long gameSessionId) {
         GameSession gameSession = gameSessions.get(gameSessionId);
-        return findGameRoomById(gameSession.getGameRoomId());
+        return findGameRoomById(gameSession.gameRoomId());
     }
 
     @Override
@@ -120,14 +120,14 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
     private void saveGameSession(GameSession gameSession) {
         try {
             if (gameSession != null) {
-                if (gameSession.getId() == null) {
+                if (gameSession.id() == null) {
                     Field idField = GameSession.class.getDeclaredField("id");
                     idField.setAccessible(true);
                     ReflectionUtils.setField(idField, gameSession, ++gameSessionSeq);
                 }
 
-                if (!gameSessions.containsKey(gameSession.getId())) {
-                    gameSessions.put(gameSession.getId(), gameSession);
+                if (!gameSessions.containsKey(gameSession.id())) {
+                    gameSessions.put(gameSession.id(), gameSession);
                 }
             }
         }
