@@ -4,24 +4,31 @@ import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.game.application.command.*;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
-import com.bb.webcanvasservice.game.application.registry.GameSessionLoadRegistry;
-import com.bb.webcanvasservice.game.domain.repository.GamePlayHistoryRepository;
-import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
-import com.bb.webcanvasservice.game.domain.event.GameRoomJoinEvent;
-import com.bb.webcanvasservice.game.domain.event.GameTurnProgressedEvent;
+import com.bb.webcanvasservice.game.domain.event.*;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomParticipantNotFoundException;
+import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
 import com.bb.webcanvasservice.game.domain.exception.JoinCodeNotGeneratedException;
 import com.bb.webcanvasservice.game.domain.model.GamePlayHistory;
-import com.bb.webcanvasservice.game.domain.model.gameroom.*;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoom;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipant;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoomState;
+import com.bb.webcanvasservice.game.domain.model.session.GamePlayer;
+import com.bb.webcanvasservice.game.domain.model.session.GameSession;
+import com.bb.webcanvasservice.game.domain.model.session.GameTurn;
 import com.bb.webcanvasservice.game.domain.port.dictionary.GameDictionaryQueryPort;
 import com.bb.webcanvasservice.game.domain.port.user.GameUserCommandPort;
+import com.bb.webcanvasservice.game.domain.repository.GamePlayHistoryRepository;
+import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
+import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -40,8 +47,8 @@ public class GameService {
      * 도메인 레포지토리
      */
     private final GameRoomRepository gameRoomRepository;
+    private final GameSessionRepository gameSessionRepository;
     private final GamePlayHistoryRepository gamePlayHistoryRepository;
-    private final GameSessionLoadRegistry gameSessionLoadRegistry;
 
     /**
      * common layer
@@ -351,20 +358,40 @@ public class GameService {
          * 요청 보낸 유저가 대상 게임 방의 HOST가 맞는지 확인
          */
         gameRoom.validateIsHost(command.userId());
+        gameRoom.validateStateToLoad();
+        gameRoom.changeStateToPlay();
 
+        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
 
         /**
          * 새로운 게임 세션을 생성해 로드한다.
          */
-        gameRoom.loadGameSession(command.timePerTurn());
-        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
+        GameSession savedGameSession = gameSessionRepository.save(
+                GameSession.create(
+                        gameRoom.getId(),
+                        command.turnCount(),
+                        command.timePerTurn(),
+                        new ArrayList<>()
+                ));
+        savedGameSession.involvePlayers(
+                gameRoom.getCurrentParticipants().stream()
+                        .map(gameRoomParticipant ->
+                                GamePlayer.create(
+                                        savedGameSession.id(),
+                                        gameRoomParticipant.getUserId(),
+                                        gameRoomParticipant.getNickname()
+                                )
+                        )
+                        .collect(Collectors.toList())
+        );
 
-        List<GameRoomParticipant> participants = gameRoom.getCurrentParticipants();
+
+        List<GameRoomParticipant> participants = savedGameRoom.getCurrentParticipants();
         userCommandPort.moveUsersToGameSession(participants.stream().map(GameRoomParticipant::getUserId).collect(Collectors.toList()));
 
         List<GamePlayHistory> gamePlayHistories = participants
                 .stream()
-                .map(participant -> new GamePlayHistory(participant.getUserId(), gameRoom.getCurrentGameSession().getId()))
+                .map(participant -> new GamePlayHistory(participant.getUserId(), savedGameSession.id()))
                 .toList();
         gamePlayHistoryRepository.saveAll(gamePlayHistories);
 
@@ -372,9 +399,8 @@ public class GameService {
         /**
          * 이벤트 발행하여 커밋 이후 next turn 및 메세징 처리
          */
-        gameRoom.processEventQueue(eventPublisher::publishEvent);
-
-        return savedGameRoom.getCurrentGameSession().getId();
+        eventPublisher.publishEvent(new GameSessionStartEvent(gameRoom.getId(), savedGameSession.gameRoomId()));
+        return savedGameSession.id();
     }
 
 
@@ -386,15 +412,14 @@ public class GameService {
      */
     @Transactional(readOnly = true)
     public GameSessionDto findCurrentGameSession(Long gameRoomId) {
-        GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomId).orElseThrow(GameRoomNotFoundException::new);
-        GameSession gameSession = gameRoom.getCurrentGameSession();
+        GameSession gameSession = gameSessionRepository.findCurrentGameSessionByGameRoomId(gameRoomId).orElseThrow(GameSessionNotFoundException::new);
 
         return new GameSessionDto(
-                gameSession.getId(),
-                gameSession.getState(),
-                gameSession.getTimePerTurn(),
+                gameSession.id(),
+                gameSession.state(),
+                gameSession.timePerTurn(),
                 gameSession.getCompletedGameTurnCount(),
-                gameSession.getTurnCount()
+                gameSession.turnCount()
         );
     }
 
@@ -406,13 +431,12 @@ public class GameService {
      */
     @Transactional(readOnly = true)
     public GameTurnDto findCurrentGameTurn(Long gameSessionId, Long userId) {
-        GameRoom gameRoom = gameRoomRepository.findGameRoomByGameSessionId(gameSessionId).orElseThrow(GameRoomNotFoundException::new);
-        GameSession gameSession = gameRoom.getCurrentGameSession();
+        GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId).orElseThrow(GameSessionNotFoundException::new);
         GameTurn gameTurn = gameSession.getCurrentTurn();
 
         return new GameTurnDto(
-                gameTurn.getDrawerId(),
-                gameTurn.getDrawerId().equals(userId) ? gameTurn.getAnswer() : null,
+                gameTurn.drawerId(),
+                gameTurn.drawerId().equals(userId) ? gameTurn.answer() : null,
                 gameTurn.calculateExpiration());
     }
 
@@ -425,8 +449,8 @@ public class GameService {
     @Transactional
     public void processToNextTurn(ProcessToNextTurnCommand command) {
         log.debug("{} 세션 다음 턴으로 진행", command.gameSessionId());
-        GameRoom gameRoom = gameRoomRepository.findGameRoomByGameSessionId(command.gameSessionId()).orElseThrow(GameRoomNotFoundException::new);
-        GameSession gameSession = gameRoom.getCurrentGameSession();
+        GameRoom gameRoom = gameRoomRepository.findGameRoomById(command.gameRoomId()).orElseThrow(GameRoomNotFoundException::new);
+        GameSession gameSession = gameSessionRepository.findGameSessionById(command.gameRoomId()).orElseThrow(GameSessionNotFoundException::new);
 
         if (!command.answered()) {
             gameSession.passCurrentTurn();
@@ -436,32 +460,32 @@ public class GameService {
             log.debug("모든 턴이 진행되었습니다.");
             log.debug("게임 세션 종료");
 
-            gameRoom.endCurrentGameSession();
+            gameSession.end();
+            gameSessionRepository.save(gameSession);
+
+            gameRoom.resetToWaiting();
             gameRoomRepository.save(gameRoom);
 
             userCommandPort.moveUsersToRoom(gameRoom.getCurrentParticipants().stream().map(GameRoomParticipant::getUserId).collect(Collectors.toList()));
-
-            gameRoom.processEventQueue(eventPublisher::publishEvent);
+            eventPublisher.publishEvent(new GameSessionEndEvent(gameSession.id(), gameRoom.getId()));
             return;
         }
 
 
         gameSession.allocateNewGameTurn(
-                gameRoom.findNextDrawerId(),
                 dictionaryQueryPort.drawRandomKoreanNoun()
         );
-
-        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
-        GameTurn newGameTurn = savedGameRoom.getGameSession().getCurrentTurn();
+        GameSession savedGameSession = gameSessionRepository.save(gameSession);
+        GameTurn newGameTurn = savedGameSession.getCurrentTurn();
 
         /**
          * 새 턴이 진행되었음을 알리는 event pub
          */
         eventPublisher.publishEvent(
                 new GameTurnProgressedEvent(
-                        gameSession.getGameRoomId(),
+                        command.gameRoomId(),
                         command.gameSessionId(),
-                        newGameTurn.getId()
+                        newGameTurn.id()
                 )
         );
     }
@@ -475,18 +499,18 @@ public class GameService {
     @Transactional
     public boolean successSubscription(Long gameSessionId, Long userId) {
         log.debug("user {} subscribe game session {}", userId, gameSessionId);
-        GameRoom gameRoom = gameRoomRepository.findGameRoomByGameSessionId(gameSessionId).orElseThrow(GameRoomNotFoundException::new);
-        int enteredUserCount = gameRoom.getCurrentParticipants().size();
 
-        gameSessionLoadRegistry.register(gameSessionId, userId);
-        if (gameSessionLoadRegistry.isAllLoaded(gameSessionId, enteredUserCount)) {
+        GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId).orElseThrow(GameSessionNotFoundException::new);
+        gameSession.loadPlayer(userId);
+
+        GameSession savedGameSession = gameSessionRepository.save(gameSession);
+
+        if (savedGameSession.isAllPlayersLoaded()) {
             log.debug("game session {} all loaded", gameSessionId);
-            gameSessionLoadRegistry.clear(gameSessionId);
 
-            gameRoom.startGameSession();
-            gameRoomRepository.save(gameRoom);
+            gameSession.start();
 
-            gameRoom.processEventQueue(eventPublisher::publishEvent);
+            eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn()));
             return true;
         }
 

@@ -1,7 +1,9 @@
 package com.bb.webcanvasservice.small.game.stub.service;
 
+import com.bb.webcanvasservice.game.domain.model.session.GameSession;
+import com.bb.webcanvasservice.game.domain.model.session.GameTurn;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
-import com.bb.webcanvasservice.game.domain.model.gameroom.*;
+import com.bb.webcanvasservice.game.domain.model.room.*;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -42,7 +44,7 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
     @Override
     public Optional<GameRoom> findGameRoomByGameSessionId(Long gameSessionId) {
         GameSession gameSession = gameSessions.get(gameSessionId);
-        return findGameRoomById(gameSession.getGameRoomId());
+        return findGameRoomById(gameSession.gameRoomId());
     }
 
     @Override
@@ -97,18 +99,6 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
                 gameRooms.put(gameRoom.getId(), gameRoom);
             }
 
-            /**
-             * 게임 세션 저장
-             */
-            saveGameSession(gameRoom.getGameSession());
-
-            /**
-             * 게임 턴 목록 저장
-             */
-            if (gameRoom.getGameSession() != null) {
-                saveAllGameTurns(gameRoom.getGameSession().getGameTurns());
-            }
-
             return gameRoom;
         } catch (NoSuchFieldException e) {
             throw new IllegalStateException();
@@ -118,14 +108,14 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
     private void saveGameSession(GameSession gameSession) {
         try {
             if (gameSession != null) {
-                if (gameSession.getId() == null) {
+                if (gameSession.id() == null) {
                     Field idField = GameSession.class.getDeclaredField("id");
                     idField.setAccessible(true);
                     ReflectionUtils.setField(idField, gameSession, ++gameSessionSeq);
                 }
 
-                if (!gameSessions.containsKey(gameSession.getId())) {
-                    gameSessions.put(gameSession.getId(), gameSession);
+                if (!gameSessions.containsKey(gameSession.id())) {
+                    gameSessions.put(gameSession.id(), gameSession);
                 }
             }
         }
@@ -159,12 +149,12 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
             gameTurnIdField.setAccessible(true);
 
             for (GameTurn gameTurn : turns) {
-                if (gameTurn.getId() == null) {
+                if (gameTurn.id() == null) {
                     ReflectionUtils.setField(gameTurnIdField, gameTurn, ++gameTurnSeq);
                 }
 
-                if (!gameTurns.containsKey(gameTurn.getId())) {
-                    gameTurns.put(gameTurn.getId(), gameTurn);
+                if (!gameTurns.containsKey(gameTurn.id())) {
+                    gameTurns.put(gameTurn.id(), gameTurn);
                 }
             }
         } catch (NoSuchFieldException e) {

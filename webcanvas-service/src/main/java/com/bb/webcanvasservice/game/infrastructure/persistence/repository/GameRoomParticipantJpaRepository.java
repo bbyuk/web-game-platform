@@ -1,7 +1,7 @@
 package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState;
-import com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomState;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipantState;
+import com.bb.webcanvasservice.game.domain.model.room.GameRoomState;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameRoomParticipantJpaEntity;
 import jakarta.persistence.LockModeType;
@@ -31,7 +31,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
                 join        UserJpaEntity u
                 on          gre.userEntity.id = u.id
                 where       gre.userEntity.id = :userId
-                and         gre.state = com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.WAITING
+                and         gre.state = com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipantState.WAITING
             )
             """)
     boolean existsGameRoomParticipantByUserId(@Param("userId") Long userId);
@@ -64,7 +64,7 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
             join fetch  grp.userEntity u
             join fetch  grp.gameRoomEntity gr
             where       grp.gameRoomEntity.id = :gameRoomId
-            and         grp.state = com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.WAITING
+            and         grp.state = com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipantState.WAITING
             order by    grp.id asc
             """
     )
@@ -117,8 +117,8 @@ public interface GameRoomParticipantJpaRepository extends JpaRepository<GameRoom
             from        GameRoomParticipantJpaEntity gre
             where       gre.gameRoomEntity.id = :gameRoomId
             and         gre.state in (
-                                        com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.WAITING,
-                                        com.bb.webcanvasservice.game.domain.model.gameroom.GameRoomParticipantState.PLAYING
+                                        com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipantState.WAITING,
+                                        com.bb.webcanvasservice.game.domain.model.room.GameRoomParticipantState.PLAYING
                                      )
             order by    gre.id asc
             """

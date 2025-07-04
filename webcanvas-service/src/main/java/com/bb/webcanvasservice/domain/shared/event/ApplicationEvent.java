@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.common.event;
+package com.bb.webcanvasservice.domain.shared.event;
 
 import lombok.Getter;
 

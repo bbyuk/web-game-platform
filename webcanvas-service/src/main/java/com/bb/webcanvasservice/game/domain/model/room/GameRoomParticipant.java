@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.game.domain.model.gameroom;
+package com.bb.webcanvasservice.game.domain.model.room;
 
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomHostCanNotChangeReadyException;
@@ -223,13 +223,6 @@ public class GameRoomParticipant {
         return GameRoomParticipantState.joined.contains(state);
     }
 
-    /**
-     * 로딩중인지 여부를 리턴한다.
-     * @return 로딩 여부
-     */
-    public boolean isLoading() {
-        return this.state == GameRoomParticipantState.LOADING;
-    }
 
     /**
      * 유저가 호스트인지 체크한다.
@@ -269,10 +262,4 @@ public class GameRoomParticipant {
         this.ready = true;
     }
 
-    /**
-     * 게임 세션이 로드되어 로딩 상태로 변경한다.
-     */
-    public void loadSession() {
-        this.state = GameRoomParticipantState.LOADING;
-    }
 }
