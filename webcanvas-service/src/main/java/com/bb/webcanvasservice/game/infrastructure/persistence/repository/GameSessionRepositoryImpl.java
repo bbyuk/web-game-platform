@@ -3,6 +3,7 @@ package com.bb.webcanvasservice.game.infrastructure.persistence.repository;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
 import com.bb.webcanvasservice.game.domain.model.session.GameSession;
+import com.bb.webcanvasservice.game.domain.model.session.GameSessionState;
 import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GamePlayerJpaEntity;
 import com.bb.webcanvasservice.game.infrastructure.persistence.entity.GameSessionJpaEntity;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * TODO GameSessionRepository 구현
+ * GameSessionRepository 구현
  */
 @Repository
 @RequiredArgsConstructor
@@ -100,8 +101,23 @@ public class GameSessionRepositoryImpl implements GameSessionRepository {
         );
     }
 
+    /**
+     * 게엠 방 ID로 현재 게임 세션 찾기
+     * @param gameRoomId 게임 방 ID
+     * @return 게임 세션
+     */
     @Override
     public Optional<GameSession> findCurrentGameSessionByGameRoomId(Long gameRoomId) {
-        return Optional.empty();
+        GameSessionJpaEntity gameSessionJpaEntity = gameSessionJpaRepository.findByGameRoomIdAndStates(gameRoomId, GameSessionState.active).orElseThrow(GameSessionNotFoundException::new);
+        List<GameTurnJpaEntity> gameTurnJpaEntities = gameTurnJpaRepository.findByGameSessionId(gameSessionJpaEntity.getId());
+        List<GamePlayerJpaEntity> gamePlayerJpaEntities = gamePlayerJpaRepository.findByGameSessionId(gameSessionJpaEntity.getId());
+
+        return Optional.of(GameModelMapper
+                .toModel(
+                        gameSessionJpaEntity,
+                        gamePlayerJpaEntities,
+                        gameTurnJpaEntities
+                )
+        );
     }
 }
