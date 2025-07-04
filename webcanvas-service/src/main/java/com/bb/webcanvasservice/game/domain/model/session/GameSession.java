@@ -53,17 +53,6 @@ public class GameSession extends AggregateRoot {
      */
     private List<GameTurn> gameTurns;
 
-
-    public GameSession(Long id, Long gameRoomId, int turnCount, int timePerTurn, GameSessionState state, List<GamePlayer> gamePlayers, List<GameTurn> gameTurns) {
-        this.id = id;
-        this.gameRoomId = gameRoomId;
-        this.turnCount = turnCount;
-        this.timePerTurn = timePerTurn;
-        this.state = state;
-        this.gamePlayers = gamePlayers;
-        this.gameTurns = gameTurns;
-    }
-
     // ===================================================
     // ====================== getter =====================
     // ===================================================
@@ -99,6 +88,27 @@ public class GameSession extends AggregateRoot {
     // ====================== getter =====================
     // ===================================================
 
+
+    public GameSession(Long id, Long gameRoomId, int turnCount, int timePerTurn, GameSessionState state, List<GamePlayer> gamePlayers, List<GameTurn> gameTurns) {
+        this.id = id;
+        this.gameRoomId = gameRoomId;
+        this.turnCount = turnCount;
+        this.timePerTurn = timePerTurn;
+        this.state = state;
+        this.gamePlayers = gamePlayers;
+        this.gameTurns = gameTurns;
+    }
+
+    /**
+     * 게임 세션이 새로 생성 된 시점엔 LOADING 상태로 생성된다.
+     * @param turnCount 턴 수
+     * @param timePerTurn 턴별 시간
+     * @return 새로 생성된 게임 세션 객체
+     */
+    public static GameSession create(Long gameRoomId, int turnCount, int timePerTurn, List<GamePlayer> gamePlayers) {
+        return new GameSession(null, gameRoomId, turnCount, timePerTurn, GameSessionState.LOADING, gamePlayers, new ArrayList<>());
+    }
+
     /**
      * 새 게임턴을 할당한다.
      * @param answer 새로 할당할 턴의 정답.
@@ -114,16 +124,6 @@ public class GameSession extends AggregateRoot {
      */
     public boolean shouldEnd() {
         return this.turnCount <= getCompletedGameTurnCount();
-    }
-
-    /**
-     * 게임 세션이 새로 생성 된 시점엔 LOADING 상태로 생성된다.
-     * @param turnCount 턴 수
-     * @param timePerTurn 턴별 시간
-     * @return 새로 생성된 게임 세션 객체
-     */
-    public static GameSession create(Long gameRoomId, int turnCount, int timePerTurn, List<GamePlayer> gamePlayers) {
-        return new GameSession(null, gameRoomId, turnCount, timePerTurn, GameSessionState.LOADING, gamePlayers, new ArrayList<>());
     }
 
     /**

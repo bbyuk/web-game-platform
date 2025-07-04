@@ -50,9 +50,6 @@ public class GameRoomRepositoryTest {
     private GameRoomRepository gameRoomRepository;
 
     @Autowired
-    private GameSessionRepository gameSessionRepository;
-
-    @Autowired
     private RaceConditionTester raceConditionTester;
 
     @Autowired
