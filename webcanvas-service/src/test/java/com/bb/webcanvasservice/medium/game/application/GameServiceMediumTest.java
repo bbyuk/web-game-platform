@@ -12,11 +12,13 @@ import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
 import com.bb.webcanvasservice.game.application.registry.GameSessionLoadRegistry;
 import com.bb.webcanvasservice.game.application.registry.GameTurnTimerRegistry;
+import com.bb.webcanvasservice.game.domain.model.session.GameSession;
 import com.bb.webcanvasservice.game.domain.model.session.GameSessionState;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;
 import com.bb.webcanvasservice.game.domain.model.room.*;
+import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
 import com.bb.webcanvasservice.user.domain.model.User;
 import com.bb.webcanvasservice.user.domain.repository.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -42,6 +44,9 @@ public class GameServiceMediumTest {
 
     @Autowired
     GameRoomRepository gameRoomRepository;
+
+    @Autowired
+    GameSessionRepository gameSessionRepository;
 
     @Autowired
     GameSessionLoadRegistry gameSessionLoadRegistry;
@@ -237,13 +242,14 @@ public class GameServiceMediumTest {
 
         // when
         Long gameSessionId = gameService.loadGameSession(new StartGameCommand(gameRoomJoinDto.gameRoomId(), 2, 20, hostUserId));
+        GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId).orElseThrow(RuntimeException::new);
         GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomJoinDto.gameRoomId()).orElseThrow(RuntimeException::new);
 
         // then
-        Assertions.assertThat(gameRoom.getCurrentGameSession()).isNotNull();
-        Assertions.assertThat(gameRoom.getCurrentGameSession().getState()).isEqualTo(GameSessionState.LOADING);
+        Assertions.assertThat(gameSession).isNotNull();
+        Assertions.assertThat(gameSession.state()).isEqualTo(GameSessionState.LOADING);
         gameRoom.getParticipants().forEach(participant -> {
-            Assertions.assertThat(participant.isLoading()).isTrue();
+            Assertions.assertThat(participant.isPlaying()).isTrue();
             Assertions.assertThat(participant.isReady()).isEqualTo(participant.isHost());
         });
     }
@@ -265,15 +271,15 @@ public class GameServiceMediumTest {
 
         // when
         GameSessionDto findCurrentGameSession = gameService.findCurrentGameSession(gameRoom.getId());
-
-        var gameSession = gameRoom.getCurrentGameSession();
+        GameSession gameSession = gameSessionRepository.findGameSessionById(findCurrentGameSession.gameSessionId())
+                .orElseThrow(RuntimeException::new);
 
         var expectedResult = new GameSessionDto(
-                gameSession.getId(),
-                gameSession.getState(),
-                gameSession.getTimePerTurn(),
+                gameSession.id(),
+                gameSession.state(),
+                gameSession.timePerTurn(),
                 gameSession.getCompletedGameTurnCount(),
-                gameSession.getTurnCount()
+                gameSession.turnCount()
         );
         // then
         Assertions.assertThat(expectedResult).usingRecursiveComparison().isEqualTo(findCurrentGameSession);

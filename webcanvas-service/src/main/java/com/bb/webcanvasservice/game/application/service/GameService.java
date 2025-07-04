@@ -4,7 +4,6 @@ import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.game.application.command.*;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
-import com.bb.webcanvasservice.game.application.registry.GameSessionLoadRegistry;
 import com.bb.webcanvasservice.game.domain.event.*;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
 import com.bb.webcanvasservice.game.domain.exception.GameRoomParticipantNotFoundException;
@@ -54,7 +53,6 @@ public class GameService {
     /**
      * common layer
      */
-    private final GameSessionLoadRegistry gameSessionLoadRegistry;
     private final GameProperties gameProperties;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -437,8 +435,8 @@ public class GameService {
         GameTurn gameTurn = gameSession.getCurrentTurn();
 
         return new GameTurnDto(
-                gameTurn.getDrawerId(),
-                gameTurn.getDrawerId().equals(userId) ? gameTurn.getAnswer() : null,
+                gameTurn.drawerId(),
+                gameTurn.drawerId().equals(userId) ? gameTurn.answer() : null,
                 gameTurn.calculateExpiration());
     }
 
@@ -487,7 +485,7 @@ public class GameService {
                 new GameTurnProgressedEvent(
                         command.gameRoomId(),
                         command.gameSessionId(),
-                        newGameTurn.getId()
+                        newGameTurn.id()
                 )
         );
     }

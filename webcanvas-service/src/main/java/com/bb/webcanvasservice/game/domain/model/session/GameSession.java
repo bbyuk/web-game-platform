@@ -64,6 +64,41 @@ public class GameSession extends AggregateRoot {
         this.gameTurns = gameTurns;
     }
 
+    // ===================================================
+    // ====================== getter =====================
+    // ===================================================
+    public Long gameRoomId() {
+        return gameRoomId;
+    }
+    public int turnCount() {
+        return turnCount;
+    }
+
+    public int timePerTurn() {
+        return timePerTurn;
+    }
+
+    public Long id() {
+        return id;
+    }
+
+
+    public GameSessionState state() {
+        return state;
+    }
+
+    public List<GamePlayer> gamePlayers() {
+        return gamePlayers;
+    }
+
+    public List<GameTurn> gameTurns() {
+        return gameTurns;
+    }
+
+    // ===================================================
+    // ====================== getter =====================
+    // ===================================================
+
     /**
      * 새 게임턴을 할당한다.
      * @param answer 새로 할당할 턴의 정답.
@@ -115,43 +150,6 @@ public class GameSession extends AggregateRoot {
         return state == GameSessionState.COMPLETED;
     }
 
-
-    // ===================================================
-    // ====================== getter =====================
-    // ===================================================
-    public Long gameRoomId() {
-        return gameRoomId;
-    }
-    public int turnCount() {
-        return turnCount;
-    }
-
-    public int timePerTurn() {
-        return timePerTurn;
-    }
-
-    public Long id() {
-        return id;
-    }
-
-
-    public GameSessionState state() {
-        return state;
-    }
-
-    public List<GamePlayer> gamePlayers() {
-        return gamePlayers;
-    }
-
-    public List<GameTurn> gameTurns() {
-        return gameTurns;
-    }
-
-    // ===================================================
-    // ====================== getter =====================
-    // ===================================================
-
-
     /**
      * 현재 게임 방에서 진행중인 세션의 턴 정답을 체크한다.
      * @param senderId
@@ -168,13 +166,13 @@ public class GameSession extends AggregateRoot {
                  * TODO 해당 유저에게 패널티 부여
                  */
                 currentTurn.pass();
-                eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.getId()));
+                eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.id()));
             }
         }
         else {
             if (currentTurn.isAnswer(value))  {
                 currentTurn.markingAsCorrect(senderId);
-                eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.getId(), senderId));
+                eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.id(), senderId));
             }
         }
     }
@@ -283,7 +281,7 @@ public class GameSession extends AggregateRoot {
     Map<Long, Integer> getDrawerCountMap() {
         return gameTurns.stream()
                 .collect(Collectors.toMap(
-                        GameTurn::getDrawerId,
+                        GameTurn::drawerId,
                         gt -> 1,
                         Integer::sum
                 ));

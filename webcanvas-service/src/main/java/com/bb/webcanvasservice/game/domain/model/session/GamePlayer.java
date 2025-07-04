@@ -83,4 +83,11 @@ public class GamePlayer {
         this.state = GamePlayerState.INACTIVE;
     }
 
+    /**
+     * 게임 플레이어가 플레이중인지 체크한다.
+     * @return
+     */
+    public boolean isPlaying() {
+        return this.state == GamePlayerState.PLAYING;
+    }
 }

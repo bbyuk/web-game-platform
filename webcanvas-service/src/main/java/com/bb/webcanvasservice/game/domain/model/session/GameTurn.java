@@ -53,6 +53,38 @@ public class GameTurn {
         return new GameTurn(null, gameSessionId, drawerId, answer, LocalDateTime.now(), null, GameTurnState.ACTIVE, duration);
     }
 
+    // ===================================================
+    // ====================== getter =====================
+    // ===================================================
+
+    public Long id() {
+        return id;
+    }
+    public Long gameSessionId() {
+        return gameSessionId;
+    }
+    public String answer() {
+        return answer;
+    }
+    public Long correctAnswererId() {
+        return correctAnswererId;
+    }
+    public Long drawerId() {
+        return drawerId;
+    }
+    public LocalDateTime startedAt() {
+        return startedAt;
+    }
+    public GameTurnState state() {
+        return state;
+    }
+    public int duration() { return duration; }
+
+
+    // ===================================================
+    // ====================== getter =====================
+    // ===================================================
+
     /**
      * 정답을 맞혔을을 때 호출
      * @param userId 유저 ID
@@ -68,34 +100,6 @@ public class GameTurn {
      */
     public boolean isActive() {
         return this.state == GameTurnState.ACTIVE;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getGameSessionId() {
-        return gameSessionId;
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
-    public Long getCorrectAnswererId() {
-        return correctAnswererId;
-    }
-
-    public Long getDrawerId() {
-        return drawerId;
-    }
-
-    public LocalDateTime getStartedAt() {
-        return startedAt;
-    }
-
-    public GameTurnState getState() {
-        return state;
     }
 
     /**
@@ -162,4 +166,5 @@ public class GameTurn {
          * TODO 이벤트 발행
          */
     }
+
 }

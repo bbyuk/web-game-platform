@@ -140,7 +140,7 @@ public class GameModelMapper {
     }
 
     public static GameTurnJpaEntity toEntity(GameTurn gameTurn, GameSessionJpaEntity gameSessionEntity) {
-        return new GameTurnJpaEntity(gameTurn.getId(), gameSessionEntity, gameTurn.getDrawerId(), gameTurn.getAnswer(), gameTurn.getCorrectAnswererId(), gameTurn.getState());
+        return new GameTurnJpaEntity(gameTurn.id(), gameSessionEntity, gameTurn.drawerId(), gameTurn.answer(), gameTurn.correctAnswererId(), gameTurn.state());
     }
 
     public static GamePlayerJpaEntity toEntity(GamePlayer gamePlayer, GameSessionJpaEntity gameSessionJpaEntity, UserJpaEntity userJpaEntity) {

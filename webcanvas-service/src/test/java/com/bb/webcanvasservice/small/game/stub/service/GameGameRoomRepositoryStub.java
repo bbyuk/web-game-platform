@@ -99,18 +99,6 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
                 gameRooms.put(gameRoom.getId(), gameRoom);
             }
 
-            /**
-             * 게임 세션 저장
-             */
-            saveGameSession(gameRoom.getGameSession());
-
-            /**
-             * 게임 턴 목록 저장
-             */
-            if (gameRoom.getGameSession() != null) {
-                saveAllGameTurns(gameRoom.getGameSession().getGameTurns());
-            }
-
             return gameRoom;
         } catch (NoSuchFieldException e) {
             throw new IllegalStateException();
@@ -161,12 +149,12 @@ public class GameGameRoomRepositoryStub implements GameRoomRepository {
             gameTurnIdField.setAccessible(true);
 
             for (GameTurn gameTurn : turns) {
-                if (gameTurn.getId() == null) {
+                if (gameTurn.id() == null) {
                     ReflectionUtils.setField(gameTurnIdField, gameTurn, ++gameTurnSeq);
                 }
 
-                if (!gameTurns.containsKey(gameTurn.getId())) {
-                    gameTurns.put(gameTurn.getId(), gameTurn);
+                if (!gameTurns.containsKey(gameTurn.id())) {
+                    gameTurns.put(gameTurn.id(), gameTurn);
                 }
             }
         } catch (NoSuchFieldException e) {

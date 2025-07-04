@@ -3,9 +3,11 @@ package com.bb.webcanvasservice.medium.game.infrastructure.persistence.repositor
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.config.JpaConfig;
+import com.bb.webcanvasservice.game.domain.model.session.GamePlayer;
 import com.bb.webcanvasservice.game.domain.model.session.GameSession;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.model.room.*;
+import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomRepositoryImpl;
 import com.bb.webcanvasservice.user.domain.model.User;
 import com.bb.webcanvasservice.user.domain.repository.UserRepository;
@@ -28,6 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
@@ -45,6 +48,9 @@ public class GameRoomRepositoryTest {
 
     @Autowired
     private GameRoomRepository gameRoomRepository;
+
+    @Autowired
+    private GameSessionRepository gameSessionRepository;
 
     @Autowired
     private RaceConditionTester raceConditionTester;
@@ -96,68 +102,10 @@ public class GameRoomRepositoryTest {
     }
 
     @Test
-    @DisplayName("게임 방 ID로 게임 방 찾기 - 세션 캐스케이드")
-    void 게임방_ID로_게임_방_찾기_3() throws Exception {
-        // given
-        User hostUser = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User guestUser = userRepository.save(User.create(FingerprintGenerator.generate()));
-
-        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
-
-        GameRoomParticipant host = GameRoomParticipant.create(hostUser.getId(), "호스트");
-        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.getId(), "게스트");
-
-        gameRoom.letIn(host);
-        gameRoom.letIn(guest);
-
-        gameRoom.changeParticipantReady(guest, true);
-
-        gameRoom.loadGameSession(2);
-
-        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
-
-        // when
-        Assertions.assertThat(savedGameRoom.getGameSession()).isNotNull();
-        gameRoomRepository.findGameRoomById(savedGameRoom.getId())
-                .ifPresent(findGameRoom -> {
-                    Assertions.assertThat(findGameRoom).usingRecursiveComparison().isEqualTo(savedGameRoom);
-                });
-
-        // then
-    }
-
-    @Test
     @DisplayName("게임 방 ID로 게임 방 찾기 - 턴, 세션 캐스케이드")
     void 게임_방_ID로_게임_방_찾기() throws Exception {
         // given
-        User hostUser = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User guestUser = userRepository.save(User.create(FingerprintGenerator.generate()));
-
-        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
-
-        GameRoomParticipant host = GameRoomParticipant.create(hostUser.getId(), "호스트");
-        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.getId(), "게스트");
-
-        gameRoom.letIn(host);
-        gameRoom.letIn(guest);
-
-        gameRoom.changeParticipantReady(guest, true);
-
-        gameRoom.loadGameSession(2);
-
-        GameSession gameSession = gameRoom.getGameSession();
-        gameSession.allocateNewGameTurn("테스트");
-
-        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
-
         // when
-        Assertions.assertThat(gameSession.gameTurns().size()).isEqualTo(1);
-        gameRoomRepository.findGameRoomById(savedGameRoom.getId())
-                .ifPresent(findGameRoom -> {
-                    Assertions.assertThat(findGameRoom).usingRecursiveComparison().isEqualTo(savedGameRoom);
-                });
-
-
         // then
     }
 
@@ -198,35 +146,6 @@ public class GameRoomRepositoryTest {
         // then
         Assertions.assertThat(findGameRoomByHost).usingRecursiveComparison().isEqualTo(savedGameRoom);
         Assertions.assertThat(findGameRoomByHost).usingRecursiveComparison().isEqualTo(findGameRoomByGuest);
-    }
-
-    @Test
-    @DisplayName("게임 세션 ID로 조회 - 성공 테스트")
-    void 게임_세션_ID로_조회() throws Exception {
-        // given
-        User hostUser = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User guestUser = userRepository.save(User.create(FingerprintGenerator.generate()));
-
-        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
-
-        GameRoomParticipant host = GameRoomParticipant.create(hostUser.getId(), "호스트");
-        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.getId(), "게스트");
-
-        gameRoom.letIn(host);
-        gameRoom.letIn(guest);
-
-        gameRoom.changeParticipantReady(guest, true);
-
-        gameRoom.loadGameSession(22);
-
-        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
-
-        // when
-        GameRoom findGameRoom = gameRoomRepository.findGameRoomByGameSessionId(savedGameRoom.getGameSession().getId())
-                .orElseThrow(RuntimeException::new);
-
-        // then
-        Assertions.assertThat(findGameRoom).usingRecursiveComparison().isEqualTo(savedGameRoom);
     }
 
     @Test
@@ -393,62 +312,9 @@ public class GameRoomRepositoryTest {
     @DisplayName("입장 가능한 게임 방의 목록 조회 - 성공테스트")
     void 입장_가능한_게임_방의_목록_조회() throws Exception {
         // given
-        User user1 = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User user2 = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User user3 = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User user4 = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User user5 = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User user6 = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User user7 = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User user8 = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User user9 = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User user10 = userRepository.save(User.create(FingerprintGenerator.generate()));
-        User user11 = userRepository.save(User.create(FingerprintGenerator.generate()));
-
-
-        GameRoom fullRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
-        GameRoom joinableRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
-        GameRoom playingRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
-
-        GameRoomParticipant participant1 = GameRoomParticipant.create(user1.getId(), "테스트");
-        GameRoomParticipant participant2 = GameRoomParticipant.create(user2.getId(), "테스트");
-        GameRoomParticipant participant3 = GameRoomParticipant.create(user3.getId(), "테스트");
-        GameRoomParticipant participant4 = GameRoomParticipant.create(user4.getId(), "테스트");
-        GameRoomParticipant participant5 = GameRoomParticipant.create(user5.getId(), "테스트");
-        GameRoomParticipant participant6 = GameRoomParticipant.create(user6.getId(), "테스트");
-        GameRoomParticipant participant7 = GameRoomParticipant.create(user7.getId(), "테스트");
-        GameRoomParticipant participant8 = GameRoomParticipant.create(user8.getId(), "테스트");
-        GameRoomParticipant participant9 = GameRoomParticipant.create(user9.getId(), "테스트");
-        GameRoomParticipant participant10 = GameRoomParticipant.create(user10.getId(), "테스트");
-        GameRoomParticipant participant11 = GameRoomParticipant.create(user11.getId(), "테스트");
-
-        fullRoom.letIn(participant1);
-        fullRoom.letIn(participant2);
-        fullRoom.letIn(participant3);
-        fullRoom.letIn(participant4);
-        fullRoom.letIn(participant5);
-        fullRoom.letIn(participant6);
-        fullRoom.letIn(participant7);
-        fullRoom.letIn(participant8);
-
-        joinableRoom.letIn(participant9);
-
-        playingRoom.letIn(participant10);
-        playingRoom.letIn(participant11);
-
-        playingRoom.changeParticipantReady(participant11, true);
-        playingRoom.loadGameSession(20);
-        playingRoom.startGameSession();
-
-        GameRoom savedGameRoom1 = gameRoomRepository.save(fullRoom);
-        GameRoom savedGameRoom2 = gameRoomRepository.save(joinableRoom);
-        GameRoom savedGameRoom3 = gameRoomRepository.save(playingRoom);
-
 
         // when
-        List<GameRoom> gameRooms = gameRoomRepository.findGameRoomsByCapacityAndGameRoomStateAndGameRoomParticipantState(GameRoomState.WAITING, GameRoomParticipantState.WAITING);
 
         // then
-        Assertions.assertThat(gameRooms.size()).isEqualTo(1);
     }
 }

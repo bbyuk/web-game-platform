@@ -6,10 +6,13 @@ import com.bb.webcanvasservice.game.application.command.UpdateReadyCommand;
 import com.bb.webcanvasservice.game.application.config.GameProperties;
 import com.bb.webcanvasservice.game.application.dto.*;
 import com.bb.webcanvasservice.game.application.registry.GameTurnTimerRegistry;
-import com.bb.webcanvasservice.game.domain.model.session.GameSessionState;
+import com.bb.webcanvasservice.game.domain.model.GamePlayHistory;
+import com.bb.webcanvasservice.game.domain.model.session.*;
+import com.bb.webcanvasservice.game.domain.repository.GamePlayHistoryRepository;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.domain.model.room.*;
+import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.registry.InMemoryGameSessionLoadRegistry;
 import com.bb.webcanvasservice.game.infrastructure.persistence.registry.InMemoryGameTurnTimerRegistry;
 import com.bb.webcanvasservice.small.game.dummy.ApplicationEventPublisherDummy;
@@ -22,8 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 @Tag("small")
@@ -38,13 +40,60 @@ public class GameServiceSmallTest {
     GameRoomRepository gameRoomRepository = new GameGameRoomRepositoryStub();
     InMemoryGameSessionLoadRegistry gameSessionLoadRegistry = new InMemoryGameSessionLoadRegistry();
 
+    GameSessionRepository gameSessionRepository = new GameSessionRepository() {
+        Map<Long, GameSession> gameSessions = new HashMap<>();
+        Map<Long, GamePlayer> gamePlayers = new HashMap<>();
+        Map<Long, GameTurn> gameTurns = new HashMap<>();
+
+        @Override
+        public GameSession save(GameSession gameSession) {
+
+            gameSession.gamePlayers().stream().forEach(gamePlayer -> {
+                gamePlayers.putIfAbsent(gamePlayer.id(), gamePlayer);
+                gamePlayers.replace(gamePlayer.id(), gamePlayer);
+            });
+
+            gameSession.gameTurns().stream().forEach(gameTurn -> {
+                gameTurns.putIfAbsent(gameTurn.id(), gameTurn);
+                gameTurns.replace(gameTurn.id(), gameTurn);
+            });
+
+            gameSessions.putIfAbsent(gameSession.id(), gameSession);
+            gameSessions.replace(gameSession.id(), gameSession);
+            return null;
+        }
+
+        @Override
+        public Optional<GameSession> findGameSessionById(Long gameSessionId) {
+            return Optional.of(gameSessions.get(gameSessionId));
+        }
+
+        @Override
+        public Optional<GameSession> findCurrentGameSessionByGameRoomId(Long gameRoomId) {
+            return gameSessions.values()
+                    .stream()
+                    .filter(gameSession -> gameSession.isActive() && gameSession.gameRoomId().equals(gameRoomId))
+                    .findFirst();
+        }
+    };
+
     GameTurnTimerRegistry gameTurnTimerRegistry = new InMemoryGameTurnTimerRegistry();
     GameService gameService = new GameService(
             new GameDictionaryQueryPortStub(),
             new GameUserCommandPortStub(),
             gameRoomRepository,
-            new GameGamePlayHistoryRepositoryStub(),
-            gameSessionLoadRegistry,
+            gameSessionRepository,
+            new GamePlayHistoryRepository() {
+                @Override
+                public List<GamePlayHistory> findByGameSessionId(Long gameSessionId) {
+                    return null;
+                }
+
+                @Override
+                public void saveAll(List<GamePlayHistory> gamePlayHistories) {
+
+                }
+            },
             new GameProperties(gameRoomCapacity,
                     5,
                     8,
@@ -209,12 +258,16 @@ public class GameServiceSmallTest {
         // when
         Long gameSessionId = gameService.loadGameSession(new StartGameCommand(gameRoomJoinDto.gameRoomId(), 2, 20, hostUserId));
         GameRoom gameRoom = gameRoomRepository.findGameRoomById(gameRoomJoinDto.gameRoomId()).orElseThrow(RuntimeException::new);
+        GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId).orElseThrow(RuntimeException::new);
 
         // then
-        Assertions.assertThat(gameRoom.getCurrentGameSession()).isNotNull();
-        Assertions.assertThat(gameRoom.getCurrentGameSession().getState()).isEqualTo(GameSessionState.LOADING);
+        Assertions.assertThat(gameSession).isNotNull();
+        Assertions.assertThat(gameSession.state()).isEqualTo(GameSessionState.LOADING);
+        Assertions.assertThat(gameSession.gamePlayers().size()).isEqualTo(gameRoom.getParticipants().size());
+        gameSession.gamePlayers().forEach(gamePlayer -> Assertions.assertThat(gamePlayer.state()).isEqualTo(GamePlayerState.INIT));
+
         gameRoom.getParticipants().forEach(participant -> {
-            Assertions.assertThat(participant.isLoading()).isTrue();
+            Assertions.assertThat(participant.isPlaying()).isTrue();
             Assertions.assertThat(participant.isReady()).isEqualTo(participant.isHost());
         });
     }
@@ -237,14 +290,15 @@ public class GameServiceSmallTest {
         // when
         GameSessionDto findCurrentGameSession = gameService.findCurrentGameSession(gameRoom.getId());
 
-        var gameSession = gameRoom.getCurrentGameSession();
+        GameSession gameSession = gameSessionRepository.findCurrentGameSessionByGameRoomId(findCurrentGameSession.gameSessionId())
+                .orElseThrow(RuntimeException::new);
 
         var expectedResult = new GameSessionDto(
-                gameSession.getId(),
-                gameSession.getState(),
-                gameSession.getTimePerTurn(),
+                gameSession.id(),
+                gameSession.state(),
+                gameSession.timePerTurn(),
                 gameSession.getCompletedGameTurnCount(),
-                gameSession.getTurnCount()
+                gameSession.turnCount()
         );
         // then
         Assertions.assertThat(expectedResult).usingRecursiveComparison().isEqualTo(findCurrentGameSession);
@@ -294,14 +348,14 @@ public class GameServiceSmallTest {
 
         // then
         Assertions.assertThat(hostCompleted && guestCompleted).isTrue();
-        Assertions.assertThat(gameSessionLoadRegistry.isClear(gameSessionId)).isTrue();
+        GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId)
+                .orElseThrow(RuntimeException::new);
 
         gameRoomRepository.findGameRoomById(gameRoom.getId())
                 .ifPresent(savedGameRoom -> {
-                    Assertions.assertThat(savedGameRoom.getCurrentGameSession().isPlaying()).isTrue();
-                    savedGameRoom.getCurrentParticipants()
-                            .stream()
-                            .forEach(participant -> Assertions.assertThat(participant.isPlaying()).isTrue());
+                    Assertions.assertThat(gameSession.isPlaying()).isTrue();
+                    gameSession.gamePlayers().stream()
+                            .forEach(gamePlayer -> Assertions.assertThat(gamePlayer.isPlaying()).isTrue());
                 });
     }
 
