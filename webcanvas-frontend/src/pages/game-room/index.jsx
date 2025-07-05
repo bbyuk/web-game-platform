@@ -1,19 +1,17 @@
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import React, { useEffect, useRef, useState } from "react";
-import { game } from "@/api/index.js";
-import { getApiClient } from "@/client/http/index.jsx";
-import { pages } from "@/router/index.jsx";
-import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from "@/constants/message.js";
-import { ArrowLeft, Gamepad2, MessageCircle } from "lucide-react";
-import { getWebSocketClient } from "@/client/stomp/index.jsx";
-import { useAuthentication } from "@/contexts/authentication/index.jsx";
-import { useApiLock } from "@/api/lock/index.jsx";
-import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
-import ItemList from "@/components/layouts/side-panel/contents/item-list/index.jsx";
-import { useRightSideStore } from "@/stores/layout/rightSideStore.jsx";
-import ChatList from "@/components/layouts/side-panel/contents/chat-list/index.jsx";
-import SidePanelFooterInput from "@/components/layouts/side-panel/footer/input/index.jsx";
-import { useClientStore } from "@/stores/client/clientStore.jsx";
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { game } from '@/api/index.js';
+import { getApiClient } from '@/client/http/index.jsx';
+import { pages } from '@/router/index.jsx';
+import { EMPTY_MESSAGES, REDIRECT_MESSAGES } from '@/constants/message.js';
+import { ArrowLeft, Gamepad2 } from 'lucide-react';
+import { getWebSocketClient } from '@/client/stomp/index.jsx';
+import { useAuthentication } from '@/contexts/authentication/index.jsx';
+import { useApiLock } from '@/api/lock/index.jsx';
+import { useLeftSideStore } from '@/stores/layout/leftSideStore.jsx';
+import ItemList from '@/components/layouts/side-panel/contents/item-list/index.jsx';
+import { useRightSideStore } from '@/stores/layout/rightSideStore.jsx';
+import { useClientStore } from '@/stores/client/clientStore.jsx';
 
 export default function GameRoomPage() {
   // ===============================================================
@@ -42,7 +40,6 @@ export default function GameRoomPage() {
     role: null,
     ready: false,
   });
-  const [chatMessages, setChatMessages] = useState([]);
   const [gameRoomState, setGameRoomState] = useState(null);
 
   // ===============================================================
@@ -209,51 +206,17 @@ export default function GameRoomPage() {
         case "ROOM/SESSION_STARTED":
           startLoading();
           navigate(pages.gameRoom.playing.url(roomId), { replace: true });
-          // findCurrentGameRoomInfo().then((response) => {
-          //   if (!response) {
-          //     return;
-          //   }
-          //
-          //   setLeftSidebar(response);
-          // });
           break;
       }
     };
 
-    /**
-     * 채팅 메세지 브로커 핸들러
-     * @param frame
-     */
-    const gameRoomChatHandler = (frame) => {
-      console.log(frame);
-
-      const newMessage = {
-        value: frame.value,
-        senderId: frame.senderId,
-        nickname: enteredUsers
-          .filter(enteredUser => enteredUser.userId === frame.senderId)
-          .map(enteredUser => enteredUser.nickname),
-        color: enteredUsers
-          .filter(enteredUser => enteredUser.userId === frame.senderId)
-          .map(enteredUser => enteredUser.color)
-      }
-
-      console.log(enteredUsers);
-
-      setChatMessages((prevItems) => [...prevItems, newMessage]);
-    };
 
     const topics = [
       // 게임 방 공통 이벤트 broker
       {
         destination: `/room/${roomId}`,
         messageHandler: gameRoomEventHandler,
-      },
-      // 게임 방 내 채팅 broker
-      {
-        destination: `/room/${roomId}/chat`,
-        messageHandler: gameRoomChatHandler,
-      },
+      }
     ];
 
     console.log("game-room/index.jsx = 구독");
@@ -293,26 +256,6 @@ export default function GameRoomPage() {
    * 웹소켓 연결 해제
    */
   useEffect(() => {
-    rightSideStore.setTitle({
-      label: "chat",
-      icon: <MessageCircle size={20} className="text-gray-400" />,
-      button: false,
-      onClick: () => {},
-    });
-
-    rightSideStore.setContents({
-      slot: ChatList,
-      props: {
-        messages: chatMessages,
-        removeOldChat: (maxChatCount) => {
-          setChatMessages((prev) => prev.slice(-maxChatCount));
-        },
-      },
-    });
-    rightSideStore.setFooter({
-      slot: SidePanelFooterInput,
-    });
-
     return () => {
       if (webSocketClientRef.current) {
         webSocketClientRef.current.deactivate();
@@ -321,18 +264,6 @@ export default function GameRoomPage() {
       rightSideStore.clear();
     };
   }, []);
-
-  useEffect(() => {
-    rightSideStore.setContents({
-      slot: ChatList,
-      props: {
-        messages: chatMessages,
-        removeOldChat: (maxChatCount) => {
-          setChatMessages((prev) => prev.slice(-maxChatCount));
-        },
-      },
-    });
-  }, [chatMessages]);
 
   /**
    * roomId 서버 조회 및 validation
@@ -385,17 +316,6 @@ export default function GameRoomPage() {
     if (!webSocketClientRef.current || !authenticatedUserId) {
       return;
     }
-
-    rightSideStore.setFooter({
-      slot: SidePanelFooterInput,
-      props: {
-        onSubmit: (message) => {
-          webSocketClientRef.current.send(`/room/${roomId}/chat/send`, {
-            value: message,
-          });
-        },
-      },
-    });
 
     subscribeTopics();
   }, [authenticatedUserId, webSocketClientRef.current]);
