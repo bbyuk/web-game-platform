@@ -1,9 +1,6 @@
 package com.bb.webcanvasservice.small.game.domain.model.session;
 
-import com.bb.webcanvasservice.game.domain.model.session.GameSession;
-import com.bb.webcanvasservice.game.domain.model.session.GameSessionState;
-import com.bb.webcanvasservice.game.domain.model.session.GameTurn;
-import com.bb.webcanvasservice.game.domain.model.session.GameTurnState;
+import com.bb.webcanvasservice.game.domain.model.session.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -14,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Tag("small")
-@DisplayName("[small] [game.session] [domain] 게임 세션 도메인 모델 테스트")
+@DisplayName("[small] [game/session] [domain] 게임 세션 도메인 모델 테스트")
 public class GameSessionTest {
 
     @Test
@@ -42,6 +39,31 @@ public class GameSessionTest {
         Assertions.assertThat(gameSession.shouldEnd()).isTrue();
 
         // then
+
+    }
+
+    @Test
+    @DisplayName("")
+    void 새_게임_턴_할당() throws Exception {
+        // given
+        long gameSessionId = 999L;
+        String answer = "정답";
+
+        GameSession gameSession = new GameSession(
+                gameSessionId,
+                12L,
+                4,
+                10,
+                GameSessionState.PLAYING,
+                List.of(new GamePlayer(1L, gameSessionId, 1L, "유저1", GamePlayerState.PLAYING)),
+                new ArrayList<>());
+
+        // when
+        gameSession.allocateNewGameTurn(answer);
+
+        // then
+        Assertions.assertThat(gameSession.gameTurns().size()).isEqualTo(1);
+        Assertions.assertThat(gameSession.gameTurns().get(0).isAnswer(answer)).isTrue();
 
     }
 }

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Tag("small")
-@DisplayName("[small] [game.room] [domain] 게임 방 도메인 모델 테스트")
+@DisplayName("[small] [game/room] [domain] 게임 방 도메인 모델 테스트")
 class GameRoomTest {
 
     final int joinCodeLength = 6;

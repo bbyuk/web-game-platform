@@ -192,7 +192,8 @@ public class GameSession extends AggregateRoot {
         int minCount = Integer.MAX_VALUE;
         List<Long> candidates = new ArrayList<>();
 
-        for (GamePlayer gamePlayer : gamePlayers) {
+
+        for (GamePlayer gamePlayer : gamePlayers.stream().filter(GamePlayer::isPlaying).toList()) {
             Long userId = gamePlayer.userId();
             int count = drawerCountMap.getOrDefault(userId, 0);
 
