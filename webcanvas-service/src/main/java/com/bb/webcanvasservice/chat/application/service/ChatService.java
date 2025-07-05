@@ -34,7 +34,19 @@ public class ChatService {
      * @param command 메세지 전송 커맨드
      */
     @Transactional
-    public void sendChatMessage(SendMessageCommand command) {
+    public void sendChatMessageToWaitingRoom(SendMessageCommand command) {
+        String destination = getDestination(command.gameRoomId());
+        Message newMessage = Message.create(command.message(), command.senderId(), destination);
+
+        /**
+         * TODO 채팅방에 메세지 임시저장
+         */
+
+        messageSender.send(destination, newMessage);
+    }
+
+    @Transactional
+    public void sendChatMessageToGameSession(SendMessageCommand command) {
         String destination = getDestination(command.gameRoomId());
         Message newMessage = Message.create(command.message(), command.senderId(), destination);
 
@@ -43,7 +55,6 @@ public class ChatService {
         /**
          * TODO 채팅방에 메세지 임시저장
          */
-
 
         messageSender.send(destination, newMessage);
     }

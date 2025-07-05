@@ -22,11 +22,19 @@ public class ChatController {
     private final ChatService chatService;
 
     @MessageMapping("room/{gameRoomId}/chat/send")
-    @Operation(summary = "채팅 메세지 전송", description = "채팅 메세지를 같은 메세지 브로커를 구독하는 클라이언트로 전송한다.")
-    public void sendChatMessage(@DestinationVariable("gameRoomId") Long gameRoomId,
+    @Operation(summary = "게임 대기 방 채팅 메세지 전송", description = "채팅 메세지를 같은 방에 입장한 유저들에게 전송한다.")
+    public void sendChatMessageAtWaitingRoom(@DestinationVariable("gameRoomId") Long gameRoomId,
                                 SendMessageRequest request,
                                 @Authenticated WebCanvasAuthentication authentication) {
-        chatService.sendChatMessage(ChatCommandMapper.toCommand(gameRoomId, authentication.getUserId(), request));
+        chatService.sendChatMessageToWaitingRoom(ChatCommandMapper.toCommand(gameRoomId, authentication.getUserId(), request));
+    }
+
+    @MessageMapping("session/{gameSessionId}/chat/send")
+    @Operation(summary = "게임 세션 채팅 메세지 전송", description = "채팅 메세지를 게임 세션 내로 전송하고, 정답을 체크한다.")
+    public void sendChatMessageAtGameSession(@DestinationVariable("gameRoomId") Long gameRoomId,
+                                SendMessageRequest request,
+                                @Authenticated WebCanvasAuthentication authentication) {
+        chatService.sendChatMessageToGameSession(ChatCommandMapper.toCommand(gameRoomId, authentication.getUserId(), request));
     }
 
 }
