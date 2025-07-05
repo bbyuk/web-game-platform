@@ -13,6 +13,6 @@ public class UserModelEntityMapper {
     }
 
     public static UserJpaEntity toUserJpaEntity(User user) {
-        return new UserJpaEntity(user.getId(), user.getFingerprint(), user.getRefreshToken(), user.getState());
+        return new UserJpaEntity(user.id(), user.fingerprint(), user.refreshToken(), user.state());
     }
 }

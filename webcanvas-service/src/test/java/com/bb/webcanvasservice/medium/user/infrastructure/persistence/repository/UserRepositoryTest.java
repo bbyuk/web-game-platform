@@ -34,7 +34,7 @@ class UserRepositoryTest {
         User savedUser = userRepository.save(user);
 
         // then
-        userRepository.findById(savedUser.getId())
+        userRepository.findById(savedUser.id())
                 .ifPresent(findUser ->
                         Assertions
                                 .assertThat(findUser)

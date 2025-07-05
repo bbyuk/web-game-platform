@@ -38,9 +38,34 @@ public class User {
         return new User(null, fingerprint, UserState.IN_LOBBY, null);
     }
 
+
+    // ===================================================
+    // ====================== getter =====================
+    // ===================================================
+
+    public Long id() {
+        return id;
+    }
+
+    public String fingerprint() {
+        return fingerprint;
+    }
+
+    public String refreshToken() {
+        return refreshToken;
+    }
+
+    public UserState state() {
+        return state;
+    }
+
+    // ===================================================
+    // ====================== getter =====================
+    // ===================================================
+
     /**
      * 유저에게 할당된 refreshToken을 업데이트하여 리턴한다.
-     * @param refreshToken
+     * @param refreshToken 리프레쉬 토큰
      */
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
@@ -48,7 +73,7 @@ public class User {
 
     /**
      * 유저 상태를 변경한다.
-     * @param state
+     * @param state 상태 코드
      */
     public void changeState(UserState state) {
         this.state = state;
@@ -83,24 +108,5 @@ public class User {
      */
     public boolean canJoin() {
         return this.state == UserState.IN_LOBBY;
-    }
-
-    /**
-     * 매핑을 위한 getter 모음
-     */
-    public Long getId() {
-        return id;
-    }
-
-    public String getFingerprint() {
-        return fingerprint;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public UserState getState() {
-        return state;
     }
 }

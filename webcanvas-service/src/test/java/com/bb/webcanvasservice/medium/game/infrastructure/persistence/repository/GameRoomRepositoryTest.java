@@ -3,11 +3,8 @@ package com.bb.webcanvasservice.medium.game.infrastructure.persistence.repositor
 import com.bb.webcanvasservice.common.util.FingerprintGenerator;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.config.JpaConfig;
-import com.bb.webcanvasservice.game.domain.model.session.GamePlayer;
-import com.bb.webcanvasservice.game.domain.model.session.GameSession;
 import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
 import com.bb.webcanvasservice.game.domain.model.room.*;
-import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
 import com.bb.webcanvasservice.game.infrastructure.persistence.repository.GameRoomRepositoryImpl;
 import com.bb.webcanvasservice.user.domain.model.User;
 import com.bb.webcanvasservice.user.domain.repository.UserRepository;
@@ -30,7 +27,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
@@ -42,7 +38,7 @@ import java.util.stream.Collectors;
 })
 @Transactional
 @Tag("medium")
-@DisplayName("[medium] [game] [persistence] Game Repository 영속성 테스트")
+@DisplayName("[medium] [game/room] [persistence] Game Repository 영속성 테스트")
 public class GameRoomRepositoryTest {
 
 
@@ -85,8 +81,8 @@ public class GameRoomRepositoryTest {
 
         GameRoom savedGameRoom = gameRoomRepository.save(GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity));
 
-        GameRoomParticipant host = GameRoomParticipant.create(hostUser.getId(), "호스트");
-        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.getId(), "게스트");
+        GameRoomParticipant host = GameRoomParticipant.create(hostUser.id(), "호스트");
+        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.id(), "게스트");
 
         savedGameRoom.letIn(host);
         savedGameRoom.letIn(guest);
@@ -115,8 +111,8 @@ public class GameRoomRepositoryTest {
 
         GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
 
-        GameRoomParticipant host = GameRoomParticipant.create(hostUser.getId(), "호스트");
-        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.getId(), "게스트");
+        GameRoomParticipant host = GameRoomParticipant.create(hostUser.id(), "호스트");
+        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.id(), "게스트");
 
         gameRoom.letIn(host);
         gameRoom.letIn(guest);
@@ -124,13 +120,13 @@ public class GameRoomRepositoryTest {
         GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
         GameRoomParticipant findHostParticipant = savedGameRoom.getParticipants()
                 .stream()
-                .filter(participant -> participant.getUserId().equals(hostUser.getId()))
+                .filter(participant -> participant.getUserId().equals(hostUser.id()))
                 .findFirst()
                 .orElseThrow(IllegalAccessError::new);
 
         GameRoomParticipant findGuestParticipant = savedGameRoom.getParticipants()
                 .stream()
-                .filter(participant -> participant.getUserId().equals(guestUser.getId()))
+                .filter(participant -> participant.getUserId().equals(guestUser.id()))
                 .findFirst()
                 .orElseThrow(IllegalAccessError::new);
 
@@ -156,8 +152,8 @@ public class GameRoomRepositoryTest {
 
         GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
 
-        GameRoomParticipant host = GameRoomParticipant.create(hostUser.getId(), "호스트");
-        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.getId(), "게스트");
+        GameRoomParticipant host = GameRoomParticipant.create(hostUser.id(), "호스트");
+        GameRoomParticipant guest = GameRoomParticipant.create(guestUser.id(), "게스트");
 
         gameRoom.letIn(host);
         gameRoom.letIn(guest);

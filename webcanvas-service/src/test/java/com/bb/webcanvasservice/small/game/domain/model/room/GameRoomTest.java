@@ -34,9 +34,9 @@ class GameRoomTest {
 
         GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
 
-        GameRoomParticipant user1Participant = GameRoomParticipant.create(user1.getId(), "테스트중인");
-        GameRoomParticipant user2Participant = GameRoomParticipant.create(user2.getId(), "테스트중인");
-        GameRoomParticipant user3Participant = GameRoomParticipant.create(user3.getId(), "테스트중인");
+        GameRoomParticipant user1Participant = GameRoomParticipant.create(user1.id(), "테스트중인");
+        GameRoomParticipant user2Participant = GameRoomParticipant.create(user2.id(), "테스트중인");
+        GameRoomParticipant user3Participant = GameRoomParticipant.create(user3.id(), "테스트중인");
 
         gameRoom.letIn(user1Participant);
         gameRoom.letIn(user2Participant);
@@ -64,16 +64,16 @@ class GameRoomTest {
 
         GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
 
-        GameRoomParticipant user1Participant = GameRoomParticipant.create(user1.getId(), "테스트중인");
-        GameRoomParticipant user2Participant = GameRoomParticipant.create(user2.getId(), "테스트중인");
-        GameRoomParticipant user3Participant = GameRoomParticipant.create(user3.getId(), "테스트중인");
-        GameRoomParticipant user4Participant = GameRoomParticipant.create(user4.getId(), "테스트중인");
-        GameRoomParticipant user5Participant = GameRoomParticipant.create(user5.getId(), "테스트중인");
-        GameRoomParticipant user6Participant = GameRoomParticipant.create(user6.getId(), "테스트중인");
-        GameRoomParticipant user7Participant = GameRoomParticipant.create(user7.getId(), "테스트중인");
-        GameRoomParticipant user8Participant = GameRoomParticipant.create(user8.getId(), "테스트중인");
+        GameRoomParticipant user1Participant = GameRoomParticipant.create(user1.id(), "테스트중인");
+        GameRoomParticipant user2Participant = GameRoomParticipant.create(user2.id(), "테스트중인");
+        GameRoomParticipant user3Participant = GameRoomParticipant.create(user3.id(), "테스트중인");
+        GameRoomParticipant user4Participant = GameRoomParticipant.create(user4.id(), "테스트중인");
+        GameRoomParticipant user5Participant = GameRoomParticipant.create(user5.id(), "테스트중인");
+        GameRoomParticipant user6Participant = GameRoomParticipant.create(user6.id(), "테스트중인");
+        GameRoomParticipant user7Participant = GameRoomParticipant.create(user7.id(), "테스트중인");
+        GameRoomParticipant user8Participant = GameRoomParticipant.create(user8.id(), "테스트중인");
 
-        GameRoomParticipant user9Participant = GameRoomParticipant.create(user2.getId(), "테스트중인");
+        GameRoomParticipant user9Participant = GameRoomParticipant.create(user2.id(), "테스트중인");
 
         gameRoom.letIn(user1Participant);
         gameRoom.letIn(user2Participant);
@@ -99,8 +99,8 @@ class GameRoomTest {
 
         GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
 
-        GameRoomParticipant gameRoomParticipant1 = GameRoomParticipant.create(user1.getId(), "테스트중인");
-        GameRoomParticipant gameRoomParticipant2 = GameRoomParticipant.create(user2.getId(), "테스트중인");
+        GameRoomParticipant gameRoomParticipant1 = GameRoomParticipant.create(user1.id(), "테스트중인");
+        GameRoomParticipant gameRoomParticipant2 = GameRoomParticipant.create(user2.id(), "테스트중인");
 
         gameRoom.letIn(gameRoomParticipant1);
         gameRoom.letIn(gameRoomParticipant2);
@@ -131,8 +131,8 @@ class GameRoomTest {
 
         GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(joinCodeLength), roomCapacity);
 
-        GameRoomParticipant gameRoomParticipant1 = GameRoomParticipant.create(user1.getId(), "테스트중인");
-        GameRoomParticipant gameRoomParticipant2 = GameRoomParticipant.create(user2.getId(), "테스트중인");
+        GameRoomParticipant gameRoomParticipant1 = GameRoomParticipant.create(user1.id(), "테스트중인");
+        GameRoomParticipant gameRoomParticipant2 = GameRoomParticipant.create(user2.id(), "테스트중인");
 
         gameRoom.letIn(gameRoomParticipant1);
         gameRoom.letIn(gameRoomParticipant2);
@@ -165,8 +165,8 @@ class GameRoomTest {
         var participantIdField = GameRoomParticipant.class.getDeclaredField("id");
         participantIdField.setAccessible(true);
 
-        GameRoomParticipant gameRoomParticipant1 = GameRoomParticipant.create(user1.getId(), "테스트중인");
-        GameRoomParticipant gameRoomParticipant2 = GameRoomParticipant.create(user2.getId(), "테스트중인");
+        GameRoomParticipant gameRoomParticipant1 = GameRoomParticipant.create(user1.id(), "테스트중인");
+        GameRoomParticipant gameRoomParticipant2 = GameRoomParticipant.create(user2.id(), "테스트중인");
         ReflectionUtils.setField(participantIdField, gameRoomParticipant1, 1L);
         ReflectionUtils.setField(participantIdField, gameRoomParticipant2, 2L);
 

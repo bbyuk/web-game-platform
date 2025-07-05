@@ -10,7 +10,7 @@ import com.bb.webcanvasservice.user.domain.model.UserState;
  */
 public class UserApplicationDtoMapper {
     public static UserDto toUserDto(User userJpaEntity) {
-        return new UserDto(userJpaEntity.getId(), userJpaEntity.getFingerprint());
+        return new UserDto(userJpaEntity.id(), userJpaEntity.fingerprint());
     }
     public static UserStateDto toUserStateDto(UserState userState) {
         return new UserStateDto(userState);

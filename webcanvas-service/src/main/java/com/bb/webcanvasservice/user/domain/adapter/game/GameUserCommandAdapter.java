@@ -49,7 +49,7 @@ public class GameUserCommandAdapter implements GameUserCommandPort {
         User user = userRepository
                 .findById(userId).orElseThrow(UserNotFoundException::new);
 
-        if (user.getState() != UserState.IN_LOBBY) {
+        if (user.state() != UserState.IN_LOBBY) {
             throw new AlreadyJoinedRoomException();
         }
     }

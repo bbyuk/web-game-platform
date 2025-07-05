@@ -9,6 +9,6 @@ import com.bb.webcanvasservice.user.domain.view.UserInfo;
 public class UserModelViewMapper {
 
     public static UserInfo toView(User model) {
-        return new UserInfo(model.getId(), model.getFingerprint(), model.getRefreshToken(), model.getState());
+        return new UserInfo(model.id(), model.fingerprint(), model.refreshToken(), model.state());
     }
 }

@@ -73,7 +73,7 @@ public class GameSessionRepositoryImpl implements GameSessionRepository {
                 .map(gamePlayer -> GameModelMapper.toEntity(
                                 gamePlayer,
                                 savedGameSessionJpaEntity,
-                                userJpaRepository.findById(gamePlayer.id())
+                                userJpaRepository.findById(gamePlayer.userId())
                                         .orElseThrow(UserNotFoundException::new)
                         )
                 ).collect(Collectors.toList());
