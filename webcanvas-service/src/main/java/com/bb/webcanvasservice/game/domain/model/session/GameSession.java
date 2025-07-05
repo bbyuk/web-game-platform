@@ -187,7 +187,12 @@ public class GameSession extends AggregateRoot {
          * 현재 게임중인 유저 목록
          */
         // 유저별 턴 수 집계
-        Map<Long, Integer> drawerCountMap = getDrawerCountMap();
+        Map<Long, Integer> drawerCountMap = gameTurns.stream()
+                .collect(Collectors.toMap(
+                        GameTurn::drawerId,
+                        gt -> 1,
+                        Integer::sum
+                ));
 
         int minCount = Integer.MAX_VALUE;
         List<Long> candidates = new ArrayList<>();
@@ -225,7 +230,7 @@ public class GameSession extends AggregateRoot {
      * @return 종료된 게임 턴 수
      */
     public int getCompletedGameTurnCount() {
-        return (int) gameTurns.stream().filter(gameTurn -> gameTurn.isCompleted()).count();
+        return (int) gameTurns.stream().filter(GameTurn::isCompleted).count();
     }
 
     public GameTurn getCurrentTurn() {
@@ -256,36 +261,11 @@ public class GameSession extends AggregateRoot {
     }
 
     /**
-     * 해당 게임 세션에 새로운 게임 턴을 생성해 리턴한다.
-     * @param drawerId 턴 담당 drawer id
-     * @param answer 정답
-     * @return
-     */
-    public GameTurn create(Long drawerId, String answer) {
-        GameTurn newGameTurn = GameTurn.create(id, drawerId, answer, timePerTurn);
-        gameTurns.add(newGameTurn);
-        return newGameTurn;
-    }
-
-    /**
      * 세션이 로딩 중인지 여부를 확인한다.
      * @return
      */
     public boolean isLoading() {
         return state == GameSessionState.LOADING;
-    }
-
-    /**
-     * 도메인 내부 메소드
-     * @return drawer ID를 뽑기위한 카운트 맵을 리턴한다.
-     */
-    Map<Long, Integer> getDrawerCountMap() {
-        return gameTurns.stream()
-                .collect(Collectors.toMap(
-                        GameTurn::drawerId,
-                        gt -> 1,
-                        Integer::sum
-                ));
     }
 
     /**

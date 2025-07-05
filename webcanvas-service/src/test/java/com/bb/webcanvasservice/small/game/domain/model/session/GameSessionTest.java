@@ -64,6 +64,5 @@ public class GameSessionTest {
         // then
         Assertions.assertThat(gameSession.gameTurns().size()).isEqualTo(1);
         Assertions.assertThat(gameSession.gameTurns().get(0).isAnswer(answer)).isTrue();
-
     }
 }
