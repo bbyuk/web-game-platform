@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -77,7 +78,7 @@ public class GameSessionRepositoryTest {
 
 
         // when
-        GameSession savedGameSession = gameSessionRepository.save(GameSession.create(savedGameRoom.getId(), 2, 20, new ArrayList<>()));
+        GameSession savedGameSession = gameSessionRepository.save(GameSession.create(savedGameRoom.getId(), 2, 20));
 
 
         // then
@@ -98,5 +99,71 @@ public class GameSessionRepositoryTest {
 
         Assertions.assertThat(gamePlayerSavedGameSession.gamePlayers().size()).isEqualTo(2);
 
+    }
+
+
+    @Test
+    @DisplayName("게임 세션 ID로 게임 세션 조회 - 게임 턴, 게임 플레이어 목록 함꼐 로딩")
+    void 게임_세션_ID로_게임_세션_조회() throws Exception {
+        // given
+        User host = userRepository.save(User.create(FingerprintGenerator.generate()));
+        User guest = userRepository.save(User.create(FingerprintGenerator.generate()));
+
+        GameRoom gameRoom = GameRoom.create(JoinCodeGenerator.generate(JOIN_CODE_LENGTH), GAME_ROOM_CAPACITY);
+
+        GameRoomParticipant hostParticipant = GameRoomParticipant.create(host.id(), "방장");
+        GameRoomParticipant guestParticipant = GameRoomParticipant.create(guest.id(), "유저1");
+
+        gameRoom.letIn(hostParticipant);
+        gameRoom.letIn(guestParticipant);
+
+        gameRoomRepository.save(gameRoom);
+
+        gameRoom.changeParticipantReady(guestParticipant, true);
+
+        gameRoom.validateStateToLoad();
+        gameRoom.changeStateToPlay();
+
+        GameRoom savedGameRoom = gameRoomRepository.save(gameRoom);
+
+
+        // when
+        GameSession savedGameSession = gameSessionRepository.save(GameSession.create(savedGameRoom.getId(), 2, 20));
+        savedGameSession.involvePlayers(
+                gameRoom.getCurrentParticipants().stream()
+                        .map(gameRoomParticipant ->
+                                GamePlayer.create(
+                                        savedGameSession.id(),
+                                        gameRoomParticipant.getUserId(),
+                                        gameRoomParticipant.getNickname()
+                                )
+                        )
+                        .collect(Collectors.toList())
+        );
+        savedGameSession.start();
+        savedGameSession.allocateNewGameTurn("hello world");
+
+
+
+        GameSession gamePlayerSavedGameSession = gameSessionRepository.save(savedGameSession);
+
+
+
+        // then
+        Optional<GameSession> gameSessionById = gameSessionRepository.findGameSessionById(gamePlayerSavedGameSession.id());
+        Assertions.assertThat(gameSessionById).isPresent();
+        GameSession gameSession = gameSessionById.get();
+
+        // game players
+        Assertions.assertThat(gameSession.gamePlayers().size()).isEqualTo(2);
+        gameSession.gamePlayers().forEach(gamePlayer -> {
+            Assertions.assertThat(gamePlayer.id()).isNotNull();
+        });
+
+        // gameTurns
+        Assertions.assertThat(gameSession.gameTurns().size()).isEqualTo(1);
+        gameSession.gameTurns().forEach(gameTurn -> {
+            Assertions.assertThat(gameTurn.id()).isNotNull();
+        });
     }
 }

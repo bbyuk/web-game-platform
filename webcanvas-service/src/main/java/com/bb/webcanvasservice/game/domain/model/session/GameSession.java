@@ -105,8 +105,8 @@ public class GameSession extends AggregateRoot {
      * @param timePerTurn 턴별 시간
      * @return 새로 생성된 게임 세션 객체
      */
-    public static GameSession create(Long gameRoomId, int turnCount, int timePerTurn, List<GamePlayer> gamePlayers) {
-        return new GameSession(null, gameRoomId, turnCount, timePerTurn, GameSessionState.LOADING, gamePlayers, new ArrayList<>());
+    public static GameSession create(Long gameRoomId, int turnCount, int timePerTurn) {
+        return new GameSession(null, gameRoomId, turnCount, timePerTurn, GameSessionState.LOADING, new ArrayList<>(), new ArrayList<>());
     }
 
     /**
@@ -296,8 +296,7 @@ public class GameSession extends AggregateRoot {
             throw new GameSessionNotFoundException();
         }
         state = GameSessionState.PLAYING;
-        gamePlayers.stream()
-                .forEach(GamePlayer::changeStateToPlaying);
+        gamePlayers.forEach(GamePlayer::changeStateToPlaying);
     }
 
     /**

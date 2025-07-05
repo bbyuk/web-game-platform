@@ -371,8 +371,7 @@ public class GameService {
                 GameSession.create(
                         gameRoom.getId(),
                         command.turnCount(),
-                        command.timePerTurn(),
-                        new ArrayList<>()
+                        command.timePerTurn()
                 ));
         savedGameSession.involvePlayers(
                 gameRoom.getCurrentParticipants().stream()
