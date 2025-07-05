@@ -2,7 +2,6 @@ package com.bb.webcanvasservice.game.domain.model.room;
 
 import com.bb.webcanvasservice.common.exception.AbnormalAccessException;
 import com.bb.webcanvasservice.domain.shared.AggregateRoot;
-import com.bb.webcanvasservice.domain.shared.event.ApplicationEvent;
 import com.bb.webcanvasservice.game.domain.event.GameRoomExitEvent;
 import com.bb.webcanvasservice.game.domain.event.GameRoomHostChangedEvent;
 import com.bb.webcanvasservice.game.domain.event.UserReadyChanged;
@@ -12,7 +11,6 @@ import com.bb.webcanvasservice.game.domain.exception.IllegalGameRoomStateExcepti
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -131,9 +129,9 @@ public class GameRoom extends AggregateRoot {
              * 250522
              * 퇴장 요청을 보낸 유저가 HOST일 경우 남은 유저 중 제일 처음 입장한 유저가 HOST가 된다.
              */
-            currentParticipants.stream()
-                    .sorted(Comparator.comparing(GameRoomParticipant::getJoinedAt))
-                    .findFirst()
+            currentParticipants
+                    .stream()
+                    .min(Comparator.comparing(GameRoomParticipant::getJoinedAt))
                     .ifPresentOrElse(
                             participant -> {
                                 participant.changeRoleToHost();
@@ -257,11 +255,10 @@ public class GameRoom extends AggregateRoot {
     }
 
     /**
-     * 현재 게임 세션을 종료한다.
+     * 게임 방과 게임 방 참가자 상태를 WAITING 상태로 리셋한다.
      */
     public void resetToWaiting() {
-        List<GameRoomParticipant> currentParticipants = getCurrentParticipants();
-        currentParticipants.forEach(GameRoomParticipant::changeStateToWaiting);
+        getCurrentParticipants().forEach(GameRoomParticipant::changeStateToWaiting);
 
         /**
          * 게임 방 초기 상태로 리셋

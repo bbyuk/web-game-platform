@@ -53,17 +53,6 @@ public class GameSession extends AggregateRoot {
      */
     private List<GameTurn> gameTurns;
 
-
-    public GameSession(Long id, Long gameRoomId, int turnCount, int timePerTurn, GameSessionState state, List<GamePlayer> gamePlayers, List<GameTurn> gameTurns) {
-        this.id = id;
-        this.gameRoomId = gameRoomId;
-        this.turnCount = turnCount;
-        this.timePerTurn = timePerTurn;
-        this.state = state;
-        this.gamePlayers = gamePlayers;
-        this.gameTurns = gameTurns;
-    }
-
     // ===================================================
     // ====================== getter =====================
     // ===================================================
@@ -99,6 +88,27 @@ public class GameSession extends AggregateRoot {
     // ====================== getter =====================
     // ===================================================
 
+
+    public GameSession(Long id, Long gameRoomId, int turnCount, int timePerTurn, GameSessionState state, List<GamePlayer> gamePlayers, List<GameTurn> gameTurns) {
+        this.id = id;
+        this.gameRoomId = gameRoomId;
+        this.turnCount = turnCount;
+        this.timePerTurn = timePerTurn;
+        this.state = state;
+        this.gamePlayers = gamePlayers;
+        this.gameTurns = gameTurns;
+    }
+
+    /**
+     * 게임 세션이 새로 생성 된 시점엔 LOADING 상태로 생성된다.
+     * @param turnCount 턴 수
+     * @param timePerTurn 턴별 시간
+     * @return 새로 생성된 게임 세션 객체
+     */
+    public static GameSession create(Long gameRoomId, int turnCount, int timePerTurn) {
+        return new GameSession(null, gameRoomId, turnCount, timePerTurn, GameSessionState.LOADING, new ArrayList<>(), new ArrayList<>());
+    }
+
     /**
      * 새 게임턴을 할당한다.
      * @param answer 새로 할당할 턴의 정답.
@@ -114,16 +124,6 @@ public class GameSession extends AggregateRoot {
      */
     public boolean shouldEnd() {
         return this.turnCount <= getCompletedGameTurnCount();
-    }
-
-    /**
-     * 게임 세션이 새로 생성 된 시점엔 LOADING 상태로 생성된다.
-     * @param turnCount 턴 수
-     * @param timePerTurn 턴별 시간
-     * @return 새로 생성된 게임 세션 객체
-     */
-    public static GameSession create(Long gameRoomId, int turnCount, int timePerTurn, List<GamePlayer> gamePlayers) {
-        return new GameSession(null, gameRoomId, turnCount, timePerTurn, GameSessionState.LOADING, gamePlayers, new ArrayList<>());
     }
 
     /**
@@ -187,12 +187,18 @@ public class GameSession extends AggregateRoot {
          * 현재 게임중인 유저 목록
          */
         // 유저별 턴 수 집계
-        Map<Long, Integer> drawerCountMap = getDrawerCountMap();
+        Map<Long, Integer> drawerCountMap = gameTurns.stream()
+                .collect(Collectors.toMap(
+                        GameTurn::drawerId,
+                        gt -> 1,
+                        Integer::sum
+                ));
 
         int minCount = Integer.MAX_VALUE;
         List<Long> candidates = new ArrayList<>();
 
-        for (GamePlayer gamePlayer : gamePlayers) {
+
+        for (GamePlayer gamePlayer : gamePlayers.stream().filter(GamePlayer::isPlaying).toList()) {
             Long userId = gamePlayer.userId();
             int count = drawerCountMap.getOrDefault(userId, 0);
 
@@ -224,7 +230,7 @@ public class GameSession extends AggregateRoot {
      * @return 종료된 게임 턴 수
      */
     public int getCompletedGameTurnCount() {
-        return (int) gameTurns.stream().filter(gameTurn -> gameTurn.isCompleted()).count();
+        return (int) gameTurns.stream().filter(GameTurn::isCompleted).count();
     }
 
     public GameTurn getCurrentTurn() {
@@ -255,36 +261,11 @@ public class GameSession extends AggregateRoot {
     }
 
     /**
-     * 해당 게임 세션에 새로운 게임 턴을 생성해 리턴한다.
-     * @param drawerId 턴 담당 drawer id
-     * @param answer 정답
-     * @return
-     */
-    public GameTurn create(Long drawerId, String answer) {
-        GameTurn newGameTurn = GameTurn.create(id, drawerId, answer, timePerTurn);
-        gameTurns.add(newGameTurn);
-        return newGameTurn;
-    }
-
-    /**
      * 세션이 로딩 중인지 여부를 확인한다.
      * @return
      */
     public boolean isLoading() {
         return state == GameSessionState.LOADING;
-    }
-
-    /**
-     * 도메인 내부 메소드
-     * @return drawer ID를 뽑기위한 카운트 맵을 리턴한다.
-     */
-    Map<Long, Integer> getDrawerCountMap() {
-        return gameTurns.stream()
-                .collect(Collectors.toMap(
-                        GameTurn::drawerId,
-                        gt -> 1,
-                        Integer::sum
-                ));
     }
 
     /**
@@ -315,6 +296,7 @@ public class GameSession extends AggregateRoot {
             throw new GameSessionNotFoundException();
         }
         state = GameSessionState.PLAYING;
+        gamePlayers.forEach(GamePlayer::changeStateToPlaying);
     }
 
     /**

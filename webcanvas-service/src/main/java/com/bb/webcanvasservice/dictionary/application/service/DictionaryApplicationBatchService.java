@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.dictionary.application.service;
 
-import com.bb.webcanvasservice.common.lock.DistributedLock;
+import com.bb.webcanvasservice.common.lock.ConcurrencyLock;
 import com.bb.webcanvasservice.infrastructure.lock.exception.LockAlreadyOccupiedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,14 +11,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DictionaryApplicationBatchService {
 
-    private final DistributedLock distributedLock;
+    private final ConcurrencyLock concurrencyLock;
     private final DictionaryBatchJob dictionaryBatchJob;
 
     public void batchInsertWordDataWithLock() {
         String batchId = "word-data-initial-insert";
 
         try {
-            distributedLock.executeAsyncWithLock(
+            concurrencyLock.executeAsyncWithLock(
                     batchId,
                     dictionaryBatchJob::batchInsertWordData
             );
