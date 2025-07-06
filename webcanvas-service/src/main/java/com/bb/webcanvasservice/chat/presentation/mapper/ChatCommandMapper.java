@@ -8,7 +8,7 @@ import com.bb.webcanvasservice.chat.presentation.request.SendMessageRequest;
  * chat send
  */
 public class ChatCommandMapper {
-    public static SendMessageCommand toCommand(Long gameRoomId, Long userId, SendMessageRequest request) {
-        return new SendMessageCommand(gameRoomId, userId, request.value());
+    public static SendMessageCommand toCommand(Long targetId, Long userId, SendMessageRequest request) {
+        return new SendMessageCommand(targetId, userId, request.value());
     }
 }

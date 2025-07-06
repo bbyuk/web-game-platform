@@ -31,10 +31,10 @@ public class ChatController {
 
     @MessageMapping("session/{gameSessionId}/chat/send")
     @Operation(summary = "게임 세션 채팅 메세지 전송", description = "채팅 메세지를 게임 세션 내로 전송하고, 정답을 체크한다.")
-    public void sendChatMessageAtGameSession(@DestinationVariable("gameRoomId") Long gameRoomId,
+    public void sendChatMessageAtGameSession(@DestinationVariable("gameSessionId") Long gameSessionId,
                                 SendMessageRequest request,
                                 @Authenticated WebCanvasAuthentication authentication) {
-        chatService.sendChatMessageToGameSession(ChatCommandMapper.toCommand(gameRoomId, authentication.getUserId(), request));
+        chatService.sendChatMessageToGameSession(ChatCommandMapper.toCommand(gameSessionId, authentication.getUserId(), request));
     }
 
 }

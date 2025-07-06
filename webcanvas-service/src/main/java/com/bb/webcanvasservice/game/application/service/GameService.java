@@ -504,12 +504,12 @@ public class GameService {
         return concurrencyLock.executeWithLock(
                 "game-session-subscribe-" + gameSessionId,
                 () -> {
-                    GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId).orElseThrow(GameSessionNotFoundException::new);
-                    gameSession.loadPlayer(userId);
+                    GameSession gameSession = loadPlayerToGameSession(gameSessionId, userId);
+                    if (gameSession.isPlaying()) {
+                        return false;
+                    }
 
-                    GameSession savedGameSession = gameSessionRepository.save(gameSession);
-
-                    if (savedGameSession.isAllPlayersLoaded()) {
+                    if (gameSession.isAllPlayersLoaded()) {
                         log.debug("game session {} all loaded", gameSessionId);
 
                         gameSession.start();
@@ -521,5 +521,18 @@ public class GameService {
 
                     return false;
                 });
+    }
+
+    /**
+     * 대상 게임 세션에 대상 유저를 플레이어로 로드한다.
+     * @param gameSessionId 대상 게임 세션 ID
+     * @param userId 대상 유저 ID
+     * @return 저장된 게임 세션
+     */
+    private GameSession loadPlayerToGameSession(Long gameSessionId, Long userId) {
+        GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId).orElseThrow(GameSessionNotFoundException::new);
+        gameSession.loadPlayer(userId);
+
+        return gameSessionRepository.save(gameSession);
     }
 }

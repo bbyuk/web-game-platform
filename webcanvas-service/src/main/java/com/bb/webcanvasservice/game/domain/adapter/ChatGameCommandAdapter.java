@@ -3,9 +3,6 @@ package com.bb.webcanvasservice.game.domain.adapter;
 import com.bb.webcanvasservice.chat.domain.port.game.ChatGameCommandPort;
 import com.bb.webcanvasservice.game.domain.exception.GameSessionNotFoundException;
 import com.bb.webcanvasservice.game.domain.model.session.GameSession;
-import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
-import com.bb.webcanvasservice.game.domain.exception.GameRoomNotFoundException;
-import com.bb.webcanvasservice.game.domain.model.room.GameRoom;
 import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -24,8 +21,8 @@ public class ChatGameCommandAdapter implements ChatGameCommandPort {
     }
 
     @Override
-    public void checkAnswer(Long gameRoomId, Long senderId, String value) {
-        GameSession gameSession = gameSessionRepository.findCurrentGameSessionByGameRoomId(gameRoomId)
+    public void checkAnswer(Long gameSessionId, Long senderId, String value) {
+        GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId)
                 .orElseThrow(GameSessionNotFoundException::new);
 
         gameSession.checkAnswer(senderId, value);

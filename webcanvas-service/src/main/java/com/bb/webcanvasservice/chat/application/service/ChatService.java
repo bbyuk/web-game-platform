@@ -19,23 +19,12 @@ public class ChatService {
     private final ChatGameCommandPort chatGameCommandPort;
 
     /**
-     * destination을 만들어 가져온다.
-     *
-     * @param gameRoomId
-     * @return
-     */
-    private String getDestination(Long gameRoomId) {
-        return "/room/" + gameRoomId + "/chat";
-    }
-
-
-    /**
      * 동일한 gameRoomId 대상 메세지 브로커를 구독중인 클라이언트로 채팅 메세지를 전송하고 서버에 임시 저장한다.
      * @param command 메세지 전송 커맨드
      */
     @Transactional
     public void sendChatMessageToWaitingRoom(SendMessageCommand command) {
-        String destination = getDestination(command.gameRoomId());
+        String destination = "/room/" + command.targetId() + "/chat";
         Message newMessage = Message.create(command.message(), command.senderId(), destination);
 
         /**
@@ -47,10 +36,10 @@ public class ChatService {
 
     @Transactional
     public void sendChatMessageToGameSession(SendMessageCommand command) {
-        String destination = getDestination(command.gameRoomId());
+        String destination = "/session/" + command.targetId() + "/chat";
         Message newMessage = Message.create(command.message(), command.senderId(), destination);
 
-        chatGameCommandPort.checkAnswer(command.gameRoomId(), command.senderId(), command.message());
+        chatGameCommandPort.checkAnswer(command.targetId(), command.senderId(), command.message());
 
         /**
          * TODO 채팅방에 메세지 임시저장
