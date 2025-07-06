@@ -39,12 +39,10 @@ public class ChatService {
         String destination = "/session/" + command.targetId() + "/chat";
         Message newMessage = Message.create(command.message(), command.senderId(), destination);
 
-        chatGameCommandPort.checkAnswer(command.targetId(), command.senderId(), command.message());
-
         /**
          * TODO 채팅방에 메세지 임시저장
          */
-
         messageSender.send(destination, newMessage);
+        chatGameCommandPort.checkAnswer(command.targetId(), command.senderId(), command.message());
     }
 }

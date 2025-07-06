@@ -45,6 +45,11 @@ public class GameService {
     private final GameUserCommandPort userCommandPort;
 
     /**
+     * inner domain service
+     */
+    private final GameTurnTimerService gameTurnTimerService;
+
+    /**
      * 도메인 레포지토리
      */
     private final GameRoomRepository gameRoomRepository;
@@ -453,25 +458,21 @@ public class GameService {
         GameRoom gameRoom = gameRoomRepository.findGameRoomById(command.gameRoomId()).orElseThrow(GameRoomNotFoundException::new);
         GameSession gameSession = gameSessionRepository.findGameSessionById(command.gameSessionId()).orElseThrow(GameSessionNotFoundException::new);
 
+        if (gameSession.shouldEnd()) {
+            endGameSession(gameSession, gameRoom);
+            return;
+        }
+
         if (!command.answered()) {
             gameSession.passCurrentTurn();
         }
 
-        if (gameSession.shouldEnd()) {
-            log.debug("모든 턴이 진행되었습니다.");
-            log.debug("게임 세션 종료");
-
-            gameSession.end();
-            gameSessionRepository.save(gameSession);
-
-            gameRoom.resetToWaiting();
-            gameRoomRepository.save(gameRoom);
-
-            userCommandPort.moveUsersToRoom(gameRoom.getCurrentParticipants().stream().map(GameRoomParticipant::getUserId).collect(Collectors.toList()));
-            eventPublisher.publishEvent(new GameSessionEndEvent(gameSession.id(), gameRoom.getId()));
-            return;
+        if (command.answered()) {
+            gameTurnTimerService.resetTurnTimer(command);
         }
-
+        else if(gameSession.gameTurns().isEmpty()) {
+            gameTurnTimerService.registerTurnTimer(command, this::processToNextTurn);
+        }
 
         gameSession.allocateNewGameTurn(
                 dictionaryQueryPort.drawRandomKoreanNoun()
@@ -489,6 +490,25 @@ public class GameService {
                         newGameTurn.id()
                 )
         );
+    }
+
+    /**
+     * 게임 세션을 종료하고 게임 방을 기존 상태로 변경한다.
+     * @param gameSession 게임 세션 ID
+     * @param gameRoom 게임 방 ID
+     */
+    private void endGameSession(GameSession gameSession, GameRoom gameRoom) {
+        log.debug("모든 턴이 진행되었습니다.");
+        log.debug("게임 세션 종료");
+
+        gameSession.end();
+        gameSessionRepository.save(gameSession);
+
+        gameRoom.resetToWaiting();
+        gameRoomRepository.save(gameRoom);
+
+        userCommandPort.moveUsersToRoom(gameRoom.getCurrentParticipants().stream().map(GameRoomParticipant::getUserId).collect(Collectors.toList()));
+        eventPublisher.publishEvent(new GameSessionEndEvent(gameSession.id(), gameRoom.getId()));
     }
 
     /**
@@ -510,17 +530,25 @@ public class GameService {
                     }
 
                     if (gameSession.isAllPlayersLoaded()) {
-                        log.debug("game session {} all loaded", gameSessionId);
-
-                        gameSession.start();
-
-                        gameSessionRepository.save(gameSession);
-                        eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn()));
+                        startGameSession(gameSession);
                         return true;
                     }
 
                     return false;
                 });
+    }
+
+    /**
+     * 모든 유저들이 로드 된 후 게임 세션을 시작한다
+     * @param gameSession 게임 세션
+     */
+    private void startGameSession(GameSession gameSession) {
+        log.debug("game session {} all loaded", gameSession.id());
+
+        gameSession.start();
+
+        gameSessionRepository.save(gameSession);
+        eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn()));
     }
 
     /**

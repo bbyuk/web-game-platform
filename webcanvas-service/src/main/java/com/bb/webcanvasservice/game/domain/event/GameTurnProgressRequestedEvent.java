@@ -11,18 +11,20 @@ public class GameTurnProgressRequestedEvent extends ApplicationEvent {
     private final Long gameRoomId;
     private final Long gameSessionId;
     private final Long gameTurnId;
+    private final int gameTurnPeriod;
     private final Long answererId;
 
-    public GameTurnProgressRequestedEvent(Long gameRoomId, Long gameSessionId, Long gameTurnId, Long answererId) {
+    public GameTurnProgressRequestedEvent(Long gameRoomId, Long gameSessionId, Long gameTurnId, int gameTurnPeriod, Long answererId) {
         super("SESSION/TURN_PROGRESS_REQUESTED");
         this.gameRoomId = gameRoomId;
         this.gameSessionId = gameSessionId;
         this.gameTurnId = gameTurnId;
+        this.gameTurnPeriod = gameTurnPeriod;
         this.answererId = answererId;
     }
 
-    public GameTurnProgressRequestedEvent(Long gameRoomId, Long gameSessionId, Long gameTurnId) {
-        this(gameRoomId, gameSessionId, gameTurnId, null);
+    public GameTurnProgressRequestedEvent(Long gameRoomId, Long gameSessionId, int gameTurnPeriod, Long gameTurnId) {
+        this(gameRoomId, gameSessionId, gameTurnId, gameTurnPeriod, null);
     }
 
     public Long getGameRoomId() {
@@ -37,7 +39,13 @@ public class GameTurnProgressRequestedEvent extends ApplicationEvent {
         return gameTurnId;
     }
 
+    public int getGameTurnPeriod() {
+        return gameTurnPeriod;
+    }
+
     public Long getAnswererId() {
         return answererId;
     }
+
+
 }

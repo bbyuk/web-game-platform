@@ -34,23 +34,23 @@ public class GameTurnTimerService {
                     catch(Exception e) {
                         exceptionHandler.handle(e);
                     }
-                }, 0,
+                }, command.period(),
                 command.period(), TimeUnit.SECONDS);
-        gameTurnTimerRegistry.register(command.gameRoomId(), new GameTurnTimer(future, command.period(), turnEndHandler));
+        gameTurnTimerRegistry.register(command.gameSessionId(), new GameTurnTimer(future, command.period(), turnEndHandler));
     }
 
     /**
-     * 게임 방 턴 타이머를 종료
+     * 게임 세션 턴 타이머를 종료
      *
-     * @param gameRoomId
+     * @param gameSessionId 게임 세션 ID
      */
-    public void stopTurnTimer(Long gameRoomId) {
-        GameTurnTimer gameTurnTimer = gameTurnTimerRegistry.get(gameRoomId);
-        if (gameTurnTimerRegistry.contains(gameRoomId)) {
+    public void stopTurnTimer(Long gameSessionId) {
+        GameTurnTimer gameTurnTimer = gameTurnTimerRegistry.get(gameSessionId);
+        if (gameTurnTimerRegistry.contains(gameSessionId)) {
             gameTurnTimer.stop();
         }
 
-        gameTurnTimerRegistry.remove(gameRoomId);
+        gameTurnTimerRegistry.remove(gameSessionId);
     }
 
     /**
@@ -60,16 +60,15 @@ public class GameTurnTimerService {
      */
     public void resetTurnTimer(ProcessToNextTurnCommand command) {
         if (!gameTurnTimerRegistry.contains(command.gameSessionId())) {
-            GameTurnTimerNotFoundException exception = new GameTurnTimerNotFoundException();
-            throw exception;
+            throw new GameTurnTimerNotFoundException();
         }
 
-        GameTurnTimer oldTimer = gameTurnTimerRegistry.get(command.gameRoomId());
-        stopTurnTimer(command.gameRoomId());
+        GameTurnTimer oldTimer = gameTurnTimerRegistry.get(command.gameSessionId());
+        stopTurnTimer(command.gameSessionId());
 
 
         // 새 타이머 등록
-        registerTurnTimer(command, (c) -> oldTimer.executeCallback(c));
+        registerTurnTimer(command, oldTimer::executeCallback);
     }
 
 }

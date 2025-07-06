@@ -166,13 +166,13 @@ public class GameSession extends AggregateRoot {
                  * TODO 해당 유저에게 패널티 부여
                  */
                 currentTurn.pass();
-                eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.id()));
+                eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, timePerTurn, currentTurn.id()));
             }
         }
         else {
             if (currentTurn.isAnswer(value))  {
                 currentTurn.markingAsCorrect(senderId);
-                eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.id(), senderId));
+                eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.id(), timePerTurn, senderId));
             }
         }
     }

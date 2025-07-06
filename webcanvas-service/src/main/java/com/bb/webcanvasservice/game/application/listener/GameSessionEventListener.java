@@ -4,9 +4,7 @@ import com.bb.webcanvasservice.common.messaging.websocket.MessageSender;
 import com.bb.webcanvasservice.game.application.command.ProcessToNextTurnCommand;
 import com.bb.webcanvasservice.game.application.service.GameService;
 import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;
-import com.bb.webcanvasservice.game.domain.event.AllUserInGameSessionLoadedEvent;
-import com.bb.webcanvasservice.game.domain.event.GameSessionEndEvent;
-import com.bb.webcanvasservice.game.domain.event.GameTurnProgressedEvent;
+import com.bb.webcanvasservice.game.domain.event.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -41,15 +39,12 @@ public class GameSessionEventListener {
         log.debug("모든 유저가 로딩되어 게임을 시작 gameSessionId = {}", event.getGameSessionId());
         messageSender.send("/session/" + event.getGameSessionId(), event);
 
-        gameTurnTimerService.registerTurnTimer(
-                new ProcessToNextTurnCommand(event.getGameRoomId(), event.getGameSessionId(), event.getTimePerTurn(), false),
-                gameService::processToNextTurn
-        );
+        gameService.processToNextTurn(new ProcessToNextTurnCommand(event.getGameRoomId(), event.getGameSessionId(), event.getTimePerTurn(), false));
     }
 
     /**
-     * 게임 턴 진행 이벤트 핸들러
-     * gameRoom 메세지 브로커에 턴 진행 이벤트 메세지 push
+     * 게임 턴 진행 이후 이벤트 핸들러
+     * game session 메세지 브로커에 턴 진행 이벤트 메세지 push
      *
      * @param event
      */
@@ -65,7 +60,7 @@ public class GameSessionEventListener {
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameSessionEnd(GameSessionEndEvent event) {
-        gameTurnTimerService.stopTurnTimer(event.getGameRoomId());
+        gameTurnTimerService.stopTurnTimer(event.getGameSessionId());
         messageSender.send("/session/" + event.getGameSessionId(), event);
 
         /**
@@ -73,5 +68,13 @@ public class GameSessionEventListener {
          */
     }
 
-
+    /**
+     * 게임 턴 진행 요청 이벤트 핸들러 (게임 턴 진행 이전)
+     *
+     * @param event
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleGameTurnProgressRequested(GameTurnProgressRequestedEvent event) {
+        gameService.processToNextTurn(new ProcessToNextTurnCommand(event.getGameRoomId(), event.getGameSessionId(), event.getGameTurnPeriod(), event.getAnswererId() != null));
+    }
 }
