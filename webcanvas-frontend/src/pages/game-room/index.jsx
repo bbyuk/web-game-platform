@@ -221,7 +221,7 @@ export default function GameRoomPage() {
 
     console.log("game-room/index.jsx = 구독");
 
-    webSocketClientRef.current.subscribe(topics);
+    webSocketClientRef.current.subscribe("room", topics);
   };
 
   // ===============================================================
@@ -258,6 +258,7 @@ export default function GameRoomPage() {
   useEffect(() => {
     return () => {
       if (webSocketClientRef.current) {
+        webSocketClientRef.current.unsubscribe("room");
         webSocketClientRef.current.deactivate();
       }
       leftSideStore.clear();

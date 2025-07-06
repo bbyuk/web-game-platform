@@ -72,7 +72,7 @@ export default function GameRoomWaitingPage() {
     ];
 
     console.log("game-room/waiting/index.jsx = 구독");
-    webSocketClientRef.current.subscribe(topics);
+    webSocketClientRef.current.subscribe("room/waiting", topics);
   };
 
   /**
@@ -174,6 +174,12 @@ export default function GameRoomWaitingPage() {
     rightSideStore.setFooter({
       slot: SidePanelFooterInput,
     });
+
+    return () => {
+      if (webSocketClientRef.current) {
+        webSocketClientRef.current.unsubscribe("room/waiting");
+      }
+    };
   }, []);
 
   useEffect(() => {

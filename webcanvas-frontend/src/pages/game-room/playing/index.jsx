@@ -107,7 +107,7 @@ export default function GameRoomPlayingPage() {
 
     console.log("game-room/playing/index.jsx = 구독");
 
-    webSocketClientRef.current.subscribe(topics);
+    webSocketClientRef.current.subscribe("room/playing", topics);
   };
 
   /**
@@ -162,6 +162,12 @@ export default function GameRoomPlayingPage() {
 
   useEffect(() => {
     findCurrentGameSessionInfo();
+
+    return () => {
+      if (webSocketClientRef.current) {
+        webSocketClientRef.current.unsubscribe("room/playing");
+      }
+    };
   }, []);
 
   useEffect(() => {
