@@ -384,6 +384,7 @@ public class GameService {
                         )
                         .collect(Collectors.toList())
         );
+        gameSessionRepository.save(savedGameSession);
 
 
         List<GameRoomParticipant> participants = savedGameRoom.getCurrentParticipants();
@@ -450,7 +451,7 @@ public class GameService {
     public void processToNextTurn(ProcessToNextTurnCommand command) {
         log.debug("{} 세션 다음 턴으로 진행", command.gameSessionId());
         GameRoom gameRoom = gameRoomRepository.findGameRoomById(command.gameRoomId()).orElseThrow(GameRoomNotFoundException::new);
-        GameSession gameSession = gameSessionRepository.findGameSessionById(command.gameRoomId()).orElseThrow(GameSessionNotFoundException::new);
+        GameSession gameSession = gameSessionRepository.findGameSessionById(command.gameSessionId()).orElseThrow(GameSessionNotFoundException::new);
 
         if (!command.answered()) {
             gameSession.passCurrentTurn();
