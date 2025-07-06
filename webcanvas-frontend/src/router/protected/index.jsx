@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useUserStore } from "@/stores/user/userStore.jsx";
 import { getApiClient } from "@/client/http/index.jsx";
 import { game, user } from "@/api/index.js";
+import { STORAGE_KEY } from '@/constants/storage-key.js';
 
 export default function ProtectedRoute() {
   const { isAuthenticated } = useAuthentication();
@@ -19,6 +20,11 @@ export default function ProtectedRoute() {
     }
     if (!userState) {
       apiClient.get(user.findUserState).then((response) => {
+        if (!response.state) {
+          // TODO test code
+          localStorage.removeItem(STORAGE_KEY.ACCESS_TOKEN);
+        }
+
         setUserState(response.state);
 
         if (response.state === "IN_LOBBY") {
@@ -30,8 +36,6 @@ export default function ProtectedRoute() {
             replace: true,
           });
           return;
-        } else {
-          alert("유저 상태를 찾지 못했습니다.");
         }
       });
     }

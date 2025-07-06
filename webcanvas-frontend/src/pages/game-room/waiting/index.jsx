@@ -140,6 +140,9 @@ export default function GameRoomWaitingPage() {
         onClick: buttonOnClickHandler,
       },
     });
+    return () => {
+      leftSideStore.clearFooter();
+    };
   }, [readyStatus, myInfo]);
 
   useEffect(() => {

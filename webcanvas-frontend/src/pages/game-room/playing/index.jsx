@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { game } from "@/api/index.js";
 import { useApiLock } from "@/api/lock/index.jsx";
-import { Gamepad2 } from "lucide-react";
+import { Gamepad2, MessageCircle } from 'lucide-react';
 import { getApiClient } from "@/client/http/index.jsx";
 import { useAuthentication } from "@/contexts/authentication/index.jsx";
 import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
@@ -13,6 +13,9 @@ import GameTurnTimer from "@/components/game-turn-timer/index.jsx";
 import AnswerBoard from "@/components/answer-board/index.jsx";
 import { useTimer } from "@/pages/game-room/playing/timer.jsx";
 import { useClientStore } from "@/stores/client/clientStore.jsx";
+import ChatList from '@/components/layouts/side-panel/contents/chat-list/index.jsx';
+import SidePanelFooterInput from '@/components/layouts/side-panel/footer/input/index.jsx';
+import { useRightSideStore } from '@/stores/layout/rightSideStore.jsx';
 
 export default function GameRoomPlayingPage() {
   // ===============================================================
@@ -31,12 +34,15 @@ export default function GameRoomPlayingPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const { webSocketClientRef, enteredUsers } = useOutletContext();
-  const { setContents } = useLeftSideStore();
+  const rightSideStore = useRightSideStore();
+  const leftSideStore = useLeftSideStore();
   const { endLoading } = useClientStore();
 
   const [gameSessionId, setGameSessionId] = useState(null);
   const [currentDrawerId, setCurrentDrawerId] = useState(null);
   const [displayedAnswer, setDisplayedAnswer] = useState(null);
+  const [chatMessages, setChatMessages] = useState([]);
+
 
   // 게임 턴 별 시간 (s)
   const [timePerTurn, setTimePerTurn] = useState(0);
@@ -97,12 +103,39 @@ export default function GameRoomPlayingPage() {
           break;
       }
     };
+
+    /**
+     * 채팅 메세지 브로커 핸들러
+     * @param frame
+     */
+    const gameSessionChatHandler = (frame) => {
+      console.log(frame);
+
+      const newMessage = {
+        value: frame.value,
+        senderId: frame.senderId,
+        nickname: enteredUsers
+          .filter(enteredUser => enteredUser.userId === frame.senderId)
+          .map(enteredUser => enteredUser.nickname),
+        color: enteredUsers
+          .filter(enteredUser => enteredUser.userId === frame.senderId)
+          .map(enteredUser => enteredUser.color)
+      }
+
+      console.log(enteredUsers);
+      setChatMessages((prevItems) => [...prevItems, newMessage]);
+    };
+
     const topics = [
       // 게임 세션 진행 이벤트 broker
       {
         destination: `/session/${gameSessionId}`,
         messageHandler: gameSessionEventHandler,
       },
+      {
+        destination: `/session/${gameSessionId}/chat`,
+        messageHandler: gameSessionChatHandler
+      }
     ];
 
     console.log("game-room/playing/index.jsx = 구독");
@@ -161,6 +194,26 @@ export default function GameRoomPlayingPage() {
   // ===============================================================
 
   useEffect(() => {
+    rightSideStore.setTitle({
+      label: "chat",
+      icon: <MessageCircle size={20} className="text-gray-400" />,
+      button: false,
+      onClick: () => {},
+    });
+
+    rightSideStore.setContents({
+      slot: ChatList,
+      props: {
+        messages: chatMessages,
+        removeOldChat: (maxChatCount) => {
+          setChatMessages((prev) => prev.slice(-maxChatCount));
+        },
+      },
+    });
+    rightSideStore.setFooter({
+      slot: SidePanelFooterInput,
+    });
+
     findCurrentGameSessionInfo();
 
     return () => {
@@ -171,7 +224,30 @@ export default function GameRoomPlayingPage() {
   }, []);
 
   useEffect(() => {
+    rightSideStore.setContents({
+      slot: ChatList,
+      props: {
+        messages: chatMessages,
+        removeOldChat: (maxChatCount) => {
+          setChatMessages((prev) => prev.slice(-maxChatCount));
+        },
+      },
+    });
+  }, [chatMessages]);
+
+  useEffect(() => {
     if (!gameSessionId || !webSocketClientRef.current) return;
+
+    rightSideStore.setFooter({
+      slot: SidePanelFooterInput,
+      props: {
+        onSubmit: (message) => {
+          webSocketClientRef.current.send(`/session/${gameSessionId}/chat/send`, {
+            value: message,
+          });
+        },
+      },
+    });
 
     /**
      * 게임 세션 ID를 상태에 저장한 후 세션 웹소켓을 구독한다.
@@ -180,7 +256,7 @@ export default function GameRoomPlayingPage() {
   }, [gameSessionId, webSocketClientRef.current]);
 
   useEffect(() => {
-    setContents({
+    leftSideStore.setContents({
       slot: ItemList,
       props: {
         value: enteredUsers.map(({ userId, nickname, role, ...rest }) => ({
@@ -191,6 +267,7 @@ export default function GameRoomPlayingPage() {
         })),
       },
     });
+
   }, [authenticatedUserId, currentDrawerId]);
 
   const isDrawer = authenticatedUserId === currentDrawerId;
