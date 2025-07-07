@@ -6,6 +6,7 @@ export default function Canvas({
   color = "black",
   lineWidth = 5,
   reRenderingSignal = false,
+  drawable = false,
   afterReRendering = () => {},
   className = String(),
 }) {
@@ -137,6 +138,9 @@ export default function Canvas({
    * 화면에 그림 그리기 시작 (마우스 클릭 시작)
    */
   const startPainting = () => {
+    if (!drawable) {
+      return;
+    }
     setPainting(true);
   };
   /**

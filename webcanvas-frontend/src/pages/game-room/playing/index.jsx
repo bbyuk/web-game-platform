@@ -284,6 +284,7 @@ export default function GameRoomPlayingPage() {
         className="flex-1"
         strokes={strokes}
         onStroke={onStrokeHandler}
+        drawable={authenticatedUserId === currentDrawerId}
         reRenderingSignal={reRenderingSignal}
         afterReRendering={onReRenderingHandler}
         // color={
