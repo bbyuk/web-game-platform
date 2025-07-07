@@ -64,10 +64,7 @@ export default function GameRoomPlayingPage() {
   const onStrokeHandler = (stroke) => {
     if (stroke.points.length > 0) {
       setStrokes((prevItems) => [...prevItems, stroke]);
-      webSocketClientRef.current.publish({
-        destination: `/session/${gameSessionId}/canvas/stroke`,
-        body: JSON.stringify(stroke),
-      });
+      webSocketClientRef.current.send(`/session/${gameSessionId}/canvas/stroke`, stroke);
     }
   };
 
@@ -135,6 +132,13 @@ export default function GameRoomPlayingPage() {
       {
         destination: `/session/${gameSessionId}/chat`,
         messageHandler: gameSessionChatHandler
+      },
+      {
+        destination: `/session/${gameSessionId}/canvas`,
+        messageHandler: (frame) => {
+          setStrokes((prevItems) => [...prevItems, frame]);
+          setReRenderingSignal(true);
+        }
       }
     ];
 
