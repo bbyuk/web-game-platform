@@ -1,8 +1,7 @@
 package com.bb.webcanvasservice.game.infrastructure.config;
 
-import com.bb.webcanvasservice.chat.domain.port.game.ChatGameCommandPort;
-import com.bb.webcanvasservice.game.domain.repository.GameRoomRepository;
-import com.bb.webcanvasservice.game.domain.adapter.ChatGameCommandAdapter;
+import com.bb.webcanvasservice.chat.domain.port.game.ChatGamePort;
+import com.bb.webcanvasservice.game.domain.adapter.ChatGameAdapter;
 import com.bb.webcanvasservice.game.domain.repository.GameSessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -21,7 +20,7 @@ public class GameAdapterConfig {
     private final ApplicationEventPublisher eventPublisher;
 
     @Bean
-    public ChatGameCommandPort chatGameCommandPort() {
-        return new ChatGameCommandAdapter(gameSessionRepository, eventPublisher);
+    public ChatGamePort chatGameCommandPort() {
+        return new ChatGameAdapter(gameSessionRepository, eventPublisher);
     }
 }

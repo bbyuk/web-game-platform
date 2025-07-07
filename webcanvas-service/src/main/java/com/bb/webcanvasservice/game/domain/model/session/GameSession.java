@@ -158,22 +158,9 @@ public class GameSession extends AggregateRoot {
     public void checkAnswer(Long senderId, String value) {
         GameTurn currentTurn = getCurrentTurn();
 
-        if (currentTurn.isDrawer(senderId)) {
-            if (currentTurn.containsAnswer(value)) {
-                /**
-                 * 해당 턴의 drawer가 정답을 포함한 채팅을 입력할 시 해당턴은 PASS로 처리
-                 *
-                 * TODO 해당 유저에게 패널티 부여
-                 */
-                currentTurn.pass();
-                eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, timePerTurn, currentTurn.id()));
-            }
-        }
-        else {
-            if (currentTurn.isAnswer(value))  {
-                currentTurn.markingAsCorrect(senderId);
-                eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.id(), timePerTurn, senderId));
-            }
+        if (currentTurn.isAnswer(value))  {
+            currentTurn.markingAsCorrect(senderId);
+            eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.id(), timePerTurn, senderId));
         }
     }
 
