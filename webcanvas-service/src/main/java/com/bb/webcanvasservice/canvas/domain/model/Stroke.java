@@ -27,4 +27,20 @@ public class Stroke {
     public static Stroke createNewStroke(String color, int lineWidth, List<Coordinate> points) {
         return new Stroke(null, color, lineWidth, points);
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public int getLineWidth() {
+        return lineWidth;
+    }
+
+    public List<Coordinate> getPoints() {
+        return points;
+    }
 }
