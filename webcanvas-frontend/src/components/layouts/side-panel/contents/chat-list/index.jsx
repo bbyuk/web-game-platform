@@ -27,6 +27,7 @@ export default function ChatList({ messages, removeOldChat }) {
           key={`chat-message-${index}`}
           senderId={message.senderId}
           nickname={message.nickname}
+          nicknameDisplay={index === 0 || messages[index - 1].senderId !== message.senderId}
           color={message.color}
           message={message.value}
         />
