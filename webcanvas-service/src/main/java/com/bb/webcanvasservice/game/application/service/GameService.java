@@ -476,7 +476,7 @@ public class GameService {
             eventPublisher.publishEvent(new GameTurnTimerResetRequestedEvent(command.gameRoomId(), command.gameSessionId(), command.period(), command.answered()));
         } else if (gameSession.gameTurns().isEmpty()) {
             // 바로 실행할 수 있도록 등록
-            eventPublisher.publishEvent(new GameTurnTimerRegisterRequestedEvent(command.gameSessionId(), command.gameSessionId(), command.period(), command.answered()));
+            eventPublisher.publishEvent(new GameTurnTimerRegisterRequestedEvent(command.gameRoomId(), command.gameSessionId(), command.period(), command.answered()));
         }
 
         gameSession.allocateNewGameTurn(
