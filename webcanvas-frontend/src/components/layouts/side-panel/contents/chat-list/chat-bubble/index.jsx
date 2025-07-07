@@ -4,18 +4,19 @@ import { useAuthentication } from "@/contexts/authentication/index.jsx";
  * 채팅 말풍선
  * @param senderId
  * @param message
+ * @param nicknameDisplay
  * @param nickname
  * @param color
  * @returns {JSX.Element}
  */
-export default function ChatBubble({ senderId, message, nickname, color }) {
+export default function ChatBubble({ senderId, message, nicknameDisplay, nickname, color }) {
   const { authenticatedUserId } = useAuthentication();
   const isMe = authenticatedUserId === senderId;
 
   return (
     <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
       <div className="flex flex-col max-w-[80%]">
-        {!isMe && (
+        {nicknameDisplay && !isMe && (
           <span
             className="mb-1 ml-1 text-xs font-semibold"
             style={{ color }}

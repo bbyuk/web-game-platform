@@ -36,10 +36,7 @@ public class CanvasService {
          * gameRoom id에 해당하는 토픽으로 브로드캐스팅
          * /session/{gameRoomId}/canvas 브로커를 구독중인 클라이언트로 stroke 이벤트 브로드캐스팅
          */
-        String targetBroker = String.format("%s/%d/%s",
-                webSocketProperties.topic().main().gameRoom(),
-                command.gameSessionId(),
-                webSocketProperties.topic().sub().canvas());
+        String targetBroker = "/session/" + command.gameSessionId() + "/canvas";
 
         log.info("send to broker => {}", targetBroker);
 
