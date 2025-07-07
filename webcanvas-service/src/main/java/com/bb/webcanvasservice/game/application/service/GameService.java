@@ -467,12 +467,7 @@ public class GameService {
             gameSession.passCurrentTurn();
         }
 
-        if (command.answered()) {
-            log.debug("정답!");
-            eventPublisher.publishEvent(new GameTurnTimerResetRequestedEvent(command.gameRoomId(), command.gameSessionId(), command.period(), command.answered()));
-        } else if (gameSession.gameTurns().isEmpty()) {
-            // 바로 실행할 수 있도록 등록
-            log.debug("게임 시작!");
+        if (command.answered() || gameSession.gameTurns().isEmpty()) {
             eventPublisher.publishEvent(new GameTurnTimerRegisterRequestedEvent(command.gameRoomId(), command.gameSessionId(), command.period(), command.answered()));
         }
 

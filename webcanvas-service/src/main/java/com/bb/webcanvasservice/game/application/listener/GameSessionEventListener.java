@@ -49,22 +49,10 @@ public class GameSessionEventListener {
     }
 
     /**
-     * 게임 턴 타이머 리셋 요청 이벤트 핸들링
+     * 게임 턴 타이머 등록 요청 이벤트 핸들링
      *
      * @param event
      */
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleGameTurnTimerResetRequested(GameTurnTimerResetRequestedEvent event) {
-        log.debug("리셋요청 = {}", event);
-        gameTurnTimerPort.registerTurnTimer(
-                new ProcessToNextTurnCommand(event.getGameRoomId(),
-                        event.getGameSessionId(),
-                        event.getPeriod(),
-                        event.isAnswered()
-                ), event.getPeriod()
-        );
-    }
-
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameTurnTimerRegisterRequested(GameTurnTimerRegisterRequestedEvent event) {
         log.debug("등록 요청 = {}", event);
@@ -73,7 +61,7 @@ public class GameSessionEventListener {
                         event.getGameSessionId(),
                         event.getPeriod(),
                         event.isAnswered()
-                ), 0
+                ), event.getPeriod()
         );
     }
 
