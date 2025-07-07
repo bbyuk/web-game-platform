@@ -38,8 +38,35 @@ public class GameSessionEventListener {
     public void handleAllUserInGameSessionLoaded(AllUserInGameSessionLoadedEvent event) {
         log.debug("모든 유저가 로딩되어 게임을 시작 gameSessionId = {}", event.getGameSessionId());
         messageSender.send("/session/" + event.getGameSessionId(), event);
+    }
 
-        gameService.processToNextTurn(new ProcessToNextTurnCommand(event.getGameRoomId(), event.getGameSessionId(), event.getTimePerTurn(), false));
+    /**
+     * 게임 턴 타이머 리셋 요청 이벤트 핸들링
+     *
+     * @param event
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleGameTurnTimerResetRequested(GameTurnTimerResetRequestedEvent event) {
+        gameTurnTimerService.resetTurnTimer(
+                new ProcessToNextTurnCommand(event.getGameRoomId(),
+                        event.getGameSessionId(),
+                        event.getPeriod(),
+                        event.isAnswered()
+                )
+        );
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleGameTurnTimerRegisterRequested(GameTurnTimerRegisterRequestedEvent event) {
+        gameTurnTimerService.registerTurnTimer(
+                new ProcessToNextTurnCommand(event.getGameRoomId(),
+                        event.getGameSessionId(),
+                        event.getPeriod(),
+                        event.isAnswered()
+                ),
+                gameService::processToNextTurn,
+                0
+        );
     }
 
     /**

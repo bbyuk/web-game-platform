@@ -23,7 +23,7 @@ public class GamePlayerJpaEntity {
      */
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "game_session_id")
     /**
      * 플레이어가 로드된 게임 세션

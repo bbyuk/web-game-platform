@@ -25,7 +25,7 @@ public class GameTurnTimerService {
      * @param command 턴 진행 command
      * @param turnEndHandler 턴 종료시 작업할 핸들러
      */
-    public void registerTurnTimer(ProcessToNextTurnCommand command, Consumer<ProcessToNextTurnCommand> turnEndHandler) {
+    public void registerTurnTimer(ProcessToNextTurnCommand command, Consumer<ProcessToNextTurnCommand> turnEndHandler, int startAfter) {
         ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
                 () -> {
                     try {
@@ -34,7 +34,7 @@ public class GameTurnTimerService {
                     catch(Exception e) {
                         exceptionHandler.handle(e);
                     }
-                }, command.period(),
+                }, startAfter,
                 command.period(), TimeUnit.SECONDS);
         gameTurnTimerRegistry.register(command.gameSessionId(), new GameTurnTimer(future, command.period(), turnEndHandler));
     }
@@ -68,7 +68,7 @@ public class GameTurnTimerService {
 
 
         // 새 타이머 등록
-        registerTurnTimer(command, oldTimer::executeCallback);
+        registerTurnTimer(command, oldTimer::executeCallback, command.period());
     }
 
 }

@@ -29,7 +29,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -454,6 +453,12 @@ public class GameService {
      */
     @Transactional
     public void processToNextTurn(ProcessToNextTurnCommand command) {
+        /**
+         * 1. 게임 세션 종료 여부 체크
+         * 2. 게임 턴 타이머 등록 및 재등록
+         * 3. 기존 게임턴 처리 및 게임 턴 추가
+         */
+
         log.debug("{} 세션 다음 턴으로 진행", command.gameSessionId());
         GameRoom gameRoom = gameRoomRepository.findGameRoomById(command.gameRoomId()).orElseThrow(GameRoomNotFoundException::new);
         GameSession gameSession = gameSessionRepository.findGameSessionById(command.gameSessionId()).orElseThrow(GameSessionNotFoundException::new);
@@ -468,10 +473,10 @@ public class GameService {
         }
 
         if (command.answered()) {
-            gameTurnTimerService.resetTurnTimer(command);
-        }
-        else if(gameSession.gameTurns().isEmpty()) {
-            gameTurnTimerService.registerTurnTimer(command, this::processToNextTurn);
+            eventPublisher.publishEvent(new GameTurnTimerResetRequestedEvent(command.gameRoomId(), command.gameSessionId(), command.period(), command.answered()));
+        } else if (gameSession.gameTurns().isEmpty()) {
+            // 바로 실행할 수 있도록 등록
+            eventPublisher.publishEvent(new GameTurnTimerRegisterRequestedEvent(command.gameSessionId(), command.gameSessionId(), command.period(), command.answered()));
         }
 
         gameSession.allocateNewGameTurn(
@@ -494,8 +499,9 @@ public class GameService {
 
     /**
      * 게임 세션을 종료하고 게임 방을 기존 상태로 변경한다.
+     *
      * @param gameSession 게임 세션 ID
-     * @param gameRoom 게임 방 ID
+     * @param gameRoom    게임 방 ID
      */
     private void endGameSession(GameSession gameSession, GameRoom gameRoom) {
         log.debug("모든 턴이 진행되었습니다.");
@@ -540,6 +546,7 @@ public class GameService {
 
     /**
      * 모든 유저들이 로드 된 후 게임 세션을 시작한다
+     *
      * @param gameSession 게임 세션
      */
     private void startGameSession(GameSession gameSession) {
@@ -548,13 +555,16 @@ public class GameService {
         gameSession.start();
 
         gameSessionRepository.save(gameSession);
+
+        processToNextTurn(new ProcessToNextTurnCommand(gameSession.gameRoomId(), gameSession.id(), gameSession.timePerTurn(), false));
         eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn()));
     }
 
     /**
      * 대상 게임 세션에 대상 유저를 플레이어로 로드한다.
+     *
      * @param gameSessionId 대상 게임 세션 ID
-     * @param userId 대상 유저 ID
+     * @param userId        대상 유저 ID
      * @return 저장된 게임 세션
      */
     private GameSession loadPlayerToGameSession(Long gameSessionId, Long userId) {

@@ -24,7 +24,7 @@ public class GameTurnJpaEntity extends BaseEntity {
     private Long id;
 
     @JoinColumn(name = "game_session_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private GameSessionJpaEntity gameSessionEntity;
 
     @Column(name = "drawer_id")
