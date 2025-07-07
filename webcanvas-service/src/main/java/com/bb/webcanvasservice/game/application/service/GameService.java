@@ -44,11 +44,6 @@ public class GameService {
     private final GameUserCommandPort userCommandPort;
 
     /**
-     * inner domain service
-     */
-    private final GameTurnTimerService gameTurnTimerService;
-
-    /**
      * 도메인 레포지토리
      */
     private final GameRoomRepository gameRoomRepository;
@@ -473,15 +468,19 @@ public class GameService {
         }
 
         if (command.answered()) {
+            log.debug("정답!");
             eventPublisher.publishEvent(new GameTurnTimerResetRequestedEvent(command.gameRoomId(), command.gameSessionId(), command.period(), command.answered()));
         } else if (gameSession.gameTurns().isEmpty()) {
             // 바로 실행할 수 있도록 등록
+            log.debug("게임 시작!");
             eventPublisher.publishEvent(new GameTurnTimerRegisterRequestedEvent(command.gameRoomId(), command.gameSessionId(), command.period(), command.answered()));
         }
 
         gameSession.allocateNewGameTurn(
                 dictionaryQueryPort.drawRandomKoreanNoun()
         );
+        log.debug("allocate call => {}", command);
+
         GameSession savedGameSession = gameSessionRepository.save(gameSession);
         GameTurn newGameTurn = savedGameSession.getCurrentTurn();
 
@@ -556,7 +555,6 @@ public class GameService {
 
         gameSessionRepository.save(gameSession);
 
-        processToNextTurn(new ProcessToNextTurnCommand(gameSession.gameRoomId(), gameSession.id(), gameSession.timePerTurn(), false));
         eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn()));
     }
 

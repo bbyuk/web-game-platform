@@ -1,11 +1,14 @@
 package com.bb.webcanvasservice.game.domain.event;
 
 import com.bb.webcanvasservice.domain.shared.event.ApplicationEvent;
+import lombok.ToString;
 
 /**
  * 게임 턴 진행처리 요청 이벤트
  * pass or answered 시
  */
+
+@ToString
 public class GameTurnProgressRequestedEvent extends ApplicationEvent {
 
     private final Long gameRoomId;

@@ -3,11 +3,13 @@ package com.bb.webcanvasservice.game.application.listener;
 import com.bb.webcanvasservice.common.messaging.websocket.MessageSender;
 import com.bb.webcanvasservice.game.application.command.ProcessToNextTurnCommand;
 import com.bb.webcanvasservice.game.application.service.GameService;
-import com.bb.webcanvasservice.game.application.service.GameTurnTimerService;
 import com.bb.webcanvasservice.game.domain.event.*;
+import com.bb.webcanvasservice.game.domain.port.external.GameTurnTimerPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -28,16 +30,22 @@ public class GameSessionEventListener {
      * 도메인 서비스
      */
     private final GameService gameService;
-    private final GameTurnTimerService gameTurnTimerService;
+
+    /**
+     * 도메인 port
+     */
+    private final GameTurnTimerPort gameTurnTimerPort;
 
 
     /**
      * 게임 세션이 시작되고 모든 유저가 게임 세션 브로커 토픽을 구독완료하고 로딩 되었을 때 발행되는 이벤트를 핸들링한다.
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAllUserInGameSessionLoaded(AllUserInGameSessionLoadedEvent event) {
         log.debug("모든 유저가 로딩되어 게임을 시작 gameSessionId = {}", event.getGameSessionId());
         messageSender.send("/session/" + event.getGameSessionId(), event);
+        gameService.processToNextTurn(new ProcessToNextTurnCommand(event.getGameRoomId(), event.getGameSessionId(), event.getTimePerTurn(), false));
     }
 
     /**
@@ -47,25 +55,25 @@ public class GameSessionEventListener {
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameTurnTimerResetRequested(GameTurnTimerResetRequestedEvent event) {
-        gameTurnTimerService.resetTurnTimer(
+        log.debug("리셋요청 = {}", event);
+        gameTurnTimerPort.registerTurnTimer(
                 new ProcessToNextTurnCommand(event.getGameRoomId(),
                         event.getGameSessionId(),
                         event.getPeriod(),
                         event.isAnswered()
-                )
+                ), event.getPeriod()
         );
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameTurnTimerRegisterRequested(GameTurnTimerRegisterRequestedEvent event) {
-        gameTurnTimerService.registerTurnTimer(
+        log.debug("등록 요청 = {}", event);
+        gameTurnTimerPort.registerTurnTimer(
                 new ProcessToNextTurnCommand(event.getGameRoomId(),
                         event.getGameSessionId(),
                         event.getPeriod(),
                         event.isAnswered()
-                ),
-                gameService::processToNextTurn,
-                0
+                ), 0
         );
     }
 
@@ -87,7 +95,7 @@ public class GameSessionEventListener {
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameSessionEnd(GameSessionEndEvent event) {
-        gameTurnTimerService.stopTurnTimer(event.getGameSessionId());
+        gameTurnTimerPort.stopTurnTimer(event.getGameSessionId());
         messageSender.send("/session/" + event.getGameSessionId(), event);
 
         /**
@@ -100,8 +108,11 @@ public class GameSessionEventListener {
      *
      * @param event
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGameTurnProgressRequested(GameTurnProgressRequestedEvent event) {
+        log.debug("턴 진행 요청 이벤트 발생 ====== {}", event);
+
         gameService.processToNextTurn(new ProcessToNextTurnCommand(event.getGameRoomId(), event.getGameSessionId(), event.getGameTurnPeriod(), event.getAnswererId() != null));
     }
 }

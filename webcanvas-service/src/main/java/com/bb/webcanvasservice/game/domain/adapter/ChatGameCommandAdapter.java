@@ -27,5 +27,7 @@ public class ChatGameCommandAdapter implements ChatGameCommandPort {
 
         gameSession.checkAnswer(senderId, value);
         gameSession.processEventQueue(eventPublisher::publishEvent);
+
+        gameSessionRepository.save(gameSession);
     }
 }
