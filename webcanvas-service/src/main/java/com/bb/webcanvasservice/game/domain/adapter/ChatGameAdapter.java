@@ -26,6 +26,8 @@ public class ChatGameAdapter implements ChatGamePort {
                 .orElseThrow(GameSessionNotFoundException::new);
 
         gameSession.checkAnswer(senderId, value);
+        gameSessionRepository.save(gameSession);
+
         gameSession.processEventQueue(eventPublisher::publishEvent);
     }
 
