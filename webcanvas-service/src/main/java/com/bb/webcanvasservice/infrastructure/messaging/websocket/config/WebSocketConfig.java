@@ -2,10 +2,12 @@ package com.bb.webcanvasservice.infrastructure.messaging.websocket.config;
 
 import com.bb.webcanvasservice.common.util.JwtManager;
 import com.bb.webcanvasservice.game.application.service.GameService;
+import com.bb.webcanvasservice.infrastructure.messaging.websocket.handler.StompErrorHandler;
 import com.bb.webcanvasservice.infrastructure.messaging.websocket.interceptor.JwtAuthenticationChannelInterceptor;
 import com.bb.webcanvasservice.common.messaging.websocket.WebSocketSessionRegistry;
 import com.bb.webcanvasservice.infrastructure.security.websocket.WebSocketAuthenticationArgumentResolver;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -13,6 +15,8 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
+import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
 import java.util.List;
 
@@ -85,5 +89,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(webSocketAuthenticationArgumentResolver);
+    }
+
+    /**
+     * Stomp 프로토콜 처리중 발생하는 에러 핸들러
+     * @return bean 등록
+     */
+    @Bean
+    public StompSubProtocolErrorHandler stompSubProtocolErrorHandler() {
+        return new StompErrorHandler();
     }
 }
