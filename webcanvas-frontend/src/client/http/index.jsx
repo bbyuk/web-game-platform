@@ -65,9 +65,9 @@ export const getApiClient = () => {
           /**
            * 토큰 refresh
            */
-          const { isAuthenticated } = await tokenRefresh();
+          const tokenRefreshed = await tokenRefresh();
 
-          if (!isAuthenticated) {
+          if (!tokenRefreshed) {
             /**
              * 인증 실패 -> 토큰 만료시 refresh 시도 -> refresh마저 실패시 unauthorized handling
              */
@@ -140,9 +140,11 @@ export const getApiClient = () => {
         /**
          * refresh 성공
          */
-        const { fingerprint, accessToken, success } = await response.json();
+        const { fingerprint, accessToken } = await response.json();
         localStorage.setItem(STORAGE_KEY.FINGERPRINT, fingerprint);
         localStorage.setItem(STORAGE_KEY.ACCESS_TOKEN, accessToken);
+
+        return true;
       })
       .catch((error) => {
         alert(error.message);
