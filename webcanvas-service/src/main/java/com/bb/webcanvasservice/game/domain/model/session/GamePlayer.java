@@ -66,7 +66,9 @@ public class GamePlayer {
      * 세션에 player를 로드한다.
      */
     public void load() {
-        this.state = GamePlayerState.LOADED;
+        if (this.state() == GamePlayerState.INIT) {
+            this.state = GamePlayerState.LOADED;
+        }
     }
 
     /**

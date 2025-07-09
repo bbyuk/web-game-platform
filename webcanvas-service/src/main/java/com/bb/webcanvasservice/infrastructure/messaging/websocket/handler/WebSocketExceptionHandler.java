@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 
 /**
  * 웹소켓 MessageMapping 처리 중 발생하는 예외 공통 처리를 위한 클래스
+ * Presentation Layer 이후 시점에서 발생한 비즈니스 예외 공통 처리
  */
 @Slf4j
 @ControllerAdvice

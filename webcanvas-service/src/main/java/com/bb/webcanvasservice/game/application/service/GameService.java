@@ -1,5 +1,6 @@
 package com.bb.webcanvasservice.game.application.service;
 
+import com.bb.webcanvasservice.common.cuncurrent.SerializedTaskExecutor;
 import com.bb.webcanvasservice.common.lock.ConcurrencyLock;
 import com.bb.webcanvasservice.common.util.JoinCodeGenerator;
 import com.bb.webcanvasservice.game.application.command.*;
@@ -30,6 +31,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -55,7 +58,17 @@ public class GameService {
      */
     private final GameProperties gameProperties;
     private final ApplicationEventPublisher eventPublisher;
+
+    /**
+     * TODO 둘 중 타당한 동시성 제어 툴 사용 필요
+     */
     private final ConcurrencyLock concurrencyLock;
+    private final SerializedTaskExecutor serializedTaskExecutor;
+
+    /**
+     * 하위 서비스
+     */
+    private final GameTransactionDelegateService gameTransactionDelegateService;
 
     /**
      * 게임 방을 새로 생성하고, 생성을 요청한 유저를 입장시킨다.
@@ -520,50 +533,23 @@ public class GameService {
     @Transactional
     public boolean successSubscription(Long gameSessionId, Long userId) {
         log.debug("user {} subscribe game session {}", userId, gameSessionId);
+        try {
+            return serializedTaskExecutor.execute(
+                    "game-session-subscribe-" + gameSessionId,
+                    () -> CompletableFuture
+                            .supplyAsync(
+                                    () -> gameTransactionDelegateService.successToSubscribeTransaction(gameSessionId, userId))
+            ).get(2, TimeUnit.SECONDS);
+        }
+        catch(Exception e) {
+            /**
+             * TODO 예외처리 공통작업 필요
+             */
+            log.error("구독 처리중 오류가 발생했습니다. 관리자에게 문의해주세요.");
+            log.error(e.getMessage(), e);
+            throw new IllegalStateException();
+        }
 
-        return concurrencyLock.executeWithLock(
-                "game-session-subscribe-" + gameSessionId,
-                () -> {
-                    GameSession gameSession = loadPlayerToGameSession(gameSessionId, userId);
-                    if (gameSession.isPlaying()) {
-                        return false;
-                    }
-
-                    if (gameSession.isAllPlayersLoaded()) {
-                        startGameSession(gameSession);
-                        return true;
-                    }
-
-                    return false;
-                });
     }
 
-    /**
-     * 모든 유저들이 로드 된 후 게임 세션을 시작한다
-     *
-     * @param gameSession 게임 세션
-     */
-    private void startGameSession(GameSession gameSession) {
-        log.debug("game session {} all loaded", gameSession.id());
-
-        gameSession.start();
-
-        gameSessionRepository.save(gameSession);
-
-        eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn()));
-    }
-
-    /**
-     * 대상 게임 세션에 대상 유저를 플레이어로 로드한다.
-     *
-     * @param gameSessionId 대상 게임 세션 ID
-     * @param userId        대상 유저 ID
-     * @return 저장된 게임 세션
-     */
-    private GameSession loadPlayerToGameSession(Long gameSessionId, Long userId) {
-        GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId).orElseThrow(GameSessionNotFoundException::new);
-        gameSession.loadPlayer(userId);
-
-        return gameSessionRepository.save(gameSession);
-    }
 }
