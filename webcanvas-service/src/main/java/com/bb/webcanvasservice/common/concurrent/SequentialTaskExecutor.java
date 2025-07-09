@@ -1,4 +1,4 @@
-package com.bb.webcanvasservice.common.cuncurrent;
+package com.bb.webcanvasservice.common.concurrent;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 /**
  * 동시성 문제 해결을 위한 순차 작업 Executor
  */
-public interface SerializedTaskExecutor {
+public interface SequentialTaskExecutor {
 
     /**
      * 주어진 key에 대해 순차적으로 작업을 실행한다.

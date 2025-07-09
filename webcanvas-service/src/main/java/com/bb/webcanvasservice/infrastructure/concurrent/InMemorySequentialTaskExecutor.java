@@ -1,6 +1,6 @@
 package com.bb.webcanvasservice.infrastructure.concurrent;
 
-import com.bb.webcanvasservice.common.cuncurrent.SerializedTaskExecutor;
+import com.bb.webcanvasservice.common.concurrent.SequentialTaskExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +12,10 @@ import java.util.function.Supplier;
 
 @Slf4j
 @Component
-public class InMemorySerializedTaskExecutor implements SerializedTaskExecutor {
+public class InMemorySequentialTaskExecutor implements SequentialTaskExecutor {
 
     private final Map<String, TaskQueue> taskQueues = new ConcurrentHashMap<>();
-    private final ExecutorService taskExecutor = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Override
     public void execute(String key, Runnable task) {
@@ -72,7 +72,7 @@ public class InMemorySerializedTaskExecutor implements SerializedTaskExecutor {
 
         private void tryStart() {
             if (isRunning.compareAndSet(false, true)) {
-                taskExecutor.submit(this::processQueue);
+                executorService.submit(this::processQueue);
             }
         }
 
