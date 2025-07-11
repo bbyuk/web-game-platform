@@ -22,14 +22,26 @@ public class CanvasWebSocketController {
     private final CanvasService canvasService;
 
     /**
-     * 요청 받은 Stroke 이벤트를 요청자가 입장해있는 방에 브로드캐스팅한다.
+     * 요청 받은 Stroke 이벤트를 요청자가 입장해있는 세션에 브로드캐스팅한다.
      * @param request   stroke 요청
      * @param authentication 인증 객체
      */
     @MessageMapping("session/{gameSessionId}/canvas/stroke")
-    public void broadcastStrokeOnRoom(@DestinationVariable("gameSessionId") Long gameSessionId, StrokeRequest request, @Authenticated WebCanvasAuthentication authentication) {
+    public void broadcastStrokeAtSession(@DestinationVariable("gameSessionId") Long gameSessionId, StrokeRequest request, @Authenticated WebCanvasAuthentication authentication) {
         log.info("클라이언트로부터 메세지 받음");
 
         canvasService.broadcastStrokeOnRoom(CanvasCommandMapper.toCommand(gameSessionId, authentication.getUserId(), request));
+    }
+
+    /**
+     * Canvas clear 이벤트를 요청자가 입장해있는 세션에 브로드캐스팅한다.
+     * @param request   stroke 요청
+     * @param authentication 인증 객체
+     */
+    @MessageMapping("session/{gameSessionId}/canvas/clear")
+    public void broadcastClearAtSession(@DestinationVariable("gameSessionId") Long gameSessionId, @Authenticated WebCanvasAuthentication authentication) {
+        log.info("클라이언트로부터 메세지 받음");
+
+        canvasService.broadcastClearAtSession(gameSessionId, authentication.getUserId());
     }
 }
