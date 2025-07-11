@@ -29,7 +29,7 @@ export default function GameRoomPage() {
   const { state } = useLocation();
 
   /**
-   * 페이지 상태
+   * 페이지 상태ㅁ
    */
   const [connected, setConnected] = useState(false);
   const [enteredUsers, setEnteredUsers] = useState([]);
