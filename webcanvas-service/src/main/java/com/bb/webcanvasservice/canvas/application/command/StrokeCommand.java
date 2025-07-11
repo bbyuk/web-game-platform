@@ -14,6 +14,8 @@ public record StrokeCommand(
         @Schema(description = "스트로크 발생 게임 세션 ID")
         Long gameSessionId,
 
+        @Schema(description = "Stroke tool")
+        String tool,
         @Schema(description = "스트로크의 색상")
         String color,
 

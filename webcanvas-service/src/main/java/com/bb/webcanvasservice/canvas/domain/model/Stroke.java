@@ -8,6 +8,9 @@ import java.util.List;
 public class Stroke {
     private final Long id;
 
+    // 캔버스 툴 종류
+    private final String tool;
+
     // 스트로크의 색상
     private final String color;
 
@@ -17,15 +20,20 @@ public class Stroke {
     // 선을 구성하는 점들
     private final List<Coordinate> points;
 
-    public Stroke(Long id, String color, int lineWidth, List<Coordinate> points) {
+    public Stroke(Long id, String tool, String color, int lineWidth, List<Coordinate> points) {
         this.id = id;
+        this.tool = tool;
         this.color = color;
         this.lineWidth = lineWidth;
         this.points = points;
     }
 
-    public static Stroke createNewStroke(String color, int lineWidth, List<Coordinate> points) {
-        return new Stroke(null, color, lineWidth, points);
+    public static Stroke createNewStroke(String tool, String color, int lineWidth, List<Coordinate> points) {
+        return new Stroke(null, tool, color, lineWidth, points);
+    }
+
+    public String getTool() {
+        return tool;
     }
 
     public Long getId() {

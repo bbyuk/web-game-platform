@@ -40,7 +40,7 @@ public class CanvasService {
 
         log.info("send to broker => {}", targetBroker);
 
-        Stroke newStroke = Stroke.createNewStroke(command.color(), command.lineWidth(), command.points());
+        Stroke newStroke = Stroke.createNewStroke(command.tool(), command.color(), command.lineWidth(), command.points());
 
         /**
          * TODO newStroke를 비동기적으로 세션에 포함시켜 저장한다.
