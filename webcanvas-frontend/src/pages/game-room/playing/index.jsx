@@ -313,6 +313,9 @@ export default function GameRoomPlayingPage() {
       <Canvas
         className="flex-1"
         strokes={strokes}
+        tool={selectedCanvasTool}
+        color={selectedCanvasPenColor}
+        lineWidth={selectedCanvasToolSize}
         onStroke={onStrokeHandler}
         drawable={authenticatedUserId === currentDrawerId}
         reRenderingSignal={reRenderingSignal}

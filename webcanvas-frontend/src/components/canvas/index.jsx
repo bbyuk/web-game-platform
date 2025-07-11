@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 export default function Canvas({
   strokes = [],
   onStroke = (stroke) => {},
+  tool = "pen",
   color = "black",
   lineWidth = 5,
   reRenderingSignal = false,
@@ -27,7 +28,7 @@ export default function Canvas({
   /**
    * 현재 마우스를 누르고 그리고 있는 중인지 여부
    */
-  const [painting, setPainting] = useState(false);
+  const [dragging, setDragging] = useState(false);
   /**
    * Stroke 이벤트마다 집계되는 stroke 획 state
    */
@@ -64,15 +65,16 @@ export default function Canvas({
     const scaledX = offsetX / canvasRef.current.width;
     const scaledY = offsetY / canvasRef.current.height;
 
-    if (painting) {
+    if (dragging) {
       ctx.lineTo(offsetX, offsetY);
       ctx.stroke();
 
       // setCurrentStroke((prevItems) => [...prevItems, { x: scaledX, y: scaledY, color: color }]);
 
       setCurrentStroke({
+        tool: tool,
         color: color,
-        lineWidth: 5,
+        lineWidth: lineWidth,
         points: [...currentStroke.points, { x: scaledX, y: scaledY }],
       });
     } else {
@@ -94,7 +96,7 @@ export default function Canvas({
     // 200ms 동안 resize 이벤트가 더이상 발생하지 않으면 resize 작업 수행
     resizeTimer.current = setTimeout(() => {
       setResizing(false);
-    }, 200);
+    }, 500);
   };
   /**
    * ====================================== 이벤트 핸들러 ======================================
@@ -119,8 +121,20 @@ export default function Canvas({
     const canvasHeight = canvasRef.current.height;
 
     strokes.forEach((stroke) => {
+      // 상태 저장
+      ctx.save();
+
+      // 지우개 모드인지 펜 모드인지 분기
+      if (stroke.tool === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = stroke.color;
+      }
+      // 획 굵기
+      ctx.lineWidth = stroke.lineWidth;
+
       ctx.beginPath();
-      ctx.strokeStyle = stroke.color;
       ctx.moveTo(stroke.points[0].x * canvasWidth, stroke.points[0].y * canvasHeight);
 
       stroke.points.forEach((point, index) => {
@@ -131,6 +145,8 @@ export default function Canvas({
       });
 
       ctx.stroke();
+      // 상태 복구
+      ctx.restore();
     });
   };
 
@@ -141,13 +157,13 @@ export default function Canvas({
     if (!drawable) {
       return;
     }
-    setPainting(true);
+    setDragging(true);
   };
   /**
    * 화면에 그림 그리기 종료 (마우스 클릭 종료)
    */
   const stopPainting = () => {
-    setPainting(false);
+    setDragging(false);
   };
 
   const initCanvas = () => {
@@ -166,7 +182,7 @@ export default function Canvas({
     canvas.width = clientWidth;
     canvas.height = clientHeight;
 
-    ctx.lineWidth = lineWidth;
+
     ctx.lineCap = "round";
     ctx.strokeStyle = color;
   };
@@ -208,6 +224,15 @@ export default function Canvas({
       contextRef.current.strokeStyle = color;
     }
   }, [color]);
+
+  /**
+   * lineWidth 변경
+   */
+  useEffect(() => {
+    if (contextRef.current) {
+      contextRef.current.lineWidth = lineWidth;
+    }
+  }, [lineWidth]);
 
   /**
    * resizing handling
