@@ -87,6 +87,17 @@ export default function GameRoomPlayingPage() {
   };
 
   /**
+   * 캔버스 컴포넌트를 클리어한다.
+   */
+  const clearCanvas = () => {
+    // sender client clear
+    setStrokes([]);
+    setReRenderingSignal(true);
+    // websocket clear message send
+    webSocketClientRef.current.send(`/session/${gameSessionId}/canvas/clear`)
+  };
+
+  /**
    * 웹소켓을 통해 구독할 토픽과 콜백을 정의하고 구독한다.
    */
   const subscribeTopics = () => {
@@ -308,6 +319,7 @@ export default function GameRoomPlayingPage() {
             onChangeTool={(value) => (setSelectedCanvasTool(value))}
             onChangeSize={(value) => (setSelectedCanvasToolSize(value))}
             onChangeColor={(value) => (setSelectedCanvasPenColor(value))}
+            onClear={clearCanvas}
           />
         </>}
       <Canvas

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Eraser} from 'lucide-react';
+import { Eraser, XCircle } from 'lucide-react';
 
 /**
  * CanvasToolbar Component
@@ -11,6 +11,7 @@ import {Eraser} from 'lucide-react';
  *   onChangeTool: (tool: 'pen' | 'eraser') => void,
  *   onChangeSize: (size: number) => void,
  *   onChangeColor: (color: string) => void,
+ *   onClear: () => void,
  * }} props
  */
 export default function CanvasToolbar({
@@ -21,9 +22,10 @@ export default function CanvasToolbar({
                                         onChangeTool,
                                         onChangeSize,
                                         onChangeColor,
+                                        onClear,
                                       }) {
   return (
-    <div className="flex items-center w-full p-2 bg-gray-800 border-b border-gray-700">
+    <div className="flex items-center justify-between w-full p-2 bg-gray-800 border-b border-gray-700">
       {/* Left group: Color Pens, Eraser & Brush Size */}
       <div className="flex items-center space-x-2">
         {colors.map((c) => (
@@ -37,16 +39,13 @@ export default function CanvasToolbar({
             className={`w-6 h-6 rounded-full border-2 focus:outline-none transition-colors cursor-pointer ${
               color === c ? 'border-white' : 'border-gray-600'
             }`}
-            style={{backgroundColor: c}}
+            style={{ backgroundColor: c }}
             title={`Color ${c}`}
           />
         ))}
         <button
           type="button"
-          onClick={() => {
-            onChangeColor(null);
-            onChangeTool('eraser');
-          }}
+          onClick={() => onChangeTool('eraser')}
           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors focus:outline-none cursor-pointer ${
             tool === 'eraser'
               ? 'bg-indigo-600 border-white text-white'
@@ -54,10 +53,9 @@ export default function CanvasToolbar({
           }`}
           title="지우개"
         >
-          <Eraser className="w-4 h-4"/>
+          <Eraser className="w-4 h-4" />
         </button>
-        {/* Brush Size Slider */}
-        <div className="flex items-center space-x-1 ml-2">
+        <div className="flex items-center space-x-1">
           <label htmlFor="brush-size" className="text-sm text-gray-300">
             크기
           </label>
@@ -65,13 +63,23 @@ export default function CanvasToolbar({
             id="brush-size"
             type="range"
             min="1"
-            max="50"
+            max="10"
             value={size}
             onChange={(e) => onChangeSize(Number(e.target.value))}
-            className="h-1 w-32 accent-indigo-500"
+            className="h-1 w-32 accent-indigo-500 cursor-pointer"
           />
         </div>
       </div>
+
+      {/* Right group: Clear All Button */}
+      <button
+        type="button"
+        onClick={onClear}
+        className="p-2 rounded-full bg-red-600 hover:bg-red-500 text-white transition-colors focus:outline-none cursor-pointer"
+        title="전체 지우기"
+      >
+        <XCircle className="w-5 h-5" />
+      </button>
     </div>
   );
 }
