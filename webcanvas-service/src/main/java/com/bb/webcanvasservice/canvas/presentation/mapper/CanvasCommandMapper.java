@@ -12,6 +12,7 @@ public class CanvasCommandMapper {
         return new StrokeCommand(
                 userId,
                 gameSessionId,
+                request.tool(),
                 request.color(),
                 request.lineWidth(),
                 request.points()

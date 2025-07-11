@@ -7,6 +7,10 @@ import java.util.List;
 
 @Schema(description = "캔버스 스트로크 draw 요청 DTO")
 public record StrokeRequest(
+
+        @Schema(description = "스트로크 tool")
+        String tool,
+
         @Schema(description = "선의 색")
         String color,
 

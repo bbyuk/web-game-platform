@@ -1,21 +1,22 @@
 import Canvas from "@/components/canvas/index.jsx";
-import React, { useEffect, useState } from "react";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { game } from "@/api/index.js";
-import { useApiLock } from "@/api/lock/index.jsx";
-import { Gamepad2, MessageCircle } from 'lucide-react';
-import { getApiClient } from "@/client/http/index.jsx";
-import { useAuthentication } from "@/contexts/authentication/index.jsx";
-import { useLeftSideStore } from "@/stores/layout/leftSideStore.jsx";
+import React, {useEffect, useState} from "react";
+import {useNavigate, useOutletContext, useParams} from "react-router-dom";
+import {game} from "@/api/index.js";
+import {useApiLock} from "@/api/lock/index.jsx";
+import {Gamepad2, MessageCircle} from 'lucide-react';
+import {getApiClient} from "@/client/http/index.jsx";
+import {useAuthentication} from "@/contexts/authentication/index.jsx";
+import {useLeftSideStore} from "@/stores/layout/leftSideStore.jsx";
 import ItemList from "@/components/layouts/side-panel/contents/item-list/index.jsx";
-import { pages } from "@/router/index.jsx";
+import {pages} from "@/router/index.jsx";
 import GameTurnTimer from "@/components/game-turn-timer/index.jsx";
 import AnswerBoard from "@/components/answer-board/index.jsx";
-import { useTimer } from "@/pages/game-room/playing/timer.jsx";
-import { useClientStore } from "@/stores/client/clientStore.jsx";
+import {useTimer} from "@/pages/game-room/playing/timer.jsx";
+import {useClientStore} from "@/stores/client/clientStore.jsx";
 import ChatList from '@/components/layouts/side-panel/contents/chat-list/index.jsx';
 import SidePanelFooterInput from '@/components/layouts/side-panel/footer/input/index.jsx';
-import { useRightSideStore } from '@/stores/layout/rightSideStore.jsx';
+import {useRightSideStore} from '@/stores/layout/rightSideStore.jsx';
+import CanvasToolbar from "@/components/canvas/toolbar/index.jsx";
 
 export default function GameRoomPlayingPage() {
   // ===============================================================
@@ -27,16 +28,16 @@ export default function GameRoomPlayingPage() {
   //캔버스 온디맨드 리렌더링 시그널
   const [reRenderingSignal, setReRenderingSignal] = useState(false);
   // 유저ID
-  const { authenticatedUserId } = useAuthentication();
+  const {authenticatedUserId} = useAuthentication();
   // apiLock
-  const { apiLock } = useApiLock();
+  const {apiLock} = useApiLock();
   const apiClient = getApiClient();
   const navigate = useNavigate();
-  const { roomId } = useParams();
-  const { webSocketClientRef, enteredUsers } = useOutletContext();
+  const {roomId} = useParams();
+  const {webSocketClientRef, enteredUsers} = useOutletContext();
   const rightSideStore = useRightSideStore();
   const leftSideStore = useLeftSideStore();
-  const { endLoading } = useClientStore();
+  const {endLoading} = useClientStore();
 
   const [gameSessionId, setGameSessionId] = useState(null);
   const [currentDrawerId, setCurrentDrawerId] = useState(null);
@@ -44,13 +45,30 @@ export default function GameRoomPlayingPage() {
   const [chatMessages, setChatMessages] = useState([]);
 
 
-  // 게임 턴 별 시간 (s)
+  /**
+   * ====== 캔버스 관련 state ======
+   */
+  const [selectedCanvasTool, setSelectedCanvasTool] = useState("pen");
+  const [selectedCanvasToolSize, setSelectedCanvasToolSize] = useState(5);
+  const [selectedCanvasPenColor, setSelectedCanvasPenColor] = useState("#000000");
+
+  /**
+   * ====== 캔버스 관련 state ======
+   */
+
+  /**
+   * ====== 게임 플레이 세션 관련 state ======
+   */
+    // 게임 턴 별 시간 (s)
   const [timePerTurn, setTimePerTurn] = useState(0);
   // 현재 턴의 인덱스
   const [currentTurnIndex, setCurrentTurnIndex] = useState(0);
   // 전체 턴 수
   const [turnCount, setTurnCount] = useState(0);
   const [isTurnActive, setIsTurnActive] = useState(false);
+  /**
+   * ====== 게임 플레이 세션 관련 state ======
+   */
   const timer = useTimer();
 
   // ===============================================================
@@ -63,9 +81,20 @@ export default function GameRoomPlayingPage() {
    */
   const onStrokeHandler = (stroke) => {
     if (stroke.points.length > 0) {
-      setStrokes((prevItems) => [...prevItems, stroke]);
+      // setStrokes((prevItems) => [...prevItems, stroke]);
       webSocketClientRef.current.send(`/session/${gameSessionId}/canvas/stroke`, stroke);
     }
+  };
+
+  /**
+   * 캔버스 컴포넌트를 클리어한다.
+   */
+  const clearCanvas = () => {
+    // sender client clear
+    setStrokes([]);
+    setReRenderingSignal(true);
+    // websocket clear message send
+    webSocketClientRef.current.send(`/session/${gameSessionId}/canvas/clear`)
   };
 
   /**
@@ -95,7 +124,7 @@ export default function GameRoomPlayingPage() {
           alert("게임이 종료되었습니다. 대기실로 이동합니다.");
           navigate(pages.gameRoom.waiting.url(roomId), {
             replace: true,
-            state: { gameSessionEnd: true },
+            state: {gameSessionEnd: true},
           });
           break;
       }
@@ -200,9 +229,10 @@ export default function GameRoomPlayingPage() {
   useEffect(() => {
     rightSideStore.setTitle({
       label: "chat",
-      icon: <MessageCircle size={20} className="text-gray-400" />,
+      icon: <MessageCircle size={20} className="text-gray-400"/>,
       button: false,
-      onClick: () => {},
+      onClick: () => {
+      },
     });
 
     rightSideStore.setContents({
@@ -263,7 +293,7 @@ export default function GameRoomPlayingPage() {
     leftSideStore.setContents({
       slot: ItemList,
       props: {
-        value: enteredUsers.map(({ userId, nickname, role, ...rest }) => ({
+        value: enteredUsers.map(({userId, nickname, role, ...rest}) => ({
           label: nickname,
           highlight: userId === currentDrawerId,
           theme: "indigo",
@@ -278,11 +308,26 @@ export default function GameRoomPlayingPage() {
 
   return (
     <>
-      <GameTurnTimer remainingPercent={timer.remainingPercent} />
-      {isDrawer && <AnswerBoard answer={displayedAnswer} />}
+      <GameTurnTimer remainingPercent={timer.remainingPercent}/>
+      {isDrawer &&
+        <>
+          <AnswerBoard answer={displayedAnswer}/>
+          <CanvasToolbar
+            tool={selectedCanvasTool}
+            size={selectedCanvasToolSize}
+            color={selectedCanvasPenColor}
+            onChangeTool={(value) => (setSelectedCanvasTool(value))}
+            onChangeSize={(value) => (setSelectedCanvasToolSize(value))}
+            onChangeColor={(value) => (setSelectedCanvasPenColor(value))}
+            onClear={clearCanvas}
+          />
+        </>}
       <Canvas
         className="flex-1"
         strokes={strokes}
+        tool={selectedCanvasTool}
+        color={selectedCanvasPenColor}
+        lineWidth={selectedCanvasToolSize}
         onStroke={onStrokeHandler}
         drawable={authenticatedUserId === currentDrawerId}
         reRenderingSignal={reRenderingSignal}

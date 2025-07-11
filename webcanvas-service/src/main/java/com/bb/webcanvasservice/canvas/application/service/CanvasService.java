@@ -1,6 +1,7 @@
 package com.bb.webcanvasservice.canvas.application.service;
 
 import com.bb.webcanvasservice.canvas.application.command.StrokeCommand;
+import com.bb.webcanvasservice.canvas.domain.event.CanvasClearEvent;
 import com.bb.webcanvasservice.common.messaging.websocket.MessageSender;
 import com.bb.webcanvasservice.canvas.domain.model.Stroke;
 import com.bb.webcanvasservice.infrastructure.messaging.websocket.config.WebSocketProperties;
@@ -40,12 +41,34 @@ public class CanvasService {
 
         log.info("send to broker => {}", targetBroker);
 
-        Stroke newStroke = Stroke.createNewStroke(command.color(), command.lineWidth(), command.points());
+        Stroke newStroke = Stroke.createNewStroke(command.tool(), command.color(), command.lineWidth(), command.points());
 
         /**
          * TODO newStroke를 비동기적으로 세션에 포함시켜 저장한다.
          */
 
         messageSender.send(targetBroker, newStroke);
+    }
+
+    /**
+     * 대상 유저가 입장해있는 세션 웹소켓 메세지 브로커로 clear 이벤트를 브로드캐스팅한다.
+     * @param gameSessionId
+     * @param userId
+     */
+    public void broadcastClearAtSession(Long gameSessionId, Long userId) {
+
+        /**
+         * gameRoom id에 해당하는 토픽으로 브로드캐스팅
+         * /session/{gameRoomId}/canvas 브로커를 구독중인 클라이언트로 stroke 이벤트 브로드캐스팅
+         */
+        String targetBroker = "/session/" + gameSessionId + "/canvas";
+
+        log.info("send to broker => {}", targetBroker);
+
+        /**
+         * TODO newStroke를 비동기적으로 세션에 포함시켜 저장한다.
+         */
+
+        messageSender.send(targetBroker, new CanvasClearEvent());
     }
 }
