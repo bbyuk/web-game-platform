@@ -81,7 +81,7 @@ export default function GameRoomPlayingPage() {
    */
   const onStrokeHandler = (stroke) => {
     if (stroke.points.length > 0) {
-      setStrokes((prevItems) => [...prevItems, stroke]);
+      // setStrokes((prevItems) => [...prevItems, stroke]);
       webSocketClientRef.current.send(`/session/${gameSessionId}/canvas/stroke`, stroke);
     }
   };
