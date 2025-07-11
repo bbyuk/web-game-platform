@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eraser } from 'lucide-react';
+import {Eraser} from 'lucide-react';
 
 /**
  * CanvasToolbar Component
@@ -37,13 +37,16 @@ export default function CanvasToolbar({
             className={`w-6 h-6 rounded-full border-2 focus:outline-none transition-colors cursor-pointer ${
               color === c ? 'border-white' : 'border-gray-600'
             }`}
-            style={{ backgroundColor: c }}
+            style={{backgroundColor: c}}
             title={`Color ${c}`}
           />
         ))}
         <button
           type="button"
-          onClick={() => onChangeTool('eraser')}
+          onClick={() => {
+            onChangeColor(null);
+            onChangeTool('eraser');
+          }}
           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors focus:outline-none cursor-pointer ${
             tool === 'eraser'
               ? 'bg-indigo-600 border-white text-white'
@@ -51,7 +54,7 @@ export default function CanvasToolbar({
           }`}
           title="지우개"
         >
-          <Eraser className="w-4 h-4" />
+          <Eraser className="w-4 h-4"/>
         </button>
         {/* Brush Size Slider */}
         <div className="flex items-center space-x-1 ml-2">

@@ -220,18 +220,20 @@ export default function Canvas({
    * 컬러 변경
    */
   useEffect(() => {
-    if (contextRef.current) {
-      contextRef.current.strokeStyle = color;
+    if (!contextRef.current) {
+      return;
     }
+    contextRef.current.strokeStyle = color;
   }, [color]);
 
   /**
    * lineWidth 변경
    */
   useEffect(() => {
-    if (contextRef.current) {
-      contextRef.current.lineWidth = lineWidth;
+    if (!contextRef.current) {
+      return;
     }
+    contextRef.current.lineWidth = lineWidth;
   }, [lineWidth]);
 
   /**
@@ -243,6 +245,18 @@ export default function Canvas({
       reRendering();
     }
   }, [resizing]);
+
+  useEffect(() => {
+    if (!contextRef.current) {
+      return;
+    }
+    if (tool === "eraser") {
+      contextRef.current.strokeStyle = "#FFFFFF";
+    }
+    else if (tool === "pen") {
+      contextRef.current.strokeStyle = color;
+    }
+  }, [tool]);
 
   return (
     <div className="flex justify-center items-center flex-1 overflow-hidden bg-gray-800">
