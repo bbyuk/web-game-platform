@@ -2,6 +2,7 @@ package com.bb.webcanvasservice.canvas.application.service;
 
 import com.bb.webcanvasservice.canvas.application.command.StrokeCommand;
 import com.bb.webcanvasservice.canvas.domain.event.CanvasClearEvent;
+import com.bb.webcanvasservice.canvas.domain.event.CanvasStrokeEvent;
 import com.bb.webcanvasservice.common.messaging.websocket.MessageSender;
 import com.bb.webcanvasservice.canvas.domain.model.Stroke;
 import com.bb.webcanvasservice.infrastructure.messaging.websocket.config.WebSocketProperties;
@@ -47,7 +48,7 @@ public class CanvasService {
          * TODO newStroke를 비동기적으로 세션에 포함시켜 저장한다.
          */
 
-        messageSender.send(targetBroker, newStroke);
+        messageSender.send(targetBroker, new CanvasStrokeEvent(newStroke));
     }
 
     /**
