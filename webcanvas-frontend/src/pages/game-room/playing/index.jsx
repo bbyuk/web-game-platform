@@ -103,7 +103,7 @@ export default function GameRoomPlayingPage() {
   const subscribeTopics = () => {
     console.log("게임 세션 이벤트브로커 구독");
     /**
-     * 게임 방 메세지 브로커 핸들러
+     * 게임 세션 처리 브로커 핸들러
      * @param frame
      */
     const gameSessionEventHandler = (frame) => {
@@ -134,7 +134,7 @@ export default function GameRoomPlayingPage() {
      * 채팅 메세지 브로커 핸들러
      * @param frame
      */
-    const gameSessionChatHandler = (frame) => {
+    const gameSessionChatEventHandler = (frame) => {
       console.log(frame);
 
       const newMessage = {
@@ -152,6 +152,21 @@ export default function GameRoomPlayingPage() {
       setChatMessages((prevItems) => [...prevItems, newMessage]);
     };
 
+    /**
+     * 캔버스 브로커 핸들러
+     * @type {[{messageHandler: gameSessionEventHandler, destination: string},{messageHandler: gameSessionChatEventHandler, destination: string},{messageHandler: messageHandler, destination: string}]}
+     */
+    const canvasEventHandler = (frame) => {
+      if (frame.event === "SESSION/CANVAS/STROKE") {
+        setStrokes((prevItems) => [...prevItems, frame.stroke]);
+        setReRenderingSignal(true);
+      }
+      else if (frame.event === "SESSION/CANVAS/CLEAR") {
+        setStrokes([]);
+        setReRenderingSignal(true);
+      }
+    };
+
     const topics = [
       // 게임 세션 진행 이벤트 broker
       {
@@ -160,14 +175,11 @@ export default function GameRoomPlayingPage() {
       },
       {
         destination: `/session/${gameSessionId}/chat`,
-        messageHandler: gameSessionChatHandler
+        messageHandler: gameSessionChatEventHandler
       },
       {
         destination: `/session/${gameSessionId}/canvas`,
-        messageHandler: (frame) => {
-          setStrokes((prevItems) => [...prevItems, frame]);
-          setReRenderingSignal(true);
-        }
+        messageHandler: canvasEventHandler
       }
     ];
 
