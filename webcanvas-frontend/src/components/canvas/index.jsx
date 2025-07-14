@@ -182,7 +182,7 @@ export default function Canvas({
     canvas.width = clientWidth;
     canvas.height = clientHeight;
 
-
+    ctx.lineWidth = lineWidth;
     ctx.lineCap = "round";
     ctx.strokeStyle = color;
   };
