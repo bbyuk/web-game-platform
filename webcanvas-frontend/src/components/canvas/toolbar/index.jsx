@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eraser, XCircle } from 'lucide-react';
+import { Eraser, SlidersHorizontal, XCircle } from 'lucide-react';
 
 /**
  * CanvasToolbar Component
@@ -22,7 +22,7 @@ export default function CanvasToolbar({
                                         onChangeTool,
                                         onChangeSize,
                                         onChangeColor,
-                                        onClear,
+                                        onClear
                                       }) {
   return (
     <div className="flex items-center justify-between w-full p-2 bg-gray-800 border-b border-gray-700">
@@ -56,8 +56,11 @@ export default function CanvasToolbar({
           <Eraser className="w-4 h-4" />
         </button>
         <div className="flex items-center space-x-1">
-          <label htmlFor="brush-size" className="text-sm text-gray-300">
-            크기
+          <label htmlFor="brush-size" className="cursor-pointer">
+            <SlidersHorizontal
+              className="w-5 h-5 text-gray-300 hover:text-gray-100 transition-colors"
+              title="브러시 크기 조절"
+            />
           </label>
           <input
             id="brush-size"

@@ -260,8 +260,8 @@ export default function Canvas({
   }, [tool]);
 
   // 툴별 커서 URL 지정 (커서 파일은 public/cursors 폴더 등에 두고 가져온다고 가정)
-  const cursorUrl = tool
-    ? `url('/cursors/${tool}.cur') 0 16, auto`
+  const cursorUrl = drawable && ㅎtool
+    ? `url('/cursors/${tool}_24.cur') 4 22, auto`
     : "default"
 
 
