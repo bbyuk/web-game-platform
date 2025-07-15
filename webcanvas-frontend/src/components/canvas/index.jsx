@@ -1,16 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 
 export default function Canvas({
-  strokes = [],
-  onStroke = (stroke) => {},
-  tool = "pen",
-  color = "black",
-  lineWidth = 5,
-  reRenderingSignal = false,
-  drawable = false,
-  afterReRendering = () => {},
-  className = String(),
-}) {
+                                 strokes = [],
+                                 onStroke = (stroke) => {
+                                 },
+                                 tool = "pen",
+                                 color = "black",
+                                 lineWidth = 5,
+                                 reRenderingSignal = false,
+                                 drawable = false,
+                                 afterReRendering = () => {
+                                 },
+                                 className = String(),
+                               }) {
   const initialStroke = {
     color: color,
     lineWidth: lineWidth,
@@ -75,7 +77,7 @@ export default function Canvas({
         tool: tool,
         color: color,
         lineWidth: lineWidth,
-        points: [...currentStroke.points, { x: scaledX, y: scaledY }],
+        points: [...currentStroke.points, {x: scaledX, y: scaledY}],
       });
     } else {
       ctx.beginPath();
@@ -173,7 +175,7 @@ export default function Canvas({
 
     contextRef.current = ctx;
 
-    const { clientWidth, clientHeight } = parent;
+    const {clientWidth, clientHeight} = parent;
 
     // 실제 캔버스 내부 크기 설정 (픽셀 크기)
     canvas.style.width = "100%";
@@ -252,11 +254,16 @@ export default function Canvas({
     }
     if (tool === "eraser") {
       contextRef.current.strokeStyle = "#FFFFFF";
-    }
-    else if (tool === "pen") {
+    } else if (tool === "pen") {
       contextRef.current.strokeStyle = color;
     }
   }, [tool]);
+
+  // 툴별 커서 URL 지정 (커서 파일은 public/cursors 폴더 등에 두고 가져온다고 가정)
+  const cursorUrl = tool
+    ? `url('/cursors/${tool}.cur') 0 16, auto`
+    : "default"
+
 
   return (
     <div className="flex justify-center items-center flex-1 overflow-hidden bg-gray-800">
@@ -269,6 +276,7 @@ export default function Canvas({
           onMouseUp={stopPainting}
           onMouseLeave={stopPainting}
           className="w-full h-full"
+          style={{ cursor: cursorUrl }}
         />
       </div>
     </div>
