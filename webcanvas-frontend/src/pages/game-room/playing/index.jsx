@@ -17,6 +17,7 @@ import ChatList from '@/components/layouts/side-panel/contents/chat-list/index.j
 import SidePanelFooterInput from '@/components/layouts/side-panel/footer/input/index.jsx';
 import {useRightSideStore} from '@/stores/layout/rightSideStore.jsx';
 import CanvasToolbar from "@/components/canvas/toolbar/index.jsx";
+import { CountdownProvider, useCountdown } from '@/contexts/countdown/index.jsx';
 
 export default function GameRoomPlayingPage() {
   // ===============================================================
@@ -66,6 +67,9 @@ export default function GameRoomPlayingPage() {
   // 전체 턴 수
   const [turnCount, setTurnCount] = useState(0);
   const [isTurnActive, setIsTurnActive] = useState(false);
+
+  // countdown context
+  const countdown = useCountdown();
   /**
    * ====== 게임 플레이 세션 관련 state ======
    */
@@ -319,7 +323,7 @@ export default function GameRoomPlayingPage() {
   const isDrawer = authenticatedUserId === currentDrawerId;
 
   return (
-    <>
+    <CountdownProvider>
       <GameTurnTimer remainingPercent={timer.remainingPercent}/>
       {isDrawer &&
         <>
@@ -348,6 +352,6 @@ export default function GameRoomPlayingPage() {
         //   topTabs.items[topTabs.selectedIndex] ? topTabs.items[topTabs.selectedIndex].label : "black"
         // }
       />
-    </>
+    </CountdownProvider>
   );
 }
