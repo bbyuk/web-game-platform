@@ -18,6 +18,7 @@ import SidePanelFooterInput from '@/components/layouts/side-panel/footer/input/i
 import {useRightSideStore} from '@/stores/layout/rightSideStore.jsx';
 import CanvasToolbar from "@/components/canvas/toolbar/index.jsx";
 import { CountdownProvider, useCountdown } from '@/contexts/countdown/index.jsx';
+import { useToast } from '@/contexts/toast/index.jsx';
 
 export default function GameRoomPlayingPage() {
   // ===============================================================
@@ -70,6 +71,22 @@ export default function GameRoomPlayingPage() {
 
   // countdown context
   const countdown = useCountdown();
+  const toast = useToast();
+
+  const handleAnswer = isCorrect => {
+    if (isCorrect) {
+      countdown(
+        5,
+        { message: '🎉 정답입니다!' },
+        () => toast('다음 턴으로 이동합니다.', 3000)
+      );
+    } else {
+      // 오답은 토스트만
+      toast('다시 시도해보세요.', 3000);
+    }
+  };
+
+
   /**
    * ====== 게임 플레이 세션 관련 state ======
    */
@@ -266,6 +283,7 @@ export default function GameRoomPlayingPage() {
 
     findCurrentGameSessionInfo();
 
+    handleAnswer(true);
     return () => {
       if (webSocketClientRef.current) {
         webSocketClientRef.current.unsubscribe("room/playing");
@@ -323,7 +341,7 @@ export default function GameRoomPlayingPage() {
   const isDrawer = authenticatedUserId === currentDrawerId;
 
   return (
-    <CountdownProvider>
+    <>
       <GameTurnTimer remainingPercent={timer.remainingPercent}/>
       {isDrawer &&
         <>
@@ -352,6 +370,6 @@ export default function GameRoomPlayingPage() {
         //   topTabs.items[topTabs.selectedIndex] ? topTabs.items[topTabs.selectedIndex].label : "black"
         // }
       />
-    </CountdownProvider>
+    </>
   );
 }

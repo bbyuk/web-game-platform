@@ -12,6 +12,7 @@ import { useLeftSideStore } from '@/stores/layout/leftSideStore.jsx';
 import ItemList from '@/components/layouts/side-panel/contents/item-list/index.jsx';
 import { useRightSideStore } from '@/stores/layout/rightSideStore.jsx';
 import { useClientStore } from '@/stores/client/clientStore.jsx';
+import { CountdownProvider } from '@/contexts/countdown/index.jsx';
 
 export default function GameRoomPage() {
   // ===============================================================
@@ -38,7 +39,7 @@ export default function GameRoomPage() {
     nickname: null,
     color: null,
     role: null,
-    ready: false,
+    ready: false
   });
   const [gameRoomState, setGameRoomState] = useState(null);
 
@@ -71,18 +72,18 @@ export default function GameRoomPage() {
           color: response.requesterUserSummary.color,
           role: response.requesterUserSummary.role,
           gameRoomParticipantId: response.gameRoomParticipantId,
-          ready: response.requesterUserSummary.ready,
+          ready: response.requesterUserSummary.ready
         });
 
-        if (roomId !== "temp" && !connected) {
+        if (roomId !== 'temp' && !connected) {
           setConnected(true);
         }
 
         setGameRoomState(response.gameRoomState);
-        if (response.gameRoomState === "WAITING") {
+        if (response.gameRoomState === 'WAITING') {
           navigate(pages.gameRoom.waiting.url(response.gameRoomId), { replace: true });
           return null;
-        } else if (response.gameRoomState === "PLAYING") {
+        } else if (response.gameRoomState === 'PLAYING') {
           navigate(pages.gameRoom.playing.url(response.gameRoomId), { replace: true });
           return null;
         }
@@ -91,7 +92,7 @@ export default function GameRoomPage() {
         return response;
       })
       .catch((error) => {
-        if (error.code === "R003" || error.code === "R000") {
+        if (error.code === 'R003' || error.code === 'R000') {
           // 로비로 이동
           alert(REDIRECT_MESSAGES.TO_LOBBY);
           navigate(pages.lobby.url, { replace: true });
@@ -111,17 +112,17 @@ export default function GameRoomPage() {
         props: {
           value: response.enteredUsers.map(({ nickname, ...rest }) => ({
             label: nickname,
-            ...rest,
-          })),
-        },
+            ...rest
+          }))
+        }
       });
     } else {
       leftSideStore.setContents({
         slot: ItemList,
         props: {
           value: [],
-          emptyPlaceholder: EMPTY_MESSAGES.ENTERED_USER_LIST,
-        },
+          emptyPlaceholder: EMPTY_MESSAGES.ENTERED_USER_LIST
+        }
       });
     }
   };
@@ -131,7 +132,7 @@ export default function GameRoomPage() {
    * @returns {Promise<void>}
    */
   const exitGameRoom = async (gameRoomParticipantId) => {
-    if (!confirm("방에서 나가시겠습니까?")) {
+    if (!confirm('방에서 나가시겠습니까?')) {
       return;
     }
 
@@ -155,8 +156,10 @@ export default function GameRoomPage() {
       webSocketClientRef.current.deactivate();
     }
     const options = {
-      onConnect: (frame) => {},
-      onError: (frame) => {},
+      onConnect: (frame) => {
+      },
+      onError: (frame) => {
+      }
     };
     webSocketClientRef.current = getWebSocketClient(options);
   };
@@ -176,8 +179,8 @@ export default function GameRoomPage() {
       }
 
       switch (frame.event) {
-        case "ROOM/JOIN":
-        case "ROOM/EXIT":
+        case 'ROOM/JOIN':
+        case 'ROOM/EXIT':
           if (authenticatedUserId !== frame.userId) {
             /**
              * 다른 사람 입장 OR 퇴장 이벤트 발생시
@@ -191,7 +194,7 @@ export default function GameRoomPage() {
             });
           }
           break;
-        case "ROOM/USER_READY_CHANGED":
+        case 'ROOM/USER_READY_CHANGED':
           /**
            * 다른 사람 ready 발생시
            */
@@ -203,7 +206,7 @@ export default function GameRoomPage() {
             setLeftSidebar(response);
           });
           break;
-        case "ROOM/SESSION_STARTED":
+        case 'ROOM/SESSION_STARTED':
           startLoading();
           navigate(pages.gameRoom.playing.url(roomId), { replace: true });
           break;
@@ -215,13 +218,13 @@ export default function GameRoomPage() {
       // 게임 방 공통 이벤트 broker
       {
         destination: `/room/${roomId}`,
-        messageHandler: gameRoomEventHandler,
+        messageHandler: gameRoomEventHandler
       }
     ];
 
-    console.log("game-room/index.jsx = 구독");
+    console.log('game-room/index.jsx = 구독');
 
-    webSocketClientRef.current.subscribe("room", topics);
+    webSocketClientRef.current.subscribe('room', topics);
   };
 
   // ===============================================================
@@ -230,20 +233,20 @@ export default function GameRoomPage() {
 
   useEffect(() => {
     const title =
-      gameRoomState === "WAITING"
+      gameRoomState === 'WAITING'
         ? {
-            label: "exit",
-            icon: <ArrowLeft size={20} className="text-gray-400" />,
-            button: true,
-            onClick: () => {
-              exitGameRoom(myInfo.gameRoomParticipantId);
-            },
+          label: 'exit',
+          icon: <ArrowLeft size={20} className="text-gray-400" />,
+          button: true,
+          onClick: () => {
+            exitGameRoom(myInfo.gameRoomParticipantId);
           }
+        }
         : {
-            label: "playing",
-            icon: <Gamepad2 className="w-6 h-6 text-green-500" />,
-            button: false,
-          };
+          label: 'playing',
+          icon: <Gamepad2 className="w-6 h-6 text-green-500" />,
+          button: false
+        };
 
     console.log(title);
 
@@ -258,7 +261,7 @@ export default function GameRoomPage() {
   useEffect(() => {
     return () => {
       if (webSocketClientRef.current) {
-        webSocketClientRef.current.unsubscribe("room");
+        webSocketClientRef.current.unsubscribe('room');
         webSocketClientRef.current.deactivate();
       }
       leftSideStore.clear();
@@ -295,7 +298,7 @@ export default function GameRoomPage() {
       // }
 
       if (ready) {
-        return "indigo";
+        return 'indigo';
       }
     };
 
@@ -307,9 +310,9 @@ export default function GameRoomPage() {
             label: nickname,
             highlight: ready,
             theme: getLeftSideItemTheme(role, ready),
-            ...rest,
-          })),
-        },
+            ...rest
+          }))
+        }
       });
     }
   }, [enteredUsers]);
@@ -335,13 +338,15 @@ export default function GameRoomPage() {
   }, [connected]);
 
   return (
-    <Outlet
-      context={{
-        enteredUsers,
-        myInfo,
-        changeReadyState,
-        webSocketClientRef,
-      }}
-    />
+    <CountdownProvider>
+      <Outlet
+        context={{
+          enteredUsers,
+          myInfo,
+          changeReadyState,
+          webSocketClientRef
+        }}
+      />
+    </CountdownProvider>
   );
 }

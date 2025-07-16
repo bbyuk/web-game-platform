@@ -9,11 +9,9 @@ export function CountdownProvider({ children }) {
   const intervalRef = useRef(null);
 
   const startCountdown = useCallback(
-    (seconds, { message = '', status = 'success' } = {}, onFinish = () => {}) => {
+    (seconds, { message = '' } = {}, onFinish = () => {}) => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-
-      setCountdown({ timeLeft: seconds, message, status });
-
+      setCountdown({ timeLeft: seconds, message });
       intervalRef.current = setInterval(() => {
         setCountdown(prev => {
           if (!prev || prev.timeLeft <= 1) {
@@ -33,20 +31,47 @@ export function CountdownProvider({ children }) {
   return (
     <CountdownContext.Provider value={startCountdown}>
       {children}
-      {countdown && ReactDOM.createPortal(
-        <div className="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-40 pointer-events-none">
-          {countdown.message && (
-            <div className={`text-2xl font-bold mb-4 ${
-              countdown.status === 'success' ? 'text-green-500' : ''
-            }`}
-            >
-              {countdown.message}
+      {countdown &&
+        ReactDOM.createPortal(
+          // ↓ 여기 bg-black/50 과 backdrop-blur-sm을 추가
+          <div className="
+            fixed inset-0
+            flex flex-col items-center justify-center
+            bg-black/50 backdrop-blur-sm
+            z-50 pointer-events-none
+          ">
+            {/* 정답 체크 애니메이션 */}
+            {countdown.message && (
+              <div className="relative mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="absolute inset-0 w-20 h-20 text-green-400 opacity-75 animate-ping"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M9 12l2 2l4 -4" />
+                </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="relative w-20 h-20 text-green-500 animate-bounce"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M9 12l2 2l4 -4" />
+                </svg>
+              </div>
+            )}
+            {/* 카운트다운 숫자 */}
+            <div className="text-7xl text-white font-bold animate-pulse">
+              {countdown.timeLeft}
             </div>
-          )}
-          <div className="text-6xl text-white animate-pulse">{countdown.timeLeft}</div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body
+        )}
     </CountdownContext.Provider>
   );
 }
