@@ -1,23 +1,23 @@
-import Canvas from "@/components/canvas/index.jsx";
-import React, {useEffect, useState} from "react";
-import {useNavigate, useOutletContext, useParams} from "react-router-dom";
-import {game} from "@/api/index.js";
-import {useApiLock} from "@/api/lock/index.jsx";
-import {Gamepad2, MessageCircle} from 'lucide-react';
-import {getApiClient} from "@/client/http/index.jsx";
-import {useAuthentication} from "@/contexts/authentication/index.jsx";
-import {useLeftSideStore} from "@/stores/layout/leftSideStore.jsx";
-import ItemList from "@/components/layouts/side-panel/contents/item-list/index.jsx";
-import {pages} from "@/router/index.jsx";
-import GameTurnTimer from "@/components/game-turn-timer/index.jsx";
-import AnswerBoard from "@/components/answer-board/index.jsx";
-import {useTimer} from "@/pages/game-room/playing/timer.jsx";
-import {useClientStore} from "@/stores/client/clientStore.jsx";
+import Canvas from '@/components/canvas/index.jsx';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { game } from '@/api/index.js';
+import { useApiLock } from '@/api/lock/index.jsx';
+import { MessageCircle } from 'lucide-react';
+import { getApiClient } from '@/client/http/index.jsx';
+import { useAuthentication } from '@/contexts/authentication/index.jsx';
+import { useLeftSideStore } from '@/stores/layout/leftSideStore.jsx';
+import ItemList from '@/components/layouts/side-panel/contents/item-list/index.jsx';
+import { pages } from '@/router/index.jsx';
+import GameTurnTimer from '@/components/game-turn-timer/index.jsx';
+import AnswerBoard from '@/components/answer-board/index.jsx';
+import { useTimer } from '@/pages/game-room/playing/timer.jsx';
+import { useClientStore } from '@/stores/client/clientStore.jsx';
 import ChatList from '@/components/layouts/side-panel/contents/chat-list/index.jsx';
 import SidePanelFooterInput from '@/components/layouts/side-panel/footer/input/index.jsx';
-import {useRightSideStore} from '@/stores/layout/rightSideStore.jsx';
-import CanvasToolbar from "@/components/canvas/toolbar/index.jsx";
-import { CountdownProvider, useCountdown } from '@/contexts/countdown/index.jsx';
+import { useRightSideStore } from '@/stores/layout/rightSideStore.jsx';
+import CanvasToolbar from '@/components/canvas/toolbar/index.jsx';
+import { useCountdown } from '@/contexts/countdown/index.jsx';
 import { useToast } from '@/contexts/toast/index.jsx';
 
 export default function GameRoomPlayingPage() {
@@ -134,6 +134,7 @@ export default function GameRoomPlayingPage() {
       }
       switch (frame.event) {
         case "SESSION/TURN_PROGRESSED":
+          handleAnswer(true);
           findCurrentGameTurnInfo(gameSessionId);
 
           break;
