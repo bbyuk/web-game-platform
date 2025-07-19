@@ -174,7 +174,13 @@ public class GameSession extends AggregateRoot {
 
         if (currentTurn.isAnswer(value))  {
             currentTurn.markingAsCorrect(senderId);
-            eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.id(), timePerTurn, senderId, delayBetweenTurns));
+            eventQueue.add(new GameTurnProgressRequestedEvent(
+                    gameRoomId,
+                    id,
+                    currentTurn.id(),
+                    timePerTurn,
+                    senderId,
+                    delayBetweenTurns));
         }
     }
 
@@ -318,4 +324,25 @@ public class GameSession extends AggregateRoot {
                 .findFirst()
                 .ifPresent(GamePlayer::load);
     }
+
+    /**
+     * 현재 세션 진행 상태가 첫 번째 턴인지 여부를 확인한다.
+     * @return
+     */
+    public boolean isFirstTurn() {
+        return gameTurns.size() == 1;
+    }
+
+    /**
+     * 이전 턴 정답자 ID 리턴
+     * @return
+     */
+    public Long getPrevAnswererId() {
+        if (isFirstTurn()) {
+            return null;
+        }
+
+        return gameTurns.get(gameTurns.size() - 2).correctAnswererId();
+    }
+
 }
