@@ -487,7 +487,10 @@ public class GameService {
                 new GameTurnProgressedEvent(
                         command.gameRoomId(),
                         command.gameSessionId(),
-                        newGameTurn.id()
+                        newGameTurn.id(),
+                        savedGameSession.isFirstTurn(),
+                        savedGameSession.getPrevAnswererId(),
+                        savedGameSession.delayBetweenTurns()
                 )
         );
     }
