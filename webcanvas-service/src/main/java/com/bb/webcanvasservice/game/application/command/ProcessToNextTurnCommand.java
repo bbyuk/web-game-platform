@@ -15,5 +15,8 @@ public record ProcessToNextTurnCommand(
         int period,
 
         @Schema(description = "정답 여부")
-        boolean answered
+        boolean answered,
+
+        @Schema(description = "다음 턴 시작 딜레이 초")
+        int startDelaySeconds
 ) {}
