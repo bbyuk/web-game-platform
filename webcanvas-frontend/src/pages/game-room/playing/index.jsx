@@ -134,12 +134,14 @@ export default function GameRoomPlayingPage() {
       }
       switch (frame.event) {
         case "SESSION/TURN_PROGRESSED":
-          handleAnswer(true);
           findCurrentGameTurnInfo(gameSessionId);
 
           break;
         case "SESSION/ALL_USER_LOADED":
           endLoading();
+          countdown(
+            frame.sessionStartCountDownDelaySeconds
+          );
           break;
         case "SESSION/END":
           // TODO 게임 종료 이벤트 클라이언트 핸들링
@@ -284,7 +286,6 @@ export default function GameRoomPlayingPage() {
 
     findCurrentGameSessionInfo();
 
-    handleAnswer(true);
     return () => {
       if (webSocketClientRef.current) {
         webSocketClientRef.current.unsubscribe("room/playing");
