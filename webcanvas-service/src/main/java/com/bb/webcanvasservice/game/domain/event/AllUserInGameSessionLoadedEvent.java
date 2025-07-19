@@ -9,12 +9,14 @@ public class AllUserInGameSessionLoadedEvent extends ApplicationEvent {
     private final Long gameSessionId;
     private final Long gameRoomId;
     private final int timePerTurn;
+    private final int sessionStartCountDownDelaySeconds;
 
-    public AllUserInGameSessionLoadedEvent(Long gameSessionId, Long gameRoomId, int timePerTurn) {
+    public AllUserInGameSessionLoadedEvent(Long gameSessionId, Long gameRoomId, int timePerTurn, int sessionStartCountDownDelaySeconds) {
         super("SESSION/ALL_USER_LOADED");
         this.gameSessionId = gameSessionId;
         this.gameRoomId = gameRoomId;
         this.timePerTurn = timePerTurn;
+        this.sessionStartCountDownDelaySeconds = sessionStartCountDownDelaySeconds;
     }
 
     public Long getGameSessionId() {
@@ -27,5 +29,9 @@ public class AllUserInGameSessionLoadedEvent extends ApplicationEvent {
 
     public int getTimePerTurn() {
         return timePerTurn;
+    }
+
+    public int getSessionStartCountDownDelaySeconds() {
+        return sessionStartCountDownDelaySeconds;
     }
 }

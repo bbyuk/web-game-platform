@@ -53,6 +53,12 @@ public class GameSession extends AggregateRoot {
      */
     private List<GameTurn> gameTurns;
 
+    // 게임 시작시 딜레이
+    private final int startDelaySeconds = 3;
+
+    // 게임 턴간 딜레이
+    private final int delayBetweenTurns = 2;
+
     // ===================================================
     // ====================== getter =====================
     // ===================================================
@@ -84,6 +90,14 @@ public class GameSession extends AggregateRoot {
         return gameTurns;
     }
 
+    public int startDelaySeconds() {
+        return startDelaySeconds;
+    }
+
+    public int delayBetweenTurns() {
+        return delayBetweenTurns;
+    }
+
     // ===================================================
     // ====================== getter =====================
     // ===================================================
@@ -113,8 +127,8 @@ public class GameSession extends AggregateRoot {
      * 새 게임턴을 할당한다.
      * @param answer 새로 할당할 턴의 정답.
      */
-    public void allocateNewGameTurn(String answer) {
-        GameTurn newGameTurn = GameTurn.create(id, findNextDrawerId(), answer, timePerTurn);
+    public void allocateNewGameTurn(String answer, int startDelaySeconds) {
+        GameTurn newGameTurn = GameTurn.create(id, findNextDrawerId(), answer, timePerTurn, startDelaySeconds);
         gameTurns.add(newGameTurn);
     }
 
@@ -160,7 +174,7 @@ public class GameSession extends AggregateRoot {
 
         if (currentTurn.isAnswer(value))  {
             currentTurn.markingAsCorrect(senderId);
-            eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.id(), timePerTurn, senderId));
+            eventQueue.add(new GameTurnProgressRequestedEvent(gameRoomId, id, currentTurn.id(), timePerTurn, senderId, delayBetweenTurns));
         }
     }
 

@@ -471,12 +471,9 @@ public class GameService {
             gameSession.passCurrentTurn();
         }
 
-        if (command.answered() || gameSession.gameTurns().isEmpty()) {
-            eventPublisher.publishEvent(new GameTurnTimerRegisterRequestedEvent(command.gameRoomId(), command.gameSessionId(), command.period(), command.answered()));
-        }
-
         gameSession.allocateNewGameTurn(
-                dictionaryQueryPort.drawRandomKoreanNoun()
+                dictionaryQueryPort.drawRandomKoreanNoun(),
+                command.startDelaySeconds()
         );
         log.debug("allocate call => {}", command);
 
@@ -528,35 +525,5 @@ public class GameService {
     )
     public boolean successSubscription(Long gameSessionId, Long userId) {
         return gameTransactionDelegateService.successToSubscribeTransaction(gameSessionId, userId);
-    }
-
-
-    /**
-     * 모든 유저들이 로드 된 후 게임 세션을 시작한다
-     *
-     * @param gameSession 게임 세션
-     */
-    private void startGameSession(GameSession gameSession) {
-        log.debug("game session {} all loaded", gameSession.id());
-
-        gameSession.start();
-
-        gameSessionRepository.save(gameSession);
-
-        eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn()));
-    }
-
-    /**
-     * 대상 게임 세션에 대상 유저를 플레이어로 로드한다.
-     *
-     * @param gameSessionId 대상 게임 세션 ID
-     * @param userId        대상 유저 ID
-     * @return 저장된 게임 세션
-     */
-    private GameSession loadPlayerToGameSession(Long gameSessionId, Long userId) {
-        GameSession gameSession = gameSessionRepository.findGameSessionById(gameSessionId).orElseThrow(GameSessionNotFoundException::new);
-        gameSession.loadPlayer(userId);
-
-        return gameSessionRepository.save(gameSession);
     }
 }

@@ -49,8 +49,8 @@ public class GameTurn {
         this.duration = duration;
     }
 
-    public static GameTurn create(Long gameSessionId, Long drawerId, String answer, int duration) {
-        return new GameTurn(null, gameSessionId, drawerId, answer, LocalDateTime.now(), null, GameTurnState.ACTIVE, duration);
+    public static GameTurn create(Long gameSessionId, Long drawerId, String answer, int duration, int startDelaySeconds) {
+        return new GameTurn(null, gameSessionId, drawerId, answer, LocalDateTime.now().plusSeconds(startDelaySeconds), null, GameTurnState.ACTIVE, duration);
     }
 
     // ===================================================

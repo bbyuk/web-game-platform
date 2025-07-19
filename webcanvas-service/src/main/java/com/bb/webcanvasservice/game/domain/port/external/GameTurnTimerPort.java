@@ -7,9 +7,8 @@ public interface GameTurnTimerPort {
      * 게임 턴 타이머를 스케줄러에 등록한다.
      *
      * @param command 턴 진행 command
-     * @param startDelaySeconds timer 등록시점부터 첫 콜백 실행까지 딜레이
      */
-    void registerTurnTimer(ProcessToNextTurnCommand command, int startDelaySeconds);
+    void registerTurnTimer(ProcessToNextTurnCommand command);
 
     /**
      * 게임 턴 타이머를 중지한다.

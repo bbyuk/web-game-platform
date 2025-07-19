@@ -21,21 +21,14 @@ public class InMemoryGameTurnTimerAdapter implements GameTurnTimerPort {
     private final GameService gameService;
 
     @Override
-    public void registerTurnTimer(ProcessToNextTurnCommand command, int startDelaySeconds) {
+    public void registerTurnTimer(ProcessToNextTurnCommand command) {
         stopTurnTimer(command.gameSessionId()); // 중복 등록 방지
 
-        log.debug("startDelay = {}", startDelaySeconds);
         log.debug("command = {}", command);
 
-        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
-                () -> {
-                    try {
-                        gameService.processToNextTurn(command); // 트랜잭션 처리 포함된 public 메서드
-                    } catch (Exception e) {
-                        // 로깅 + 예외처리
-                    }
-                },
-                startDelaySeconds,
+        ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(
+                () -> gameService.processToNextTurn(command),
+                command.startDelaySeconds(),
                 command.period(),
                 TimeUnit.SECONDS
         );

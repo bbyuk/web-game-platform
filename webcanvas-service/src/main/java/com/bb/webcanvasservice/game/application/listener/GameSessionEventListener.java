@@ -45,7 +45,15 @@ public class GameSessionEventListener {
     public void handleAllUserInGameSessionLoaded(AllUserInGameSessionLoadedEvent event) {
         log.debug("모든 유저가 로딩되어 게임을 시작 gameSessionId = {}", event.getGameSessionId());
         messageSender.send("/session/" + event.getGameSessionId(), event);
-        gameService.processToNextTurn(new ProcessToNextTurnCommand(event.getGameRoomId(), event.getGameSessionId(), event.getTimePerTurn(), false));
+        gameTurnTimerPort.registerTurnTimer(
+                new ProcessToNextTurnCommand(
+                        event.getGameRoomId(),
+                        event.getGameSessionId(),
+                        event.getTimePerTurn(),
+                        false,
+                        event.getSessionStartCountDownDelaySeconds()
+                )
+        );
     }
 
     /**
@@ -57,11 +65,13 @@ public class GameSessionEventListener {
     public void handleGameTurnTimerRegisterRequested(GameTurnTimerRegisterRequestedEvent event) {
         log.debug("등록 요청 = {}", event);
         gameTurnTimerPort.registerTurnTimer(
-                new ProcessToNextTurnCommand(event.getGameRoomId(),
+                new ProcessToNextTurnCommand(
+                        event.getGameRoomId(),
                         event.getGameSessionId(),
                         event.getPeriod(),
-                        event.isAnswered()
-                ), event.getPeriod()
+                        event.isAnswered(),
+                        event.getNextTurnStartCountdownDelaySeconds()
+                )
         );
     }
 
@@ -101,6 +111,14 @@ public class GameSessionEventListener {
     public void handleGameTurnProgressRequested(GameTurnProgressRequestedEvent event) {
         log.debug("턴 진행 요청 이벤트 발생 ====== {}", event);
 
-        gameService.processToNextTurn(new ProcessToNextTurnCommand(event.getGameRoomId(), event.getGameSessionId(), event.getGameTurnPeriod(), event.getAnswererId() != null));
+        gameService.processToNextTurn(
+                new ProcessToNextTurnCommand(
+                        event.getGameRoomId(),
+                        event.getGameSessionId(),
+                        event.getGameTurnPeriod(),
+                        event.getAnswererId() != null,
+                        event.getNextTurnStartCountdownDelaySeconds()
+                )
+        );
     }
 }

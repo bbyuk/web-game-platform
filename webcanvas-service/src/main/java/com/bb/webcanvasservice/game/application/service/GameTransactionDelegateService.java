@@ -37,6 +37,7 @@ public class GameTransactionDelegateService {
         return false;
     }
 
+
     /**
      * 모든 유저들이 로드 된 후 게임 세션을 시작한다
      *
@@ -49,7 +50,7 @@ public class GameTransactionDelegateService {
 
         gameSessionRepository.save(gameSession);
 
-        eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn()));
+        eventPublisher.publishEvent(new AllUserInGameSessionLoadedEvent(gameSession.id(), gameSession.gameRoomId(), gameSession.timePerTurn(), gameSession.delayBetweenTurns()));
     }
 
     /**
