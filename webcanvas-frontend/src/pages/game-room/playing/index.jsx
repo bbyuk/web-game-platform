@@ -73,20 +73,6 @@ export default function GameRoomPlayingPage() {
   const countdown = useCountdown();
   const toast = useToast();
 
-  const handleAnswer = isCorrect => {
-    if (isCorrect) {
-      countdown(
-        5,
-        { message: '🎉 정답입니다!' },
-        () => toast('다음 턴으로 이동합니다.', 3000)
-      );
-    } else {
-      // 오답은 토스트만
-      toast('다시 시도해보세요.', 3000);
-    }
-  };
-
-
   /**
    * ====== 게임 플레이 세션 관련 state ======
    */
@@ -135,6 +121,10 @@ export default function GameRoomPlayingPage() {
       switch (frame.event) {
         case "SESSION/TURN_PROGRESSED":
           findCurrentGameTurnInfo(gameSessionId);
+          // TODO - countdown 컨텍스트 분리하여 정답자 노출 context 추가
+          countdown(
+            frame.startDelaySeconds
+          )
 
           break;
         case "SESSION/ALL_USER_LOADED":
