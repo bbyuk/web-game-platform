@@ -122,9 +122,12 @@ export default function GameRoomPlayingPage() {
         case "SESSION/TURN_PROGRESSED":
           findCurrentGameTurnInfo(gameSessionId);
           // TODO - countdown 컨텍스트 분리하여 정답자 노출 context 추가
-          countdown(
-            frame.startDelaySeconds
-          )
+          if(!frame.first) {
+            countdown(
+              frame.startDelaySeconds
+            )
+          }
+
 
           break;
         case "SESSION/ALL_USER_LOADED":
