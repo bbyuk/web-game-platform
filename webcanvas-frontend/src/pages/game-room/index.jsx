@@ -12,7 +12,7 @@ import { useLeftSideStore } from '@/stores/layout/leftSideStore.jsx';
 import ItemList from '@/components/layouts/side-panel/contents/item-list/index.jsx';
 import { useRightSideStore } from '@/stores/layout/rightSideStore.jsx';
 import { useClientStore } from '@/stores/client/clientStore.jsx';
-import { CountdownProvider } from '@/contexts/countdown/index.jsx';
+import { GameSessionProvider } from '@/contexts/game-session/index.jsx';
 
 export default function GameRoomPage() {
   // ===============================================================
@@ -338,7 +338,7 @@ export default function GameRoomPage() {
   }, [connected]);
 
   return (
-    <CountdownProvider>
+    <GameSessionProvider>
       <Outlet
         context={{
           enteredUsers,
@@ -347,6 +347,6 @@ export default function GameRoomPage() {
           webSocketClientRef
         }}
       />
-    </CountdownProvider>
+    </GameSessionProvider>
   );
 }
