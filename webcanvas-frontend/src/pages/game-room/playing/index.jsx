@@ -17,8 +17,9 @@ import ChatList from '@/components/layouts/side-panel/contents/chat-list/index.j
 import SidePanelFooterInput from '@/components/layouts/side-panel/footer/input/index.jsx';
 import { useRightSideStore } from '@/stores/layout/rightSideStore.jsx';
 import CanvasToolbar from '@/components/canvas/toolbar/index.jsx';
-import { useCountdown } from '@/contexts/countdown/index.jsx';
-import { useToast } from '@/contexts/toast/index.jsx';
+import { useGameSession } from '@/contexts/game-session/index.jsx';
+import CountdownOverlay from '@/components/overlay/countdown.jsx';
+import TurnResultOverlay from '@/components/overlay/turnResult.jsx';
 
 export default function GameRoomPlayingPage() {
   // ===============================================================
@@ -70,8 +71,8 @@ export default function GameRoomPlayingPage() {
   const [isTurnActive, setIsTurnActive] = useState(false);
 
   // countdown context
-  const countdown = useCountdown();
-  const toast = useToast();
+  const { startCountdown, startTurnResult } = useGameSession();
+
 
   /**
    * ====== 게임 플레이 세션 관련 state ======
@@ -122,14 +123,28 @@ export default function GameRoomPlayingPage() {
         case "SESSION/TURN_PROGRESSED":
           findCurrentGameTurnInfo(gameSessionId);
           // TODO - countdown 컨텍스트 분리하여 정답자 노출 context 추가
-          countdown(
-            frame.startDelaySeconds
-          )
+          if(!frame.first) {
+            console.log(frame);
+            const msg = frame.prevTurnAnswererId
+              ? `${frame.prevTurnAnswererId}님이 정답을 맞혔습니다!`
+              : '이번 턴 정답자가 없습니다';
+
+            startTurnResult(
+              msg,         // overlay에 표시할 메시지
+              frame.startDelaySeconds
+              // () => {
+              //   // 4초 후 자동으로 사라진 뒤, 다시 다음 카운트다운 등으로 이어갈 로직
+              //   startCountdown(3, '다음 턴 시작까지');
+              // }
+            );
+          }
+
+
 
           break;
         case "SESSION/ALL_USER_LOADED":
           endLoading();
-          countdown(
+          startCountdown(
             frame.sessionStartCountDownDelaySeconds
           );
           break;
@@ -334,6 +349,10 @@ export default function GameRoomPlayingPage() {
 
   return (
     <>
+      {/* 게임 시작시 카운트다운 오버레이 */}
+      <CountdownOverlay />
+      {/* 게임 턴 진행간 결과 오버레이 */}
+      <TurnResultOverlay />
       <GameTurnTimer remainingPercent={timer.remainingPercent}/>
       {isDrawer &&
         <>
