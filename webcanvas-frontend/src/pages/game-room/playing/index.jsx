@@ -175,7 +175,6 @@ export default function GameRoomPlayingPage() {
           .map(enteredUser => enteredUser.color)
       }
 
-      console.log(enteredUsers);
       setChatMessages((prevItems) => [...prevItems, newMessage]);
     };
 
