@@ -248,7 +248,6 @@ export default function GameRoomPage() {
           button: false
         };
 
-    console.log(title);
 
     leftSideStore.setTitle(title);
   }, [gameRoomState]);
