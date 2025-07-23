@@ -164,8 +164,6 @@ export default function GameRoomPlayingPage() {
      * @param frame
      */
     const gameSessionChatEventHandler = (frame) => {
-      console.log(frame);
-
       const newMessage = {
         value: frame.value,
         senderId: frame.senderId,
