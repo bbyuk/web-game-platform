@@ -124,7 +124,6 @@ export default function GameRoomPlayingPage() {
           findCurrentGameTurnInfo(gameSessionId);
           // TODO - countdown 컨텍스트 분리하여 정답자 노출 context 추가
           if(!frame.first) {
-            console.log(frame);
             const msg = frame.prevTurnAnswererId
               ? `${frame.prevTurnAnswererId}님이 정답을 맞혔습니다!`
               : '이번 턴 정답자가 없습니다';
