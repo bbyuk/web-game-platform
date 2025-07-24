@@ -59,7 +59,6 @@ export default function GameRoomWaitingPage() {
           .map(enteredUser => enteredUser.color)
       }
 
-      console.log(enteredUsers);
       setChatMessages((prevItems) => [...prevItems, newMessage]);
     };
 
