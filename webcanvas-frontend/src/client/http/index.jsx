@@ -107,7 +107,6 @@ export const getApiClient = () => {
     if (errorCodeMapping.alert) {
       alert(message);
     } else if (errorCodeMapping.toast) {
-      // console.log("토스트 작업 TODO ====== ", message);
       toast.error(message);
     }
   };
