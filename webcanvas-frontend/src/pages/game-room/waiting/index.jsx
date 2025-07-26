@@ -46,7 +46,6 @@ export default function GameRoomWaitingPage() {
      * @param frame
      */
     const gameRoomChatHandler = (frame) => {
-      console.log(frame);
 
       const newMessage = {
         value: frame.value,
